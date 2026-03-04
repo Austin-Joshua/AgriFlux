@@ -7,7 +7,7 @@ import {
     Award, Settings, Info, X, Leaf, LogOut, PanelLeftClose, PanelLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo-icon.png';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -82,8 +82,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                         onClick={() => navigate('/dashboard')}
                         className={`flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity ${collapsed ? 'justify-center w-full' : ''}`}
                     >
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0">
-                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0 bg-green-900">
+                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
                         </div>
                         {!collapsed && (
                             <div>

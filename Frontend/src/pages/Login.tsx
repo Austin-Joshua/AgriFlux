@@ -5,7 +5,7 @@ import { Eye, EyeOff, Leaf, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo-icon.png';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -55,7 +55,7 @@ const Login: React.FC = () => {
                 <div className="relative">
                     <div className="flex items-center gap-3 mb-12">
                         <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl overflow-hidden">
-                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
+                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain p-1" />
                         </div>
                         <div>
                             <h1 className="text-4xl font-black font-display tracking-tightest">AgriFlux</h1>
@@ -95,8 +95,8 @@ const Login: React.FC = () => {
                 <div className="w-full max-w-md animate-slide-up">
                     {/* Mobile Logo */}
                     <div className="lg:hidden flex items-center gap-3 justify-center mb-8">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
-                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden bg-green-900">
+                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
                         </div>
                         <h1 className="text-2xl font-black text-gray-900 dark:text-white font-display tracking-tightest text-gradient">AgriFlux</h1>
                     </div>
@@ -118,7 +118,7 @@ const Login: React.FC = () => {
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gold-600'
                                         }`}
                                 >
-                                    {mode}
+                                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
                                 </button>
                             ))}
                         </div>
