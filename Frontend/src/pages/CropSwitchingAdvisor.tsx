@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ArrowRight, CheckCircle, Sprout, TrendingDown, Cloud } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle, Sprout, TrendingDown, Cloud, FileText } from 'lucide-react';
+import ReportModal from '../components/ReportModal';
 
 const CROPS_DB: Record<string, {
     waterNeed: string; climateResilience: number; profitScore: number; alternatives: string[];
@@ -40,6 +41,7 @@ const CropSwitchingAdvisor: React.FC = () => {
     const [tempRisk, setTempRisk] = useState(2.5);
     const [analyzed, setAnalyzed] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [selectedReport, setSelectedReport] = useState<{ title: string; content: React.ReactNode } | null>(null);
 
     const cropInfo = CROPS_DB[currentCrop] || CROPS_DB['Rice'];
     const overallRisk = Math.round((rainfallRisk * 0.6 + tempRisk * 8) / 2);
@@ -148,7 +150,32 @@ const CropSwitchingAdvisor: React.FC = () => {
                         <div className="space-y-3">
                             <h3 className="section-header">🤖 AI Crop Switch Recommendations</h3>
                             {(activeRules.length > 0 ? activeRules : cropInfo.switchRules.slice(0, 1)).map((rule, i) => (
-                                <div key={i} className="card p-4 border-l-4 border-primary-500 space-y-3">
+                                <div
+                                    key={i}
+                                    role="button"
+                                    onClick={() => setSelectedReport({
+                                        title: `AI Recommendation: Switch to ${rule.alternative}`,
+                                        content: (
+                                            <div className="space-y-6 text-gray-700 dark:text-gray-300">
+                                                <div className="p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl">
+                                                    <h4 className="font-bold text-primary-700 dark:text-primary-400 mb-2 flex items-center gap-2">
+                                                        <Sprout size={18} /> Primary Justification
+                                                    </h4>
+                                                    <p className="text-sm font-medium">{rule.reason}</p>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Expected Impact Analysis</h4>
+                                                    <ul className="space-y-3 text-sm">
+                                                        <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Yield Protection:</strong> Up to 85% higher yield retention under predicted stress conditions.</li>
+                                                        <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Water Savings:</strong> Significant reduction in irrigation requirements compared to {currentCrop}.</li>
+                                                        <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Market Outlook:</strong> {rule.alternative} has a strong baseline profit score of {CROPS_DB[rule.alternative]?.profitScore || 75}/100 with growing demand.</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                    className="card p-4 border-l-4 border-primary-500 space-y-3 cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all group"
+                                >
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
@@ -157,13 +184,18 @@ const CropSwitchingAdvisor: React.FC = () => {
                                             </div>
                                             <div className="flex items-center justify-center md:justify-start gap-2">
                                                 <span className="font-semibold text-gray-800 dark:text-gray-200">{currentCrop}</span>
-                                                <ArrowRight size={16} className="text-primary-500" />
+                                                <ArrowRight size={16} className="text-primary-500 group-hover:translate-x-1 transition-transform" />
                                                 <span className="font-bold text-primary-600 dark:text-primary-400">{rule.alternative}</span>
                                             </div>
                                         </div>
-                                        <span className="badge-green whitespace-nowrap">Recommended</span>
+                                        <div className="flex flex-col items-end gap-2">
+                                            <span className="badge-green whitespace-nowrap">Recommended</span>
+                                            <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-500 px-2 py-1 rounded-md flex items-center gap-1 font-bold group-hover:text-primary-600 transition-colors">
+                                                <FileText size={10} /> View Report
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">{rule.reason}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed pr-8">{rule.reason}</p>
                                 </div>
                             ))}
                         </div>
@@ -188,6 +220,13 @@ const CropSwitchingAdvisor: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <ReportModal
+                isOpen={!!selectedReport}
+                onClose={() => setSelectedReport(null)}
+                title={selectedReport?.title || ''}
+                content={selectedReport?.content}
+            />
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Map as MapIcon, Maximize2, Calculator, TrendingUp, AlertCircle, CheckCircle2, FileImage } from 'lucide-react';
+import { Upload, Map as MapIcon, Maximize2, Calculator, TrendingUp, AlertCircle, CheckCircle2, FileImage, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ReportModal from '../components/ReportModal';
 
 const LandIntelligence: React.FC = () => {
     const { t } = useTranslation();
@@ -13,6 +14,7 @@ const LandIntelligence: React.FC = () => {
         health: number;
         zones: { type: string; area: number; color: string }[];
     } | null>(null);
+    const [selectedReport, setSelectedReport] = useState<{ title: string; content: React.ReactNode } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDrag = (e: React.DragEvent) => {
@@ -191,9 +193,40 @@ const LandIntelligence: React.FC = () => {
                                         <CheckCircle2 size={16} />
                                         <span className="text-xs font-bold">{t('land.reliability')}: 92%</span>
                                     </div>
-                                    <p className="text-xs text-gray-500 leading-relaxed italic">
+                                    <p className="text-xs text-gray-500 leading-relaxed italic mb-4">
                                         {t('land.disclaimer')}
                                     </p>
+                                    <button
+                                        onClick={() => setSelectedReport({
+                                            title: 'Comprehensive Land Intelligence Report',
+                                            content: (
+                                                <div className="space-y-6 text-gray-700 dark:text-gray-300">
+                                                    <div>
+                                                        <h3 className="text-lg font-bold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Spatial Analysis Overview</h3>
+                                                        <p className="text-sm leading-relaxed">The AI vision model has processed the uploaded satellite imagery and identified distinct productivity zones across your {result.size} acre property. The overall health index is rated at {result.health}/100.</p>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-bold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Zone Breakdown</h4>
+                                                        <ul className="space-y-3 text-sm">
+                                                            {result.zones.map(z => (
+                                                                <li key={z.type} className="flex items-center gap-2">
+                                                                    <div className={`w-3 h-3 rounded-full ${z.color} shrink-0`} />
+                                                                    <strong>{z.type}:</strong> {z.area} acres ({(z.area / result.size * 100).toFixed(1)}%)
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                                                        <h4 className="font-bold text-amber-700 dark:text-amber-500 mb-2">Valuation Metrics</h4>
+                                                        <p className="text-sm font-medium">The estimated market value of ₹ {(result.value / 100000).toFixed(1)} Lakhs is calculated based on current regional land rates, soil health index, and the historical yield capacity of the identified productive zones.</p>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                        className="w-full btn-outline border-primary-200 dark:border-primary-800 text-primary-700 py-2.5 flex items-center justify-center gap-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-900/50 transition-colors"
+                                    >
+                                        <FileText size={16} /> View Comprehensive Report
+                                    </button>
                                 </div>
                             </div>
                         )}
@@ -221,6 +254,12 @@ const LandIntelligence: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <ReportModal
+                isOpen={!!selectedReport}
+                onClose={() => setSelectedReport(null)}
+                title={selectedReport?.title || ''}
+                content={selectedReport?.content}
+            />
         </div>
     );
 };
