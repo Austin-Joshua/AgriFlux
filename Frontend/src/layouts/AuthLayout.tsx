@@ -91,7 +91,7 @@ const AuthLayout: React.FC = () => {
                     </button>
 
                     {notifOpen && (
-                        <div className="absolute right-0 top-full mt-2 w-80 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
+                        <div className="absolute -right-24 sm:right-0 top-full mt-2 w-80 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
                             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30">
                                 <h3 className="font-bold text-gray-900 dark:text-white text-sm font-display">Notifications</h3>
                                 <button onClick={handleMarkAllRead} className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest hover:underline">
@@ -163,7 +163,7 @@ const AuthLayout: React.FC = () => {
                         <ChevronDown size={13} className={`transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {langOpen && (
-                        <div className="absolute right-0 top-full mt-2 w-44 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
+                        <div className="absolute -right-12 sm:right-0 top-full mt-2 w-44 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
                             {LANGUAGES.map(lang => (
                                 <button key={lang.code}
                                     onClick={() => { i18n.changeLanguage(lang.code); setLangOpen(false); }}
@@ -194,7 +194,7 @@ const AuthLayout: React.FC = () => {
                     </button>
 
                     {accountOpen && (
-                        <div className="absolute right-0 top-full mt-2 w-56 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
+                        <div className="absolute right-0 top-full mt-2 w-56 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
                             {/* Simple Settings Action */}
                             <button
                                 onClick={() => { navigate('/settings'); setAccountOpen(false); }}
