@@ -3,7 +3,7 @@ import { Leaf, TrendingUp, Droplets, FlaskConical, Award, Satellite } from 'luci
 
 const About: React.FC = () => (
     <div className="space-y-6 max-w-5xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
             <div>
                 <h1 className="page-header text-gradient font-extrabold">About AgriFlux</h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">Empowering Sustainable Agriculture through Climate Intelligence</p>

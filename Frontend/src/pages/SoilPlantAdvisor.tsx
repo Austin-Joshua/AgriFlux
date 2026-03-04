@@ -101,12 +101,12 @@ const SoilPlantAdvisor: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header">🔬 {t('advisor.title')}</h1>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('advisor.subtitle')}</p>
                 </div>
-                <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-center md:justify-start gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
                     <button
                         onClick={() => setMode('soil')}
                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mode === 'soil' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}

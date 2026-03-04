@@ -53,12 +53,12 @@ const ClimateSimulator: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header text-gradient font-extrabold">{t('simulator.title')}</h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('simulator.subtitle')}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
                         ✨ Premium AI Simulation
                     </span>

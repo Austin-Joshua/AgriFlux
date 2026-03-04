@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
-import { FlaskConical, AlertTriangle, CheckCircle, Leaf, Target } from 'lucide-react';
+import { FlaskConical, AlertTriangle, CheckCircle, Leaf, Target, UploadCloud, FileText } from 'lucide-react';
 
 const Gauge: React.FC<{ value: number; label: string; color: string }> = ({ value, label, color }) => (
     <div className="flex flex-col items-center">
@@ -25,6 +25,9 @@ const SoilHealthAdvisor: React.FC = () => {
     const [form, setForm] = useState({ nitrogen: '60', phosphorus: '35', potassium: '45', ph: '6.5', organicCarbon: '1.2' });
     const [analyzed, setAnalyzed] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [predictionText, setPredictionText] = useState<string | null>(null);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const radarData = [
         { subject: 'Nitrogen', value: Math.min(100, (Number(form.nitrogen) / 100) * 100) },
@@ -37,8 +40,21 @@ const SoilHealthAdvisor: React.FC = () => {
     const handleAnalyze = async () => {
         setLoading(true);
         await new Promise(r => setTimeout(r, 1000));
+        setPredictionText(null);
         setAnalyzed(true);
         setLoading(false);
+    };
+
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        // Simulate document OCR and data extraction
+        await new Promise(r => setTimeout(r, 2000));
+        setForm({ nitrogen: '42', phosphorus: '18', potassium: '55', ph: '6.8', organicCarbon: '1.5' });
+        setPredictionText("Govt. Soil Health Card parsed successfully. The soil shows optimal pH but is deficient in Phosphorus. Current levels support Wheat and Corn, provided targeted P-fertilizer is applied.");
+        setAnalyzed(true);
+        setUploading(false);
     };
 
     const pH = Number(form.ph);
@@ -58,12 +74,12 @@ const SoilHealthAdvisor: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header text-gradient font-extrabold">{t('soil.title')}</h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('soil.subtitle')}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
                         ✨ Premium Soil Analysis
                     </span>
@@ -73,7 +89,14 @@ const SoilHealthAdvisor: React.FC = () => {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Soil Input Form */}
                 <div className="card">
-                    <h3 className="section-header mb-4">Soil Test Parameters</h3>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="section-header flex-1">Soil Test Parameters</h3>
+                        <input type="file" ref={fileInputRef} className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleUpload} />
+                        <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="btn-outline py-1.5 px-3 flex items-center gap-1 text-xs">
+                            {uploading ? <div className="w-3 h-3 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /> : <UploadCloud size={14} />}
+                            Upload Govt Doc
+                        </button>
+                    </div>
                     <div className="space-y-4">
                         {[
                             { name: 'nitrogen', label: 'Nitrogen (N)', unit: 'kg/ha', max: '200' },
@@ -140,9 +163,18 @@ const SoilHealthAdvisor: React.FC = () => {
                 {/* Recommendations */}
                 <div className="card space-y-4">
                     <h3 className="section-header">{t('soil.recommendations')}</h3>
+
+                    {predictionText && (
+                        <div className="p-3 bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800/50 rounded-xl mb-4">
+                            <h4 className="font-bold text-primary-700 dark:text-primary-400 text-sm flex items-center gap-2 mb-1">
+                                <FileText size={14} /> AI Document Analysis
+                            </h4>
+                            <p className="text-xs text-primary-800 dark:text-primary-300 leading-relaxed italic">{predictionText}</p>
+                        </div>
+                    )}
                     {fertilizers.map(f => (
                         <div key={f.name} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center md:justify-start gap-2">
                                 <div className={`w-2 h-2 rounded-full ${f.color === 'primary' ? 'bg-primary-500' : f.color === 'blue' ? 'bg-blue-500' : 'bg-earth-500'}`} />
                                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{f.name}</span>
                             </div>

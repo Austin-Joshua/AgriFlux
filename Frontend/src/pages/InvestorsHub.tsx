@@ -60,8 +60,8 @@ const InvestorsHub: React.FC = () => {
                                 </div>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 flex-1 leading-relaxed">{inv.description}</p>
                                 <div className="space-y-1.5 mb-3 text-xs">
-                                    <div className="flex items-center gap-2"><Briefcase size={11} className="text-primary-500" /><span className="text-gray-400">{t('investors.ticket')}:</span><span className="font-semibold text-gray-700 dark:text-gray-200">{inv.ticketSize}</span></div>
-                                    <div className="flex items-center gap-2"><Star size={11} className="text-amber-400" /><span className="text-gray-400">{inv.portfolio}</span></div>
+                                    <div className="flex items-center justify-center md:justify-start gap-2"><Briefcase size={11} className="text-primary-500" /><span className="text-gray-400">{t('investors.ticket')}:</span><span className="font-semibold text-gray-700 dark:text-gray-200">{inv.ticketSize}</span></div>
+                                    <div className="flex items-center justify-center md:justify-start gap-2"><Star size={11} className="text-amber-400" /><span className="text-gray-400">{inv.portfolio}</span></div>
                                 </div>
                                 <div className="flex flex-wrap gap-1 mb-4">{inv.focus.map(f => <span key={f} className="text-[10px] px-1.5 py-0.5 rounded bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400">{f}</span>)}</div>
                                 <div className="flex gap-2">

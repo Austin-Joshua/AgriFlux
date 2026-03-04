@@ -79,7 +79,7 @@ const MarketAnalysis: React.FC = () => {
     return (
         <div className="space-y-5">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header">📈 {t('market.title')}</h1>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('market.subtitle')}</p>

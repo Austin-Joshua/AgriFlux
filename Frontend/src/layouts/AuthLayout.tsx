@@ -43,7 +43,7 @@ const AuthLayout: React.FC = () => {
             </button>
 
             {/* Main Glass Container (Matching Website Glassmorphism) */}
-            <div className="relative w-full max-w-[1050px] min-h-[720px] bg-white/70 dark:bg-gray-800/60 backdrop-blur-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-white/40 dark:border-white/5 flex overflow-hidden ring-1 ring-black/5">
+            <div className="relative w-full max-w-[1050px] min-h-[600px] lg:min-h-[720px] bg-white/70 dark:bg-gray-800/60 backdrop-blur-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-white/40 dark:border-white/5 flex overflow-hidden ring-1 ring-black/5">
 
                 {/* The "Sliding" Branding Panel (Ditto Repo Style) */}
                 <motion.div

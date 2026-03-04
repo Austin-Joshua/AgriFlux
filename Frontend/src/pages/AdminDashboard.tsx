@@ -55,7 +55,7 @@ const AdminDashboard: React.FC = () => {
                     <h1 className="page-header">🛡️ {t('admin.title')}</h1>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('admin.loggedInAs')} <strong>{user?.name}</strong> · {t('admin.fullAccess')}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="px-3 py-1.5 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold border border-red-200">🛡️ {t('admin.mode')}</span>
                     <button className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-500 text-xs flex items-center gap-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         <Download size={12} /> {t('admin.exportReport')}
@@ -108,7 +108,7 @@ const AdminDashboard: React.FC = () => {
                             </Pie>
                         </PieChart>
                         <div className="mt-3 space-y-1.5">
-                            {roleData.map(r => <div key={r.name} className="flex items-center justify-between text-xs"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ background: r.color }} /><span className="text-gray-600 dark:text-gray-300">{r.name}</span></div><span className="font-bold text-gray-700 dark:text-gray-200">{r.value}</span></div>)}
+                            {roleData.map(r => <div key={r.name} className="flex items-center justify-between text-xs"><div className="flex items-center justify-center md:justify-start gap-2"><div className="w-3 h-3 rounded-full" style={{ background: r.color }} /><span className="text-gray-600 dark:text-gray-300">{r.name}</span></div><span className="font-bold text-gray-700 dark:text-gray-200">{r.value}</span></div>)}
                         </div>
                     </div>
                 </div>
