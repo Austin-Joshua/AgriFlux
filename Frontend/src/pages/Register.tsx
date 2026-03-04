@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Leaf, Mail, Lock, User, Phone, MapPin, Wheat } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Wheat } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.jpg';
 
 const Register: React.FC = () => {
     const { t } = useTranslation();
-    const { register, isLoading } = useAuth();
+    const { register, loginWithProvider, isLoading } = useAuth();
     const navigate = useNavigate();
+
+    const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
     const [form, setForm] = useState({
         name: '', email: '', password: '', confirmPassword: '',
@@ -33,6 +35,19 @@ const Register: React.FC = () => {
             navigate('/dashboard');
         } catch {
             setError('Registration failed. Please try again.');
+        }
+    };
+
+    const handleSocialSignup = async (provider: 'google' | 'microsoft' | 'apple') => {
+        setSocialLoading(provider);
+        setError('');
+        try {
+            await loginWithProvider(provider, 'farmer');
+            navigate('/dashboard');
+        } catch {
+            setError('Social sign-up failed. Please try again.');
+        } finally {
+            setSocialLoading(null);
         }
     };
 
@@ -131,6 +146,35 @@ const Register: React.FC = () => {
                             ) : t('auth.register')}
                         </button>
                     </form>
+
+                    {/* Social Sign Up */}
+                    <div className="mt-5">
+                        <div className="relative flex items-center gap-3 mb-4">
+                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
+                            <span className="text-xs text-gray-400 font-medium">Or sign up with</span>
+                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                            {([
+                                { id: 'google', label: 'Google', emoji: '🔍' },
+                                { id: 'microsoft', label: 'Microsoft', emoji: '🪟' },
+                                { id: 'apple', label: 'Apple', emoji: '🍎' },
+                            ] as const).map(p => (
+                                <button
+                                    key={p.id}
+                                    type="button"
+                                    onClick={() => handleSocialSignup(p.id)}
+                                    disabled={!!socialLoading || isLoading}
+                                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    {socialLoading === p.id
+                                        ? <div className="w-4 h-4 border-2 border-gray-400 border-t-primary-600 rounded-full animate-spin" />
+                                        : <span>{p.emoji}</span>}
+                                    <span className="hidden sm:inline text-xs">{socialLoading === p.id ? 'Signing up…' : p.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
 
                     <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
                         {t('auth.hasAccount')}{' '}
