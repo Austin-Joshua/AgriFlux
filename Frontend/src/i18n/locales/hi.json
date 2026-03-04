@@ -1,0 +1,61 @@
+{
+    "nav": {
+        "dashboard": "डैशबोर्ड",
+        "yieldPrediction": "उपज भविष्यवाणी",
+        "irrigation": "सिंचाई बुद्धिमत्ता",
+        "soilHealth": "मृदा स्वास्थ्य सलाहकार",
+        "cropHealth": "फसल स्वास्थ्य निगरानी",
+        "climateRisk": "जलवायु जोखिम",
+        "climateSimulator": "जलवायु सिमुलेटर",
+        "cropSwitching": "फसल बदलने का सलाहकार",
+        "sustainability": "स्थिरता स्कोर",
+        "settings": "सेटिंग्स",
+        "about": "हमारे बारे में"
+    },
+    "auth": {
+        "login": "साइन इन करें",
+        "register": "खाता बनाएं",
+        "email": "ईमेल पता",
+        "password": "पासवर्ड",
+        "forgotPassword": "पासवर्ड भूल गए?",
+        "noAccount": "खाता नहीं है?",
+        "hasAccount": "पहले से खाता है?",
+        "welcomeBack": "वापस स्वागत है",
+        "fullName": "पूरा नाम",
+        "farmName": "खेत का नाम"
+    },
+    "dashboard": {
+        "title": "खेत डैशबोर्ड",
+        "subtitle": "एआई-संचालित कृषि बुद्धिमत्ता",
+        "yieldForecast": "उपज पूर्वानुमान",
+        "climateRisk": "जलवायु जोखिम स्कोर",
+        "irrigationStatus": "सिंचाई स्थिति",
+        "soilHealth": "मृदा स्वास्थ्य"
+    },
+    "common": {
+        "loading": "लोड हो रहा है...",
+        "error": "त्रुटि",
+        "success": "सफलता",
+        "cancel": "रद्द करें",
+        "save": "सहेजें",
+        "submit": "जमा करें",
+        "calculate": "गणना करें",
+        "analyze": "विश्लेषण करें"
+    },
+    "settings": {
+        "title": "सेटिंग्स",
+        "theme": "थीम",
+        "language": "भाषा",
+        "darkMode": "डार्क मोड",
+        "lightMode": "लाइट मोड",
+        "saveChanges": "बदलाव सहेजें",
+        "languages": {
+            "en": "अंग्रेजी",
+            "hi": "हिंदी",
+            "ta": "तमिल",
+            "te": "तेलुगु",
+            "kn": "कन्नड़",
+            "ml": "मलयालम"
+        }
+    }
+}
