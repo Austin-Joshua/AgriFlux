@@ -88,8 +88,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                             <div className="flex items-center gap-2.5">
                                 <img src={logo} alt="AgriFlux Logo" className="h-9 w-9 object-contain rounded-xl shadow-sm" />
                                 <div className="flex flex-col text-left">
-                                    <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">AgriFlux</span>
-                                    <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">Intelligence Platform</span>
+                                    <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">{t('common.agriflux', 'AgriFlux')}</span>
+                                    <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">{t('common.intelligencePlatform', 'Intelligence Platform')}</span>
                                 </div>
                             </div>
                         ) : (
@@ -121,8 +121,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                                 {user?.name?.charAt(0).toUpperCase() || 'F'}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user?.name || 'Farmer'}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.farmName || 'My Farm'}</p>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user?.name || t('common.farmer', 'Farmer')}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.farmName || t('common.myFarm', 'My Farm')}</p>
                             </div>
                             <button onClick={handleLogout}
                                 className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 hover:scale-110"

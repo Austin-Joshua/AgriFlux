@@ -203,8 +203,8 @@ const AuthLayout: React.FC = () => {
                                     <Settings size={18} className="text-primary-600 dark:text-primary-400" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-sm font-bold text-gray-900 dark:text-white">Settings</p>
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">App preferences</p>
+                                    <p className="text-sm font-bold text-gray-900 dark:text-white">{t('common.settings', 'Settings')}</p>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">{t('common.appPreferences', 'App preferences')}</p>
                                 </div>
                                 <ChevronRight size={14} className="ml-auto text-primary-300 group-hover:translate-x-0.5 transition-all" />
                             </button>
@@ -217,8 +217,8 @@ const AuthLayout: React.FC = () => {
                                     <LogOut size={18} className="text-red-500" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-sm font-bold">Sign Out</p>
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Exit session</p>
+                                    <p className="text-sm font-bold">{t('common.signOut', 'Sign Out')}</p>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">{t('common.exitSession', 'Exit session')}</p>
                                 </div>
                             </button>
                         </div>
@@ -258,8 +258,8 @@ const AuthLayout: React.FC = () => {
                                         <img src={logo} alt="AgriFlux" className="w-10 h-10 object-contain" />
                                     </motion.div>
                                     <div className="flex flex-col text-left">
-                                        <span className="text-2xl font-black text-white leading-none tracking-tight">AgriFlux</span>
-                                        <span className="text-xs font-black text-gold-400 uppercase tracking-widest mt-1">Intelligence Platform</span>
+                                        <span className="text-2xl font-black text-white leading-none tracking-tight">{t('common.agriflux', 'AgriFlux')}</span>
+                                        <span className="text-xs font-black text-gold-400 uppercase tracking-widest mt-1">{t('common.intelligencePlatform', 'Intelligence Platform')}</span>
                                     </div>
                                 </div>
 
@@ -271,12 +271,12 @@ const AuthLayout: React.FC = () => {
                                         transition={{ delay: 0.2 }}
                                     >
                                         <h2 className="text-5xl font-black font-display leading-[1.1] tracking-tightest mb-4">
-                                            {isLogin ? 'Smart Farming Starts Here.' : 'Grow Better With AI.'}
+                                            {isLogin ? t('common.smartFarming', 'Smart Farming Starts Here.') : t('common.growBetter', 'Grow Better With AI.')}
                                         </h2>
                                         <p className="text-primary-100/90 text-xl font-medium leading-relaxed max-w-[340px]">
                                             {isLogin
-                                                ? 'Access your precision agriculture insights and manage your farm with intelligence.'
-                                                : 'Join the next generation of digital agriculture and optimize your farm resources.'}
+                                                ? t('common.smartFarmingDesc', 'Access your precision agriculture insights and manage your farm with intelligence.')
+                                                : t('common.growBetterDesc', 'Join the next generation of digital agriculture and optimize your farm resources.')}
                                         </p>
                                     </motion.div>
                                 </div>

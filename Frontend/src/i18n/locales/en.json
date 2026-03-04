@@ -15,7 +15,19 @@
         "soilAdvisor": "Soil & Plant Advisor",
         "landIntelligence": "Land Intelligence",
         "settings": "Settings",
-        "about": "About"
+        "about": "About",
+        "agriflux": "AgriFlux",
+        "intelligencePlatform": "Intelligence Platform",
+        "farmer": "Farmer",
+        "myFarm": "My Farm",
+        "fullSettings": "Full Settings",
+        "appPreferences": "App preferences",
+        "signOut": "Sign Out",
+        "exitSession": "Exit session",
+        "smartFarming": "Smart Farming Starts Here.",
+        "smartFarmingDesc": "Access your precision agriculture insights and manage your farm with intelligence.",
+        "growBetter": "Grow Better With AI.",
+        "growBetterDesc": "Join the next generation of digital agriculture and optimize your farm resources."
     },
     "land": {
         "title": "Land Intelligence",
@@ -388,5 +400,43 @@
         "settings": "Settings",
         "signout": "Sign Out",
         "daysAgo": "days ago"
+    },
+    "ai": {
+        "title": "AgriFlux AI",
+        "online": "Online",
+        "placeholder": "Ask about crops, soil, weather...",
+        "tags": {
+            "yield": "Yield tips",
+            "irrigation": "Irrigation",
+            "soil": "Soil health",
+            "climate": "Climate risk"
+        },
+        "responses": {
+            "default": "I'm your AgriFlux AI! Ask me about crop yield, irrigation, soil health, climate risk, pests, subsidies, or drones.",
+            "greeting": "👋 Hi! I'm AgriFlux AI. Ask me anything about farming, crops, or climate!",
+            "yield": "For optimal yield, ensure your soil NPK levels are balanced. Rice yields 3,500-5,000 kg/ha under good conditions.",
+            "irrigation": "Irrigation should be based on crop requirements and soil moisture. Rice needs 450-700mm per season.",
+            "soil": "Healthy soil holds pH 6-7, solid NPK, and >1.5% organic carbon. Add compost regularly.",
+            "climate": "Climate change increases drought risks. Use the Simulator to plan, and consider resilient crop varieties.",
+            "fertilizer": "Apply NPK based on soil tests. Split applications improve uptake efficiency by 20-30%.",
+            "weather": "Always plan irrigation around 7-day rainfall forecasts to save water and prevent runoff.",
+            "sustainability": "Farm sustainability measures fertilizer efficiency, water use, and soil health. Aim for >70 score.",
+            "pests": "Common pests like aphids and borers can be managed with integrated pest management (IPM) and neem oil.",
+            "diseases": "Fungal diseases spread quickly in high humidity. Ensure good spacing and use preventive bio-fungicides.",
+            "market": "Market prices fluctuate. Check the Market Analysis tab before harvesting to time your sale effectively.",
+            "msp": "The Minimum Support Price (MSP) is the guaranteed government price. Always compare local mandi rates to MSP.",
+            "subsidies": "The government offers subsidies for solar pumps, drip irrigation, and organic seeds. Check the Subsidies tab.",
+            "drones": "Agricultural drones can spray fertilizers 10x faster and help identify pest hotspots via multispectral imaging.",
+            "satellites": "Satellite imagery (NDVI) helps assess land vigor, predict yields, and verify farm size for loans.",
+            "loans": "Kisan Credit Cards (KCC) offer low-interest farming loans. Satellite verification speeds up approval.",
+            "organic": "Organic farming eliminates chemical costs and builds long-term soil carbon. Start transitioning incrementally.",
+            "weeds": "Manage weeds early before they compete for nutrients. Mulching and cover crops naturally suppress weed growth.",
+            "harvest": "Harvest at the correct moisture content (e.g., 14% for wheat) to prevent post-harvest fungal losses.",
+            "storage": "Store grains in cool, dry, well-ventilated silos or hermetic bags to prevent weevil infestations.",
+            "machinery": "Renting tractors or combine harvesters via local cooperatives is often more cost-effective than purchasing.",
+            "livestock": "Integrating livestock with crops creates a circular farm economy where manure acts as free fertilizer.",
+            "seeds": "Always use certified, high-yielding variety (HYV) seeds treated with fungicides for the best germination rates.",
+            "insurance": "Crop insurance (like PMFBY) protects against weather anomalies. Register before the sowing season begins."
+        }
     }
 }
