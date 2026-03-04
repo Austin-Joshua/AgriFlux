@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
     LayoutDashboard, TrendingUp, Droplets, FlaskConical,
     Satellite, CloudLightning, Thermometer, Sprout,
-    Award, Settings, Info, X, Leaf, LogOut, PanelLeftClose, PanelLeft
+    Award, Settings, Info, X, Leaf, LogOut, PanelLeftClose, PanelLeft,
+    Landmark, BarChart3, Handshake, TestTube
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.jpg';
@@ -26,6 +27,10 @@ const navItems = [
     { to: '/simulator', icon: Thermometer, labelKey: 'nav.climateSimulator' },
     { to: '/crop-switching', icon: Sprout, labelKey: 'nav.cropSwitching' },
     { to: '/sustainability', icon: Award, labelKey: 'nav.sustainability' },
+    { to: '/subsidies', icon: Landmark, labelKey: 'nav.subsidies' },
+    { to: '/market', icon: BarChart3, labelKey: 'nav.market' },
+    { to: '/investors', icon: Handshake, labelKey: 'nav.investors' },
+    { to: '/soil-advisor', icon: TestTube, labelKey: 'nav.soilAdvisor' },
 ];
 
 const bottomItems = [

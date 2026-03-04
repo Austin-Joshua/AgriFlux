@@ -31,7 +31,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex gradient-hero dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
+        <div className="min-h-screen flex relative" style={{ background: 'linear-gradient(135deg, #071a0e 0%, #0a2318 50%, #0d2e1c 100%)' }}>
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5 dark:opacity-10"
                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%2316a34a\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}
@@ -46,10 +46,9 @@ const Login: React.FC = () => {
             </button>
 
             {/* Left Panel — Branding */}
-            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-gradient-to-br from-primary-800 via-primary-600 to-gold-600 p-12 text-white relative overflow-hidden shadow-2xl">
-                <div className="absolute inset-0 opacity-15">
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold-400 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary-400 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
+            <div className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden shadow-2xl border-r border-white/5" style={{ background: 'linear-gradient(160deg, #0a2e1a 0%, #0f4a2a 40%, #0d3a20 100%)' }}>
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-amber-400 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
                 </div>
 
                 <div className="relative">
@@ -90,7 +89,7 @@ const Login: React.FC = () => {
             </div>
 
             {/* Right Panel — Login Form */}
-            <div className="flex-1 flex items-center justify-center p-6">
+            <div className="flex-1 flex items-center justify-center p-6" style={{ background: 'linear-gradient(160deg, #061610 0%, #0a2318 100%)' }}>
                 <div className="w-full max-w-md animate-slide-up">
                     {/* Mobile Logo */}
                     <div className="lg:hidden flex justify-center mb-8">

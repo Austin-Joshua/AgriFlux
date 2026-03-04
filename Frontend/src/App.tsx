@@ -20,6 +20,10 @@ import CropSwitchingAdvisor from './pages/CropSwitchingAdvisor';
 import SustainabilityScore from './pages/SustainabilityScore';
 import Settings from './pages/Settings';
 import About from './pages/About';
+import GovernmentSubsidies from './pages/GovernmentSubsidies';
+import MarketAnalysis from './pages/MarketAnalysis';
+import InvestorsHub from './pages/InvestorsHub';
+import SoilPlantAdvisor from './pages/SoilPlantAdvisor';
 
 const App: React.FC = () => {
     return (
@@ -118,6 +122,38 @@ const App: React.FC = () => {
                             element={
                                 <ProtectedRoute>
                                     <Layout><About /></Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/subsidies"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout><GovernmentSubsidies /></Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/market"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout><MarketAnalysis /></Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/investors"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout><InvestorsHub /></Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/soil-advisor"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout><SoilPlantAdvisor /></Layout>
                                 </ProtectedRoute>
                             }
                         />

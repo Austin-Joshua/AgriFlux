@@ -9,6 +9,10 @@
         "climateSimulator": "Climate Simulator",
         "cropSwitching": "Crop Switching Advisor",
         "sustainability": "Sustainability Score",
+        "subsidies": "Govt Subsidies",
+        "market": "Market Analysis",
+        "investors": "Investors Hub",
+        "soilAdvisor": "Soil & Plant Advisor",
         "settings": "Settings",
         "about": "About"
     },

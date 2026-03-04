@@ -45,16 +45,16 @@ const Register: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gold-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 p-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/5 blur-[100px] rounded-full -mr-48 -mt-48" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary-400/5 blur-[80px] rounded-full -ml-40 -mb-40" />
+        <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #061610 0%, #0a2318 50%, #0d2e1c 100%)' }}>
+            <div className="absolute top-0 right-0 w-72 h-72 bg-amber-400/5 blur-[80px] rounded-full -mr-36 -mt-36" />
+            <div className="absolute bottom-0 left-0 w-60 h-60 bg-green-600/10 blur-[60px] rounded-full -ml-30 -mb-30" />
             <div className="w-full max-w-lg animate-slide-up relative z-10">
                 <div className="text-center mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 rounded-2xl flex items-center justify-center shadow-glow-gold mx-auto mb-4 border-2 border-white/50 dark:border-gray-700/50 overflow-hidden">
+                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4 border border-amber-400/20 overflow-hidden" style={{ background: '#0a2318' }}>
                         <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
                     </div>
-                    <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tightest text-gradient">Join AgriFlux</h1>
-                    <p className="text-gold-600 dark:text-gold-400 text-xs font-bold uppercase tracking-widest mt-2 italic">Precision AI Agriculture Intelligence</p>
+                    <h1 className="text-3xl font-black text-white font-display tracking-tightest">Join AgriFlux</h1>
+                    <p className="text-amber-400/80 text-xs font-bold uppercase tracking-widest mt-2">Precision AI Agriculture Intelligence</p>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
