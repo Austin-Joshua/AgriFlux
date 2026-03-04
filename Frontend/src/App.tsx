@@ -24,6 +24,8 @@ import GovernmentSubsidies from './pages/GovernmentSubsidies';
 import MarketAnalysis from './pages/MarketAnalysis';
 import InvestorsHub from './pages/InvestorsHub';
 import SoilPlantAdvisor from './pages/SoilPlantAdvisor';
+import AgronomistDashboard from './pages/AgronomistDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 const App: React.FC = () => {
     return (
@@ -154,6 +156,22 @@ const App: React.FC = () => {
                             element={
                                 <ProtectedRoute>
                                     <Layout><SoilPlantAdvisor /></Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/agronomist"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout><AgronomistDashboard /></Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout><AdminDashboard /></Layout>
                                 </ProtectedRoute>
                             }
                         />

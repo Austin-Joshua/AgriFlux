@@ -9,24 +9,55 @@ import logo from '../assets/logo.jpg';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
-    const { login, isLoading } = useAuth();
+    const { login, loginWithProvider, isLoading } = useAuth();
     const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
+
+    const roleCreds: Record<string, { email: string; password: string }> = {
+        farmer: { email: 'user@agriflux.ai', password: 'password123' },
+        agronomist: { email: 'agronomist@agriflux.ai', password: 'agro123' },
+        admin: { email: 'admin@agriflux.ai', password: 'admin123' },
+    };
 
     const [email, setEmail] = useState('user@agriflux.ai');
     const [password, setPassword] = useState('password123');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [socialLoading, setSocialLoading] = useState<string | null>(null);
     const [loginMode, setLoginMode] = useState<'farmer' | 'agronomist' | 'admin'>('farmer');
+
+    const switchMode = (mode: 'farmer' | 'agronomist' | 'admin') => {
+        setLoginMode(mode);
+        setEmail(roleCreds[mode].email);
+        setPassword(roleCreds[mode].password);
+        setError('');
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
-            await login(email, password);
-            navigate('/dashboard');
+            await login(email, password, loginMode);
+            if (loginMode === 'admin') navigate('/admin');
+            else if (loginMode === 'agronomist') navigate('/agronomist');
+            else navigate('/dashboard');
         } catch (err) {
             setError('Invalid credentials. Please try again.');
+        }
+    };
+
+    const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
+        setSocialLoading(provider);
+        setError('');
+        try {
+            await loginWithProvider(provider, loginMode);
+            if (loginMode === 'admin') navigate('/admin');
+            else if (loginMode === 'agronomist') navigate('/agronomist');
+            else navigate('/dashboard');
+        } catch {
+            setError('Social login failed. Please try again.');
+        } finally {
+            setSocialLoading(null);
         }
     };
 
@@ -105,11 +136,11 @@ const Login: React.FC = () => {
                         </div>
 
                         {/* Login Mode Tabs */}
-                        <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 mb-6">
+                        <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 mb-5">
                             {(['farmer', 'agronomist', 'admin'] as const).map(mode => (
                                 <button
                                     key={mode}
-                                    onClick={() => setLoginMode(mode)}
+                                    onClick={() => switchMode(mode)}
                                     className={`flex-1 py-2 px-3 rounded-lg text-[10px] font-black uppercase tracking-tighter transition-all duration-300 ${loginMode === mode
                                         ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-glow-gold scale-105'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gold-600'
@@ -118,6 +149,12 @@ const Login: React.FC = () => {
                                     {mode.charAt(0).toUpperCase() + mode.slice(1)}
                                 </button>
                             ))}
+                        </div>
+                        {/* Role hint */}
+                        <div className="mb-4 p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/50 text-xs text-primary-700 dark:text-primary-400 flex items-center gap-2">
+                            <span className="font-bold">{loginMode === 'farmer' ? '🌾 Farmer' : loginMode === 'agronomist' ? '🔬 Agronomist' : '🛡️ Admin'} Mode:</span>
+                            <span className="font-mono">{roleCreds[loginMode].email}</span>
+                            <span className="opacity-60">/ {roleCreds[loginMode].password}</span>
                         </div>
 
                         {error && (
@@ -195,19 +232,23 @@ const Login: React.FC = () => {
                                 <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
                             </div>
                             <div className="grid grid-cols-3 gap-3">
-                                {[
-                                    { id: 'google-login', label: 'Google', emoji: '🔍' },
-                                    { id: 'microsoft-login', label: 'Microsoft', emoji: '🪟' },
-                                    { id: 'apple-login', label: 'Apple', emoji: '🍎' },
-                                ].map(provider => (
+                                {([
+                                    { id: 'google', label: 'Google', emoji: '🔍' },
+                                    { id: 'microsoft', label: 'Microsoft', emoji: '🪟' },
+                                    { id: 'apple', label: 'Apple', emoji: '🍎' },
+                                ] as const).map(p => (
                                     <button
-                                        key={provider.id}
-                                        id={provider.id}
-                                        onClick={() => handleSubmit({ preventDefault: () => { } } as React.FormEvent)}
-                                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-105"
+                                        key={p.id}
+                                        id={`${p.id}-login`}
+                                        type="button"
+                                        onClick={() => handleSocialLogin(p.id)}
+                                        disabled={!!socialLoading || isLoading}
+                                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
-                                        <span>{provider.emoji}</span>
-                                        <span className="hidden sm:inline text-xs">{provider.label}</span>
+                                        {socialLoading === p.id ? (
+                                            <div className="w-4 h-4 border-2 border-gray-400 border-t-primary-600 rounded-full animate-spin" />
+                                        ) : <span>{p.emoji}</span>}
+                                        <span className="hidden sm:inline text-xs">{socialLoading === p.id ? 'Signing in…' : p.label}</span>
                                     </button>
                                 ))}
                             </div>
