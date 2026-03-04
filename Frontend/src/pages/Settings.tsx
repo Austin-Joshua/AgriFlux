@@ -46,21 +46,30 @@ const Settings: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="page-header">{t('settings.title')}</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your AgriFlux account and preferences</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('settings.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">Manage your premium AgriFlux farm account preferences</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        ⭐ Premium Account
+                    </span>
+                </div>
             </div>
 
             <div className="flex gap-6 flex-col lg:flex-row">
                 {/* Sidebar tabs */}
                 <div className="lg:w-56 flex-shrink-0">
-                    <div className="card p-2 space-y-1">
+                    <div className="card glass-gold border-gold-300 dark:border-gold-800/40 p-2 space-y-1">
                         {sidebarItems.map(item => (
                             <button
                                 key={item.key}
                                 id={`settings-${item.key}`}
                                 onClick={() => setActiveSection(item.key)}
-                                className={activeSection === item.key ? 'nav-item-active w-full' : 'nav-item w-full'}
+                                className={activeSection === item.key
+                                    ? 'flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-glow-gold w-full'
+                                    : 'flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gold-50 dark:hover:bg-gold-900/20 hover:text-gold-700 w-full'}
                             >
                                 <item.icon size={16} />
                                 {item.label}
@@ -76,17 +85,20 @@ const Settings: React.FC = () => {
                         <div className="space-y-5">
                             <div className="flex items-center gap-4 pb-5 border-b border-gray-100 dark:border-gray-700">
                                 <div className="relative">
-                                    <div className="w-20 h-20 gradient-green rounded-2xl flex items-center justify-center text-white text-3xl font-bold">
+                                    <div className="w-20 h-20 bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-glow-gold">
                                         {user?.name?.charAt(0) || 'F'}
                                     </div>
-                                    <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary-500 rounded-full flex items-center justify-center text-white shadow-md hover:bg-primary-600 transition-colors">
+                                    <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-gold-600 rounded-full flex items-center justify-center text-white shadow-md hover:bg-gold-700 transition-colors border-2 border-white dark:border-gray-800">
                                         <Camera size={12} />
                                     </button>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-lg text-gray-900 dark:text-white">{user?.name}</h3>
-                                    <p className="text-gray-500 dark:text-gray-400 text-sm">{user?.email}</p>
-                                    <span className="badge-green mt-1">Farmer Account</span>
+                                    <h3 className="font-black text-xl text-gray-900 dark:text-white font-display tracking-tight">{user?.name}</h3>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">{user?.email}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="badge-gold px-2 py-0.5 text-[10px]">VERIFIED FARMER</span>
+                                        <span className="text-[10px] text-primary-600 font-bold uppercase tracking-widest">PRO PLAN</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -132,8 +144,8 @@ const Settings: React.FC = () => {
                                         id={`theme-${opt.value}`}
                                         onClick={() => (isDark ? opt.value === 'light' : opt.value === 'dark') && toggleTheme()}
                                         className={`flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${(isDark ? opt.value === 'dark' : opt.value === 'light')
-                                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                                                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                                             }`}
                                     >
                                         <opt.icon size={24} className={isDark && opt.value === 'dark' ? 'text-primary-500' : !isDark && opt.value === 'light' ? 'text-primary-500' : 'text-gray-400'} />
@@ -161,8 +173,8 @@ const Settings: React.FC = () => {
                                         id={`lang-${lang.code}`}
                                         onClick={() => i18n.changeLanguage(lang.code)}
                                         className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${i18n.language === lang.code
-                                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                                                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
+                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'
                                             }`}
                                     >
                                         <span className="text-3xl">{lang.flag}</span>

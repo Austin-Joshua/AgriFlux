@@ -31,30 +31,43 @@ const ClimateRisk: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="page-header">{t('climate.title')}</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">{t('climate.subtitle')}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('climate.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('climate.subtitle')}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        🛡️ Climate Intelligence
+                    </span>
+                </div>
             </div>
 
             {/* Risk Score + Alerts */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="card flex flex-col items-center justify-center text-center">
-                    <CloudLightning size={28} className="text-orange-500 mb-3" />
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Climate Risk Score</p>
+                <div className="card glass-gold border-gold-300 dark:border-gold-800/40 flex flex-col items-center justify-center text-center">
+                    <CloudLightning size={28} className="text-gold-600 mb-3" />
+                    <p className="text-sm font-bold text-gold-700 dark:text-gold-400 mb-2 uppercase tracking-widest text-[10px]">Risk Score</p>
                     <div className="relative w-36 h-36 mb-3">
                         <svg className="w-36 h-36 -rotate-90" viewBox="0 0 36 36">
                             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                fill="none" stroke="#fef3c7" strokeWidth="2.5" />
+                                fill="none" stroke="#fef3c7" strokeOpacity={0.2} strokeWidth="2.5" />
                             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                fill="none" stroke="#f59e0b" strokeWidth="3" strokeDasharray={`${riskScore}, 100`} strokeLinecap="round" />
+                                fill="none" stroke="url(#goldGradLinear)" strokeWidth="3.5" strokeDasharray={`${riskScore}, 100`} strokeLinecap="round" />
+                            <defs>
+                                <linearGradient id="goldGradLinear" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#f59e0b" />
+                                    <stop offset="100%" stopColor="#d97706" />
+                                </linearGradient>
+                            </defs>
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-3xl font-bold text-gray-900 dark:text-white font-display">{riskScore}</span>
-                            <span className="text-xs text-gray-500">/ 100</span>
+                            <span className="text-4xl font-black text-gold-600 dark:text-gold-400 font-display">{riskScore}</span>
+                            <span className="text-[10px] text-gray-500 font-bold">OPTIMAL</span>
                         </div>
                     </div>
-                    <span className="badge-green">Low Risk</span>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Good conditions for most crops this season</p>
+                    <span className="badge-gold px-4 py-1.5 animate-pulse-slow">Low Risk</span>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-3 font-medium">Favorable conditions for rice cultivation continue</p>
 
                     <div className="mt-4 w-full grid grid-cols-2 gap-2 text-center">
                         <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-xl">

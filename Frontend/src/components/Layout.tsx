@@ -21,7 +21,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             />
 
             <div className={`flex-1 flex flex-col min-w-0 ${mainMargin} transition-all duration-300`}>
-                <Header onMenuClick={() => setSidebarOpen(true)} />
+                <Header
+                    onMenuClick={() => setSidebarOpen(true)}
+                    onCollapseToggle={() => setSidebarCollapsed(prev => !prev)}
+                />
                 <main className="flex-1 p-4 md:p-6 overflow-auto">
                     <div className="max-w-7xl mx-auto animate-fade-in">
                         {children}

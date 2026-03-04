@@ -37,12 +37,19 @@ const SustainabilityScore: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <div className="flex items-center gap-3 mb-1">
-                    <h1 className="page-header">{t('sustainability.title')}</h1>
-                    <span className="badge bg-earth-100 dark:bg-earth-900/30 text-earth-700 dark:text-earth-300">🏆 Hackathon Feature</span>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('sustainability.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('sustainability.subtitle')}</p>
                 </div>
-                <p className="text-gray-500 dark:text-gray-400">{t('sustainability.subtitle')}</p>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        🌟 Premium Farm Score
+                    </span>
+                    <span className="badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
+                        🏆 Precision Intelligence
+                    </span>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

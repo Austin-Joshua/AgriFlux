@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';
 import { TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ChevronDown } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const CROPS = ['Rice', 'Wheat', 'Corn', 'Sugarcane', 'Cotton', 'Soybean', 'Millet', 'Barley', 'Sorghum', 'Groundnut'];
 
@@ -31,6 +32,7 @@ const predictYield = (inputs: Record<string, number | string>) => {
 
 const YieldPrediction: React.FC = () => {
     const { t } = useTranslation();
+    const { isDark } = useTheme();
     const [form, setForm] = useState({
         cropType: 'Rice', nitrogen: '80', phosphorus: '40', potassium: '50',
         rainfall: '800', temperature: '26', humidity: '65', fertilizerUsed: '150', historicalYield: '4000'
@@ -65,9 +67,16 @@ const YieldPrediction: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="page-header">{t('yield.title')}</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">{t('yield.subtitle')}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('yield.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium">{t('yield.subtitle')}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        ✨ Full AI Report
+                    </span>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -133,30 +142,31 @@ const YieldPrediction: React.FC = () => {
                 </div>
 
                 {/* Radar Chart */}
-                <div className="card flex flex-col">
-                    <h3 className="section-header mb-3">Nutrient Profile</h3>
+                <div className="card glass-gold flex flex-col border-gold-200 dark:border-gold-900/40">
+                    <h3 className="section-header mb-3 text-gold-700 dark:text-gold-400">Nutrient Profile</h3>
                     <ResponsiveContainer width="100%" height={220}>
                         <RadarChart data={radarData}>
-                            <PolarGrid />
-                            <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: '#6b7280' }} />
-                            <Radar name="Soil" dataKey="value" stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} strokeWidth={2} />
+                            <PolarGrid stroke={isDark ? '#4b5563' : '#e5e7eb'} />
+                            <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: isDark ? '#9ca3af' : '#6b7280' }} />
+                            <Radar name="Soil" dataKey="value" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} strokeWidth={2.5} />
                         </RadarChart>
                     </ResponsiveContainer>
 
                     {result && (
-                        <div className={`mt-4 p-4 rounded-xl border-2 ${result.risk === 'Low' ? 'border-primary-300 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-700' :
-                                result.risk === 'Medium' ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700' :
-                                    'border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700'
+                        <div className={`mt-4 p-5 rounded-2xl border-b-4 shadow-xl transition-all animate-scale-in ${result.risk === 'Low' ? 'border-primary-500 bg-white dark:bg-gray-800' :
+                            result.risk === 'Medium' ? 'border-gold-500 bg-white dark:bg-gray-800' :
+                                'border-red-500 bg-white dark:bg-gray-800'
                             }`}>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('yield.predictedYield')}</p>
-                            <p className="text-3xl font-bold text-gray-900 dark:text-white font-display">
-                                {result.predicted.toLocaleString()}<span className="text-sm font-normal text-gray-500"> kg/ha</span>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{t('yield.predictedYield')}</p>
+                            <p className="text-4xl font-extrabold text-gray-900 dark:text-white font-display">
+                                {result.predicted.toLocaleString()}<span className="text-sm font-normal text-gray-500 ml-1">kg/ha</span>
                             </p>
-                            <div className="flex items-center gap-2 mt-2">
-                                <span className={`badge ${result.risk === 'Low' ? 'badge-green' : result.risk === 'Medium' ? 'badge-yellow' : 'badge-red'}`}>
+                            <div className="flex items-center gap-3 mt-3">
+                                <span className={`badge py-1 px-3 ${result.risk === 'Low' ? 'badge-green' : result.risk === 'Medium' ? 'badge-gold' : 'badge-red'}`}>
                                     {result.risk} Risk
                                 </span>
-                                <span className={`text-sm font-semibold ${Number(result.improvement) >= 0 ? 'text-primary-600 dark:text-primary-400' : 'text-red-500'}`}>
+                                <span className={`flex items-center gap-1 text-sm font-bold ${Number(result.improvement) >= 0 ? 'text-primary-600 dark:text-primary-400' : 'text-red-500'}`}>
+                                    {Number(result.improvement) >= 0 ? <TrendingUp size={14} /> : null}
                                     {Number(result.improvement) >= 0 ? '+' : ''}{result.improvement}%
                                 </span>
                             </div>

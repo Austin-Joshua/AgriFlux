@@ -19,23 +19,33 @@ const CropHealthMonitoring: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="page-header">Satellite Crop Health Monitoring</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">NDVI & EVI vegetation indices for precision crop health assessment</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">Satellite Crop Health</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">Precision NDVI & EVI vegetation analytics via satellite vision</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        🛰️ Satellite AI Vision
+                    </span>
+                    <span className="badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
+                        🏆 Precision Intelligence
+                    </span>
+                </div>
             </div>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: 'Avg NDVI Score', value: avgNDVI, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '🌿' },
+                    { label: 'Avg NDVI Score', value: avgNDVI, color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '🌿' },
                     { label: 'Healthy Zones', value: `${healthyCount}/${NDVI_ZONES.length}`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '✅' },
-                    { label: 'Stress Zones', value: NDVI_ZONES.filter(z => z.status === 'Stressed').length, color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-900/20', icon: '⚠️' },
+                    { label: 'Stress Zones', value: NDVI_ZONES.filter(z => z.status === 'Stressed').length, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', icon: '⚠️' },
                     { label: 'Total Farm Area', value: '9.0 ha', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '🗺️' },
                 ].map(s => (
-                    <div key={s.label} className={`card p-4 ${s.bg}`}>
+                    <div key={s.label} className={`card p-4 transition-transform hover:scale-105 duration-300 ${s.bg}`}>
                         <span className="text-2xl">{s.icon}</span>
-                        <p className={`text-2xl font-bold font-display mt-2 ${s.color}`}>{s.value}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</p>
+                        <p className={`text-2xl font-black font-display mt-2 ${s.color}`}>{s.value}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">{s.label}</p>
                     </div>
                 ))}
             </div>

@@ -58,9 +58,16 @@ const SoilHealthAdvisor: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="page-header">{t('soil.title')}</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">{t('soil.subtitle')}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('soil.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('soil.subtitle')}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        ✨ Premium Soil Analysis
+                    </span>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -101,13 +108,13 @@ const SoilHealthAdvisor: React.FC = () => {
                 </div>
 
                 {/* Radar + Score */}
-                <div className="card">
-                    <h3 className="section-header mb-3">Soil Profile</h3>
+                <div className="card glass-gold border-gold-300 dark:border-gold-900/40">
+                    <h3 className="section-header mb-3 text-gold-700 dark:text-gold-400">Soil Profile</h3>
                     <ResponsiveContainer width="100%" height={200}>
                         <RadarChart data={radarData}>
-                            <PolarGrid />
-                            <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: '#6b7280' }} />
-                            <Radar name="Soil" dataKey="value" stroke="#b8823d" fill="#b8823d" fillOpacity={0.25} strokeWidth={2} />
+                            <PolarGrid stroke="#fde047" strokeWidth={0.5} strokeOpacity={0.3} />
+                            <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: '#b8823d' }} />
+                            <Radar name="Soil" dataKey="value" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} strokeWidth={2.5} />
                         </RadarChart>
                     </ResponsiveContainer>
 
@@ -119,7 +126,7 @@ const SoilHealthAdvisor: React.FC = () => {
 
                     {/* pH Status */}
                     <div className={`mt-4 p-3 rounded-xl text-sm ${pHStatus === 'Optimal' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' :
-                            'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
+                        'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
                         }`}>
                         <p className="font-semibold">pH: {form.ph} — {pHStatus}</p>
                         {pHStatus !== 'Optimal' && (

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Leaf, Mail, Lock, User, Phone, MapPin, Wheat } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.jpg';
 
 const Register: React.FC = () => {
     const { t } = useTranslation();
@@ -44,14 +45,16 @@ const Register: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen flex items-center justify-center gradient-hero dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 p-6">
-            <div className="w-full max-w-lg animate-slide-up">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gold-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/5 blur-[100px] rounded-full -mr-48 -mt-48" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary-400/5 blur-[80px] rounded-full -ml-40 -mb-40" />
+            <div className="w-full max-w-lg animate-slide-up relative z-10">
                 <div className="text-center mb-6">
-                    <div className="w-14 h-14 gradient-green rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-3">
-                        <Leaf size={28} className="text-white" />
+                    <div className="w-20 h-20 bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 rounded-2xl flex items-center justify-center shadow-glow-gold mx-auto mb-4 border-2 border-white/50 dark:border-gray-700/50 overflow-hidden">
+                        <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-display">Join AgriFlux</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Start your AI-powered farming journey</p>
+                    <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tightest text-gradient">Join AgriFlux</h1>
+                    <p className="text-gold-600 dark:text-gold-400 text-xs font-bold uppercase tracking-widest mt-2 italic">Precision AI Agriculture Intelligence</p>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
@@ -61,7 +64,7 @@ const Register: React.FC = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {fields.map(field => (
                                 <div key={field.name} className={field.name === 'email' ? 'sm:col-span-2' : ''}>
@@ -119,10 +122,10 @@ const Register: React.FC = () => {
                             </div>
                         </div>
 
-                        <button type="submit" disabled={isLoading} className="btn-primary w-full py-3 text-base mt-2">
+                        <button type="submit" disabled={isLoading} className="btn-primary w-full py-4 text-base mt-2 shadow-glow-green hover:scale-[1.02] active:scale-[0.98] transition-all">
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
                                     Creating account...
                                 </span>
                             ) : t('auth.register')}

@@ -5,6 +5,7 @@ import { Eye, EyeOff, Leaf, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
+import logo from '../assets/logo.jpg';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -12,7 +13,7 @@ const Login: React.FC = () => {
     const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState('farmer@agriflux.ai');
+    const [email, setEmail] = useState('user@agriflux.ai');
     const [password, setPassword] = useState('password123');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
@@ -45,20 +46,20 @@ const Login: React.FC = () => {
             </button>
 
             {/* Left Panel — Branding */}
-            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-gradient-to-br from-primary-700 to-primary-500 p-12 text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
+            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-gradient-to-br from-primary-800 via-primary-600 to-gold-600 p-12 text-white relative overflow-hidden shadow-2xl">
+                <div className="absolute inset-0 opacity-15">
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold-400 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary-400 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
                 </div>
 
                 <div className="relative">
                     <div className="flex items-center gap-3 mb-12">
-                        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                            <Leaf size={28} className="text-white" />
+                        <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl overflow-hidden">
+                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold font-display">AgriFlux</h1>
-                            <p className="text-primary-200 text-sm">AI Agriculture Intelligence</p>
+                            <h1 className="text-4xl font-black font-display tracking-tightest">AgriFlux</h1>
+                            <p className="text-gold-300 font-bold text-xs uppercase tracking-widest">Premium AI Agriculture</p>
                         </div>
                     </div>
 
@@ -93,17 +94,17 @@ const Login: React.FC = () => {
             <div className="flex-1 flex items-center justify-center p-6">
                 <div className="w-full max-w-md animate-slide-up">
                     {/* Mobile Logo */}
-                    <div className="lg:hidden flex items-center gap-2 justify-center mb-8">
-                        <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-md">
-                            <Leaf size={22} className="text-white" />
+                    <div className="lg:hidden flex items-center gap-3 justify-center mb-8">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
+                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-display">AgriFlux</h1>
+                        <h1 className="text-2xl font-black text-gray-900 dark:text-white font-display tracking-tightest text-gradient">AgriFlux</h1>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-dark-xl border border-gray-100 dark:border-gray-700 p-8">
                         <div className="mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white font-display">{t('auth.welcomeBack')} 👋</h2>
-                            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Sign in to your farm intelligence dashboard</p>
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-white font-display leading-tight">{t('auth.welcomeBack')} 👋</h2>
+                            <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">Sign in to your premium farm intelligence dashboard</p>
                         </div>
 
                         {/* Login Mode Tabs */}
@@ -112,12 +113,12 @@ const Login: React.FC = () => {
                                 <button
                                     key={mode}
                                     onClick={() => setLoginMode(mode)}
-                                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold capitalize transition-all duration-200 ${loginMode === mode
-                                            ? 'bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 shadow-sm'
-                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                    className={`flex-1 py-2 px-3 rounded-lg text-[10px] font-black uppercase tracking-tighter transition-all duration-300 ${loginMode === mode
+                                        ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-glow-gold scale-105'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gold-600'
                                         }`}
                                 >
-                                    {mode === 'farmer' ? '👨‍🌾' : mode === 'agronomist' ? '🔬' : '⚙️'} {mode}
+                                    {mode}
                                 </button>
                             ))}
                         </div>
@@ -140,7 +141,7 @@ const Login: React.FC = () => {
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
                                         className="input-field pl-10"
-                                        placeholder="farmer@agriflux.ai"
+                                        placeholder="user@agriflux.ai"
                                         required
                                     />
                                 </div>
@@ -178,12 +179,12 @@ const Login: React.FC = () => {
                                 id="login-submit"
                                 type="submit"
                                 disabled={isLoading}
-                                className="btn-primary w-full py-3 text-base relative"
+                                className="btn-primary w-full py-4 text-base relative shadow-glow-green mt-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
                             >
                                 {isLoading ? (
                                     <span className="flex items-center justify-center gap-2">
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        Signing in...
+                                        <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                                        Authenticating...
                                     </span>
                                 ) : t('auth.login')}
                             </button>

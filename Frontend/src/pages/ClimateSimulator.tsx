@@ -53,18 +53,25 @@ const ClimateSimulator: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <div className="flex items-center gap-3 mb-1">
-                    <h1 className="page-header">{t('simulator.title')}</h1>
-                    <span className="badge bg-earth-100 dark:bg-earth-900/30 text-earth-700 dark:text-earth-300">🏆 Hackathon Feature</span>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('simulator.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('simulator.subtitle')}</p>
                 </div>
-                <p className="text-gray-500 dark:text-gray-400">{t('simulator.subtitle')}</p>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        ✨ Premium AI Simulation
+                    </span>
+                    <span className="badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
+                        🏆 Precision Intelligence
+                    </span>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Controls */}
-                <div className="card space-y-5">
-                    <h3 className="section-header">Scenario Controls</h3>
+                <div className="card glass-gold border-gold-300 dark:border-gold-800/40 space-y-5">
+                    <h3 className="section-header text-gold-700 dark:text-gold-400">Scenario Controls</h3>
 
                     <div>
                         <label className="label">Crop</label>
@@ -139,7 +146,7 @@ const ClimateSimulator: React.FC = () => {
                 {/* Results */}
                 <div className="lg:col-span-2 space-y-4">
                     {/* Impact Card */}
-                    <div className={`card ${Number(result.change) >= 0 ? 'border-primary-200 dark:border-primary-800' : 'border-red-200 dark:border-red-800'}`}>
+                    <div className={`card shadow-glow-gold transition-all duration-500 border-b-4 ${Number(result.change) >= 0 ? 'border-primary-500' : 'border-red-500'}`}>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="flex-1">
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Predicted Yield for {crop}</p>

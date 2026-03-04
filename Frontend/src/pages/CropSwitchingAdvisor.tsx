@@ -57,18 +57,25 @@ const CropSwitchingAdvisor: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <div className="flex items-center gap-3 mb-1">
-                    <h1 className="page-header">{t('switching.title')}</h1>
-                    <span className="badge bg-earth-100 dark:bg-earth-900/30 text-earth-700 dark:text-earth-300">🏆 Hackathon Feature</span>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('switching.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('switching.subtitle')}</p>
                 </div>
-                <p className="text-gray-500 dark:text-gray-400">{t('switching.subtitle')}</p>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        🌱 Climate Resilience Advisor
+                    </span>
+                    <span className="badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
+                        🏆 Precision Intelligence
+                    </span>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Config */}
-                <div className="card">
-                    <h3 className="section-header mb-4">Farm Conditions</h3>
+                <div className="card glass-gold border-gold-300 dark:border-gold-800/40">
+                    <h3 className="section-header text-gold-700 dark:text-gold-400">Farm Conditions</h3>
                     <div className="space-y-5">
                         <div>
                             <label className="label">Current Crop</label>
@@ -123,14 +130,15 @@ const CropSwitchingAdvisor: React.FC = () => {
                 {/* Recommendations */}
                 <div className="lg:col-span-2 space-y-4">
                     {/* Risk Summary */}
-                    <div className={`card ${overallRisk > 40 ? 'border-red-200 dark:border-red-800' : overallRisk > 20 ? 'border-yellow-200 dark:border-yellow-800' : 'border-primary-200 dark:border-primary-800'}`}>
+                    <div className={`card shadow-glow-gold transition-all duration-500 border-l-8 ${overallRisk > 40 ? 'border-red-500' : overallRisk > 20 ? 'border-gold-500' : 'border-primary-500'}`}>
                         <div className="flex items-center justify-between">
                             <div>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Risk Assessment</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Overall Climate Risk for {currentCrop}</p>
-                                <p className="text-3xl font-bold font-display text-gray-900 dark:text-white mt-1">{overallRisk}% Risk</p>
+                                <p className={`text-4xl font-black font-display mt-1 ${overallRisk > 40 ? 'text-red-600' : overallRisk > 20 ? 'text-gold-600' : 'text-primary-600'}`}>{overallRisk}% Risk</p>
                             </div>
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${overallRisk > 40 ? 'bg-red-100 dark:bg-red-900/20' : overallRisk > 20 ? 'bg-yellow-100 dark:bg-yellow-900/20' : 'bg-primary-100 dark:bg-primary-900/20'}`}>
-                                {overallRisk > 40 ? <AlertTriangle size={28} className="text-red-500" /> : <TrendingDown size={28} className="text-yellow-500" />}
+                            <div className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-xl ${overallRisk > 40 ? 'bg-red-50 dark:bg-red-900/40' : overallRisk > 20 ? 'bg-gold-50 dark:bg-gold-900/40' : 'bg-primary-50 dark:bg-primary-900/40'}`}>
+                                {overallRisk > 40 ? <AlertTriangle size={36} className="text-red-500" /> : <TrendingDown size={36} className="text-gold-500" />}
                             </div>
                         </div>
                     </div>

@@ -139,6 +139,16 @@
             "ml": "Malayalam"
         }
     },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Mark all as read",
+        "markAsRead": "Mark as read",
+        "empty": "No notifications yet",
+        "unread": "unread",
+        "viewDetail": "View Details",
+        "back": "Back to list",
+        "summary": "AI Intelligence Notifications"
+    },
     "common": {
         "loading": "Loading...",
         "error": "Error",

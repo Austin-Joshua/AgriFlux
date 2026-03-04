@@ -39,15 +39,15 @@ const StatCard: React.FC<{
 
     return (
         <div
-            className="card-clickable group"
+            className="card-clickable group border-b-2 border-transparent hover:border-gold-500"
             onClick={() => navigate(route)}
             role="button"
             tabIndex={0}
             onKeyDown={e => e.key === 'Enter' && navigate(route)}
         >
             {/* Shimmer overlay on hover */}
-            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{ background: `linear-gradient(135deg, ${accentColor}08 0%, transparent 60%)` }} />
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-glow-gold"
+                style={{ background: `linear-gradient(135deg, ${accentColor}10 0%, transparent 60%)` }} />
 
             <div className="flex items-start justify-between mb-4">
                 <div className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
@@ -84,9 +84,9 @@ const Dashboard: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h1 className="page-header">
-                        {greeting}, <span className="text-gradient">{user?.name?.split(' ')[0] || 'Farmer'}</span> 👋
+                        {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`)}, <span className="text-gradient font-extrabold">{user?.name?.split(' ')[0] || 'Farmer'}</span> 👋
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">{t('dashboard.subtitle')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">{t('dashboard.subtitle')}</p>
                 </div>
                 <div className="flex items-center gap-2 text-sm bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 px-4 py-2 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
                     <Zap size={15} className="text-gold-500" />
@@ -208,10 +208,10 @@ const Dashboard: React.FC = () => {
             {/* Bottom Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* AI Insights */}
-                <div className="card">
+                <div className="card glass-gold">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="section-header">🤖 AI Insights</h3>
-                        <span className="badge-green animate-pulse-slow">Live</span>
+                        <h3 className="section-header text-gold-700 dark:text-gold-400">🤖 {t('dashboard.aiInsights')}</h3>
+                        <span className="badge-gold animate-pulse-slow">Live</span>
                     </div>
                     <div className="space-y-3">
                         {[

@@ -30,17 +30,26 @@ const IrrigationIntelligence: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="page-header">{t('irrigation.title')}</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">{t('irrigation.subtitle')}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header text-gradient font-extrabold">{t('irrigation.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium">{t('irrigation.subtitle')}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        ⚡ Precision Water Management
+                    </span>
+                </div>
             </div>
 
             {/* Alert */}
-            <div className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
-                <AlertTriangle size={20} className="text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-5 glass-gold border-gold-300 shadow-glow-gold rounded-2xl animate-slide-down">
+                <div className="w-10 h-10 rounded-full bg-gold-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <AlertTriangle size={20} className="text-gold-600" />
+                </div>
                 <div>
-                    <p className="font-semibold text-yellow-800 dark:text-yellow-300">Rainfall Alert</p>
-                    <p className="text-yellow-700 dark:text-yellow-400 text-sm mt-0.5">18mm of rainfall expected Thursday. AI recommends skipping irrigation on Wednesday and Thursday to conserve water.</p>
+                    <p className="font-bold text-gold-900 dark:text-gold-300 text-base">Rainfall Intelligence Alert</p>
+                    <p className="text-gold-800 dark:text-gold-400 text-sm mt-0.5">18mm of rainfall expected Thursday. AI recommends skipping irrigation on Wednesday and Thursday to conserve water.</p>
                 </div>
             </div>
 
