@@ -3,7 +3,7 @@ import { useLocation, Outlet, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon, ArrowLeft, ArrowRight } from 'lucide-react';
-import logo from '../assets/logo-icon.png';
+import logo from '../assets/logo.jpg';
 import { useTranslation } from 'react-i18next';
 
 const AuthLayout: React.FC = () => {
