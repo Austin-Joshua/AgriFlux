@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical, Leaf, AlertTriangle, CheckCircle, TrendingUp, Droplets, Sprout, Microscope, Camera, Activity, Search, Info } from 'lucide-react';
+import { FlaskConical, Leaf, AlertTriangle, CheckCircle, TrendingUp, Droplets, Sprout, Microscope, Camera, Activity, Search, Info, FileText } from 'lucide-react';
+import ReportModal from '../components/ReportModal';
 
 interface SoilInput {
     salinity: string; ph: string; moisture: string;
@@ -20,6 +21,7 @@ const SoilPlantAdvisor: React.FC = () => {
     const [recs, setRecs] = useState<CropRec[] | null>(null);
     const [loading, setLoading] = useState(false);
     const [alerts, setAlerts] = useState<string[]>([]);
+    const [selectedReport, setSelectedReport] = useState<{ title: string; content: React.ReactNode } | null>(null);
 
     const getRecommendations = (data: SoilInput): CropRec[] => {
         const sal = parseFloat(data.salinity);
@@ -103,21 +105,21 @@ const SoilPlantAdvisor: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
-                    <h1 className="page-header">🔬 {t('advisor.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('advisor.subtitle')}</p>
+                    <h1 className="page-header">🔬 {t('soilAdvisor.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('soilAdvisor.subtitle')}</p>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
                     <button
                         onClick={() => setMode('soil')}
                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mode === 'soil' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                     >
-                        {t('advisor.soilAnalysis')}
+                        {t('soilAdvisor.soilAnalysis')}
                     </button>
                     <button
                         onClick={() => setMode('plant')}
                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mode === 'plant' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
                     >
-                        {t('advisor.plantHealth')}
+                        {t('soilAdvisor.plantHealth')}
                     </button>
                 </div>
             </div>
@@ -132,8 +134,8 @@ const SoilPlantAdvisor: React.FC = () => {
                                         <FlaskConical size={24} />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-gray-900 dark:text-white">{t('advisor.soilReport')}</h2>
-                                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">{t('advisor.lastUpdated')}: 2 {t('common.daysAgo')}</p>
+                                        <h2 className="text-xl font-black text-gray-900 dark:text-white">{t('soilAdvisor.soilReport')}</h2>
+                                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">{t('soilAdvisor.lastUpdated')}: 2 {t('common.daysAgo')}</p>
                                     </div>
                                 </div>
 
@@ -153,18 +155,18 @@ const SoilPlantAdvisor: React.FC = () => {
                                 </div>
 
                                 <div className="space-y-4">
-                                    <h3 className="section-header">{t('advisor.recommendations')}</h3>
+                                    <h3 className="section-header">{t('soilAdvisor.recommendations')}</h3>
                                     <div className="p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800/50 flex gap-4">
                                         <div className="p-2 bg-white dark:bg-gray-800 rounded-xl h-fit shadow-sm"><Droplets size={20} className="text-primary-500" /></div>
                                         <div>
-                                            <p className="font-bold text-gray-900 dark:text-white text-sm">{t('advisor.irrigationStrategy')}</p>
+                                            <p className="font-bold text-gray-900 dark:text-white text-sm">{t('soilAdvisor.irrigationStrategy')}</p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Based on current moisture levels, increase watering cycles by 15% for the next 3 days to support peak growth phase.</p>
                                         </div>
                                     </div>
                                     <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 flex gap-4">
                                         <div className="p-2 bg-white dark:bg-gray-800 rounded-xl h-fit shadow-sm"><Sprout size={20} className="text-amber-500" /></div>
                                         <div>
-                                            <p className="font-bold text-gray-900 dark:text-white text-sm">{t('advisor.fertilizerPlan')}</p>
+                                            <p className="font-bold text-gray-900 dark:text-white text-sm">{t('soilAdvisor.fertilizerPlan')}</p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Apply 2.5kg/acre of Phosphorus-rich organic compost to address soil deficiency detected in northern plot B-12.</p>
                                         </div>
                                     </div>
@@ -173,7 +175,7 @@ const SoilPlantAdvisor: React.FC = () => {
 
                             {/* Manual Analysis Form */}
                             <div className="card">
-                                <h3 className="section-header mb-4 flex items-center gap-2"><FlaskConical size={16} className="text-primary-500" /> {t('advisor.manualInput')}</h3>
+                                <h3 className="section-header mb-4 flex items-center gap-2"><FlaskConical size={16} className="text-primary-500" /> {t('soilAdvisor.manualInput')}</h3>
                                 <form onSubmit={analyze} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="label">Salinity (dS/m)</label>
@@ -203,7 +205,7 @@ const SoilPlantAdvisor: React.FC = () => {
                                     </div>
                                     <div className="sm:col-span-2">
                                         <button type="submit" disabled={loading} className="btn-primary w-full py-3">
-                                            {loading ? t('common.loading') : t('advisor.getAIRecommendation')}
+                                            {loading ? t('common.loading') : t('soilAdvisor.getAIRecommendation')}
                                         </button>
                                     </div>
                                 </form>
@@ -219,12 +221,42 @@ const SoilPlantAdvisor: React.FC = () => {
                                     ))}
                                     <div className="grid grid-cols-1 gap-4">
                                         {recs.map((rec, i) => (
-                                            <div key={rec.name} className="card border-l-4 border-l-primary-500">
+                                            <div
+                                                key={rec.name}
+                                                className="card border-l-4 border-l-primary-500 cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all group"
+                                                onClick={() => setSelectedReport({
+                                                    title: `${rec.name} Suitability Report`,
+                                                    content: (
+                                                        <div className="space-y-6 text-gray-700 dark:text-gray-300">
+                                                            <div className="p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl">
+                                                                <h4 className="font-bold text-primary-700 dark:text-primary-400 mb-2 flex items-center gap-2">
+                                                                    <Sprout size={18} /> Primary Guidance
+                                                                </h4>
+                                                                <p className="text-sm font-medium">{rec.guidance}</p>
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="font-bold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Agronomic Requirements</h4>
+                                                                <ul className="space-y-3 text-sm">
+                                                                    <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Soil Preparation:</strong> {rec.soilPrep}</li>
+                                                                    <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Water Requirement:</strong> {rec.waterReq}</li>
+                                                                    <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Yield Potential:</strong> {rec.yieldPotential}</li>
+                                                                </ul>
+                                                            </div>
+                                                            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                                                                <h4 className="font-bold text-amber-700 dark:text-amber-500 mb-2 flex items-center gap-2">
+                                                                    <TrendingUp size={18} /> 10-Year Market Trend
+                                                                </h4>
+                                                                <p className="text-sm font-bold">{rec.tenYearTrend}</p>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })}
+                                            >
                                                 <div className="flex items-start justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <span className="text-3xl">{rec.emoji}</span>
                                                         <div>
-                                                            <h4 className="font-black text-gray-900 dark:text-white">#{i + 1} {rec.name}</h4>
+                                                            <h4 className="font-black text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">#{i + 1} {rec.name}</h4>
                                                             <div className="flex items-center gap-2 mt-1">
                                                                 <div className="h-1.5 w-24 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                                                                     <div className={`h-full bg-gradient-to-r ${rec.color}`} style={{ width: `${rec.score}%` }} />
@@ -233,12 +265,17 @@ const SoilPlantAdvisor: React.FC = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600">{rec.suitability}</span>
+                                                    <div className="flex flex-col items-end gap-2">
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600">{rec.suitability}</span>
+                                                        <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-500 px-2 py-1 rounded-md flex items-center gap-1 font-bold group-hover:text-primary-600 transition-colors hidden sm:flex">
+                                                            <FileText size={10} /> View Report
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 leading-relaxed">{rec.guidance}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 leading-relaxed">{rec.guidance.substring(0, 90)}...</p>
                                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                                                    <div><p className="text-[10px] font-bold text-gray-400 uppercase">{t('advisor.waterReq')}</p><p className="text-xs font-bold">{rec.waterReq}</p></div>
-                                                    <div><p className="text-[10px] font-bold text-gray-400 uppercase">{t('advisor.yieldPotential')}</p><p className="text-xs font-bold">{rec.yieldPotential}</p></div>
+                                                    <div><p className="text-[10px] font-bold text-gray-400 uppercase">{t('soilAdvisor.waterReq')}</p><p className="text-xs font-bold">{rec.waterReq.split(' ')[0]}</p></div>
+                                                    <div><p className="text-[10px] font-bold text-gray-400 uppercase">{t('soilAdvisor.yieldPotential')}</p><p className="text-xs font-bold">{rec.yieldPotential.split(' ')[0]}</p></div>
                                                 </div>
                                             </div>
                                         ))}
@@ -253,7 +290,7 @@ const SoilPlantAdvisor: React.FC = () => {
                                     <Microscope size={24} />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black text-gray-900 dark:text-white">{t('advisor.plantAnalysis')}</h2>
+                                    <h2 className="text-xl font-black text-gray-900 dark:text-white">{t('soilAdvisor.plantAnalysis')}</h2>
                                     <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">AI Scanner Active</p>
                                 </div>
                             </div>
@@ -262,7 +299,7 @@ const SoilPlantAdvisor: React.FC = () => {
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <div className="text-center text-white/50">
                                         <Camera size={48} className="mx-auto mb-2 opacity-20" />
-                                        <p className="text-xs font-bold uppercase tracking-widest">{t('advisor.uploadScan')}</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest">{t('soilAdvisor.uploadScan')}</p>
                                     </div>
                                 </div>
                                 <div className="absolute top-4 right-4 bg-primary-500 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse">
@@ -281,7 +318,7 @@ const SoilPlantAdvisor: React.FC = () => {
                                 <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
                                     <div className="flex items-center gap-2 mb-3">
                                         <Activity size={16} className="text-primary-500" />
-                                        <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">{t('advisor.vitals')}</h4>
+                                        <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">{t('soilAdvisor.vitals')}</h4>
                                     </div>
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center text-xs">
@@ -296,14 +333,14 @@ const SoilPlantAdvisor: React.FC = () => {
                                 </div>
                                 <button className="p-4 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:bg-primary-50/10 transition-all flex flex-col items-center justify-center gap-2">
                                     <Camera size={20} className="text-gray-400" />
-                                    <span className="text-xs font-bold text-gray-500">{t('advisor.newScan')}</span>
+                                    <span className="text-xs font-bold text-gray-500">{t('soilAdvisor.newScan')}</span>
                                 </button>
                             </div>
                         </div>
                     )}
 
                     <div className="card">
-                        <h3 className="section-header mb-4">{t('advisor.upcomingTasks')}</h3>
+                        <h3 className="section-header mb-4">{t('soilAdvisor.upcomingTasks')}</h3>
                         <div className="space-y-3">
                             {[
                                 { task: 'Soil Testing Plot C-4', time: 'Tomorrow, 08:00 AM', priority: 'High', color: 'text-red-500' },
@@ -329,13 +366,13 @@ const SoilPlantAdvisor: React.FC = () => {
                         <div className="relative z-10">
                             <div className="flex items-center gap-2 mb-4">
                                 <Search size={16} className="text-primary-400" />
-                                <h3 className="text-sm font-black uppercase tracking-wider">{t('advisor.expertHelp')}</h3>
+                                <h3 className="text-sm font-black uppercase tracking-wider">{t('soilAdvisor.expertHelp')}</h3>
                             </div>
                             <p className="text-xs text-gray-400 mb-6 leading-relaxed">
                                 Get a professional agronomy report for your farm by connecting with our certified experts.
                             </p>
                             <button className="w-full btn-primary !bg-white !text-gray-900 border-none py-3 text-xs font-black rounded-xl">
-                                {t('advisor.bookConsultation')}
+                                {t('soilAdvisor.bookConsultation')}
                             </button>
                         </div>
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/20 blur-3xl -mr-16 -mt-16" />
@@ -343,13 +380,20 @@ const SoilPlantAdvisor: React.FC = () => {
                     </div>
 
                     <div className="card">
-                        <h3 className="section-header mb-4">{t('advisor.marketImpact')}</h3>
+                        <h3 className="section-header mb-4">{t('soilAdvisor.marketImpact')}</h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed italic border-l-2 border-amber-300 pl-3">
                             "Current soil moisture level is ideal for Wheat plantation. This could lead to a 10% higher yield if sowing is completed this week."
                         </p>
                     </div>
                 </div>
             </div>
+
+            <ReportModal
+                isOpen={!!selectedReport}
+                onClose={() => setSelectedReport(null)}
+                title={selectedReport?.title || ''}
+                content={selectedReport?.content}
+            />
         </div>
     );
 };

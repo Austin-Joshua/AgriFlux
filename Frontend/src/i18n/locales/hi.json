@@ -358,6 +358,7 @@
         "resolved": "सुलझाया गया",
         "pending": "लंबित",
         "settings": "सेटिंग्स",
-        "signout": "साइन आउट"
+        "signout": "साइन आउट",
+        "daysAgo": "दिन पहले"
     }
 }

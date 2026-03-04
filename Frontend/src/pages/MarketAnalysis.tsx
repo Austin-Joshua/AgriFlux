@@ -68,13 +68,13 @@ const MarketAnalysis: React.FC = () => {
     );
 
 
-    const chartData = timeframe === '1D' ? selected.data :
-        timeframe === '1W' ? selected.weekData :
-            timeframe === '1M' ? generateData(selected.price, 4, monthLabels) :
-                generateData(selected.price, 12, yearLabels);
+    const chartData = timeframe === '1D' ? selectedCrop.trends :
+        timeframe === '1W' ? generateData(selectedCrop.price, 6, weekLabels) :
+            timeframe === '1M' ? generateData(selectedCrop.price, 4, monthLabels) :
+                generateData(selectedCrop.price, 12, yearLabels);
 
-    const aboveMSP = selected.msp > 0 && selected.price >= selected.msp;
-    const below = selected.msp > 0 && selected.price < selected.msp;
+    const aboveMSP = selectedCrop.msp > 0 && selectedCrop.price >= selectedCrop.msp;
+    const below = selectedCrop.msp > 0 && selectedCrop.price < selectedCrop.msp;
 
     return (
         <div className="space-y-5">

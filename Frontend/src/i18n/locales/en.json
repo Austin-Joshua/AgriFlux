@@ -386,6 +386,7 @@
         "resolved": "Resolved",
         "pending": "Pending",
         "settings": "Settings",
-        "signout": "Sign Out"
+        "signout": "Sign Out",
+        "daysAgo": "days ago"
     }
 }
