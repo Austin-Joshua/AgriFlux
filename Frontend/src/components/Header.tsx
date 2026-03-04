@@ -275,71 +275,32 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
                     </button>
 
                     {accountOpen && (
-                        <div className="absolute right-0 top-full mt-2 w-64 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
-                            {/* Account Info */}
-                            <div className="px-4 pt-4 pb-3 border-b border-gray-100/50 dark:border-gray-700/50">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 gradient-gold-green rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-lg flex-shrink-0">
-                                        {user?.name?.charAt(0).toUpperCase() || 'U'}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="font-semibold text-gray-900 dark:text-white truncate">{user?.name || 'Enterprise User'}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || 'user@agriflux.ai'}</p>
-                                        <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
-                                            🌾 {user?.role || 'Farmer'}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="mt-3 grid grid-cols-3 gap-1.5 text-center">
-                                    {[{ label: 'Farm', value: user?.farmName || 'Green Valley' }, { label: 'Score', value: '78/100' }, { label: 'Plan', value: 'Pro' }].map(s => (
-                                        <div key={s.label} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg py-1.5 px-1">
-                                            <p className="text-[10px] text-gray-400">{s.label}</p>
-                                            <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{s.value}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Menu Actions */}
-                            {[
-                                { icon: User, label: 'My Profile', sub: 'View & edit profile' },
-                                { icon: Shield, label: 'Security', sub: 'Password & 2FA' },
-                            ].map(item => (
-                                <button key={item.label}
-                                    onClick={() => { navigate('/settings'); setAccountOpen(false); }}
-                                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50/60 dark:hover:bg-gray-700/40 transition-all duration-150 group">
-                                    <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                                        <item.icon size={15} className="text-gray-600 dark:text-gray-300" />
-                                    </div>
-                                    <div className="text-left">
-                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{item.label}</p>
-                                        <p className="text-xs text-gray-400">{item.sub}</p>
-                                    </div>
-                                    <ChevronRight size={14} className="ml-auto text-gray-300 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all" />
-                                </button>
-                            ))}
-
+                        <div className="absolute right-0 top-full mt-2 w-56 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
+                            {/* Simple Settings Action */}
                             <button
                                 onClick={() => { navigate('/settings'); setAccountOpen(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-primary-50/40 dark:hover:bg-primary-900/10 transition-all duration-150 group border-t border-gray-100/50 dark:border-gray-700/50">
-                                <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                                    <Settings size={15} className="text-primary-600 dark:text-primary-400" />
+                                className="w-full flex items-center gap-3 px-4 py-4 hover:bg-primary-50/40 dark:hover:bg-primary-900/10 transition-all duration-150 group">
+                                <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                    <Settings size={18} className="text-primary-600 dark:text-primary-400" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Full Settings</p>
-                                    <p className="text-xs text-gray-400">App preferences</p>
+                                    <p className="text-sm font-bold text-gray-900 dark:text-white">Full Settings</p>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">App preferences</p>
                                 </div>
                                 <ChevronRight size={14} className="ml-auto text-primary-300 group-hover:translate-x-0.5 transition-all" />
                             </button>
 
-                            {/* Logout */}
+                            {/* Logout Action */}
                             <button
                                 onClick={() => { logout(); navigate('/login'); }}
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50/40 dark:hover:bg-red-900/10 text-red-500 hover:text-red-600 transition-all duration-150 group border-t border-gray-100/50 dark:border-gray-700/50">
-                                <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                                    <LogOut size={15} className="text-red-500" />
+                                className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-50/40 dark:hover:bg-red-900/10 text-red-500 hover:text-red-600 transition-all duration-150 group border-t border-gray-100/50 dark:border-gray-700/50">
+                                <div className="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                    <LogOut size={18} className="text-red-500" />
                                 </div>
-                                <span className="text-sm font-medium">Sign Out</span>
+                                <div className="text-left">
+                                    <p className="text-sm font-bold">Sign Out</p>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Exit session</p>
+                                </div>
                             </button>
                         </div>
                     )}

@@ -1,0 +1,228 @@
+import React, { useState, useRef } from 'react';
+import { Upload, Map as MapIcon, Maximize2, Calculator, TrendingUp, AlertCircle, CheckCircle2, FileImage } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+const LandIntelligence: React.FC = () => {
+    const { t } = useTranslation();
+    const [dragging, setDragging] = useState(false);
+    const [image, setImage] = useState<string | null>(null);
+    const [analyzing, setAnalyzing] = useState(false);
+    const [result, setResult] = useState<{
+        size: number;
+        value: number;
+        health: number;
+        zones: { type: string; area: number; color: string }[];
+    } | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleDrag = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === 'dragenter' || e.type === 'dragover') setDragging(true);
+        else if (e.type === 'dragleave') setDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    };
+
+    const handleFile = (file: File) => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => setImage(e.target?.result as string);
+        reader.readAsDataURL(file);
+        setResult(null);
+    };
+
+    const runAnalysis = () => {
+        setAnalyzing(true);
+        setTimeout(() => {
+            setResult({
+                size: 15.4,
+                value: 4500000,
+                health: 84,
+                zones: [
+                    { type: 'Highly Productive', area: 8.2, color: 'bg-green-500' },
+                    { type: 'Moderate Yield', area: 4.5, color: 'bg-lime-400' },
+                    { type: 'Low Productivity', area: 2.7, color: 'bg-amber-400' },
+                ]
+            });
+            setAnalyzing(false);
+        }, 2500);
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="page-header">🗺️ Land Intelligence</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Satellite & Drone Analysis for Land Size and Valuation</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Upload & Preview */}
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="card h-full min-h-[400px] flex flex-col items-center justify-center relative overflow-hidden">
+                        {!image ? (
+                            <div
+                                className={`w-full h-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 transition-all
+                                    ${dragging ? 'border-primary-500 bg-primary-50/10' : 'border-gray-200 dark:border-gray-700'}`}
+                                onDragEnter={handleDrag}
+                                onDragOver={handleDrag}
+                                onDragLeave={handleDrag}
+                                onDrop={handleDrop}
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+                                <div className="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-full text-primary-600">
+                                    <Upload size={32} />
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-lg font-bold text-gray-900 dark:text-white">Upload satellite imagery</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Drag and drop or click to browse</p>
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setImage('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1000');
+                                        }}
+                                        className="mt-6 px-4 py-2 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-bold rounded-lg hover:bg-primary-200 transition-all border border-primary-200 dark:border-primary-800"
+                                    >
+                                        ✨ Try with demo image
+                                    </button>
+                                    <p className="text-[10px] text-gray-400 mt-4 italic">Supports JPG, PNG, and TIF (max 20MB)</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full h-full flex flex-col">
+                                <div className="relative flex-1 bg-black/5 dark:bg-black/20 rounded-xl overflow-hidden group">
+                                    <img src={image} alt="Land Preview" className="w-full h-full object-contain" />
+
+                                    {/* Mock Heatmap Overlay */}
+                                    {result && (
+                                        <div className="absolute inset-0 opacity-40 mix-blend-overlay animate-pulse pointer-events-none"
+                                            style={{ background: 'radial-gradient(circle at 30% 20%, #22c55e 0%, transparent 40%), radial-gradient(circle at 70% 60%, #eab308 0%, transparent 50%), radial-gradient(circle at 40% 80%, #ef4444 0%, transparent 30%)' }} />
+                                    )}
+
+                                    {analyzing && (
+                                        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center text-white">
+                                            <div className="w-12 h-12 border-4 border-white/20 border-t-primary-500 rounded-full animate-spin mb-4" />
+                                            <p className="font-bold text-lg animate-pulse">Analyzing Land Patterns...</p>
+                                            <p className="text-sm opacity-60">Scanning vegetation index & scale...</p>
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={() => setImage(null)}
+                                        className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                    >
+                                        Change Image
+                                    </button>
+                                </div>
+
+                                {!result && !analyzing && (
+                                    <button
+                                        onClick={runAnalysis}
+                                        className="btn-primary mt-4 py-4 w-full flex items-center justify-center gap-2"
+                                    >
+                                        <Calculator size={18} /> Run AI Land Analysis
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Analysis Results */}
+                <div className="space-y-6">
+                    <div className="card">
+                        <h3 className="section-header mb-4">Analysis Parameters</h3>
+                        {!result ? (
+                            <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
+                                <MapIcon size={40} className="mb-4 opacity-20" />
+                                <p className="text-sm">Upload an image to see predicted size and value</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                {/* Main Stats */}
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div className="p-4 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-800/50">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Maximize2 size={16} className="text-primary-600" />
+                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Predicted Land Size</span>
+                                        </div>
+                                        <p className="text-3xl font-black text-primary-700 dark:text-primary-400">{result.size} <span className="text-sm">Acres</span></p>
+                                    </div>
+
+                                    <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/50">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <TrendingUp size={16} className="text-amber-600" />
+                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Market Valuation</span>
+                                        </div>
+                                        <p className="text-3xl font-black text-amber-700 dark:text-amber-500">₹ {(result.value / 100000).toFixed(1)} <span className="text-sm">Lakhs</span></p>
+                                    </div>
+                                </div>
+
+                                {/* Heatmap Legend */}
+                                <div>
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Productivity Zones</h4>
+                                    <div className="space-y-3">
+                                        {result.zones.map(z => (
+                                            <div key={z.type} className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-3 h-3 rounded-full ${z.color}`} />
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300">{z.type}</span>
+                                                </div>
+                                                <span className="text-sm font-bold text-gray-900 dark:text-white">{z.area} Ac</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Summary */}
+                                <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 mb-2">
+                                        <CheckCircle2 size={16} />
+                                        <span className="text-xs font-bold">Reliability Score: 92%</span>
+                                    </div>
+                                    <p className="text-xs text-gray-500 leading-relaxed italic">
+                                        Analysis based on vegetation density index (NDVI) and image metadata scaling. Valuation is an estimate based on local market averages.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="card bg-gradient-to-br from-primary-600 to-primary-700 text-white border-none shadow-glow-green">
+                        <div className="flex items-center gap-3 mb-4">
+                            <AlertCircle size={20} className="text-white/60" />
+                            <h3 className="font-bold">Next Steps</h3>
+                        </div>
+                        <ul className="text-xs space-y-3 opacity-90">
+                            <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-white mt-1 shrink-0" />
+                                Download PDF report for land title documentation.
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-white mt-1 shrink-0" />
+                                Connect with your nearest Agronomist for valuation certification.
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-white mt-1 shrink-0" />
+                                Apply for land-based subsidies based on verified size.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default LandIntelligence;

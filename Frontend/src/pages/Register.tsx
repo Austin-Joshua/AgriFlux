@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Wheat } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.jpg';
+import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
 
 const Register: React.FC = () => {
     const { t } = useTranslation();
     const { register, loginWithProvider, isLoading } = useAuth();
-    const { isDark, toggleTheme } = useTheme();
+    const { isDark } = useTheme();
     const navigate = useNavigate();
 
     const [socialLoading, setSocialLoading] = useState<string | null>(null);
@@ -120,141 +121,131 @@ const Register: React.FC = () => {
     ];
 
     return (
-        <div className="login-bg min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none"
-                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%2316a34a\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}
-            />
+        <div className="w-full h-full flex flex-col justify-center py-8">
+            {/* Mobile Branding */}
+            <div className="lg:hidden flex flex-col items-center mb-8 text-center">
+                <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-xl mb-4 p-2">
+                    <img src={logo} alt="AgriFlux" className="w-full h-full object-contain" />
+                </div>
+                <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">Join AgriFlux</h1>
+                <p className="text-primary-600 dark:text-amber-400/80 text-xs font-bold uppercase tracking-widest mt-2">{t('auth.register')}</p>
+            </div>
 
-            {/* Theme Toggle */}
-            <button
-                onClick={toggleTheme}
-                className="absolute top-4 right-4 p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md text-gray-600 dark:text-gray-400 hover:scale-110 transition-all z-50"
-            >
-                {isDark ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} />}
-            </button>
+            <div className="mb-6 hidden lg:block">
+                <h2 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">Create Account</h2>
+                <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">Join the next generation of precision agriculture.</p>
+            </div>
 
-            <div className="w-full max-w-lg animate-slide-up relative z-10">
-                <div className="text-center mb-6">
-                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-4 border border-primary-200 dark:border-primary-800/50 overflow-hidden bg-white dark:bg-gray-800 transition-all duration-700">
-                        <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
-                    </div>
-                    <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tightest transition-colors duration-700">Join AgriFlux</h1>
-                    <p className="text-primary-600 dark:text-amber-400/80 text-xs font-bold uppercase tracking-widest mt-2 transition-colors duration-700">Precision AI Agriculture Intelligence</p>
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-bold">
+                    <AlertCircle size={14} />
+                    {error}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {fields.map(field => (
+                        <div key={field.name} className={field.name === 'email' ? 'sm:col-span-2' : ''}>
+                            <label className="label text-[10px] uppercase tracking-widest font-bold opacity-60 ml-1">{field.label}</label>
+                            <div className="relative group">
+                                <field.icon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                                <input
+                                    type={field.type}
+                                    name={field.name}
+                                    value={form[field.name as keyof typeof form]}
+                                    onChange={handleChange}
+                                    className="input-field pl-12 h-11 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+                                    placeholder={field.placeholder}
+                                    required={field.required}
+                                />
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100 dark:border-white/5 p-8 transition-all duration-700">
-                    {error && (
-                        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
-                            {error}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {fields.map(field => (
-                                <div key={field.name} className={field.name === 'email' ? 'sm:col-span-2' : ''}>
-                                    <label className="label">{field.label}</label>
-                                    <div className="relative">
-                                        <field.icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                        <input
-                                            type={field.type}
-                                            name={field.name}
-                                            value={form[field.name as keyof typeof form]}
-                                            onChange={handleChange}
-                                            className="input-field pl-10"
-                                            placeholder={field.placeholder}
-                                            required={field.required}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Password */}
-                        <div>
-                            <label className="label">{t('auth.password')}</label>
-                            <div className="relative">
-                                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="password"
-                                    value={form.password}
-                                    onChange={handleChange}
-                                    className="input-field pl-10 pr-10"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="label">{t('auth.confirmPassword')}</label>
-                            <div className="relative">
-                                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="password"
-                                    name="confirmPassword"
-                                    value={form.confirmPassword}
-                                    onChange={handleChange}
-                                    className="input-field pl-10"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <button type="submit" disabled={isLoading} className="btn-primary w-full py-4 text-base mt-2 shadow-glow-green hover:scale-[1.02] active:scale-[0.98] transition-all">
-                            {isLoading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
-                                    Creating account...
-                                </span>
-                            ) : t('auth.register')}
-                        </button>
-                    </form>
-
-                    {/* Social Sign Up */}
-                    <div className="mt-5">
-                        <div className="relative flex items-center gap-3 mb-4">
-                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
-                            <span className="text-xs text-gray-400 font-medium">Or sign up with</span>
-                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600" />
-                        </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            {([
-                                { id: 'google', label: 'Google', emoji: '🔍' },
-                                { id: 'microsoft', label: 'Microsoft', emoji: '🪟' },
-                                { id: 'apple', label: 'Apple', emoji: '🍎' },
-                            ] as const).map(p => (
-                                <button
-                                    key={p.id}
-                                    type="button"
-                                    onClick={() => p.id === 'google' ? googleLogin() : openMockProviderPopup(p.id)}
-                                    disabled={!!socialLoading || isLoading}
-                                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
-                                >
-                                    {socialLoading === p.id
-                                        ? <div className="w-4 h-4 border-2 border-gray-400 border-t-primary-600 rounded-full animate-spin" />
-                                        : <span>{p.emoji}</span>}
-                                    <span className="hidden sm:inline text-xs">{socialLoading === p.id ? 'Signing up…' : p.label}</span>
-                                </button>
-                            ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <label className="label text-[10px] uppercase tracking-widest font-bold opacity-60 ml-1">{t('auth.password')}</label>
+                        <div className="relative group">
+                            <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                value={form.password}
+                                onChange={handleChange}
+                                className="input-field pl-12 h-11 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+                                placeholder="••••••••"
+                                required
+                            />
                         </div>
                     </div>
+                    <div className="space-y-1">
+                        <label className="label text-[10px] uppercase tracking-widest font-bold opacity-60 ml-1">{t('auth.confirmPassword')}</label>
+                        <div className="relative group">
+                            <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                            <input
+                                type="password"
+                                name="confirmPassword"
+                                value={form.confirmPassword}
+                                onChange={handleChange}
+                                className="input-field pl-12 h-11 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
+                    </div>
+                </div>
 
-                    <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                        {t('auth.hasAccount')}{' '}
-                        <Link to="/login" className="text-primary-600 dark:text-primary-400 font-semibold hover:underline">
-                            {t('auth.login')}
-                        </Link>
-                    </p>
+                <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="btn-primary w-full py-4 text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/10 mt-6 active:scale-95"
+                >
+                    {isLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                            Creating account...
+                        </span>
+                    ) : t('auth.register')}
+                </button>
+            </form>
+
+            <div className="mt-8">
+                <div className="relative flex items-center gap-4 mb-6">
+                    <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">Or sign up with</span>
+                    <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                    {[
+                        { id: 'google', icon: <GoogleIcon />, action: () => googleLogin() },
+                        { id: 'microsoft', icon: <MicrosoftIcon />, action: () => openMockProviderPopup('microsoft') },
+                        { id: 'apple', icon: <AppleIcon className={isDark ? 'text-white' : 'text-black'} />, action: () => openMockProviderPopup('apple') }
+                    ].map(provider => (
+                        <button
+                            key={provider.id}
+                            type="button"
+                            onClick={provider.action}
+                            disabled={!!socialLoading || isLoading}
+                            className="flex items-center justify-center py-3.5 border border-gray-100 dark:border-white/5 rounded-2xl bg-white/50 dark:bg-gray-900/40 hover:bg-white dark:hover:bg-gray-900 transition-all hover:shadow-xl hover:-translate-y-1 group"
+                        >
+                            <div className="scale-110 group-hover:scale-125 transition-transform">
+                                {socialLoading === provider.id ? (
+                                    <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                                ) : provider.icon}
+                            </div>
+                        </button>
+                    ))}
                 </div>
             </div>
+
+            <p className="mt-8 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t('auth.hasAccount')}{' '}
+                <Link to="/login" className="text-primary-600 dark:text-primary-400 font-black hover:underline ml-1">
+                    {t('auth.login')}
+                </Link>
+            </p>
         </div>
     );
 };

@@ -6,6 +6,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Layouts
+import AuthLayout from './layouts/AuthLayout';
+
 // Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -25,6 +28,7 @@ import GovernmentSubsidies from './pages/GovernmentSubsidies';
 import MarketAnalysis from './pages/MarketAnalysis';
 import InvestorsHub from './pages/InvestorsHub';
 import SoilPlantAdvisor from './pages/SoilPlantAdvisor';
+import LandIntelligence from './pages/LandIntelligence';
 import AgronomistDashboard from './pages/AgronomistDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -35,9 +39,11 @@ const App: React.FC = () => {
                 <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID_PLACEHOLDER">
                     <BrowserRouter>
                         <Routes>
-                            {/* Public Routes */}
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
+                            {/* Authentication Layer with Sliding Transitions */}
+                            <Route element={<AuthLayout />}>
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/register" element={<Register />} />
+                            </Route>
                             <Route path="/forgot-password" element={<ForgotPassword />} />
 
                             {/* Protected Routes inside Layout */}
@@ -158,6 +164,14 @@ const App: React.FC = () => {
                                 element={
                                     <ProtectedRoute>
                                         <Layout><SoilPlantAdvisor /></Layout>
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/land-intelligence"
+                                element={
+                                    <ProtectedRoute>
+                                        <Layout><LandIntelligence /></Layout>
                                     </ProtectedRoute>
                                 }
                             />

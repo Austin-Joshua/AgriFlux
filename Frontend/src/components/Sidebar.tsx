@@ -5,7 +5,7 @@ import {
     LayoutDashboard, TrendingUp, Droplets, FlaskConical,
     Satellite, CloudLightning, Thermometer, Sprout,
     Award, Settings, Info, X, Leaf, LogOut, PanelLeftClose, PanelLeft,
-    Landmark, BarChart3, Handshake, TestTube
+    Landmark, BarChart3, Handshake, TestTube, Map
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.jpg';
@@ -31,6 +31,7 @@ const navItems = [
     { to: '/market', icon: BarChart3, labelKey: 'nav.market' },
     { to: '/investors', icon: Handshake, labelKey: 'nav.investors' },
     { to: '/soil-advisor', icon: TestTube, labelKey: 'nav.soilAdvisor' },
+    { to: '/land-intelligence', icon: Map, labelKey: 'nav.landIntelligence' },
 ];
 
 const bottomItems = [
