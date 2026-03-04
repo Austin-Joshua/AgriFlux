@@ -8,7 +8,7 @@ import {
     Landmark, BarChart3, Handshake, TestTube, Map
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/new-leaf-logo.png';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -85,7 +85,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                         className={`flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity ${collapsed ? 'justify-center w-full' : ''}`}
                     >
                         {!collapsed ? (
-                            <img src={logo} alt="AgriFlux Logo" className="h-10 w-auto object-contain rounded" />
+                            <div className="flex items-center gap-2.5">
+                                <img src={logo} alt="AgriFlux Logo" className="h-9 w-9 object-contain rounded-xl shadow-sm" />
+                                <div className="flex flex-col text-left">
+                                    <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">AgriFlux</span>
+                                    <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">Intelligence Platform</span>
+                                </div>
+                            </div>
                         ) : (
                             <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0 bg-black">
                                 <img src={logo} alt="AgriFlux Logo" className="h-full w-auto max-w-none object-cover" style={{ objectPosition: '15% center' }} />

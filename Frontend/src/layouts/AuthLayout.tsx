@@ -3,7 +3,7 @@ import { useLocation, Outlet, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon, ArrowLeft, ArrowRight } from 'lucide-react';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/new-leaf-logo.png';
 import { useTranslation } from 'react-i18next';
 
 const AuthLayout: React.FC = () => {
@@ -66,12 +66,18 @@ const AuthLayout: React.FC = () => {
 
                         <div className="relative w-full h-full p-16 flex flex-col justify-between text-white z-10">
                             <div className="space-y-8">
-                                <motion.div
-                                    whileHover={{ scale: 1.05, rotate: 5 }}
-                                    className="w-20 h-20 bg-white/10 backdrop-blur-xl rounded-[2rem] flex items-center justify-center border border-white/20 shadow-2xl overflow-hidden ring-1 ring-white/30"
-                                >
-                                    <img src={logo} alt="AgriFlux" className="w-12 h-12 object-contain" />
-                                </motion.div>
+                                <div className="flex items-center gap-4">
+                                    <motion.div
+                                        whileHover={{ scale: 1.05, rotate: 5 }}
+                                        className="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center border border-white/20 shadow-2xl overflow-hidden ring-1 ring-white/30"
+                                    >
+                                        <img src={logo} alt="AgriFlux" className="w-10 h-10 object-contain" />
+                                    </motion.div>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-2xl font-black text-white leading-none tracking-tight">AgriFlux</span>
+                                        <span className="text-xs font-black text-gold-400 uppercase tracking-widest mt-1">Intelligence Platform</span>
+                                    </div>
+                                </div>
 
                                 <div className="space-y-4">
                                     <motion.div
