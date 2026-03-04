@@ -5,7 +5,7 @@ import { Eye, EyeOff, Leaf, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
-import logo from '../assets/logo-icon.png';
+import logo from '../assets/logo.jpg';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -53,12 +53,11 @@ const Login: React.FC = () => {
                 </div>
 
                 <div className="relative">
-                    <div className="flex items-center gap-3 mb-12">
-                        <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl overflow-hidden">
-                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain p-1" />
+                    <div className="flex flex-col items-start gap-4 mb-12">
+                        <div className="h-20 bg-black/40 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl overflow-hidden px-4">
+                            <img src={logo} alt="AgriFlux Logo" className="h-16 w-auto object-contain" />
                         </div>
-                        <div>
-                            <h1 className="text-4xl font-black font-display tracking-tightest">AgriFlux</h1>
+                        <div className="pl-2">
                             <p className="text-gold-300 font-bold text-xs uppercase tracking-widest">Premium AI Agriculture</p>
                         </div>
                     </div>
@@ -94,11 +93,10 @@ const Login: React.FC = () => {
             <div className="flex-1 flex items-center justify-center p-6">
                 <div className="w-full max-w-md animate-slide-up">
                     {/* Mobile Logo */}
-                    <div className="lg:hidden flex items-center gap-3 justify-center mb-8">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden bg-green-900">
-                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
+                    <div className="lg:hidden flex justify-center mb-8">
+                        <div className="h-16 rounded-2xl flex items-center justify-center shadow-md overflow-hidden bg-white dark:bg-black/40 px-4 border border-gray-100 dark:border-gray-800">
+                            <img src={logo} alt="AgriFlux Logo" className="h-12 w-auto object-contain" />
                         </div>
-                        <h1 className="text-2xl font-black text-gray-900 dark:text-white font-display tracking-tightest text-gradient">AgriFlux</h1>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-dark-xl border border-gray-100 dark:border-gray-700 p-8">

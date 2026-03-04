@@ -7,7 +7,7 @@ import {
     Award, Settings, Info, X, Leaf, LogOut, PanelLeftClose, PanelLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo-icon.png';
+import logo from '../assets/logo.jpg';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -82,13 +82,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                         onClick={() => navigate('/dashboard')}
                         className={`flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity ${collapsed ? 'justify-center w-full' : ''}`}
                     >
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0 bg-green-900">
-                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
-                        </div>
-                        {!collapsed && (
-                            <div>
-                                <h1 className="font-bold text-lg text-gray-900 dark:text-white font-display leading-none">AgriFlux</h1>
-                                <p className="text-xs bg-gradient-to-r from-primary-600 to-gold-500 text-transparent bg-clip-text font-semibold">AI Agriculture</p>
+                        {!collapsed ? (
+                            <img src={logo} alt="AgriFlux Logo" className="h-10 w-auto object-contain rounded" />
+                        ) : (
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0 bg-black">
+                                <img src={logo} alt="AgriFlux Logo" className="h-full w-auto max-w-none object-cover" style={{ objectPosition: '15% center' }} />
                             </div>
                         )}
                     </div>
