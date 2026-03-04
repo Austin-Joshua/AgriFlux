@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ExternalLink, Search, Filter, CheckCircle, IndianRupee, Users, FileText, Globe, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Scheme {
     id: string;
@@ -84,6 +85,7 @@ const schemes: Scheme[] = [
 const categories = ['All', 'Income Support', 'Insurance', 'Soil Health', 'Credit', 'Market Access', 'Development', 'Horticulture', 'Training', 'Irrigation'];
 
 const GovernmentSubsidies: React.FC = () => {
+    const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('All');
 
@@ -97,12 +99,12 @@ const GovernmentSubsidies: React.FC = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="page-header flex items-center gap-2">🏛️ Government Subsidies & Schemes</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">Official Indian government agricultural support programmes — apply directly for benefits</p>
+                    <h1 className="page-header flex items-center gap-2">🏛️ {t('subsidies.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">{t('subsidies.subtitle')}</p>
                 </div>
                 <div className="flex items-center gap-2 text-sm bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800">
                     <IndianRupee size={15} />
-                    <span className="font-semibold">{schemes.length} Active Schemes</span>
+                    <span className="font-semibold">{schemes.length} {t('subsidies.activeSchemes')}</span>
                 </div>
             </div>
 
@@ -112,7 +114,7 @@ const GovernmentSubsidies: React.FC = () => {
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         type="text" value={search} onChange={e => setSearch(e.target.value)}
-                        placeholder="Search schemes..."
+                        placeholder={t('subsidies.search')}
                         className="input-field pl-10 w-full"
                     />
                 </div>
@@ -126,7 +128,7 @@ const GovernmentSubsidies: React.FC = () => {
             </div>
 
             {/* Results */}
-            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{filtered.length} scheme{filtered.length !== 1 ? 's' : ''} found</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{filtered.length} {t('subsidies.found')}</p>
 
             {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -166,7 +168,7 @@ const GovernmentSubsidies: React.FC = () => {
 
                         <a href={scheme.url} target="_blank" rel="noreferrer"
                             className="btn-primary text-xs py-2.5 flex items-center justify-center gap-2 group-hover:gap-3 transition-all duration-200">
-                            Apply / Learn More <ExternalLink size={12} />
+                            {t('subsidies.applyLearn')} <ExternalLink size={12} />
                         </a>
                     </div>
                 ))}
@@ -175,8 +177,8 @@ const GovernmentSubsidies: React.FC = () => {
             {filtered.length === 0 && (
                 <div className="text-center py-16 text-gray-400 dark:text-gray-500">
                     <Globe size={40} className="mx-auto mb-3 opacity-30" />
-                    <p className="font-medium">No schemes found for your search</p>
-                    <p className="text-sm mt-1">Try a different keyword or category</p>
+                    <p className="font-medium">{t('subsidies.noResults')}</p>
+                    <p className="text-sm mt-1">{t('subsidies.tryDifferent')}</p>
                 </div>
             )}
 
@@ -184,7 +186,7 @@ const GovernmentSubsidies: React.FC = () => {
             <div className="card bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/50">
                 <p className="text-xs text-blue-600 dark:text-blue-400 flex items-start gap-2">
                     <FileText size={14} className="flex-shrink-0 mt-0.5" />
-                    <span><strong>Disclaimer:</strong> Scheme details are indicative. Always verify the latest eligibility, benefits, and application procedures on the official government portal before applying.</span>
+                    <span><strong>Disclaimer:</strong> {t('subsidies.disclaimer')}</span>
                 </p>
             </div>
         </div>

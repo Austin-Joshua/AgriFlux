@@ -60,8 +60,8 @@ const LandIntelligence: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="page-header">🗺️ Land Intelligence</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Satellite & Drone Analysis for Land Size and Valuation</p>
+                    <h1 className="page-header">🗺️ {t('land.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('land.subtitle')}</p>
                 </div>
             </div>
 
@@ -84,8 +84,8 @@ const LandIntelligence: React.FC = () => {
                                     <Upload size={32} />
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-lg font-bold text-gray-900 dark:text-white">Upload satellite imagery</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Drag and drop or click to browse</p>
+                                    <p className="text-lg font-bold text-gray-900 dark:text-white">{t('land.uploadTitle')}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('land.uploadSubtitle')}</p>
                                     <button
                                         type="button"
                                         onClick={(e) => {
@@ -94,9 +94,9 @@ const LandIntelligence: React.FC = () => {
                                         }}
                                         className="mt-6 px-4 py-2 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-bold rounded-lg hover:bg-primary-200 transition-all border border-primary-200 dark:border-primary-800"
                                     >
-                                        ✨ Try with demo image
+                                        ✨ {t('land.tryDemo')}
                                     </button>
-                                    <p className="text-[10px] text-gray-400 mt-4 italic">Supports JPG, PNG, and TIF (max 20MB)</p>
+                                    <p className="text-[10px] text-gray-400 mt-4 italic">{t('land.support')}</p>
                                 </div>
                             </div>
                         ) : (
@@ -113,8 +113,8 @@ const LandIntelligence: React.FC = () => {
                                     {analyzing && (
                                         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center text-white">
                                             <div className="w-12 h-12 border-4 border-white/20 border-t-primary-500 rounded-full animate-spin mb-4" />
-                                            <p className="font-bold text-lg animate-pulse">Analyzing Land Patterns...</p>
-                                            <p className="text-sm opacity-60">Scanning vegetation index & scale...</p>
+                                            <p className="font-bold text-lg animate-pulse">{t('land.analyzing')}</p>
+                                            <p className="text-sm opacity-60">{t('land.scanning')}</p>
                                         </div>
                                     )}
 
@@ -122,7 +122,7 @@ const LandIntelligence: React.FC = () => {
                                         onClick={() => setImage(null)}
                                         className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-all opacity-0 group-hover:opacity-100"
                                     >
-                                        Change Image
+                                        {t('land.changeImage')}
                                     </button>
                                 </div>
 
@@ -131,7 +131,7 @@ const LandIntelligence: React.FC = () => {
                                         onClick={runAnalysis}
                                         className="btn-primary mt-4 py-4 w-full flex items-center justify-center gap-2"
                                     >
-                                        <Calculator size={18} /> Run AI Land Analysis
+                                        <Calculator size={18} /> {t('land.runAnalysis')}
                                     </button>
                                 )}
                             </div>
@@ -142,11 +142,11 @@ const LandIntelligence: React.FC = () => {
                 {/* Analysis Results */}
                 <div className="space-y-6">
                     <div className="card">
-                        <h3 className="section-header mb-4">Analysis Parameters</h3>
+                        <h3 className="section-header mb-4">{t('land.params')}</h3>
                         {!result ? (
                             <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
                                 <MapIcon size={40} className="mb-4 opacity-20" />
-                                <p className="text-sm">Upload an image to see predicted size and value</p>
+                                <p className="text-sm">{t('land.uploadToSee')}</p>
                             </div>
                         ) : (
                             <div className="space-y-6">
@@ -155,23 +155,23 @@ const LandIntelligence: React.FC = () => {
                                     <div className="p-4 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-800/50">
                                         <div className="flex items-center gap-2 mb-1">
                                             <Maximize2 size={16} className="text-primary-600" />
-                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Predicted Land Size</span>
+                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('land.predictedSize')}</span>
                                         </div>
-                                        <p className="text-3xl font-black text-primary-700 dark:text-primary-400">{result.size} <span className="text-sm">Acres</span></p>
+                                        <p className="text-3xl font-black text-primary-700 dark:text-primary-400">{result.size} <span className="text-sm">{t('land.acres')}</span></p>
                                     </div>
 
                                     <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/50">
                                         <div className="flex items-center gap-2 mb-1">
                                             <TrendingUp size={16} className="text-amber-600" />
-                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Market Valuation</span>
+                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('land.marketVal')}</span>
                                         </div>
-                                        <p className="text-3xl font-black text-amber-700 dark:text-amber-500">₹ {(result.value / 100000).toFixed(1)} <span className="text-sm">Lakhs</span></p>
+                                        <p className="text-3xl font-black text-amber-700 dark:text-amber-500">₹ {(result.value / 100000).toFixed(1)} <span className="text-sm">{t('land.lakhs')}</span></p>
                                     </div>
                                 </div>
 
                                 {/* Heatmap Legend */}
                                 <div>
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Productivity Zones</h4>
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{t('land.zones')}</h4>
                                     <div className="space-y-3">
                                         {result.zones.map(z => (
                                             <div key={z.type} className="flex items-center justify-between">
@@ -189,10 +189,10 @@ const LandIntelligence: React.FC = () => {
                                 <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                                     <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 mb-2">
                                         <CheckCircle2 size={16} />
-                                        <span className="text-xs font-bold">Reliability Score: 92%</span>
+                                        <span className="text-xs font-bold">{t('land.reliability')}: 92%</span>
                                     </div>
                                     <p className="text-xs text-gray-500 leading-relaxed italic">
-                                        Analysis based on vegetation density index (NDVI) and image metadata scaling. Valuation is an estimate based on local market averages.
+                                        {t('land.disclaimer')}
                                     </p>
                                 </div>
                             </div>
@@ -202,20 +202,20 @@ const LandIntelligence: React.FC = () => {
                     <div className="card bg-gradient-to-br from-primary-600 to-primary-700 text-white border-none shadow-glow-green">
                         <div className="flex items-center gap-3 mb-4">
                             <AlertCircle size={20} className="text-white/60" />
-                            <h3 className="font-bold">Next Steps</h3>
+                            <h3 className="font-bold">{t('land.nextSteps')}</h3>
                         </div>
                         <ul className="text-xs space-y-3 opacity-90">
                             <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-white mt-1 shrink-0" />
-                                Download PDF report for land title documentation.
+                                {t('land.step1')}
                             </li>
                             <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-white mt-1 shrink-0" />
-                                Connect with your nearest Agronomist for valuation certification.
+                                {t('land.step2')}
                             </li>
                             <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-white mt-1 shrink-0" />
-                                Apply for land-based subsidies based on verified size.
+                                {t('land.step3')}
                             </li>
                         </ul>
                     </div>

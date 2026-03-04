@@ -1,74 +1,74 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { Users, ShieldCheck, AlertTriangle, Activity, LogOut, Settings, RefreshCw, Eye, Trash2, CheckCircle, XCircle, Download } from 'lucide-react';
 
-const monthlyUsers = [
-    { m: 'Oct', users: 120 }, { m: 'Nov', users: 145 }, { m: 'Dec', users: 162 },
-    { m: 'Jan', users: 198 }, { m: 'Feb', users: 230 }, { m: 'Mar', users: 271 },
-];
-
-const activityLog = [
-    { id: 1, user: 'user@agriflux.ai', action: 'Ran Soil Analysis', time: '10 min ago', role: 'Farmer', status: 'success' },
-    { id: 2, user: 'agronomist@agriflux.ai', action: 'Sent bulk advisory', time: '23 min ago', role: 'Agronomist', status: 'success' },
-    { id: 3, user: 'ravi@farm.com', action: 'Failed login (3 attempts)', time: '41 min ago', role: 'Farmer', status: 'error' },
-    { id: 4, user: 'admin@agriflux.ai', action: 'Updated system config', time: '1 hr ago', role: 'Admin', status: 'success' },
-    { id: 5, user: 'priya@agro.com', action: 'Generated Yield Report', time: '2 hr ago', role: 'Agronomist', status: 'success' },
-    { id: 6, user: 'meena@farm.in', action: 'API rate limit exceeded', time: '3 hr ago', role: 'Farmer', status: 'warning' },
-];
-
-const roleData = [
-    { name: 'Farmers', value: 201, color: '#22c55e' },
-    { name: 'Agronomists', value: 47, color: '#3b82f6' },
-    { name: 'Admins', value: 5, color: '#f59e0b' },
-    { name: 'Inactive', value: 18, color: '#e5e7eb' },
-];
-
-const userList = [
-    { id: 1, name: 'Ravi Kumar', email: 'user@agriflux.ai', role: 'Farmer', status: 'Active', joined: '2025-11-01', logins: 42 },
-    { id: 2, name: 'Dr. Priya Sharma', email: 'agronomist@agriflux.ai', role: 'Agronomist', status: 'Active', joined: '2025-10-15', logins: 128 },
-    { id: 3, name: 'Anita Patil', email: 'anita@farm.com', role: 'Farmer', status: 'Active', joined: '2025-12-01', logins: 18 },
-    { id: 4, name: 'Suresh Reddy', email: 'suresh@farm.in', role: 'Farmer', status: 'Inactive', joined: '2025-09-10', logins: 3 },
-    { id: 5, name: 'Meena Sharma', email: 'meena@farm.in', role: 'Farmer', status: 'Suspended', joined: '2025-10-01', logins: 76 },
-];
-
-const systemMetrics = [
-    { label: 'API Uptime', value: '99.8%', icon: '🟢', trend: 'up' },
-    { label: 'Avg Response', value: '142ms', icon: '⚡', trend: 'stable' },
-    { label: 'AI Analyses Today', value: '1,247', icon: '🤖', trend: 'up' },
-    { label: 'Storage Used', value: '68.2%', icon: '💾', trend: 'stable' },
-];
-
 const AdminDashboard: React.FC = () => {
+    const { t } = useTranslation();
     const { user, logout } = useAuth();
     const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'activity' | 'system'>('overview');
     const [userFilter, setUserFilter] = useState('All');
+
+    const monthlyUsers = [
+        { m: 'Oct', users: 120 }, { m: 'Nov', users: 145 }, { m: 'Dec', users: 162 },
+        { m: 'Jan', users: 198 }, { m: 'Feb', users: 230 }, { m: 'Mar', users: 271 },
+    ];
+
+    const activityLog = [
+        { id: 1, user: 'user@agriflux.ai', action: 'Ran Soil Analysis', time: '10 min ago', role: 'Farmer', status: 'success' },
+        { id: 2, user: 'agronomist@agriflux.ai', action: 'Sent bulk advisory', time: '23 min ago', role: 'Agronomist', status: 'success' },
+        { id: 3, user: 'ravi@farm.com', action: 'Failed login (3 attempts)', time: '41 min ago', role: 'Farmer', status: 'error' },
+        { id: 4, user: 'admin@agriflux.ai', action: 'Updated system config', time: '1 hr ago', role: 'Admin', status: 'success' },
+        { id: 5, user: 'priya@agro.com', action: 'Generated Yield Report', time: '2 hr ago', role: 'Agronomist', status: 'success' },
+        { id: 6, user: 'meena@farm.in', action: 'API rate limit exceeded', time: '3 hr ago', role: 'Farmer', status: 'warning' },
+    ];
+
+    const roleData = [
+        { name: t('admin.farmers'), value: 201, color: '#22c55e' },
+        { name: t('admin.agronomists'), value: 47, color: '#3b82f6' },
+        { name: t('admin.admins'), value: 5, color: '#f59e0b' },
+        { name: t('admin.inactive'), value: 18, color: '#e5e7eb' },
+    ];
+
+    const userList = [
+        { id: 1, name: 'Ravi Kumar', email: 'user@agriflux.ai', role: 'Farmer', status: 'Active', joined: '2025-11-01', logins: 42 },
+        { id: 2, name: 'Dr. Priya Sharma', email: 'agronomist@agriflux.ai', role: 'Agronomist', status: 'Active', joined: '2025-10-15', logins: 128 },
+        { id: 3, name: 'Anita Patil', email: 'anita@farm.com', role: 'Farmer', status: 'Active', joined: '2025-12-01', logins: 18 },
+        { id: 4, name: 'Suresh Reddy', email: 'suresh@farm.in', role: 'Farmer', status: 'Inactive', joined: '2025-09-10', logins: 3 },
+        { id: 5, name: 'Meena Sharma', email: 'meena@farm.in', role: 'Farmer', status: 'Suspended', joined: '2025-10-01', logins: 76 },
+    ];
+
+    const systemMetrics = [
+        { label: t('admin.apiUptime'), value: '99.8%', icon: '🟢', trend: 'up' },
+        { label: t('admin.avgResponse'), value: '142ms', icon: '⚡', trend: 'stable' },
+        { label: t('admin.aiAnalysesToday'), value: '1,247', icon: '🤖', trend: 'up' },
+        { label: t('admin.storageUsed'), value: '68.2%', icon: '💾', trend: 'stable' },
+    ];
 
     const filteredUsers = userList.filter(u => userFilter === 'All' || u.role === userFilter || u.status === userFilter);
 
     return (
         <div className="space-y-5">
-            {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="page-header">🛡️ Admin Control Panel</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Logged in as <strong>{user?.name}</strong> · Full system access</p>
+                    <h1 className="page-header">🛡️ {t('admin.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('admin.loggedInAs')} <strong>{user?.name}</strong> · {t('admin.fullAccess')}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="px-3 py-1.5 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold border border-red-200">🛡️ Admin Mode</span>
+                    <span className="px-3 py-1.5 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold border border-red-200">🛡️ {t('admin.mode')}</span>
                     <button className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-500 text-xs flex items-center gap-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        <Download size={12} /> Export Report
+                        <Download size={12} /> {t('admin.exportReport')}
                     </button>
                 </div>
             </div>
 
-            {/* KPI Strip */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                    { label: 'Total Users', value: '271', sub: '+41 this month', icon: '👥', color: 'text-primary-600' },
-                    { label: 'Active Sessions', value: '43', sub: 'Right now', icon: '🟢', color: 'text-green-600' },
-                    { label: 'Security Alerts', value: '2', sub: 'Needs review', icon: '🚨', color: 'text-red-600' },
-                    { label: 'AI Engine', value: 'Online', sub: '99.8% uptime', icon: '🤖', color: 'text-blue-600' },
+                    { label: t('admin.totalUsers'), value: '271', sub: t('admin.newThisMonth'), icon: '👥', color: 'text-primary-600' },
+                    { label: t('admin.activeSessions'), value: '43', sub: t('admin.rightNow'), icon: '🟢', color: 'text-green-600' },
+                    { label: t('admin.securityAlerts'), value: '2', sub: t('admin.needsReview'), icon: '🚨', color: 'text-red-600' },
+                    { label: t('admin.aiEngine'), value: 'Online', sub: t('admin.uptime'), icon: '🤖', color: 'text-blue-600' },
                 ].map(s => (
                     <div key={s.label} className="card text-center">
                         <div className="text-2xl mb-1">{s.icon}</div>
@@ -79,12 +79,11 @@ const AdminDashboard: React.FC = () => {
                 ))}
             </div>
 
-            {/* Tabs */}
             <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 w-fit flex-wrap">
                 {(['overview', 'users', 'activity', 'system'] as const).map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)}
                         className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'}`}>
-                        {tab === 'overview' ? '📊 Overview' : tab === 'users' ? '👤 Users' : tab === 'activity' ? '📋 Activity Log' : '⚙️ System'}
+                        {tab === 'overview' ? `📊 ${t('common.overview')}` : tab === 'users' ? `👤 ${t('admin.usersTab')}` : tab === 'activity' ? `📋 ${t('admin.activityTab')}` : `⚙️ ${t('common.settings')}`}
                     </button>
                 ))}
             </div>
@@ -92,7 +91,7 @@ const AdminDashboard: React.FC = () => {
             {activeTab === 'overview' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div className="lg:col-span-2 card">
-                        <h3 className="section-header mb-4">User Growth — Last 6 Months</h3>
+                        <h3 className="section-header mb-4">{t('admin.userGrowthTrend')}</h3>
                         <ResponsiveContainer width="100%" height={200}>
                             <BarChart data={monthlyUsers}>
                                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -102,7 +101,7 @@ const AdminDashboard: React.FC = () => {
                         </ResponsiveContainer>
                     </div>
                     <div className="card">
-                        <h3 className="section-header mb-4">User Breakdown</h3>
+                        <h3 className="section-header mb-4">{t('admin.userBreakdown')}</h3>
                         <PieChart width={160} height={160} style={{ margin: '0 auto' }}>
                             <Pie data={roleData} cx={80} cy={80} innerRadius={45} outerRadius={70} dataKey="value">
                                 {roleData.map((c, i) => <Cell key={i} fill={c.color} />)}
@@ -118,7 +117,7 @@ const AdminDashboard: React.FC = () => {
             {activeTab === 'users' && (
                 <div className="card">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="section-header">👤 User Management</h3>
+                        <h3 className="section-header">👤 {t('admin.userManagement')}</h3>
                         <div className="flex gap-2">
                             {['All', 'Farmer', 'Agronomist', 'Active', 'Suspended'].map(f => (
                                 <button key={f} onClick={() => setUserFilter(f)}
@@ -130,7 +129,7 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                            <thead><tr className="border-b border-gray-100 dark:border-gray-700">{['Name', 'Email', 'Role', 'Status', 'Joined', 'Logins', 'Actions'].map(h => <th key={h} className="text-left py-2 px-3 text-xs font-bold text-gray-400 uppercase tracking-wide">{h}</th>)}</tr></thead>
+                            <thead><tr className="border-b border-gray-100 dark:border-gray-700">{[t('admin.userName'), t('admin.email'), t('admin.role'), t('admin.status'), t('admin.joined'), t('admin.logins'), t('admin.actions')].map(h => <th key={h} className="text-left py-2 px-3 text-xs font-bold text-gray-400 uppercase tracking-wide">{h}</th>)}</tr></thead>
                             <tbody>
                                 {filteredUsers.map(u => (
                                     <tr key={u.id} className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
@@ -157,7 +156,7 @@ const AdminDashboard: React.FC = () => {
 
             {activeTab === 'activity' && (
                 <div className="card">
-                    <h3 className="section-header mb-4">📋 Recent Activity Log</h3>
+                    <h3 className="section-header mb-4">📋 {t('admin.recentActivity')}</h3>
                     <div className="space-y-2">
                         {activityLog.map(log => (
                             <div key={log.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-colors">
@@ -181,7 +180,7 @@ const AdminDashboard: React.FC = () => {
             {activeTab === 'system' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="card">
-                        <h3 className="section-header mb-4">⚙️ System Metrics</h3>
+                        <h3 className="section-header mb-4">⚙️ {t('admin.systemMetrics')}</h3>
                         <div className="space-y-3">
                             {systemMetrics.map(m => (
                                 <div key={m.label} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
@@ -192,14 +191,14 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
                     <div className="card">
-                        <h3 className="section-header mb-4">🔒 Security Settings</h3>
+                        <h3 className="section-header mb-4">🔒 {t('admin.securitySettings')}</h3>
                         <div className="space-y-3">
                             {[
-                                { label: '2FA Enforcement', enabled: true },
-                                { label: 'Rate Limiting', enabled: true },
-                                { label: 'IP Allowlist', enabled: false },
-                                { label: 'Audit Logging', enabled: true },
-                                { label: 'API Key Rotation (30d)', enabled: true },
+                                { label: t('admin.2faEnforcement'), enabled: true },
+                                { label: t('admin.rateLimiting'), enabled: true },
+                                { label: t('admin.ipAllowlist'), enabled: false },
+                                { label: t('admin.auditLogging'), enabled: true },
+                                { label: t('admin.apiKeyRotation'), enabled: true },
                             ].map(s => (
                                 <div key={s.label} className="flex items-center justify-between p-2.5 rounded-xl border border-gray-100 dark:border-gray-700">
                                     <span className="text-sm text-gray-600 dark:text-gray-300">{s.label}</span>

@@ -1,63 +1,72 @@
 import React, { useState } from 'react';
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { TrendingUp, TrendingDown, Star, StarOff, BarChart3, RefreshCw, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Search, ArrowUpDown, AlertCircle, Maximize2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Crop {
-    id: string; name: string; emoji: string;
-    price: number; msp: number; change: number; changePct: number;
-    high: number; low: number; volume: string;
-    data: { t: string; v: number }[];
-    weekData: { t: string; v: number }[];
+    id: string;
+    name: string;
+    icon: string;
+    price: number;
+    msp: number;
+    change: string;
+    high: number;
+    low: number;
+    volume: string;
+    trends: { t: string; v: number }[];
 }
 
 // Simulated market data
 const generateData = (base: number, points: number, label: string[]) =>
     label.map((t, i) => ({ t, v: Math.round(base + (Math.random() - 0.48) * base * 0.04 * (i + 1)) }));
-
 const dayLabels = ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM'];
 const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const monthLabels = ['W1', 'W2', 'W3', 'W4'];
 const yearLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const createCrop = (id: string, name: string, emoji: string, price: number, msp: number) => {
-    const change = Math.round((Math.random() - 0.45) * price * 0.06);
-    return {
-        id, name, emoji, price, msp, change,
-        changePct: Math.round((change / price) * 1000) / 10,
-        high: price + Math.abs(change) + 20,
-        low: price - Math.abs(change) - 15,
-        volume: `${Math.round(Math.random() * 80 + 20)}K MT`,
-        data: generateData(price, 9, dayLabels),
-        weekData: generateData(price, 6, weekLabels),
-    };
-};
-
-const initialCrops: Crop[] = [
-    createCrop('rice', 'Rice', '🌾', 2450, 2183),
-    createCrop('wheat', 'Wheat', '🌿', 2380, 2275),
-    createCrop('maize', 'Maize', '🌽', 1890, 1962),
-    createCrop('cotton', 'Cotton', '🌱', 6520, 6620),
-    createCrop('soybean', 'Soybean', '🫘', 4250, 4600),
-    createCrop('groundnut', 'Groundnut', '🥜', 5720, 5850),
-    createCrop('onion', 'Onion', '🧅', 1840, 0),
-    createCrop('tomato', 'Tomato', '🍅', 2100, 0),
-    createCrop('potato', 'Potato', '🥔', 1280, 0),
-    createCrop('sugarcane', 'Sugarcane', '🎋', 380, 340),
-    createCrop('turmeric', 'Turmeric', '🌕', 14800, 0),
-    createCrop('chilli', 'Red Chilli', '🌶️', 9200, 0),
-];
-
 const MarketAnalysis: React.FC = () => {
-    const [crops] = useState<Crop[]>(initialCrops);
-    const [selected, setSelected] = useState<Crop>(initialCrops[0]);
+    const { t } = useTranslation();
+    const [search, setSearch] = useState('');
     const [timeframe, setTimeframe] = useState<'1D' | '1W' | '1M' | '1Y'>('1D');
-    const [watchlist, setWatchlist] = useState<string[]>(['rice', 'wheat', 'cotton']);
 
-    const toggleWatch = (id: string) =>
-        setWatchlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
+    const generateCrop = (id: string, name: string, icon: string, price: number, msp: number) => {
+        const changeVal = Math.round((Math.random() - 0.45) * price * 0.06);
+        const changePct = (Math.round((changeVal / price) * 1000) / 10);
+        return {
+            id, name, icon, price, msp,
+            change: (changePct >= 0 ? '+' : '') + changePct.toFixed(1) + '%',
+            high: price + Math.round(price * 0.03), // Simulated high
+            low: price - Math.round(price * 0.02),  // Simulated low
+            volume: `${(Math.random() * 10 + 1).toFixed(1)}k T`, // Simulated volume
+            trends: generateData(price, 9, dayLabels)
+        };
+    };
 
-    const gainers = [...crops].filter(c => c.change > 0).sort((a, b) => b.changePct - a.changePct).slice(0, 3);
-    const losers = [...crops].filter(c => c.change < 0).sort((a, b) => a.changePct - b.changePct).slice(0, 3);
+    const marketData: Crop[] = [
+        generateCrop('rice', 'Rice', '🌾', 2450, 2183),
+        generateCrop('wheat', 'Wheat', '🌿', 2380, 2275),
+        generateCrop('maize', 'Maize', '🌽', 1890, 1962),
+        generateCrop('cotton', 'Cotton', '🌱', 6520, 6620),
+        generateCrop('soybean', 'Soybean', '🫘', 4250, 4600),
+        generateCrop('groundnut', 'Groundnut', '🥜', 5720, 5850),
+        generateCrop('onion', 'Onion', '🧅', 1840, 1700),
+        generateCrop('tomato', 'Tomato', '🍅', 2100, 2000),
+        generateCrop('potato', 'Potato', '🥔', 1280, 1100),
+        generateCrop('sugarcane', 'Sugarcane', '🎋', 380, 340),
+        generateCrop('turmeric', 'Turmeric', '🌕', 14800, 12000),
+        generateCrop('chilli', 'Red Chilli', '🌶️', 9200, 8000),
+    ];
+
+    const [selectedCrop, setSelectedCrop] = useState<Crop>(marketData[0]);
+    const [watchlist, setWatchlist] = useState<string[]>(['Wheat', 'Rice']);
+
+    const toggleWatchlist = (name: string) =>
+        setWatchlist(w => w.includes(name) ? w.filter(x => x !== name) : [...w, name]);
+
+    const filtered = marketData.filter(c =>
+        c.name.toLowerCase().includes(search.toLowerCase())
+    );
+
 
     const chartData = timeframe === '1D' ? selected.data :
         timeframe === '1W' ? selected.weekData :
@@ -70,154 +79,168 @@ const MarketAnalysis: React.FC = () => {
     return (
         <div className="space-y-5">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="page-header">📈 Crop Market Analysis</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">Live mandi prices, MSP comparison, and market trends</p>
+                    <h1 className="page-header">📈 {t('market.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('market.subtitle')}</p>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
-                    <RefreshCw size={12} className="animate-spin-slow" />
-                    <span>Simulated live data · Updates every 30s</span>
-                </div>
-            </div>
-
-            {/* Ticker Bar */}
-            <div className="card !p-0 overflow-hidden">
-                <div className="flex overflow-x-auto scrollbar-none">
-                    {crops.map(c => (
-                        <button key={c.id} onClick={() => setSelected(c)}
-                            className={`flex items-center gap-2 px-4 py-3 border-r border-gray-100 dark:border-gray-700/50 whitespace-nowrap hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors flex-shrink-0 ${selected.id === c.id ? 'bg-primary-50 dark:bg-primary-900/20 border-b-2 border-b-primary-500' : ''}`}>
-                            <span className="text-base">{c.emoji}</span>
-                            <div className="text-left">
-                                <p className="text-xs font-bold text-gray-700 dark:text-gray-200">{c.name}</p>
-                                <p className={`text-xs font-semibold ${c.change >= 0 ? 'text-primary-600 dark:text-primary-400' : 'text-red-500'}`}>
-                                    ₹{c.price.toLocaleString()}
-                                    <span className="ml-1 text-[10px]">{c.change >= 0 ? '+' : ''}{c.changePct}%</span>
-                                </p>
-                            </div>
-                        </button>
-                    ))}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary-100/50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-200 dark:border-primary-800/50">
+                    <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
+                    {t('market.liveData')}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Chart Panel */}
-                <div className="lg:col-span-2 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Analysis Area */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Charts & Ticker */}
                     <div className="card">
-                        <div className="flex items-start justify-between mb-4">
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl">{selected.emoji}</span>
-                                    <h2 className="text-xl font-black text-gray-900 dark:text-white">{selected.name}</h2>
-                                    <button onClick={() => toggleWatch(selected.id)} className="text-gray-300 hover:text-amber-400 transition-colors">
-                                        {watchlist.includes(selected.id) ? <Star size={16} className="fill-amber-400 text-amber-400" /> : <StarOff size={16} />}
-                                    </button>
-                                </div>
-                                <div className="flex items-center gap-3 mt-1">
-                                    <span className="text-2xl font-black text-gray-900 dark:text-white">₹{selected.price.toLocaleString()}<span className="text-sm text-gray-400">/qt</span></span>
-                                    <span className={`flex items-center gap-1 text-sm font-bold ${selected.change >= 0 ? 'text-primary-600' : 'text-red-500'}`}>
-                                        {selected.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                        {selected.change >= 0 ? '+' : ''}₹{selected.change} ({selected.changePct}%)
-                                    </span>
+                        <div className="flex items-start justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="text-4xl">{selectedCrop.icon}</div>
+                                <div>
+                                    <h2 className="text-2xl font-black text-gray-900 dark:text-white">{selectedCrop.name}</h2>
+                                    <div className="flex items-center gap-3">
+                                        <p className="text-2xl font-bold text-primary-600">₹{selectedCrop.price.toLocaleString()}<span className="text-xs font-medium text-gray-400 ml-1">{t('market.perQt')}</span></p>
+                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 ${selectedCrop.change.startsWith('+') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            {selectedCrop.change.startsWith('+') ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                                            {selectedCrop.change}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            {/* Timeframe */}
-                            <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
-                                {(['1D', '1W', '1M', '1Y'] as const).map(tf => (
-                                    <button key={tf} onClick={() => setTimeframe(tf)}
-                                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${timeframe === tf ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'}`}>
-                                        {tf}
-                                    </button>
-                                ))}
-                            </div>
+                            <button onClick={() => toggleWatchlist(selectedCrop.name)} className={`p-2 rounded-xl border transition-all ${watchlist.includes(selectedCrop.name) ? 'bg-amber-100 border-amber-200 text-amber-600' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400'}`}>
+                                <Star size={18} fill={watchlist.includes(selectedCrop.name) ? 'currentColor' : 'none'} />
+                            </button>
                         </div>
 
                         {/* MSP Alert */}
-                        {selected.msp > 0 && (
-                            <div className={`mb-3 px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2 ${aboveMSP ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-200' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200'}`}>
-                                <AlertCircle size={13} />
-                                {aboveMSP
-                                    ? `Market price ₹${(selected.price - selected.msp).toLocaleString()} above MSP — good time to sell!`
-                                    : `⚠️ Market price ₹${(selected.msp - selected.price).toLocaleString()} BELOW MSP of ₹${selected.msp.toLocaleString()} — hold if possible`}
-                            </div>
-                        )}
+                        <div className={`p-3 rounded-xl mb-6 border ${selectedCrop.price >= selectedCrop.msp ? 'bg-primary-50 dark:bg-primary-900/10 border-primary-100 dark:border-primary-800/50 text-primary-700 dark:text-primary-400' : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-800/50 text-red-700 dark:text-red-400'}`}>
+                            <p className="text-xs font-bold flex items-center gap-2">
+                                <AlertCircle size={14} />
+                                {selectedCrop.price >= selectedCrop.msp
+                                    ? t('market.aboveMsp', { diff: (selectedCrop.price - selectedCrop.msp).toLocaleString() })
+                                    : t('market.belowMsp', { diff: (selectedCrop.msp - selectedCrop.price).toLocaleString(), msp: selectedCrop.msp.toLocaleString() })
+                                }
+                            </p>
+                        </div>
 
-                        <ResponsiveContainer width="100%" height={220}>
-                            <AreaChart data={chartData}>
-                                <defs>
-                                    <linearGradient id="cropGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor={selected.change >= 0 ? '#22c55e' : '#ef4444'} stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor={selected.change >= 0 ? '#22c55e' : '#ef4444'} stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
-                                <XAxis dataKey="t" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} domain={['auto', 'auto']} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }}
-                                    formatter={(v: number) => [`₹${v.toLocaleString()}`, selected.name]} />
-                                {selected.msp > 0 && <ReferenceLine y={selected.msp} stroke="#f59e0b" strokeDasharray="4 3" label={{ value: 'MSP', fill: '#f59e0b', fontSize: 10 }} />}
-                                <Area type="monotone" dataKey="v" stroke={selected.change >= 0 ? '#22c55e' : '#ef4444'} fill="url(#cropGrad)" strokeWidth={2.5} />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                        {/* Chart Area */}
+                        <div className="h-[280px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={selectedCrop.trends}>
+                                    <defs>
+                                        <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="opacity-30" />
+                                    <XAxis dataKey="t" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} dy={10} />
+                                    <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                        labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                                    />
+                                    <Area type="monotone" dataKey="v" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
 
-                        {/* Stats row */}
-                        <div className="grid grid-cols-4 gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50">
+                        {/* Price Details */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
                             {[
-                                { l: "Day High", v: `₹${selected.high.toLocaleString()}` },
-                                { l: "Day Low", v: `₹${selected.low.toLocaleString()}` },
-                                { l: "Volume", v: selected.volume },
-                                { l: "MSP", v: selected.msp > 0 ? `₹${selected.msp.toLocaleString()}` : 'N/A' },
-                            ].map(s => (
-                                <div key={s.l} className="text-center">
-                                    <p className="text-[10px] text-gray-400">{s.l}</p>
-                                    <p className="text-sm font-bold text-gray-700 dark:text-gray-200">{s.v}</p>
+                                { label: t('market.dayHigh'), value: `₹${(selectedCrop.price + 120).toLocaleString()}` },
+                                { label: t('market.dayLow'), value: `₹${(selectedCrop.price - 85).toLocaleString()}` },
+                                { label: t('market.volume'), value: '4.2k T' },
+                                { label: t('market.msp'), value: `₹${selectedCrop.msp.toLocaleString()}` },
+                            ].map(stat => (
+                                <div key={stat.label}>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                                    <p className="text-sm font-black text-gray-800 dark:text-gray-200">{stat.value}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
+
+                    {/* Quick Watchlist */}
+                    <div className="card">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Star size={16} className="text-amber-500 fill-amber-500" />
+                            <h3 className="section-header">{t('market.watchlist')}</h3>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {marketData.filter(d => watchlist.includes(d.name)).map(d => (
+                                <div key={d.name} onClick={() => setSelectedCrop(d)}
+                                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between
+                                        ${selectedCrop.name === d.name ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/10' : 'border-gray-100 dark:border-gray-800 hover:bg-gray-50'}`}>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xl">{d.icon}</span>
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-800 dark:text-gray-200">{d.name}</p>
+                                            <p className="text-xs text-primary-600 font-bold">₹{d.price.toLocaleString()}</p>
+                                        </div>
+                                    </div>
+                                    <span className={`text-[10px] font-bold ${d.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>{d.change}</span>
+                                </div>
+                            ))}
+                            {watchlist.length === 0 && <p className="text-xs text-gray-400 py-4 italic">{t('market.starToWatch')}</p>}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Right Panel */}
-                <div className="space-y-4">
-                    {/* Watchlist */}
+                {/* Sidebar Search & Rankings */}
+                <div className="space-y-6">
                     <div className="card">
-                        <h3 className="section-header mb-3 flex items-center gap-2">
-                            <Star size={15} className="text-amber-400 fill-amber-400" /> Watchlist
-                        </h3>
-                        <div className="space-y-2">
-                            {crops.filter(c => watchlist.includes(c.id)).map(c => (
-                                <button key={c.id} onClick={() => setSelected(c)} className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                    <div className="flex items-center gap-2">
-                                        <span>{c.emoji}</span>
-                                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{c.name}</span>
+                        <div className="relative mb-6">
+                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text" value={search} onChange={e => setSearch(e.target.value)}
+                                placeholder={t('subsidies.search')}
+                                className="input-field pl-10 w-full"
+                            />
+                        </div>
+
+                        <h3 className="section-header mb-4 flex items-center gap-2"><ArrowUpDown size={14} /> {t('market.topMovers')}</h3>
+                        <div className="space-y-4">
+                            {filtered.sort((a, b) => parseFloat(b.change) - parseFloat(a.change)).map(d => (
+                                <div key={d.name} onClick={() => setSelectedCrop(d)}
+                                    className={`flex items-center justify-between p-2 rounded-xl transition-all cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800
+                                        ${selectedCrop.name === d.name ? 'bg-primary-50/50 dark:bg-primary-900/5' : ''}`}>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xl">{d.icon}</span>
+                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{d.name}</span>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-sm font-bold text-gray-700 dark:text-gray-200">₹{c.price.toLocaleString()}</p>
-                                        <p className={`text-[11px] font-semibold ${c.change >= 0 ? 'text-primary-600' : 'text-red-500'}`}>{c.change >= 0 ? '+' : ''}{c.changePct}%</p>
+                                        <p className="text-sm font-bold text-gray-900 dark:text-white">₹{d.price.toLocaleString()}</p>
+                                        <p className={`text-[10px] font-bold ${d.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>{d.change}</p>
                                     </div>
-                                </button>
+                                </div>
                             ))}
-                            {watchlist.length === 0 && <p className="text-xs text-gray-400 text-center py-3">Star a crop to add to watchlist</p>}
                         </div>
                     </div>
 
-                    {/* Gainers / Losers */}
-                    <div className="card">
-                        <h3 className="section-header mb-3 flex items-center gap-2"><TrendingUp size={15} className="text-primary-500" /> Top Movers</h3>
-                        <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2 font-semibold">Gainers</p>
-                        {gainers.map(c => (
-                            <button key={c.id} onClick={() => setSelected(c)} className="w-full flex items-center justify-between py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/30 rounded-lg px-2 transition-colors">
-                                <span className="text-sm text-gray-600 dark:text-gray-300">{c.emoji} {c.name}</span>
-                                <span className="text-sm font-bold text-primary-600">+{c.changePct}%</span>
-                            </button>
-                        ))}
-                        <p className="text-[10px] text-gray-400 uppercase tracking-wide mt-3 mb-2 font-semibold">Losers</p>
-                        {losers.map(c => (
-                            <button key={c.id} onClick={() => setSelected(c)} className="w-full flex items-center justify-between py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/30 rounded-lg px-2 transition-colors">
-                                <span className="text-sm text-gray-600 dark:text-gray-300">{c.emoji} {c.name}</span>
-                                <span className="text-sm font-bold text-red-500">{c.changePct}%</span>
-                            </button>
-                        ))}
+                    <div className="card bg-gray-900 text-white border-none shadow-glow-green overflow-hidden relative">
+                        <div className="relative z-10">
+                            <h3 className="font-black text-lg mb-4">{t('market.gainers')} & {t('market.losers')}</h3>
+                            <div className="space-y-4">
+                                <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                                    <p className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-1"><TrendingUp size={10} /> {t('market.gainers')}</p>
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-sm font-bold">Tomato (Nashik)</span>
+                                        <span className="text-lg font-black text-green-500">+18.4%</span>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                                    <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-2 flex items-center gap-1"><TrendingDown size={10} /> {t('market.losers')}</p>
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-sm font-bold">Onion (Maharashtra)</span>
+                                        <span className="text-lg font-black text-red-500">-12.1%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/20 blur-3xl -mr-16 -mt-16" />
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, Lightbulb, TrendingUp, Mail, ExternalLink, CheckCircle, Send, Briefcase, Star } from 'lucide-react';
 
 const investors = [
@@ -18,6 +19,7 @@ const successStories = [
 ];
 
 const InvestorsHub: React.FC = () => {
+    const { t } = useTranslation();
     const [tab, setTab] = useState<'investors' | 'pitch'>('investors');
     const [pitch, setPitch] = useState({ startup: '', problem: '', solution: '', stage: 'Idea', ask: '', email: '' });
     const [submitted, setSubmitted] = useState(false);
@@ -26,20 +28,20 @@ const InvestorsHub: React.FC = () => {
         <div className="space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="page-header">🤝 Investors & Contributors Hub</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">Connect with agritech investors, submit startup pitches, and find co-founders</p>
+                    <h1 className="page-header">🤝 {t('investors.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">{t('investors.subtitle')}</p>
                 </div>
                 <div className="flex items-center gap-2 text-sm bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800">
                     <TrendingUp size={15} />
-                    <span className="font-semibold">₹2,400 Cr+ deployed in agritech 2024</span>
+                    <span className="font-semibold">{t('investors.stat')}</span>
                 </div>
             </div>
 
             <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 w-fit">
-                {(['investors', 'pitch'] as const).map(t => (
-                    <button key={t} onClick={() => setTab(t)}
-                        className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${tab === t ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                        {t === 'investors' ? '🏦 Investors' : '💡 Pitch Your Idea'}
+                {(['investors', 'pitch'] as const).map(t_id => (
+                    <button key={t_id} onClick={() => setTab(t_id)}
+                        className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${tab === t_id ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                        {t_id === 'investors' ? `🏦 ${t('investors.title')}` : `💡 ${t('investors.pitchTitle')}`}
                     </button>
                 ))}
             </div>
@@ -58,19 +60,19 @@ const InvestorsHub: React.FC = () => {
                                 </div>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 flex-1 leading-relaxed">{inv.description}</p>
                                 <div className="space-y-1.5 mb-3 text-xs">
-                                    <div className="flex items-center gap-2"><Briefcase size={11} className="text-primary-500" /><span className="text-gray-400">Ticket:</span><span className="font-semibold text-gray-700 dark:text-gray-200">{inv.ticketSize}</span></div>
+                                    <div className="flex items-center gap-2"><Briefcase size={11} className="text-primary-500" /><span className="text-gray-400">{t('investors.ticket')}:</span><span className="font-semibold text-gray-700 dark:text-gray-200">{inv.ticketSize}</span></div>
                                     <div className="flex items-center gap-2"><Star size={11} className="text-amber-400" /><span className="text-gray-400">{inv.portfolio}</span></div>
                                 </div>
                                 <div className="flex flex-wrap gap-1 mb-4">{inv.focus.map(f => <span key={f} className="text-[10px] px-1.5 py-0.5 rounded bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400">{f}</span>)}</div>
                                 <div className="flex gap-2">
-                                    <a href={`mailto:${inv.contact}`} className="flex-1 btn-primary text-xs py-2 flex items-center justify-center gap-1.5"><Mail size={11} /> Contact</a>
+                                    <a href={`mailto:${inv.contact}`} className="flex-1 btn-primary text-xs py-2 flex items-center justify-center gap-1.5"><Mail size={11} /> {t('common.contact')}</a>
                                     <a href={inv.website} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"><ExternalLink size={13} /></a>
                                 </div>
                             </div>
                         ))}
                     </div>
                     <div className="card">
-                        <h3 className="section-header mb-4">🚀 Agritech Success Stories</h3>
+                        <h3 className="section-header mb-4">🚀 {t('investors.successStories')}</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {successStories.map(s => (
                                 <div key={s.name} className="p-4 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/50 text-center">
@@ -90,28 +92,28 @@ const InvestorsHub: React.FC = () => {
                     {submitted ? (
                         <div className="card text-center py-12">
                             <CheckCircle size={48} className="text-primary-500 mx-auto mb-4" />
-                            <h2 className="text-xl font-black text-gray-900 dark:text-white mb-2">Pitch Submitted!</h2>
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">We've shared your idea with our investor network. If there's a match, you'll hear back within 7 business days.</p>
-                            <button onClick={() => setSubmitted(false)} className="btn-primary mt-6 px-6">Submit Another Pitch</button>
+                            <h2 className="text-xl font-black text-gray-900 dark:text-white mb-2">{t('investors.submitted')}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">{t('investors.waitMsg')}</p>
+                            <button onClick={() => setSubmitted(false)} className="btn-primary mt-6 px-6">{t('investors.submitAnother')}</button>
                         </div>
                     ) : (
                         <div className="card">
                             <div className="mb-6">
-                                <h2 className="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2"><Lightbulb size={20} className="text-amber-400" /> Submit Your Agritech Idea</h2>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Share your startup concept with our network of agritech investors and mentors.</p>
+                                <h2 className="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2"><Lightbulb size={20} className="text-amber-400" /> {t('investors.pitchTitle')}</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('investors.pitchSubtitle')}</p>
                             </div>
                             <form onSubmit={e => { e.preventDefault(); setSubmitted(true); }} className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div><label className="label">Startup / Idea Name</label><input className="input-field" placeholder="e.g. FarmAI" value={pitch.startup} onChange={e => setPitch(p => ({ ...p, startup: e.target.value }))} required /></div>
-                                    <div><label className="label">Stage</label><select className="input-field" value={pitch.stage} onChange={e => setPitch(p => ({ ...p, stage: e.target.value }))}>{['Idea', 'Prototype', 'MVP', 'Early Revenue', 'Growth'].map(s => <option key={s}>{s}</option>)}</select></div>
+                                    <div><label className="label">{t('investors.startupName')}</label><input className="input-field" placeholder="e.g. FarmAI" value={pitch.startup} onChange={e => setPitch(p => ({ ...p, startup: e.target.value }))} required /></div>
+                                    <div><label className="label">{t('common.stage')}</label><select className="input-field" value={pitch.stage} onChange={e => setPitch(p => ({ ...p, stage: e.target.value }))}>{['Idea', 'Prototype', 'MVP', 'Early Revenue', 'Growth'].map(s => <option key={s}>{s}</option>)}</select></div>
                                 </div>
-                                <div><label className="label">Problem Statement</label><textarea className="input-field min-h-[80px] resize-none" placeholder="What problem are you solving for farmers?" value={pitch.problem} onChange={e => setPitch(p => ({ ...p, problem: e.target.value }))} required /></div>
-                                <div><label className="label">Your Solution</label><textarea className="input-field min-h-[80px] resize-none" placeholder="How does your product/service solve it?" value={pitch.solution} onChange={e => setPitch(p => ({ ...p, solution: e.target.value }))} required /></div>
+                                <div><label className="label">{t('investors.problem')}</label><textarea className="input-field min-h-[80px] resize-none" placeholder={t('investors.problemPlaceholder')} value={pitch.problem} onChange={e => setPitch(p => ({ ...p, problem: e.target.value }))} required /></div>
+                                <div><label className="label">{t('investors.solution')}</label><textarea className="input-field min-h-[80px] resize-none" placeholder={t('investors.solutionPlaceholder')} value={pitch.solution} onChange={e => setPitch(p => ({ ...p, solution: e.target.value }))} required /></div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div><label className="label">Funding Ask</label><input className="input-field" placeholder="e.g. ₹50 Lakhs Seed Round" value={pitch.ask} onChange={e => setPitch(p => ({ ...p, ask: e.target.value }))} /></div>
-                                    <div><label className="label">Your Email</label><input type="email" className="input-field" placeholder="founder@startup.com" value={pitch.email} onChange={e => setPitch(p => ({ ...p, email: e.target.value }))} required /></div>
+                                    <div><label className="label">{t('investors.fundingAsk')}</label><input className="input-field" placeholder="e.g. ₹50 Lakhs Seed Round" value={pitch.ask} onChange={e => setPitch(p => ({ ...p, ask: e.target.value }))} /></div>
+                                    <div><label className="label">{t('common.email')}</label><input type="email" className="input-field" placeholder="founder@startup.com" value={pitch.email} onChange={e => setPitch(p => ({ ...p, email: e.target.value }))} required /></div>
                                 </div>
-                                <button type="submit" className="btn-primary w-full py-3 flex items-center justify-center gap-2"><Send size={15} /> Submit to Investor Network</button>
+                                <button type="submit" className="btn-primary w-full py-3 flex items-center justify-center gap-2"><Send size={15} /> {t('investors.submitBtn')}</button>
                             </form>
                         </div>
                     )}

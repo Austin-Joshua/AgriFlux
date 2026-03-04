@@ -19,12 +19,8 @@ interface SidebarProps {
 
 const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
-    { to: '/yield', icon: TrendingUp, labelKey: 'nav.yieldPrediction' },
-    { to: '/irrigation', icon: Droplets, labelKey: 'nav.irrigation' },
     { to: '/soil', icon: FlaskConical, labelKey: 'nav.soilHealth' },
     { to: '/crop-health', icon: Satellite, labelKey: 'nav.cropHealth' },
-    { to: '/climate', icon: CloudLightning, labelKey: 'nav.climateRisk' },
-    { to: '/simulator', icon: Thermometer, labelKey: 'nav.climateSimulator' },
     { to: '/crop-switching', icon: Sprout, labelKey: 'nav.cropSwitching' },
     { to: '/sustainability', icon: Award, labelKey: 'nav.sustainability' },
     { to: '/subsidies', icon: Landmark, labelKey: 'nav.subsidies' },
