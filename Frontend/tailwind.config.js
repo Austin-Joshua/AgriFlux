@@ -9,7 +9,7 @@ export default {
                 display: ['Outfit', 'Inter', 'sans-serif'],
             },
             colors: {
-                // Agriculture-inspired green & earth-tone palette (exact FarmSync palette)
+                // AgriFlux design system — green & earth tones
                 primary: {
                     50: '#f0fdf4',
                     100: '#dcfce7',

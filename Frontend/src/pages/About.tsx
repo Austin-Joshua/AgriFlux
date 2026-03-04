@@ -61,7 +61,7 @@ const About: React.FC = () => (
 
         <div className="text-center text-xs text-gray-400 dark:text-gray-500 py-4">
             <p>Built with ❤️ for sustainable farming · AgriFlux v1.0 · 2026</p>
-            <p className="mt-1">Inspired by FarmSync · Agriculture-first design system</p>
+            <p className="mt-1">Built for sustainable agriculture · AgriFlux v1.0</p>
         </div>
     </div>
 );
