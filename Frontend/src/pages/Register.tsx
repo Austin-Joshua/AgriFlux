@@ -3,11 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Wheat } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
+import { useGoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.jpg';
 
 const Register: React.FC = () => {
     const { t } = useTranslation();
     const { register, loginWithProvider, isLoading } = useAuth();
+    const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
 
     const [socialLoading, setSocialLoading] = useState<string | null>(null);
@@ -38,6 +42,62 @@ const Register: React.FC = () => {
         }
     };
 
+    const googleLogin = useGoogleLogin({
+        onSuccess: tokenResponse => {
+            console.log('Google signup success:', tokenResponse);
+            handleSocialSignup('google');
+        },
+        onError: () => setError('Google sign-up failed. Please try again.'),
+    });
+
+    const openMockProviderPopup = (provider: 'microsoft' | 'apple') => {
+        setSocialLoading(provider);
+        const width = 500;
+        const height = 600;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        const popup = window.open(
+            'about:blank',
+            `${provider}-signup`,
+            `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
+        );
+
+        if (popup) {
+            popup.document.write(`
+                <html>
+                    <head>
+                        <title>Sign up with ${provider.charAt(0).toUpperCase() + provider.slice(1)}</title>
+                        <style>
+                            body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; }
+                            .loader { border: 4px solid #f3f3f3; border-top: 4px solid #16a34a; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; }
+                            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="loader"></div>
+                        <p>Connecting to ${provider}...</p>
+                        <script>
+                            setTimeout(() => {
+                                window.close();
+                            }, 1500);
+                        </script>
+                    </body>
+                </html>
+            `);
+
+            const interval = setInterval(() => {
+                if (popup.closed) {
+                    clearInterval(interval);
+                    handleSocialSignup(provider);
+                }
+            }, 500);
+        } else {
+            setSocialLoading(null);
+            setError('Popup blocked. Please allow popups for this site.');
+        }
+    };
+
     const handleSocialSignup = async (provider: 'google' | 'microsoft' | 'apple') => {
         setSocialLoading(provider);
         setError('');
@@ -60,19 +120,30 @@ const Register: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #061610 0%, #0a2318 50%, #0d2e1c 100%)' }}>
-            <div className="absolute top-0 right-0 w-72 h-72 bg-amber-400/5 blur-[80px] rounded-full -mr-36 -mt-36" />
-            <div className="absolute bottom-0 left-0 w-60 h-60 bg-green-600/10 blur-[60px] rounded-full -ml-30 -mb-30" />
+        <div className="login-bg min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none"
+                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%2316a34a\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}
+            />
+
+            {/* Theme Toggle */}
+            <button
+                onClick={toggleTheme}
+                className="absolute top-4 right-4 p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md text-gray-600 dark:text-gray-400 hover:scale-110 transition-all z-50"
+            >
+                {isDark ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} />}
+            </button>
+
             <div className="w-full max-w-lg animate-slide-up relative z-10">
                 <div className="text-center mb-6">
-                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4 border border-amber-400/20 overflow-hidden" style={{ background: '#0a2318' }}>
+                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-4 border border-primary-200 dark:border-primary-800/50 overflow-hidden bg-white dark:bg-gray-800 transition-all duration-700">
                         <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
                     </div>
-                    <h1 className="text-3xl font-black text-white font-display tracking-tightest">Join AgriFlux</h1>
-                    <p className="text-amber-400/80 text-xs font-bold uppercase tracking-widest mt-2">Precision AI Agriculture Intelligence</p>
+                    <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tightest transition-colors duration-700">Join AgriFlux</h1>
+                    <p className="text-primary-600 dark:text-amber-400/80 text-xs font-bold uppercase tracking-widest mt-2 transition-colors duration-700">Precision AI Agriculture Intelligence</p>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100 dark:border-white/5 p-8 transition-all duration-700">
                     {error && (
                         <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
                             {error}
@@ -163,7 +234,7 @@ const Register: React.FC = () => {
                                 <button
                                     key={p.id}
                                     type="button"
-                                    onClick={() => handleSocialSignup(p.id)}
+                                    onClick={() => p.id === 'google' ? googleLogin() : openMockProviderPopup(p.id)}
                                     disabled={!!socialLoading || isLoading}
                                     className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
                                 >

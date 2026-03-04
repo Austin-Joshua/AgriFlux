@@ -450,4 +450,23 @@
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
+
+  /* Transition-aware backgrounds */
+  .login-bg {
+    @apply min-h-screen transition-all duration-700;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #fefce8 100%);
+  }
+
+  .dark .login-bg {
+    background: linear-gradient(135deg, #071a0e 0%, #0a2318 50%, #0d2e1c 100%);
+  }
+
+  .branding-bg {
+    @apply hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden shadow-2xl border-r border-white/5 transition-all duration-700;
+    background: linear-gradient(160deg, #16a34a 0%, #22c55e 40%, #15803d 100%);
+  }
+
+  .dark .branding-bg {
+    background: linear-gradient(160deg, #0a2e1a 0%, #0f4a2a 40%, #0d3a20 100%);
+  }
 }

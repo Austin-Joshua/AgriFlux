@@ -5,6 +5,7 @@ import { Eye, EyeOff, Leaf, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
+import { useGoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.jpg';
 
 const Login: React.FC = () => {
@@ -46,6 +47,62 @@ const Login: React.FC = () => {
         }
     };
 
+    const googleLogin = useGoogleLogin({
+        onSuccess: tokenResponse => {
+            console.log('Google login success:', tokenResponse);
+            handleSocialLogin('google');
+        },
+        onError: () => setError('Google login failed. Please try again.'),
+    });
+
+    const openMockProviderPopup = (provider: 'microsoft' | 'apple') => {
+        setSocialLoading(provider);
+        const width = 500;
+        const height = 600;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        const popup = window.open(
+            'about:blank',
+            `${provider}-login`,
+            `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
+        );
+
+        if (popup) {
+            popup.document.write(`
+                <html>
+                    <head>
+                        <title>Sign in with ${provider.charAt(0).toUpperCase() + provider.slice(1)}</title>
+                        <style>
+                            body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; }
+                            .loader { border: 4px solid #f3f3f3; border-top: 4px solid #16a34a; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; }
+                            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="loader"></div>
+                        <p>Connecting to ${provider}...</p>
+                        <script>
+                            setTimeout(() => {
+                                window.close();
+                            }, 1500);
+                        </script>
+                    </body>
+                </html>
+            `);
+
+            const interval = setInterval(() => {
+                if (popup.closed) {
+                    clearInterval(interval);
+                    handleSocialLogin(provider);
+                }
+            }, 500);
+        } else {
+            setSocialLoading(null);
+            setError('Popup blocked. Please allow popups for this site.');
+        }
+    };
+
     const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
         setSocialLoading(provider);
         setError('');
@@ -62,9 +119,9 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex relative" style={{ background: 'linear-gradient(135deg, #071a0e 0%, #0a2318 50%, #0d2e1c 100%)' }}>
+        <div className="login-bg flex relative">
             {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5 dark:opacity-10"
+            <div className="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none"
                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%2316a34a\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}
             />
 
@@ -77,8 +134,8 @@ const Login: React.FC = () => {
             </button>
 
             {/* Left Panel — Branding */}
-            <div className="hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden shadow-2xl border-r border-white/5" style={{ background: 'linear-gradient(160deg, #0a2e1a 0%, #0f4a2a 40%, #0d3a20 100%)' }}>
-                <div className="absolute inset-0 opacity-10">
+            <div className="branding-bg">
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-amber-400 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
                 </div>
 
@@ -241,7 +298,7 @@ const Login: React.FC = () => {
                                         key={p.id}
                                         id={`${p.id}-login`}
                                         type="button"
-                                        onClick={() => handleSocialLogin(p.id)}
+                                        onClick={() => p.id === 'google' ? googleLogin() : openMockProviderPopup(p.id)}
                                         disabled={!!socialLoading || isLoading}
                                         className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
