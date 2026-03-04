@@ -1,3 +1,24 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.cache/
+*.tsbuildinfo
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.project
+.settings/
+.vscode/launch.json
+
 # Logs
 logs
 *.log
@@ -5,35 +26,25 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# IDEs and editors
-.idea/
-.vscode/
-*.swp
-*.swo
-*.ntvs*
-*.njsproj
-*.sln
-*.suo
-
-# Operating System Files
+# OS Files
 .DS_Store
 Thumbs.db
-
-# Build directories
-dist/
-build/
-.cache/
+ehthumbs.db
+Desktop.ini
 
 # Environment variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*.local
+!.env.example
 
-# Vite
+# Testing
+coverage/
+.nyc_output/
+
+# Docker
+.docker/
+
+# Others
 .vite/
+.eslintcache
+.prettiercache
