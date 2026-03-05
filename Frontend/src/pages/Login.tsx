@@ -37,9 +37,10 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError('');
         try {
-            await login(identifier, password);
-            if (loginMode === 'admin') navigate('/admin');
-            else if (loginMode === 'agronomist') navigate('/agronomist');
+            const loggedInUser = await login(identifier, password);
+            const role = loggedInUser?.role || loginMode;
+            if (role === 'admin') navigate('/admin');
+            else if (role === 'agronomist') navigate('/agronomist');
             else navigate('/dashboard');
         } catch (err) {
             setError('Invalid credentials. Please try again.');

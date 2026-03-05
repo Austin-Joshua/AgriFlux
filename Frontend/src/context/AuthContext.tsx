@@ -20,7 +20,7 @@ export interface User {
 interface AuthContextType {
     user: User | null;
     token: string | null;
-    login: (identifier: string, password: string, role?: UserRole) => Promise<void>;
+    login: (identifier: string, password: string, role?: UserRole) => Promise<User | undefined>;
     loginWithProvider: (provider: 'google' | 'microsoft' | 'apple', role?: UserRole) => Promise<void>;
     logout: () => void;
     register: (data: RegisterData) => Promise<void>;
@@ -69,6 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await axios.post(`${API_URL}/auth/login`, { identifier, password });
             handleAuthResponse(response.data);
+            return response.data.user;
         } catch (error: any) {
             console.error('Login error:', error.response?.data?.message || error.message);
             throw error;
