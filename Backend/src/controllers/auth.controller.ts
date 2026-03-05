@@ -13,8 +13,8 @@ export const register = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Please provide phone, password and name' });
         }
 
-        const existingUser = await User.findOne({ phone });
-        if (existingUser) return res.status(400).json({ message: 'User with this phone number already exists' });
+        const existingUser = await User.findOne({ $or: [{ phone }, { email: email || undefined }] });
+        if (existingUser) return res.status(400).json({ message: 'User with this phone number or email already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create({
@@ -40,9 +40,14 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     try {
-        const { phone, password } = req.body;
+        const { identifier, password } = req.body; // identifier can be phone or email
 
-        const user = await User.findOne({ phone });
+        const user = await User.findOne({
+            $or: [
+                { phone: identifier },
+                { email: identifier }
+            ]
+        });
         if (!user) return res.status(400).json({ message: 'User not found' });
 
         const isMatch = await bcrypt.compare(password, user.password);

@@ -21,7 +21,7 @@ const Login: React.FC = () => {
         admin: { phone: '7654321098', password: 'admin123' },
     };
 
-    const [phone, setPhone] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
@@ -37,7 +37,7 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError('');
         try {
-            await login(phone, password, loginMode);
+            await login(identifier, password);
             if (loginMode === 'admin') navigate('/admin');
             else if (loginMode === 'agronomist') navigate('/agronomist');
             else navigate('/dashboard');
@@ -166,16 +166,16 @@ const Login: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                 <div className="space-y-1.5">
-                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">{t('auth.phone')}</label>
+                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">Phone or Email</label>
                     <div className="relative group">
                         <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                         <input
-                            id="phone-input"
-                            type="tel"
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
+                            id="identifier-input"
+                            type="text"
+                            value={identifier}
+                            onChange={e => setIdentifier(e.target.value)}
                             className="input-field pl-12 h-12 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
-                            placeholder="9876543210"
+                            placeholder="Enter phone or email"
                             autoComplete="off"
                             required
                         />

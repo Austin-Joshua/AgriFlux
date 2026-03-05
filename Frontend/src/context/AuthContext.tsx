@@ -20,7 +20,7 @@ export interface User {
 interface AuthContextType {
     user: User | null;
     token: string | null;
-    login: (phone: string, password: string, role?: UserRole) => Promise<void>;
+    login: (identifier: string, password: string, role?: UserRole) => Promise<void>;
     loginWithProvider: (provider: 'google' | 'microsoft' | 'apple', role?: UserRole) => Promise<void>;
     logout: () => void;
     register: (data: RegisterData) => Promise<void>;
@@ -64,10 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
     };
 
-    const login = async (phone: string, password: string) => {
+    const login = async (identifier: string, password: string) => {
         setIsLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/auth/login`, { phone, password });
+            const response = await axios.post(`${API_URL}/auth/login`, { identifier, password });
             handleAuthResponse(response.data);
         } catch (error: any) {
             console.error('Login error:', error.response?.data?.message || error.message);
