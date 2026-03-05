@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Satellite, Activity, AlertTriangle, CheckCircle, Map } from 'lucide-react';
+import ReportModal from '../components/ReportModal';
 
 const NDVI_ZONES = [
     { zone: 'Zone A (NW)', ndvi: 0.72, evi: 0.68, status: 'Healthy', color: '#22c55e', area: '2.1 ha' },
@@ -13,12 +13,116 @@ const NDVI_ZONES = [
 const CropHealthMonitoring: React.FC = () => {
     const { t } = useTranslation();
     const [selectedZone, setSelectedZone] = useState<number | null>(null);
+    const [reportModal, setReportModal] = useState<{ isOpen: boolean; title: string; content: React.ReactNode; type: 'success' | 'warning' | 'info' }>({
+        isOpen: false,
+        title: '',
+        content: null,
+        type: 'info'
+    });
 
     const avgNDVI = (NDVI_ZONES.reduce((a, z) => a + z.ndvi, 0) / NDVI_ZONES.length).toFixed(2);
     const healthyCount = NDVI_ZONES.filter(z => z.status === 'Healthy' || z.status === 'Excellent').length;
 
+    const openReport = (label: string) => {
+        let content: React.ReactNode = null;
+        let type: 'success' | 'warning' | 'info' = 'info';
+
+        if (label === 'Avg NDVI Score') {
+            content = (
+                <div className="space-y-4">
+                    <p>Current Average NDVI: <strong>{avgNDVI}</strong></p>
+                    <p>The Normalized Difference Vegetation Index (NDVI) measures the health of vegetation by analyzing the difference between near-infrared (which vegetation strongly reflects) and red light (which vegetation absorbs).</p>
+                    <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-xl border border-primary-100 dark:border-primary-800">
+                        <h4 className="font-bold text-primary-700 dark:text-primary-300 mb-2">AI Analysis</h4>
+                        <p className="text-sm">Your farm's average NDVI is stable. Zone E shows exceptional vitality, while Zone C is suppressing the overall average due to localized stress. Automated satellite monitoring suggests no large-scale intervention is needed at this time.</p>
+                    </div>
+                    <ul className="list-disc pl-5 space-y-2 text-sm">
+                        <li><strong>Photosynthetic Activity:</strong> High across 70% of the farm.</li>
+                        <li><strong>Biomass Density:</strong> Increasing in NW quadrants.</li>
+                        <li><strong>Next Scan:</strong> Expected in 48 hours via Sentinel-2.</li>
+                    </ul>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Healthy Zones') {
+            content = (
+                <div className="space-y-4">
+                    <p>Healthy Regions: <strong>{healthyCount} out of {NDVI_ZONES.length}</strong></p>
+                    <p>This metric identifies areas with optimal chlorophyll levels and moisture content. Healthy zones are characterized by vigorous growth and a lack of visible spectral stress.</p>
+                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl border border-green-100 dark:border-green-800">
+                        <h4 className="font-bold text-green-700 dark:text-green-300 mb-2">Vegetation Health Report</h4>
+                        <p className="text-sm">Consistent growth observed in Zones A, D, and E. These areas have reached the desired canopy closure for this stage of the crop cycle. Nutrient uptake remains highly efficient in these sectors.</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <p className="text-xs text-gray-400">Chlorophyll Index</p>
+                            <p className="font-bold">8.4 (High)</p>
+                        </div>
+                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <p className="text-xs text-gray-400">Leaf Area Index</p>
+                            <p className="font-bold">3.2 LAI</p>
+                        </div>
+                    </div>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Stress Zones') {
+            const stressCount = NDVI_ZONES.filter(z => z.status === 'Stressed').length;
+            content = (
+                <div className="space-y-4">
+                    <p>Active Stress Alerts: <strong>{stressCount} Zone Detected</strong></p>
+                    <p>Spectral analysis indicates a drop in near-infrared reflectance in the Southeast sector (Zone C). This is often an early indicator of water deficiency or pest pressure before it becomes visible to the human eye.</p>
+                    <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-800">
+                        <h4 className="font-bold text-red-700 dark:text-red-300 mb-2">Critical Action Required</h4>
+                        <p className="text-sm italic">"Satellite thermal imaging shows a 2°C increase in canopy temperature in Zone C compared to surroundings. Recommend immediate soil moisture check."</p>
+                    </div>
+                    <div className="p-4 border border-yellow-200 dark:border-yellow-800/50 rounded-xl bg-yellow-50/50 dark:bg-yellow-900/10">
+                        <h4 className="font-bold text-sm mb-2 text-yellow-700 dark:text-yellow-400">Probable Causes:</h4>
+                        <ol className="list-decimal pl-5 space-y-1 text-xs">
+                            <li>Clogging in drip irrigation emitters (Sector C14).</li>
+                            <li>Early-stage blast disease (Spectral signature matches).</li>
+                            <li>Localized soil salinity issues.</li>
+                        </ol>
+                    </div>
+                </div>
+            );
+            type = 'warning';
+        } else if (label === 'Total Farm Area') {
+            content = (
+                <div className="space-y-4">
+                    <p>Monitored Area: <strong>9.0 Hectares (22.2 Acres)</strong></p>
+                    <p>Precise boundary mapping ensures that AI analytics are focused strictly on your productive assets. Our Geo-fencing is accurate to within 10cm.</p>
+                    <div className="flex flex-col gap-2">
+                        {NDVI_ZONES.map(z => (
+                            <div key={z.zone} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <span className="text-xs font-semibold">{z.zone}</span>
+                                <span className="text-xs text-gray-400">{z.area}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-xs text-gray-400 border-t pt-2 dark:border-gray-700 italic">Historical data shows a 0.2 ha increase in productive land usage since last year due to wasteland reclamation in the Western boundary.</p>
+                </div>
+            );
+            type = 'info';
+        }
+
+        setReportModal({
+            isOpen: true,
+            title: label,
+            content,
+            type
+        });
+    };
+
     return (
         <div className="space-y-6">
+            <ReportModal
+                isOpen={reportModal.isOpen}
+                onClose={() => setReportModal(prev => ({ ...prev, isOpen: false }))}
+                title={reportModal.title}
+                content={reportModal.content}
+                type={reportModal.type}
+            />
             <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header text-gradient font-extrabold">Satellite Crop Health</h1>
@@ -42,8 +146,15 @@ const CropHealthMonitoring: React.FC = () => {
                     { label: 'Stress Zones', value: NDVI_ZONES.filter(z => z.status === 'Stressed').length, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', icon: '⚠️' },
                     { label: 'Total Farm Area', value: '9.0 ha', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '🗺️' },
                 ].map(s => (
-                    <div key={s.label} className={`card p-4 transition-transform hover:scale-105 duration-300 ${s.bg}`}>
-                        <span className="text-2xl">{s.icon}</span>
+                    <div
+                        key={s.label}
+                        onClick={() => openReport(s.label)}
+                        className={`card p-4 transition-all hover:scale-105 hover:shadow-xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <span className="text-2xl group-hover:rotate-12 transition-transform">{s.icon}</span>
+                            <span className="text-[8px] font-bold uppercase tracking-tighter text-gray-400 group-hover:text-primary-500 transition-colors">Click for report</span>
+                        </div>
                         <p className={`text-2xl font-black font-display mt-2 ${s.color}`}>{s.value}</p>
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">{s.label}</p>
                     </div>

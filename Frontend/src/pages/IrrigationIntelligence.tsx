@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Droplets, Clock, AlertTriangle, CheckCircle, Thermometer, Wind } from 'lucide-react';
+import ReportModal from '../components/ReportModal';
 
 const scheduleData = [
     { day: 'Mon', required: 25, recommended: 20 },
@@ -24,12 +25,85 @@ const IrrigationIntelligence: React.FC = () => {
     const [area, setArea] = useState('5');
     const [soilType, setSoilType] = useState('Clay Loam');
     const [calculated, setCalculated] = useState(false);
+    const [reportModal, setReportModal] = useState<{ isOpen: boolean; title: string; content: React.ReactNode; type: 'success' | 'warning' | 'info' }>({
+        isOpen: false,
+        title: '',
+        content: null,
+        type: 'info'
+    });
 
     const waterSaved = 2400;
     const efficiency = 84;
 
+    const openReport = (label: string) => {
+        let content: React.ReactNode = null;
+        let type: 'success' | 'warning' | 'info' = 'info';
+
+        if (label === 'Water Efficiency') {
+            content = (
+                <div className="space-y-4">
+                    <p>Current System Efficiency: <strong>{efficiency}%</strong></p>
+                    <p>Irrigation efficiency measures the ratio of water successfully delivered to the root zone versus the total water withdrawn from the source.</p>
+                    <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-xl border border-primary-100 dark:border-primary-800">
+                        <h4 className="font-bold text-primary-700 dark:text-primary-300 mb-2">AI Optimization Report</h4>
+                        <p className="text-sm">Your systems are operating at high efficiency. Precision scheduling based on evapotranspiration (ET) rates has reduced surface runoff by 22% compared to historical patterns.</p>
+                    </div>
+                    <ul className="list-disc pl-5 space-y-2 text-sm">
+                        <li><strong>Drip Uniformity:</strong> 94%</li>
+                        <li><strong>Deep Percolation Loss:</strong> Minimal (4%)</li>
+                        <li><strong>AI Suggestion:</strong> Shift pumping hours to 10 PM - 4 AM to reduce evaporation loss further.</li>
+                    </ul>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Soil Moisture') {
+            content = (
+                <div className="space-y-4">
+                    <p>Current moisture level: <strong>45% (Optimal)</strong></p>
+                    <p>Maintaining soil moisture within the "Management Allowed Depletion" (MAD) range ensures plants never reach the permanent wilting point, preventing irreversible cellular damage.</p>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+                        <h4 className="font-bold text-blue-700 dark:text-blue-300 mb-2">Moisture Analysis</h4>
+                        <p className="text-sm">Sensors at 15cm and 30cm depth confirm uniform moisture distribution. Field capacity is currently at 85% of total potential.</p>
+                    </div>
+                </div>
+            );
+            type = 'info';
+        } else if (label === 'Water Conserved') {
+            content = (
+                <div className="space-y-4">
+                    <p>Cumulative Water Savings: <strong>2,400 Liters</strong></p>
+                    <p>By using AgriFlux AI, you have prevented significant water wastage. This volume is equivalent to roughly 12 large water tanks.</p>
+                    <div className="glass-gold p-4 rounded-xl border border-gold-200">
+                        <p className="text-sm italic">"Every drop saved today is a harvest secured for tomorrow. Your sustainable practices have lowered your environmental footprint by 15% this season."</p>
+                    </div>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Et Rate (Today)') {
+            content = (
+                <div className="space-y-4">
+                    <p>Average Evapotranspiration: <strong>2.8 mm/day</strong></p>
+                    <p>ET rate is the sum of evaporation from the land surface plus transpiration from plants. It is the primary driver for irrigation demand.</p>
+                    <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 rounded-xl">
+                        <p className="text-sm text-orange-700 dark:text-orange-400 font-medium">High sunlight expected today. ET rate will peak at 1 PM.</p>
+                    </div>
+                </div>
+            );
+            type = 'info';
+        }
+
+        setReportModal({ isOpen: true, title: label, content, type });
+    };
+
     return (
         <div className="space-y-6">
+            <ReportModal
+                isOpen={reportModal.isOpen}
+                onClose={() => setReportModal(prev => ({ ...prev, isOpen: false }))}
+                title={reportModal.title}
+                content={reportModal.content}
+                type={reportModal.type}
+            />
             <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header text-gradient font-extrabold">{t('irrigation.title')}</h1>
@@ -40,6 +114,29 @@ const IrrigationIntelligence: React.FC = () => {
                         ⚡ Precision Water Management
                     </span>
                 </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                    { label: 'Water Efficiency', value: `${efficiency}%`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '⚡' },
+                    { label: 'Soil Moisture', value: '45%', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '💧' },
+                    { label: 'Water Conserved', value: '2,400 L', color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '🌍' },
+                    { label: 'Et Rate (Today)', value: '2.8 mm', color: 'text-orange-600', bg: 'bg-orange-50 dark:bg-orange-900/20', icon: '☀️' },
+                ].map(s => (
+                    <div
+                        key={s.label}
+                        onClick={() => openReport(s.label)}
+                        className={`card p-4 transition-all hover:scale-105 hover:shadow-xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <span className="text-2xl group-hover:rotate-12 transition-transform">{s.icon}</span>
+                            <span className="text-[8px] font-bold uppercase tracking-tighter text-gray-400 group-hover:text-primary-500 transition-colors">Click for report</span>
+                        </div>
+                        <p className={`text-2xl font-black font-display mt-2 ${s.color}`}>{s.value}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">{s.label}</p>
+                    </div>
+                ))}
             </div>
 
             {/* Alert */}

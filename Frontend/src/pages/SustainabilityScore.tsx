@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Award, TrendingUp, Droplets, Leaf, RefreshCcw } from 'lucide-react';
+import ReportModal from '../components/ReportModal';
 
 const trendData = [
     { month: 'Aug', score: 62 }, { month: 'Sep', score: 65 }, { month: 'Oct', score: 68 },
@@ -14,8 +15,59 @@ const SustainabilityScore: React.FC = () => {
     const [waterCons] = useState(75);
     const [cropDiv] = useState(68);
     const [soilHealth] = useState(85);
+    const [reportModal, setReportModal] = useState<{ isOpen: boolean; title: string; content: React.ReactNode; type: 'success' | 'warning' | 'info' }>({
+        isOpen: false,
+        title: '',
+        content: null,
+        type: 'info'
+    });
 
     const overall = Math.round((fertEff + waterCons + cropDiv + soilHealth) / 4);
+
+    const openReport = (label: string) => {
+        let content: React.ReactNode = null;
+        let type: 'success' | 'warning' | 'info' = 'info';
+
+        if (label === 'Fertilizer Efficiency') {
+            content = (
+                <div className="space-y-4">
+                    <p>Current Efficiency: <strong>{fertEff}%</strong></p>
+                    <p>Fertilizer efficiency measures the amount of applied nutrients that are actually taken up by the crop versus those lost to leaching or volatilization.</p>
+                    <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-xl border border-primary-100 dark:border-primary-800">
+                        <h4 className="font-bold text-primary-700 dark:text-primary-300 mb-2">Efficiency Analysis</h4>
+                        <p className="text-sm">Your split-application strategy has significantly reduced Nitrogen leaching. Continued use of organic amendments will further stabilize these levels.</p>
+                    </div>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Water Conservation') {
+            content = (
+                <div className="space-y-4">
+                    <p>Current Conservation Score: <strong>{waterCons}%</strong></p>
+                    <p>This score reflects how effectively you managed your water resources relative to the theoretical crop water requirement.</p>
+                </div>
+            );
+            type = 'info';
+        } else if (label === 'Crop Diversity') {
+            content = (
+                <div className="space-y-4">
+                    <p>Diversity Index: <strong>{cropDiv}%</strong></p>
+                    <p>Crop diversity is critical for pest management and long-term soil vitality. More diverse systems are naturally more resilient to climate shocks.</p>
+                </div>
+            );
+            type = 'info';
+        } else if (label === 'Soil Health Index') {
+            content = (
+                <div className="space-y-4">
+                    <p>Soil Health Index: <strong>{soilHealth}/100</strong></p>
+                    <p>A comprehensive rating based on organic carbon, microbial activity, and structure stability.</p>
+                </div>
+            );
+            type = 'success';
+        }
+
+        setReportModal({ isOpen: true, title: label, content, type });
+    };
 
     const radarData = [
         { subject: 'Fertilizer Eff.', value: fertEff },
@@ -37,6 +89,13 @@ const SustainabilityScore: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <ReportModal
+                isOpen={reportModal.isOpen}
+                onClose={() => setReportModal(prev => ({ ...prev, isOpen: false }))}
+                title={reportModal.title}
+                content={reportModal.content}
+                type={reportModal.type}
+            />
             <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header text-gradient font-extrabold">{t('sustainability.title')}</h1>
@@ -121,22 +180,29 @@ const SustainabilityScore: React.FC = () => {
                 {/* Metric Cards */}
                 <div className="space-y-3">
                     {metrics.map(m => (
-                        <div key={m.label} className="card p-4">
+                        <div
+                            key={m.label}
+                            onClick={() => openReport(m.label)}
+                            className="card p-4 group hover:scale-[1.02] transition-all cursor-pointer hover:shadow-xl active:scale-[0.98]"
+                        >
                             <div className="flex items-center gap-3 mb-2">
-                                <div className={`w-9 h-9 ${m.color === 'blue' ? 'bg-blue-100 dark:bg-blue-900/30' : m.color === 'earth' ? 'bg-earth-100 dark:bg-earth-900/30' : 'bg-primary-100 dark:bg-primary-900/30'} rounded-xl flex items-center justify-center`}>
+                                <div className={`w-9 h-9 ${m.color === 'blue' ? 'bg-blue-100 dark:bg-blue-900/30' : m.color === 'earth' ? 'bg-earth-100 dark:bg-earth-900/30' : 'bg-primary-100 dark:bg-primary-900/30'} rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform`}>
                                     <m.icon size={16} className={m.color === 'blue' ? 'text-blue-600' : m.color === 'earth' ? 'text-earth-600' : 'text-primary-600'} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">{m.label}</p>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 mr-3">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-tighter">{m.label}</p>
+                                        <span className="text-[7px] font-black text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity">Full Report</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 mr-3 overflow-hidden">
                                             <div className={`h-1.5 rounded-full ${m.color === 'blue' ? 'bg-blue-500' : m.color === 'earth' ? 'bg-earth-500' : 'bg-primary-500'}`} style={{ width: `${m.value}%` }} />
                                         </div>
                                         <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{m.value}%</span>
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 ml-12">{m.tip}</p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 ml-12 italic">" {m.tip} "</p>
                         </div>
                     ))}
                 </div>

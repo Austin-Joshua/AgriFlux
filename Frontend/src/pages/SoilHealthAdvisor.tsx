@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { FlaskConical, AlertTriangle, CheckCircle, Leaf, Target, UploadCloud, FileText } from 'lucide-react';
+import ReportModal from '../components/ReportModal';
 
 const Gauge: React.FC<{ value: number; label: string; color: string }> = ({ value, label, color }) => (
     <div className="flex flex-col items-center">
@@ -28,6 +29,77 @@ const SoilHealthAdvisor: React.FC = () => {
     const [uploading, setUploading] = useState(false);
     const [predictionText, setPredictionText] = useState<string | null>(null);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [reportModal, setReportModal] = useState<{ isOpen: boolean; title: string; content: React.ReactNode; type: 'success' | 'warning' | 'info' }>({
+        isOpen: false,
+        title: '',
+        content: null,
+        type: 'info'
+    });
+
+    const pH = Number(form.ph);
+    const overallScore = Math.round(
+        (Number(form.nitrogen) / 100 + Number(form.phosphorus) / 50 + Number(form.potassium) / 60 + (pH >= 6 && pH <= 7 ? 1 : 0.5) + Number(form.organicCarbon) / 3) / 5 * 100
+    );
+
+    const openReport = (label: string) => {
+        let content: React.ReactNode = null;
+        let type: 'success' | 'warning' | 'info' = 'info';
+
+        if (label === 'Overall Soil Score') {
+            content = (
+                <div className="space-y-4">
+                    <p>Current Soil Health Index: <strong>{overallScore}/100</strong></p>
+                    <p>The Soil Health Index is a composite metric derived from physical, chemical, and biological properties of the soil. It indicates the soil's capacity to function as a vital living ecosystem.</p>
+                    <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-xl border border-primary-100 dark:border-primary-800">
+                        <h4 className="font-bold text-primary-700 dark:text-primary-300 mb-2">AI Soil Verdict</h4>
+                        <p className="text-sm">Your soil is in the <strong>"Healthy"</strong> category. The nutrient balance is favorable for cereal crops, though Phosphorus levels are slightly below optimal. The biological activity index is trending upwards due to your recent organic addition practices.</p>
+                    </div>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Nutrient Balance') {
+            content = (
+                <div className="space-y-4">
+                    <p>N-P-K Ratio Status: <strong>{Number(form.nitrogen) > 50 ? 'Balanced' : 'Deficient'}</strong></p>
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
+                            <p className="text-[10px] text-gray-400">Nitrogen</p>
+                            <p className="font-bold">{form.nitrogen}</p>
+                        </div>
+                        <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center">
+                            <p className="text-[10px] text-gray-400">Phosphorus</p>
+                            <p className="font-bold">{form.phosphorus}</p>
+                        </div>
+                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center">
+                            <p className="text-[10px] text-gray-400">Potassium</p>
+                            <p className="font-bold">{form.potassium}</p>
+                        </div>
+                    </div>
+                    <p className="text-sm">Balanced nutrients are essential for enzymatic processes and structural integrity of the plant. A deficiency in Phosphorus (P) as seen here can lead to stunted root development.</p>
+                </div>
+            );
+            type = 'info';
+        } else if (label === 'pH Level') {
+            const status = pH < 5.5 ? 'Acidic' : pH > 7.5 ? 'Alkaline' : 'Optimal';
+            content = (
+                <div className="space-y-4">
+                    <p>Soil pH Level: <strong>{pH} ({status})</strong></p>
+                    <p>Soil pH determines the bioavailability of all essential nutrients. Outside the 6.0-7.0 range, many nutrients become chemically locked and unavailable to roots.</p>
+                </div>
+            );
+            type = status === 'Optimal' ? 'success' : 'warning';
+        } else if (label === 'Organic Carbon') {
+            content = (
+                <div className="space-y-4">
+                    <p>Organic Carbon: <strong>{form.organicCarbon}%</strong></p>
+                    <p>Soil Organic Carbon is the backbone of soil health. It improves water holding capacity, cation exchange capacity, and supports the soil microbiome.</p>
+                </div>
+            );
+            type = 'success';
+        }
+
+        setReportModal({ isOpen: true, title: label, content, type });
+    };
 
     const radarData = [
         { subject: 'Nitrogen', value: Math.min(100, (Number(form.nitrogen) / 100) * 100) },
@@ -57,11 +129,7 @@ const SoilHealthAdvisor: React.FC = () => {
         setUploading(false);
     };
 
-    const pH = Number(form.ph);
-    const pHStatus = pH < 5.5 ? 'Acidic' : pH > 7.5 ? 'Alkaline' : 'Optimal';
-    const overallScore = Math.round(
-        (Number(form.nitrogen) / 100 + Number(form.phosphorus) / 50 + Number(form.potassium) / 60 + (pH >= 6 && pH <= 7 ? 1 : 0.5) + Number(form.organicCarbon) / 3) / 5 * 100
-    );
+    const status = pH < 5.5 ? 'Acidic' : pH > 7.5 ? 'Alkaline' : 'Optimal';
 
     const fertilizers = [
         { name: 'Urea (N)', dose: `${Math.max(0, 100 - Number(form.nitrogen))} kg/ha`, color: 'primary' },
@@ -74,6 +142,13 @@ const SoilHealthAdvisor: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <ReportModal
+                isOpen={reportModal.isOpen}
+                onClose={() => setReportModal(prev => ({ ...prev, isOpen: false }))}
+                title={reportModal.title}
+                content={reportModal.content}
+                type={reportModal.type}
+            />
             <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header text-gradient font-extrabold">{t('soil.title')}</h1>
@@ -84,6 +159,29 @@ const SoilHealthAdvisor: React.FC = () => {
                         ✨ Premium Soil Analysis
                     </span>
                 </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                    { label: 'Overall Soil Score', value: `${overallScore}/100`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '🏆' },
+                    { label: 'Nutrient Balance', value: Number(form.nitrogen) > 50 ? 'Optimal' : 'Needs NPK', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '🧪' },
+                    { label: 'pH Level', value: form.ph, color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '💎' },
+                    { label: 'Organic Carbon', value: `${form.organicCarbon}%`, color: 'text-earth-600', bg: 'bg-earth-50 dark:bg-earth-900/20', icon: '🍂' },
+                ].map(s => (
+                    <div
+                        key={s.label}
+                        onClick={() => openReport(s.label)}
+                        className={`card p-4 transition-all hover:scale-105 hover:shadow-xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <span className="text-2xl group-hover:rotate-12 transition-transform">{s.icon}</span>
+                            <span className="text-[8px] font-bold uppercase tracking-tighter text-gray-400 group-hover:text-primary-500 transition-colors">Click for report</span>
+                        </div>
+                        <p className={`text-2xl font-black font-display mt-2 ${s.color}`}>{s.value}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">{s.label}</p>
+                    </div>
+                ))}
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -148,11 +246,11 @@ const SoilHealthAdvisor: React.FC = () => {
                     </div>
 
                     {/* pH Status */}
-                    <div className={`mt-4 p-3 rounded-xl text-sm ${pHStatus === 'Optimal' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' :
+                    <div className={`mt-4 p-3 rounded-xl text-sm ${status === 'Optimal' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300' :
                         'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
                         }`}>
-                        <p className="font-semibold">pH: {form.ph} — {pHStatus}</p>
-                        {pHStatus !== 'Optimal' && (
+                        <p className="font-semibold">pH: {form.ph} — {status}</p>
+                        {status !== 'Optimal' && (
                             <p className="text-xs mt-0.5">
                                 {pH < 5.5 ? 'Add 2 t/ha agricultural lime to correct acidity' : 'Apply gypsum or sulfur to reduce alkalinity'}
                             </p>

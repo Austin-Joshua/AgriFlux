@@ -1,10 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB } from './config/db';
 import authRoutes from './routes/auth.routes';
 import aiRoutes from './routes/ai.routes';
 
 dotenv.config();
+
+// Connect to Database
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5001;

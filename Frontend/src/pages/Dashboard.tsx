@@ -104,6 +104,30 @@ const Dashboard: React.FC = () => {
                     accentColor="#b8823d"
                     route="/soil"
                 />
+                <StatCard
+                    title={t('dashboard.yieldForecast')} value="4,200 kg/ha" change="+12%"
+                    icon={<TrendingUp size={22} className="text-primary-600" />}
+                    color="text-primary-600 dark:text-primary-400"
+                    bgColor="bg-primary-100 dark:bg-primary-900/30"
+                    accentColor="#22c55e"
+                    route="/yield"
+                />
+                <StatCard
+                    title={t('dashboard.irrigationStatus')} value="Optimal" change="Water Saved"
+                    icon={<Droplets size={22} className="text-blue-600" />}
+                    color="text-blue-600 dark:text-blue-400"
+                    bgColor="bg-blue-100 dark:bg-blue-900/30"
+                    accentColor="#3b82f6"
+                    route="/irrigation"
+                />
+                <StatCard
+                    title={t('dashboard.climateRisk')} value="Low" change="Stable"
+                    icon={<ThermometerSun size={22} className="text-gold-600" />}
+                    color="text-gold-600 dark:text-gold-400"
+                    bgColor="bg-gold-100 dark:bg-gold-900/30"
+                    accentColor="#f59e0b"
+                    route="/climate"
+                />
             </div>
 
             {/* Charts Row */}

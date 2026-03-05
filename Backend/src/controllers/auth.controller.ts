@@ -1,43 +1,60 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import User from '../models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'agriflux_secret_key_2026';
 
-// Mock DB
-const users: any[] = [];
-
 export const register = async (req: Request, res: Response) => {
-    const { email, password, name, farmName, location } = req.body;
+    try {
+        const { phone, password, name, farmName, location, role, email } = req.body;
 
-    const existingUser = users.find(u => u.email === email);
-    if (existingUser) return res.status(400).json({ message: 'User already exists' });
+        if (!phone || !password || !name) {
+            return res.status(400).json({ message: 'Please provide phone, password and name' });
+        }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { id: Date.now(), email, password: hashedPassword, name, farmName, location };
-    users.push(newUser);
+        const existingUser = await User.findOne({ phone });
+        if (existingUser) return res.status(400).json({ message: 'User with this phone number already exists' });
 
-    const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await User.create({
+            phone,
+            password: hashedPassword,
+            name,
+            farmName,
+            location,
+            role: role || 'farmer',
+            email
+        });
 
-    res.status(201).json({
-        token,
-        user: { id: newUser.id, email, name, farmName, location }
-    });
+        const token = jwt.sign({ id: newUser._id, phone: newUser.phone }, JWT_SECRET, { expiresIn: '7d' });
+
+        res.status(201).json({
+            token,
+            user: { id: newUser._id, phone, name, farmName, location, role: newUser.role }
+        });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 export const login = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    try {
+        const { phone, password } = req.body;
 
-    const user = users.find(u => u.email === email);
-    if (!user) return res.status(400).json({ message: 'User not found' });
+        const user = await User.findOne({ phone });
+        if (!user) return res.status(400).json({ message: 'User not found' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user._id, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' });
 
-    res.json({
-        token,
-        user: { id: user.id, email, name: user.name, farmName: user.farmName, location: user.location }
-    });
+        res.json({
+            token,
+            user: { id: user._id, phone: user.phone, name: user.name, farmName: user.farmName, location: user.location, role: user.role }
+        });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
 };

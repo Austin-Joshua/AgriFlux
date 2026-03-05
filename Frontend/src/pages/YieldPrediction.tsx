@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';
 import { TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ChevronDown } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import ReportModal from '../components/ReportModal';
 
 const CROPS = ['Rice', 'Wheat', 'Corn', 'Sugarcane', 'Cotton', 'Soybean', 'Millet', 'Barley', 'Sorghum', 'Groundnut'];
 
@@ -39,9 +40,59 @@ const YieldPrediction: React.FC = () => {
     });
     const [result, setResult] = useState<{ predicted: number; improvement: string; risk: string } | null>(null);
     const [loading, setLoading] = useState(false);
+    const [reportModal, setReportModal] = useState<{ isOpen: boolean; title: string; content: React.ReactNode; type: 'success' | 'warning' | 'info' }>({
+        isOpen: false,
+        title: '',
+        content: null,
+        type: 'info'
+    });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+    const openReport = (label: string) => {
+        let content: React.ReactNode = null;
+        let type: 'success' | 'warning' | 'info' = 'info';
+
+        if (label === 'Predicted Yield') {
+            const val = result ? result.predicted : '---';
+            content = (
+                <div className="space-y-4">
+                    <p>Current Predicted Yield: <strong>{val} kg</strong></p>
+                    <p>This prediction uses a Deep Neural Network (DNN) trained on regional data. It considers nutrient availability, historical weather patterns, and current crop stage.</p>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Improvement') {
+            const val = result ? result.improvement : '---';
+            content = (
+                <div className="space-y-4">
+                    <p>Projected Improvement: <strong>{val}%</strong></p>
+                    <p>Improvement is measured against your baseline historical yield. A positive percentage indicates that current management practices and favorable weather are likely to result in a better harvest.</p>
+                </div>
+            );
+            type = 'success';
+        } else if (label === 'Risk Level') {
+            const val = result ? result.risk : '---';
+            content = (
+                <div className="space-y-4">
+                    <p>Yield Risk: <strong>{val}</strong></p>
+                    <p>Risk assessment evaluates the probability of yield loss due to biotic or abiotic stress factors.</p>
+                </div>
+            );
+            type = val === 'Low' ? 'success' : val === 'Medium' ? 'warning' : 'info';
+        } else if (label === 'Confidence') {
+            content = (
+                <div className="space-y-4">
+                    <p>Model Confidence: <strong>92%</strong></p>
+                    <p>Calculated based on the completeness of input data and the prediction model's historical accuracy for this crop in this region.</p>
+                </div>
+            );
+            type = 'info';
+        }
+
+        setReportModal({ isOpen: true, title: label, content, type });
+    };
 
     const handlePredict = async () => {
         setLoading(true);
@@ -67,16 +118,49 @@ const YieldPrediction: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <ReportModal
+                isOpen={reportModal.isOpen}
+                onClose={() => setReportModal(prev => ({ ...prev, isOpen: false }))}
+                title={reportModal.title}
+                content={reportModal.content}
+                type={reportModal.type}
+            />
             <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
                 <div>
                     <h1 className="page-header text-gradient font-extrabold">{t('yield.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium">{t('yield.subtitle')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('yield.subtitle')}</p>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
-                        ✨ Full AI Report
+                        📊 Predictive AI Core
+                    </span>
+                    <span className="badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
+                        💎 Premium Model
                     </span>
                 </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                    { label: 'Predicted Yield', value: result ? `${result.predicted} kg` : '---', color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '📈' },
+                    { label: 'Improvement', value: result ? `${result.improvement}%` : '---', color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '🚀' },
+                    { label: 'Risk Level', value: result ? result.risk : '---', color: result?.risk === 'High' ? 'text-red-500' : 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '🛡️' },
+                    { label: 'Confidence', value: '92%', color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-900/20', icon: '✅' },
+                ].map(s => (
+                    <div
+                        key={s.label}
+                        onClick={() => openReport(s.label)}
+                        className={`card p-4 transition-all hover:scale-105 hover:shadow-xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <span className="text-2xl group-hover:rotate-12 transition-transform">{s.icon}</span>
+                            <span className="text-[8px] font-bold uppercase tracking-tighter text-gray-400 group-hover:text-primary-500 transition-colors">Click for report</span>
+                        </div>
+                        <p className={`text-2xl font-black font-display mt-2 ${s.color}`}>{s.value}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">{s.label}</p>
+                    </div>
+                ))}
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

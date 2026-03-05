@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5001/api';
 
 export type UserRole = 'farmer' | 'agronomist' | 'admin';
 
 export interface User {
     id: string;
     name: string;
-    email: string;
+    email?: string;
+    phone: string;
     farmName?: string;
     location?: string;
     role: UserRole;
@@ -16,7 +20,7 @@ export interface User {
 interface AuthContextType {
     user: User | null;
     token: string | null;
-    login: (email: string, password: string, role?: UserRole) => Promise<void>;
+    login: (phone: string, password: string, role?: UserRole) => Promise<void>;
     loginWithProvider: (provider: 'google' | 'microsoft' | 'apple', role?: UserRole) => Promise<void>;
     logout: () => void;
     register: (data: RegisterData) => Promise<void>;
@@ -26,28 +30,13 @@ interface AuthContextType {
 
 interface RegisterData {
     name: string;
-    email: string;
+    email?: string;
     password: string;
+    phone: string;
+    role?: UserRole;
     farmName?: string;
     location?: string;
-    phone?: string;
 }
-
-const demoUsers: Record<UserRole, User> = {
-    farmer: {
-        id: '1', name: 'Ravi Kumar', email: 'user@agriflux.ai',
-        farmName: 'Green Valley Farm', location: 'Karnataka, India', role: 'farmer',
-    },
-    agronomist: {
-        id: '2', name: 'Dr. Priya Sharma', email: 'agronomist@agriflux.ai',
-        location: 'Pune, Maharashtra', role: 'agronomist',
-        expertise: 'Soil Science & Crop Pathology',
-    },
-    admin: {
-        id: '3', name: 'Admin User', email: 'admin@agriflux.ai',
-        location: 'Bengaluru, India', role: 'admin',
-    },
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -62,54 +51,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (savedToken && savedUser) {
             setToken(savedToken);
             setUser(JSON.parse(savedUser));
+            axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
         }
         setIsLoading(false);
     }, []);
 
-    const persistUser = (u: User) => {
-        const tok = 'demo-jwt-' + u.role + '-' + Date.now();
-        setUser(u);
-        setToken(tok);
-        localStorage.setItem('agriflux-token', tok);
-        localStorage.setItem('agriflux-user', JSON.stringify(u));
+    const handleAuthResponse = (data: { token: string; user: User }) => {
+        setUser(data.user);
+        setToken(data.token);
+        localStorage.setItem('agriflux-token', data.token);
+        localStorage.setItem('agriflux-user', JSON.stringify(data.user));
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
     };
 
-    const login = async (email: string, password: string, role: UserRole = 'farmer') => {
+    const login = async (phone: string, password: string) => {
         setIsLoading(true);
-        await new Promise(r => setTimeout(r, 700)); // simulate network
         try {
-            // role-specific demo users
-            const roleKeys: UserRole[] = ['farmer', 'agronomist', 'admin'];
-            const matchedRole = roleKeys.find(r => demoUsers[r].email === email.toLowerCase()) ?? role;
-            const u: User = { ...demoUsers[matchedRole], email };
-            persistUser(u);
+            const response = await axios.post(`${API_URL}/auth/login`, { phone, password });
+            handleAuthResponse(response.data);
+        } catch (error: any) {
+            console.error('Login error:', error.response?.data?.message || error.message);
+            throw error;
         } finally {
             setIsLoading(false);
         }
     };
 
-    const loginWithProvider = async (provider: 'google' | 'microsoft' | 'apple', role: UserRole = 'farmer') => {
+    const loginWithProvider = async (provider: string, role: UserRole = 'farmer') => {
+        // Social login would normally follow a similar flow to a dedicated endpoint
+        console.log(`Simulating social login with ${provider} for role ${role}`);
         setIsLoading(true);
-        await new Promise(r => setTimeout(r, 1200)); // simulate OAuth
-        try {
-            const providerNames: Record<string, string> = { google: 'Google', microsoft: 'Microsoft', apple: 'Apple' };
-            const base = demoUsers[role];
-            const u: User = { ...base, name: base.name + ' (' + providerNames[provider] + ')', id: provider + '-' + Date.now() };
-            persistUser(u);
-        } finally {
-            setIsLoading(false);
-        }
+        await new Promise(r => setTimeout(r, 1000));
+        setIsLoading(false);
     };
 
     const register = async (data: RegisterData) => {
         setIsLoading(true);
-        await new Promise(r => setTimeout(r, 800));
         try {
-            const u: User = {
-                id: Date.now().toString(), name: data.name, email: data.email,
-                farmName: data.farmName || 'My Farm', location: data.location || 'India', role: 'farmer',
-            };
-            persistUser(u);
+            const response = await axios.post(`${API_URL}/auth/register`, data);
+            handleAuthResponse(response.data);
+        } catch (error: any) {
+            console.error('Registration error:', error.response?.data?.message || error.message);
+            throw error;
         } finally {
             setIsLoading(false);
         }
@@ -120,6 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(null);
         localStorage.removeItem('agriflux-token');
         localStorage.removeItem('agriflux-user');
+        delete axios.defaults.headers.common['Authorization'];
     };
 
     return (

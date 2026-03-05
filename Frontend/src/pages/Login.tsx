@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Leaf, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Leaf, Phone, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
@@ -15,14 +15,14 @@ const Login: React.FC = () => {
     const { isDark } = useTheme();
     const navigate = useNavigate();
 
-    const roleCreds: Record<string, { email: string; password: string }> = {
-        farmer: { email: 'user@agriflux.ai', password: 'password123' },
-        agronomist: { email: 'agronomist@agriflux.ai', password: 'agro123' },
-        admin: { email: 'admin@agriflux.ai', password: 'admin123' },
+    const roleCreds: Record<string, { phone: string; password: string }> = {
+        farmer: { phone: '9876543210', password: 'password123' },
+        agronomist: { phone: '8765432109', password: 'agro123' },
+        admin: { phone: '7654321098', password: 'admin123' },
     };
 
-    const [email, setEmail] = useState('user@agriflux.ai');
-    const [password, setPassword] = useState('password123');
+    const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [socialLoading, setSocialLoading] = useState<string | null>(null);
@@ -30,8 +30,6 @@ const Login: React.FC = () => {
 
     const switchMode = (mode: 'farmer' | 'agronomist' | 'admin') => {
         setLoginMode(mode);
-        setEmail(roleCreds[mode].email);
-        setPassword(roleCreds[mode].password);
         setError('');
     };
 
@@ -39,7 +37,7 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError('');
         try {
-            await login(email, password, loginMode);
+            await login(phone, password, loginMode);
             if (loginMode === 'admin') navigate('/admin');
             else if (loginMode === 'agronomist') navigate('/agronomist');
             else navigate('/dashboard');
@@ -156,7 +154,7 @@ const Login: React.FC = () => {
             <div className="mb-6 p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/50 text-[11px] text-primary-700 dark:text-primary-400 flex items-center gap-2">
                 <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
                 <span className="font-bold">{loginMode.toUpperCase()} Mode:</span>
-                <span className="font-mono opacity-80">{roleCreds[loginMode].email}</span>
+                <span className="font-mono opacity-80">{roleCreds[loginMode].phone}</span>
             </div>
 
             {error && (
@@ -166,18 +164,19 @@ const Login: React.FC = () => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                 <div className="space-y-1.5">
-                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">{t('auth.email')}</label>
+                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">{t('auth.phone')}</label>
                     <div className="relative group">
-                        <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                        <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                         <input
-                            id="email-input"
-                            type="email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
+                            id="phone-input"
+                            type="tel"
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
                             className="input-field pl-12 h-12 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
-                            placeholder="user@agriflux.ai"
+                            placeholder="9876543210"
+                            autoComplete="off"
                             required
                         />
                     </div>
@@ -199,6 +198,7 @@ const Login: React.FC = () => {
                             onChange={e => setPassword(e.target.value)}
                             className="input-field pl-12 pr-12 h-12 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
                             placeholder="••••••••"
+                            autoComplete="new-password"
                             required
                         />
                         <button
