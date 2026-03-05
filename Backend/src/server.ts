@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import authRoutes from './routes/auth.routes';
 import aiRoutes from './routes/ai.routes';
+import consultationRoutes from './routes/consultation.routes';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.get('/health', (_req: Request, res: Response) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/consultations', consultationRoutes);
 
 // 404
 app.use((_req: Request, res: Response) => {

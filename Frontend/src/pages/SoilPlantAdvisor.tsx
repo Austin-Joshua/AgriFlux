@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FlaskConical, Leaf, AlertTriangle, CheckCircle, TrendingUp, Droplets, Sprout, Microscope, Camera, Activity, Search, Info, FileText } from 'lucide-react';
 import ReportModal from '../components/ReportModal';
@@ -16,6 +17,7 @@ interface CropRec {
 
 const SoilPlantAdvisor: React.FC = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [mode, setMode] = useState<'soil' | 'plant'>('soil');
     const [input, setInput] = useState<SoilInput>({ salinity: '', ph: '', moisture: '', waterLevel: '', germination: '', region: 'Karnataka' });
     const [recs, setRecs] = useState<CropRec[] | null>(null);
@@ -371,7 +373,10 @@ const SoilPlantAdvisor: React.FC = () => {
                             <p className="text-xs text-gray-400 mb-6 leading-relaxed">
                                 Get a professional agronomy report for your farm by connecting with our certified experts.
                             </p>
-                            <button className="w-full btn-primary !bg-white !text-gray-900 border-none py-3 text-xs font-black rounded-xl">
+                            <button
+                                onClick={() => navigate('/book-consultation')}
+                                className="w-full btn-primary !bg-white !text-gray-900 border-none py-3 text-xs font-black rounded-xl"
+                            >
                                 {t('soilAdvisor.bookConsultation')}
                             </button>
                         </div>

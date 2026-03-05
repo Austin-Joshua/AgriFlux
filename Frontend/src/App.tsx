@@ -31,6 +31,7 @@ import SoilPlantAdvisor from './pages/SoilPlantAdvisor';
 import LandIntelligence from './pages/LandIntelligence';
 import AgronomistDashboard from './pages/AgronomistDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import BookConsultation from './pages/BookConsultation';
 
 const App: React.FC = () => {
     return (
@@ -164,6 +165,14 @@ const App: React.FC = () => {
                                 element={
                                     <ProtectedRoute>
                                         <Layout><SoilPlantAdvisor /></Layout>
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/book-consultation"
+                                element={
+                                    <ProtectedRoute>
+                                        <Layout><BookConsultation /></Layout>
                                     </ProtectedRoute>
                                 }
                             />
