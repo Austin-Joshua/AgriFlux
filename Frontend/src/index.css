@@ -172,8 +172,8 @@
   }
 
   .dark .glass-sidebar {
-    background: rgba(17, 24, 39, 0.92);
-    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(10, 26, 18, 0.94); /* Deep forest green tint */
+    border-right: 1px solid rgba(34, 197, 94, 0.1);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
   }
 
@@ -283,8 +283,8 @@
   }
 
   .dark .glass-card-sm {
-    background: rgba(55, 65, 81, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(34, 197, 94, 0.08); /* Subtle green tint */
+    border: 1px solid rgba(34, 197, 94, 0.15);
   }
 
   /* Input field */

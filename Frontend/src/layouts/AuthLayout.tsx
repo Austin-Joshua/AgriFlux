@@ -160,7 +160,7 @@ const AuthLayout: React.FC = () => {
                 {/* Form Content Areas */}
                 <div className="flex w-full h-full relative">
                     {/* Left Slot (Shows Register Form when Register, or empty/bg when Login) */}
-                    <div className="flex-1 lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-12 order-2 lg:order-1">
+                    <div className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-12 order-2 lg:order-1 ${!isLogin ? 'flex-1' : 'hidden lg:flex'}`}>
                         <AnimatePresence mode="wait">
                             {!isLogin && (
                                 <motion.div
@@ -178,7 +178,7 @@ const AuthLayout: React.FC = () => {
                     </div>
 
                     {/* Right Slot (Shows Login Form when Login, or empty/bg when Register) */}
-                    <div className="flex-1 lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-12 order-1 lg:order-2">
+                    <div className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-12 order-1 lg:order-2 ${isLogin ? 'flex-1' : 'hidden lg:flex'}`}>
                         <AnimatePresence mode="wait">
                             {isLogin && (
                                 <motion.div
