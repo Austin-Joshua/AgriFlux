@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Leaf, Phone, Lock, AlertCircle } from 'lucide-react';
@@ -28,6 +28,32 @@ const Login: React.FC = () => {
     const [error, setError] = useState('');
     const [socialLoading, setSocialLoading] = useState<string | null>(null);
     const [loginMode, setLoginMode] = useState<'farmer' | 'agronomist' | 'admin'>('farmer');
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const source = params.get('source');
+        const autoUser = params.get('identifier');
+        const autoPass = params.get('password');
+
+        if (source === 'citizenone' && autoUser && autoPass) {
+            // Auto-login for seamless integration
+            const performAutoLogin = async () => {
+                try {
+                    setIdentifier(autoUser);
+                    setPassword(autoPass);
+                    const loggedInUser = await login(autoUser, autoPass);
+                    const role = loggedInUser?.role || loginMode;
+                    toast.success(`Seamlessly logged in from CitizenOne as ${loggedInUser?.name || 'User'}`);
+                    if (role === 'admin') navigate('/admin');
+                    else if (role === 'agronomist') navigate('/agronomist');
+                    else navigate('/dashboard');
+                } catch (err) {
+                    console.error('Auto-login failed:', err);
+                }
+            };
+            performAutoLogin();
+        }
+    }, [location]);
 
     const switchMode = (mode: 'farmer' | 'agronomist' | 'admin') => {
         setLoginMode(mode);
