@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@charset "UTF-8";
+/* stylelint-disable at-rule-no-unknown */
+/* css-lint-disable */
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 /* ================================
    CUSTOM KEYFRAMES
