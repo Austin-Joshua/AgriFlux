@@ -40,11 +40,12 @@ app.use('/api/', limiter);
 const allowedOrigins = [
     process.env.FRONTEND_URL || 'http://localhost:3000',
     'https://citizenone.vercel.app',
-    'https://agriflux.vercel.app' // Added production candidate
+    'https://agriflux.vercel.app',
+    'https://agri-flux-sandy.vercel.app'
 ];
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
+        if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app')) || process.env.NODE_ENV === 'development') {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
