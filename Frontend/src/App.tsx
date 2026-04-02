@@ -1,5 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -35,180 +39,194 @@ import BookConsultation from './pages/BookConsultation';
 
 const App: React.FC = () => {
     return (
-        <ThemeProvider>
-            <AuthProvider>
-                <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID_PLACEHOLDER">
-                    <BrowserRouter>
-                        <Routes>
-                            {/* Authentication Layer with Sliding Transitions */}
-                            <Route element={<AuthLayout />}>
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/register" element={<Register />} />
-                            </Route>
-                            <Route path="/forgot-password" element={<ForgotPassword />} />
+        <HelmetProvider>
+            <ThemeProvider>
+                <AuthProvider>
+                    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID_PLACEHOLDER">
+                        <BrowserRouter>
+                            <Routes>
+                                {/* Authentication Layer with Sliding Transitions */}
+                                <Route element={<AuthLayout />}>
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/register" element={<Register />} />
+                                </Route>
+                                <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                            {/* Protected Routes inside Layout */}
-                            <Route
-                                path="/dashboard"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><Dashboard /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/yield"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><YieldPrediction /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/irrigation"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><IrrigationIntelligence /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/soil"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><SoilHealthAdvisor /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/crop-health"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><CropHealthMonitoring /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/climate"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><ClimateRisk /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/simulator"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><ClimateSimulator /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/crop-switching"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><CropSwitchingAdvisor /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/sustainability"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><SustainabilityScore /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/settings"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><Settings /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/about"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><About /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/subsidies"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><GovernmentSubsidies /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/market"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><MarketAnalysis /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/investors"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><InvestorsHub /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/soil-advisor"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><SoilPlantAdvisor /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/book-consultation"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><BookConsultation /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/land-intelligence"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><LandIntelligence /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/agronomist"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><AgronomistDashboard /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/admin"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout><AdminDashboard /></Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
+                                {/* Protected Routes inside Layout */}
+                                <Route
+                                    path="/dashboard"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><Dashboard /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/yield"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><YieldPrediction /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/irrigation"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><IrrigationIntelligence /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/soil"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><SoilHealthAdvisor /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/crop-health"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><CropHealthMonitoring /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/climate"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><ClimateRisk /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/simulator"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><ClimateSimulator /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/crop-switching"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><CropSwitchingAdvisor /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/sustainability"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><SustainabilityScore /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/settings"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><Settings /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/about"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><About /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/subsidies"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><GovernmentSubsidies /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/market"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><MarketAnalysis /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/investors"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><InvestorsHub /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/soil-advisor"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><SoilPlantAdvisor /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/book-consultation"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><BookConsultation /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/land-intelligence"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><LandIntelligence /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/agronomist"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><AgronomistDashboard /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin"
+                                    element={
+                                        <ProtectedRoute>
+                                            <Layout><AdminDashboard /></Layout>
+                                        </ProtectedRoute>
+                                    }
+                                />
 
-                            {/* Redirects */}
-                            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                        </Routes>
-                    </BrowserRouter>
-                </GoogleOAuthProvider>
-            </AuthProvider>
-        </ThemeProvider>
+                                {/* Redirects */}
+                                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                            </Routes>
+                        </BrowserRouter>
+                        <ToastContainer
+                            position="bottom-right"
+                            autoClose={4000}
+                            hideProgressBar={false}
+                            newestOnTop
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                            theme="colored"
+                        />
+                    </GoogleOAuthProvider>
+                </AuthProvider>
+            </ThemeProvider>
+        </HelmetProvider>
     );
 };
 

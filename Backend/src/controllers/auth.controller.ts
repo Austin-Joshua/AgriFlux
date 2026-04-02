@@ -6,12 +6,8 @@ import { isDBConnected } from '../config/db';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'agriflux_secret_key_2026';
 
-// In-memory demo users (fallback when MongoDB is not available)
-const demoUsers = [
-    { id: 'demo-farmer-001', name: 'Ravi Kumar', phone: '9876543210', email: 'farmer@agriflux.com', password: 'password123', role: 'farmer', farmName: 'Green Valley Farm', location: 'Karnataka, India' },
-    { id: 'demo-agro-001', name: 'Dr. Meena Singh', phone: '8765432109', email: 'agronomist@agriflux.com', password: 'agro123', role: 'agronomist', farmName: '', location: 'Punjab, India' },
-    { id: 'demo-admin-001', name: 'Admin User', phone: '7654321098', email: 'admin@agriflux.com', password: 'admin123', role: 'admin', farmName: '', location: 'New Delhi, India' },
-];
+    // Demo mode: simulate registration
+    // No longer supported in production
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -22,12 +18,7 @@ export const register = async (req: Request, res: Response) => {
         }
 
         if (!isDBConnected) {
-            // Demo mode: simulate registration
-            const token = jwt.sign({ id: `demo-${Date.now()}`, phone }, JWT_SECRET, { expiresIn: '7d' });
-            return res.status(201).json({
-                token,
-                user: { id: `demo-${Date.now()}`, phone, name, farmName, location, role: role || 'farmer', email }
-            });
+            return res.status(503).json({ message: 'Database connecting, please try again in a moment.' });
         }
 
         const existingUser = await User.findOne({ $or: [{ phone }, { email: email || undefined }] });
@@ -60,20 +51,7 @@ export const login = async (req: Request, res: Response) => {
         const { identifier, password } = req.body;
 
         if (!isDBConnected) {
-            // Demo mode: check against in-memory users
-            const demoUser = demoUsers.find(u =>
-                (u.phone === identifier || u.email === identifier) && u.password === password
-            );
-
-            if (!demoUser) {
-                return res.status(400).json({ message: 'Invalid credentials. Check demo credentials.' });
-            }
-
-            const token = jwt.sign({ id: demoUser.id, phone: demoUser.phone }, JWT_SECRET, { expiresIn: '7d' });
-            return res.json({
-                token,
-                user: { id: demoUser.id, phone: demoUser.phone, name: demoUser.name, farmName: demoUser.farmName, location: demoUser.location, role: demoUser.role, email: demoUser.email }
-            });
+            return res.status(503).json({ message: 'Database connecting, please try again in a moment.' });
         }
 
         const user = await User.findOne({

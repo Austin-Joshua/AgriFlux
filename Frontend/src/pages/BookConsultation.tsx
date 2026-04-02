@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Clock, MessageSquare, User, Video, CheckCircle, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
+import SEO from '../components/SEO';
 
 interface Expert {
     id: string;
@@ -12,7 +15,7 @@ interface Expert {
     expertise: string;
     avatar: string;
 }
-
+// ... experts array remains same ...
 const experts: Expert[] = [
     {
         id: 'exp1',
@@ -62,7 +65,7 @@ const BookConsultation: React.FC = () => {
 
         setLoading(true);
         try {
-            await axios.post('http://localhost:5001/api/consultations/book', {
+            await axios.post(`${API_URL}/consultations/book`, {
                 expertId: selectedExpert.id,
                 expertName: selectedExpert.name,
                 specialization: selectedExpert.specialization,
@@ -75,10 +78,10 @@ const BookConsultation: React.FC = () => {
             });
 
             setSubmitted(true);
+            toast.success('Consultation booked successfully!');
             setTimeout(() => navigate('/dashboard'), 3000);
         } catch (error) {
-            console.error('Error booking consultation:', error);
-            alert('Failed to book consultation. Please try again.');
+            toast.error('Failed to book consultation. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -87,6 +90,7 @@ const BookConsultation: React.FC = () => {
     if (submitted) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+                <SEO title="Booking Confirmed" />
                 <div className="w-20 h-20 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-600">
                     <CheckCircle size={48} />
                 </div>
@@ -102,11 +106,13 @@ const BookConsultation: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-10">
+            <SEO title="Book Consultation" />
             <div className="flex items-center gap-4">
                 <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all">
                     <ArrowLeft size={20} />
                 </button>
                 <div>
+// ... remainder of file ...
                     <h1 className="text-3xl font-black text-gray-900 dark:text-white">Expert Consultation</h1>
                     <p className="text-gray-500 text-sm">Book a 1-to-1 video call for specialized agricultural advice.</p>
                 </div>

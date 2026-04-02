@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.jpg';
 import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
+import SEO from '../components/SEO';
 
 const Register: React.FC = () => {
     const { t } = useTranslation();
@@ -32,14 +33,18 @@ const Register: React.FC = () => {
         e.preventDefault();
         if (form.password !== form.confirmPassword) {
             setError('Passwords do not match');
+            toast.warning('Passwords do not match');
             return;
         }
         setError('');
         try {
             await register(form);
+            toast.success('Account created successfully! Welcome to AgriFlux.');
             navigate('/dashboard');
-        } catch {
-            setError('Registration failed. Please try again.');
+        } catch (err: any) {
+            const msg = err.response?.data?.message || 'Registration failed. Please try again.';
+            setError(msg);
+            toast.error(msg);
         }
     };
 
@@ -48,7 +53,10 @@ const Register: React.FC = () => {
             console.log('Google signup success:', tokenResponse);
             handleSocialSignup('google');
         },
-        onError: () => setError('Google sign-up failed. Please try again.'),
+        onError: () => {
+            setError('Google sign-up failed.');
+            toast.error('Google sign-up failed.');
+        }
     });
 
     const openMockProviderPopup = (provider: 'microsoft' | 'apple') => {
@@ -95,7 +103,8 @@ const Register: React.FC = () => {
             }, 500);
         } else {
             setSocialLoading(null);
-            setError('Popup blocked. Please allow popups for this site.');
+            setError('Popup blocked. Please allow popups.');
+            toast.warning('Popup blocked. Please allow popups.');
         }
     };
 
@@ -104,9 +113,11 @@ const Register: React.FC = () => {
         setError('');
         try {
             await loginWithProvider(provider, 'farmer');
+            toast.success(`Welcome! Signed up with ${provider}.`);
             navigate('/dashboard');
         } catch {
             setError('Social sign-up failed. Please try again.');
+            toast.error('Social sign-up failed.');
         } finally {
             setSocialLoading(null);
         }
@@ -122,6 +133,8 @@ const Register: React.FC = () => {
 
     return (
         <div className="w-full h-full flex flex-col justify-center py-8">
+            <SEO title="Create Account" />
+            
             {/* Mobile Branding */}
             <div className="lg:hidden flex flex-col items-center mb-8 text-center">
                 <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-xl mb-4 p-2">
@@ -143,7 +156,7 @@ const Register: React.FC = () => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {fields.map(field => (
                         <div key={field.name} className={field.name === 'email' ? 'sm:col-span-2' : ''}>
@@ -158,6 +171,7 @@ const Register: React.FC = () => {
                                     className="input-field pl-12 h-11 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
                                     placeholder={field.placeholder}
                                     required={field.required}
+                                    autoComplete={field.name === 'email' ? 'email' : 'off'}
                                 />
                             </div>
                         </div>
@@ -177,6 +191,7 @@ const Register: React.FC = () => {
                                 className="input-field pl-12 h-11 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
                                 placeholder="••••••••"
                                 required
+                                autoComplete="new-password"
                             />
                         </div>
                     </div>
@@ -192,15 +207,26 @@ const Register: React.FC = () => {
                                 className="input-field pl-12 h-11 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
                                 placeholder="••••••••"
                                 required
+                                autoComplete="new-password"
                             />
                         </div>
                     </div>
                 </div>
 
+                <div className="flex items-center gap-2 px-1">
+                     <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[10px] text-primary-600 font-bold uppercase tracking-widest hover:underline"
+                     >
+                        {showPassword ? 'Hide Password' : 'Show Password'}
+                     </button>
+                </div>
+
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="btn-primary w-full py-4 text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/10 mt-6 active:scale-95"
+                    className="btn-primary w-full py-4 text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/10 mt-4 active:scale-95"
                 >
                     {isLoading ? (
                         <span className="flex items-center justify-center gap-2">

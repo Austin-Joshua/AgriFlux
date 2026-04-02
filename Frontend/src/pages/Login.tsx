@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Leaf, Phone, Lock, AlertCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.jpg';
 import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
+import SEO from '../components/SEO';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -39,11 +40,13 @@ const Login: React.FC = () => {
         try {
             const loggedInUser = await login(identifier, password);
             const role = loggedInUser?.role || loginMode;
+            toast.success(`Welcome back, ${loggedInUser?.name || 'User'}!`);
             if (role === 'admin') navigate('/admin');
             else if (role === 'agronomist') navigate('/agronomist');
             else navigate('/dashboard');
         } catch (err) {
             setError('Invalid credentials. Please try again.');
+            toast.error('Invalid credentials. Please check your phone and password.');
         }
     };
 
@@ -52,7 +55,10 @@ const Login: React.FC = () => {
             console.log('Google login success:', tokenResponse);
             handleSocialLogin('google');
         },
-        onError: () => setError('Google login failed. Please try again.'),
+        onError: () => {
+            setError('Google login failed. Please try again.');
+            toast.error('Google login failed.');
+        }
     });
 
     const openMockProviderPopup = (provider: 'microsoft' | 'apple') => {
@@ -100,6 +106,7 @@ const Login: React.FC = () => {
         } else {
             setSocialLoading(null);
             setError('Popup blocked. Please allow popups for this site.');
+            toast.warning('Popup blocked. Please allow popups.');
         }
     };
 
@@ -108,11 +115,13 @@ const Login: React.FC = () => {
         setError('');
         try {
             await loginWithProvider(provider, loginMode);
+            toast.success(`Success! Logged in with ${provider}.`);
             if (loginMode === 'admin') navigate('/admin');
             else if (loginMode === 'agronomist') navigate('/agronomist');
             else navigate('/dashboard');
         } catch {
             setError('Social login failed. Please try again.');
+            toast.error('Social login failed.');
         } finally {
             setSocialLoading(null);
         }
@@ -120,6 +129,8 @@ const Login: React.FC = () => {
 
     return (
         <div className="w-full h-full flex flex-col justify-center">
+            <SEO title="Sign In" />
+            
             {/* Mobile Branding (only visible on mobile) */}
             <div className="lg:hidden flex flex-col items-center mb-10 text-center">
                 <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-xl mb-4 p-2">
@@ -228,7 +239,7 @@ const Login: React.FC = () => {
             </form >
 
             {/* Social Login */}
-            < div className="mt-8" >
+            <div className="mt-8">
                 <div className="relative flex items-center gap-4 mb-6">
                     <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">{t('auth.orContinueWith', 'Or continue with')}</span>
@@ -255,7 +266,7 @@ const Login: React.FC = () => {
                         </button>
                     ))}
                 </div>
-            </div >
+            </div>
 
             <p className="mt-8 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 {t('auth.noAccount')}{' '}
@@ -263,7 +274,7 @@ const Login: React.FC = () => {
                     {t('auth.register')}
                 </Link>
             </p>
-        </div >
+        </div>
     );
 };
 

@@ -10,6 +10,7 @@ import {
     AlertTriangle, CheckCircle, ArrowUpRight, ArrowDownRight, Zap, Map, ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import SEO from '../components/SEO';
 
 const yieldData = [
     { month: 'Jan', yield: 2800, forecast: 2900 },
@@ -80,6 +81,8 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="space-y-5">
+            <SEO title="Dashboard" />
+            
             {/* Welcome Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>

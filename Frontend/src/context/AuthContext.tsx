@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:5001/api';
+import { API_URL } from '../config';
 
 export type UserRole = 'farmer' | 'agronomist' | 'admin';
 
