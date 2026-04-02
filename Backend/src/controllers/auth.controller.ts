@@ -14,8 +14,8 @@ export const register = async (req: Request, res: Response) => {
     try {
         const { phone, password, name, farmName, location, role, email } = req.body;
 
-        if (!phone || !password || !name) {
-            return res.status(400).json({ message: 'Please provide phone, password and name' });
+        if (!password || !name || (!email && !phone)) {
+            return res.status(400).json({ message: 'Please provide email or phone, plus password and name.' });
         }
 
         if (!isDBConnected) {

@@ -20,13 +20,13 @@ const UserSchema: Schema = new Schema({
     id: { type: String, unique: true, required: true },
     name: { type: String, required: true },
     email: { type: String, unique: true, sparse: true },
-    phone: { type: String, required: true, unique: true },
+    phone: { type: String, required: false, sparse: true }, // Made optional for synchronization
     password: { type: String, required: true },
     password_hash: { type: String, required: true },
-    role: { type: String, enum: ['farmer', 'agronomist', 'admin'], default: 'farmer' },
+    role: { type: String, enum: ['farmer', 'agronomist', 'admin', 'citizen', 'student', 'staff'], default: 'farmer' },
     plan: { type: String, enum: ['free', 'premium', 'organization'], default: 'free' },
     preferences: { type: Object, default: {} },
-    emailVerified: { type: Boolean, default: true },
+    emailVerified: { type: Boolean, default: false },
     farmName: { type: String },
     location: { type: String },
     createdAt: { type: Date, default: Date.now }
