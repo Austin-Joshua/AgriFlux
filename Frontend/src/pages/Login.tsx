@@ -16,10 +16,10 @@ const Login: React.FC = () => {
     const { isDark } = useTheme();
     const navigate = useNavigate();
 
-    const roleCreds: Record<string, { phone: string; password: string }> = {
-        farmer: { phone: '9876543210', password: 'password123' },
-        agronomist: { phone: '8765432109', password: 'agro123' },
-        admin: { phone: '7654321098', password: 'admin123' },
+    const roleCreds: Record<string, { email: string; password: string }> = {
+        farmer: { email: 'farmer@agriflux.com', password: 'password123' },
+        agronomist: { email: 'agronomist@agriflux.com', password: 'agro123' },
+        admin: { email: 'admin@agriflux.com', password: 'admin123' },
     };
 
     const [identifier, setIdentifier] = useState('');
@@ -46,7 +46,7 @@ const Login: React.FC = () => {
             else navigate('/dashboard');
         } catch (err) {
             setError('Invalid credentials. Please try again.');
-            toast.error('Invalid credentials. Please check your phone and password.');
+            toast.error('Invalid credentials. Please check your email and password.');
         }
     };
 
@@ -166,7 +166,7 @@ const Login: React.FC = () => {
             <div className="mb-6 p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/50 text-[11px] text-primary-700 dark:text-primary-400 flex items-center gap-2">
                 <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
                 <span className="font-bold">{loginMode.toUpperCase()} Mode:</span>
-                <span className="font-mono opacity-80">{roleCreds[loginMode].phone}</span>
+                <span className="font-mono opacity-80">{roleCreds[loginMode].email}</span>
             </div>
 
             {error && (
@@ -178,7 +178,7 @@ const Login: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                 <div className="space-y-1.5">
-                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">Phone or Email</label>
+                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">Email Address</label>
                     <div className="relative group">
                         <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                         <input
@@ -187,7 +187,7 @@ const Login: React.FC = () => {
                             value={identifier}
                             onChange={e => setIdentifier(e.target.value)}
                             className="input-field pl-12 h-12 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
-                            placeholder="Enter phone or email"
+                            placeholder="Enter email"
                             autoComplete="off"
                             required
                         />
