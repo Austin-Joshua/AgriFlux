@@ -22,15 +22,15 @@ export const register = async (req: Request, res: Response) => {
             return res.status(503).json({ message: 'Database connecting, please try again in a moment.' });
         }
 
-        const existingUser = await User.findOne({ $or: [{ phone }, { email: email || undefined }] });
-        if (existingUser) return res.status(400).json({ message: 'User with this phone number or email already exists' });
-
         const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Atomically create user. MongoDB 'unique' indexes on 'email' and 'phone' 
+        // will automatically prevent collisions at the same millisecond.
         const newUser = await User.create({
-            id: crypto.randomUUID(), // CitizenOne compatibility
+            id: crypto.randomUUID(), 
             phone,
             password: hashedPassword,
-            password_hash: hashedPassword, // CitizenOne compatibility
+            password_hash: hashedPassword, 
             name,
             farmName,
             location,
@@ -45,6 +45,12 @@ export const register = async (req: Request, res: Response) => {
             user: { id: newUser.id, mongoId: newUser._id, phone, name, farmName, location, role: newUser.role, email }
         });
     } catch (error: any) {
+        // Catch MongoDB Duplicate Key Error (Atomic Uniqueness check)
+        if (error.code === 11000) {
+            return res.status(400).json({ 
+                message: 'An account with this email or phone number already exists.' 
+            });
+        }
         res.status(500).json({ message: error.message });
     }
 };
