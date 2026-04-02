@@ -12,7 +12,25 @@ import aiRoutes from './routes/ai.routes';
 import consultationRoutes from './routes/consultation.routes';
 import integrationRoutes from './routes/integration.routes';
 
+import cluster from 'cluster';
+import os from 'os';
+
 dotenv.config();
+
+/**
+ * Handle uncaught exceptions and unhandled rejections globally 
+ * to prevent the entire process from crashing silently.
+ */
+process.on('uncaughtException', (err) => {
+    console.error(`💥 [CRITICAL ERROR] UNCAUGHT EXCEPTION: ${err.name} - ${err.message}`);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (err: any) => {
+    console.error(`🔥 [CRITICAL ERROR] UNHANDLED REJECTION: ${err.name} - ${err.message}`);
+    // Only exit the worker, primary will restart it
+    process.exit(1);
+});
 
 // Connect to Database
 connectDB();
@@ -21,15 +39,15 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Global Middleware
-app.use(helmet()); // Security Headers
-app.use(hpp()); // HTTP Parameter Pollution protection
-app.use(compression()); // Gzip compression
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); // Logging
+app.use(helmet()); 
+app.use(hpp()); 
+app.use(compression()); 
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); 
 
-// Rate Limiting
+// Rate Limiting (Optimized for higher traffic)
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 500, // Increased limit for heavy traffic
     message: { success: false, message: 'Too many requests, please try again later.' },
     standardHeaders: true,
     legacyHeaders: false,
@@ -54,12 +72,12 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json({ limit: '10kb' })); // Body limit for security
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '50kb' })); // Increased limit slightly for analysis data
+app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
 // Health Check
 app.get('/health', (_req: Request, res: Response) => {
-    res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+    res.status(200).json({ status: 'healthy', worker: process.pid, timestamp: new Date().toISOString() });
 });
 
 // API Routes
@@ -78,7 +96,6 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || 500;
     const message = err.message || 'Server error';
     
-    // Log error in production
     if (process.env.NODE_ENV === 'production') {
         console.error(`[Error] ${err.name}: ${message}`);
     } else {
@@ -92,6 +109,25 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 AgriFlux API running at http://localhost:${PORT}`);
-});
+/**
+ * Cluster Deployment:
+ * Spawns a worker for every CPU core to handle high traffic and provide 
+ * automatic zero-downtime restarts.
+ */
+if (cluster.isPrimary && process.env.NODE_ENV === 'production') {
+    const numCPUs = os.cpus().length;
+    console.log(`🚀 Primary process ${process.pid} is running. Spawning ${numCPUs} workers...`);
+
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
+
+    cluster.on('exit', (worker, code, signal) => {
+        console.warn(`⚠️  Worker ${worker.process.pid} died (code: ${code}, signal: ${signal}). Spawning replacement...`);
+        cluster.fork();
+    });
+} else {
+    app.listen(PORT, () => {
+        console.log(`🚀 Worker ${process.pid} started. AgriFlux API: http://localhost:${PORT}`);
+    });
+}

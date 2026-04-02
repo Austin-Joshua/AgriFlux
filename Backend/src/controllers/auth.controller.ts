@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import User from '../models/User';
 import { isDBConnected } from '../config/db';
 
@@ -26,8 +27,10 @@ export const register = async (req: Request, res: Response) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create({
+            id: crypto.randomUUID(), // CitizenOne compatibility
             phone,
             password: hashedPassword,
+            password_hash: hashedPassword, // CitizenOne compatibility
             name,
             farmName,
             location,
@@ -39,7 +42,7 @@ export const register = async (req: Request, res: Response) => {
 
         res.status(201).json({
             token,
-            user: { id: newUser._id, phone, name, farmName, location, role: newUser.role, email }
+            user: { id: newUser.id, mongoId: newUser._id, phone, name, farmName, location, role: newUser.role, email }
         });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
@@ -69,7 +72,7 @@ export const login = async (req: Request, res: Response) => {
 
         res.json({
             token,
-            user: { id: user._id, phone: user.phone, name: user.name, farmName: user.farmName, location: user.location, role: user.role, email: user.email }
+            user: { id: user.id, mongoId: user._id, phone: user.phone, name: user.name, farmName: user.farmName, location: user.location, role: user.role, email: user.email }
         });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
