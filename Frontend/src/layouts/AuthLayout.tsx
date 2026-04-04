@@ -79,7 +79,7 @@ const AuthLayout: React.FC = () => {
 
 
             {/* Main Glass Container (Matching Website Glassmorphism) */}
-            <div className="relative w-full max-w-[1050px] min-h-[600px] lg:min-h-[720px] bg-white/70 dark:bg-gray-800/60 backdrop-blur-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-white/40 dark:border-white/5 flex overflow-hidden ring-1 ring-black/5">
+            <div className="relative w-full max-w-[1050px] min-h-[580px] lg:min-h-[660px] bg-white/70 dark:bg-gray-800/60 backdrop-blur-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-white/40 dark:border-white/5 flex overflow-hidden ring-1 ring-black/5">
 
                 {/* The "Sliding" Branding Panel (Ditto Repo Style) */}
                 <motion.div
@@ -160,7 +160,7 @@ const AuthLayout: React.FC = () => {
                 {/* Form Content Areas */}
                 <div className="flex w-full h-full relative">
                     {/* Left Slot (Shows Register Form when Register, or empty/bg when Login) */}
-                    <div className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-12 order-2 lg:order-1 ${!isLogin ? 'flex-1' : 'hidden lg:flex'}`}>
+                    <div className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-8 order-2 lg:order-1 ${!isLogin ? 'flex-1' : 'hidden lg:flex'}`}>
                         <AnimatePresence mode="wait">
                             {!isLogin && (
                                 <motion.div
@@ -169,7 +169,7 @@ const AuthLayout: React.FC = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -50 }}
                                     transition={{ duration: 0.4, ease: "circOut" }}
-                                    className="w-full max-w-sm"
+                                    className="w-full max-w-md"
                                 >
                                     <Outlet />
                                 </motion.div>
@@ -178,7 +178,7 @@ const AuthLayout: React.FC = () => {
                     </div>
 
                     {/* Right Slot (Shows Login Form when Login, or empty/bg when Register) */}
-                    <div className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-12 order-1 lg:order-2 ${isLogin ? 'flex-1' : 'hidden lg:flex'}`}>
+                    <div className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-8 order-1 lg:order-2 ${isLogin ? 'flex-1' : 'hidden lg:flex'}`}>
                         <AnimatePresence mode="wait">
                             {isLogin && (
                                 <motion.div

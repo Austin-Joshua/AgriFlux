@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import User from '../models/User';
-import Report from '../models/Report';
+import User from '../../../Database/Models/User';
+import Report from '../../../Database/Models/Report';
 
 /**
  * GET /api/integration/farmer-stats/:identifier

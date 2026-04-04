@@ -5,7 +5,7 @@ import {
     LayoutDashboard, TrendingUp, Droplets, FlaskConical,
     Satellite, CloudLightning, Thermometer, Sprout,
     Award, Settings, Info, X, Leaf, LogOut, PanelLeftClose, PanelLeft,
-    Landmark, BarChart3, Handshake, TestTube, Map
+    Landmark, BarChart3, Handshake, TestTube, Map, Store, Tractor
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/new-leaf-logo.png';
@@ -19,14 +19,15 @@ interface SidebarProps {
 
 const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
-    { to: '/soil', icon: FlaskConical, labelKey: 'nav.soilHealth' },
+    { to: '/marketplace', icon: Store, labelKey: 'nav.marketplace' },
+    { to: '/equipment-rental', icon: Tractor, labelKey: 'nav.equipmentRental' },
+    { to: '/soil', icon: FlaskConical, labelKey: 'nav.soilIntelligence' },
     { to: '/crop-health', icon: Satellite, labelKey: 'nav.cropHealth' },
     { to: '/crop-switching', icon: Sprout, labelKey: 'nav.cropSwitching' },
     { to: '/sustainability', icon: Award, labelKey: 'nav.sustainability' },
     { to: '/subsidies', icon: Landmark, labelKey: 'nav.subsidies' },
     { to: '/market', icon: BarChart3, labelKey: 'nav.market' },
     { to: '/investors', icon: Handshake, labelKey: 'nav.investors' },
-    { to: '/soil-advisor', icon: TestTube, labelKey: 'nav.soilAdvisor' },
     { to: '/land-intelligence', icon: Map, labelKey: 'nav.landIntelligence' },
 ];
 

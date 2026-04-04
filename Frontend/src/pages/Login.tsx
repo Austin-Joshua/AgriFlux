@@ -5,14 +5,13 @@ import { Eye, EyeOff, Leaf, Phone, Lock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { useGoogleLogin } from '@react-oauth/google';
 import logo from '../assets/logo.jpg';
 import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
-    const { login, loginWithProvider, isLoading } = useAuth();
+    const { login, loginWithProvider, isLoading, requiresOnboarding } = useAuth();
     const { isDark } = useTheme();
     const navigate = useNavigate();
 
@@ -28,6 +27,16 @@ const Login: React.FC = () => {
     const [error, setError] = useState('');
     const [socialLoading, setSocialLoading] = useState<string | null>(null);
     const [loginMode, setLoginMode] = useState<'farmer' | 'agronomist' | 'admin'>('farmer');
+
+    // Handle redirection after auth state updates
+    useEffect(() => {
+        if (!isLoading && requiresOnboarding) {
+            navigate('/onboarding');
+        } else if (!isLoading && !requiresOnboarding && identifier && password) {
+             // Redirection for normal login is handled in handleSubmit but this 
+             // handles the social login redirect too.
+        }
+    }, [isLoading, requiresOnboarding, navigate]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -76,16 +85,6 @@ const Login: React.FC = () => {
         }
     };
 
-    const googleLogin = useGoogleLogin({
-        onSuccess: tokenResponse => {
-            console.log('Google login success:', tokenResponse);
-            handleSocialLogin('google');
-        },
-        onError: () => {
-            setError('Google login failed. Please try again.');
-            toast.error('Google login failed.');
-        }
-    });
 
     const openMockProviderPopup = (provider: 'microsoft' | 'apple') => {
         setSocialLoading(provider);
@@ -141,13 +140,18 @@ const Login: React.FC = () => {
         setError('');
         try {
             await loginWithProvider(provider, loginMode);
-            toast.success(`Success! Logged in with ${provider}.`);
-            if (loginMode === 'admin') navigate('/admin');
-            else if (loginMode === 'agronomist') navigate('/agronomist');
-            else navigate('/dashboard');
-        } catch {
-            setError('Social login failed. Please try again.');
-            toast.error('Social login failed.');
+            toast.success(`Welcome back! Successfully authenticated via ${provider}.`);
+            
+            // If onboarding is NOT required, navigate to dashboard immediately
+            // (onboarding is handled by the useEffect above)
+            if (!requiresOnboarding) {
+                if (loginMode === 'admin') navigate('/admin');
+                else if (loginMode === 'agronomist') navigate('/agronomist');
+                else navigate('/dashboard');
+            }
+        } catch (err: any) {
+            setError(`${provider} login failed. Please try again.`);
+            toast.error(`${provider} login failed.`);
         } finally {
             setSocialLoading(null);
         }
@@ -163,13 +167,13 @@ const Login: React.FC = () => {
                     <img src={logo} alt="AgriFlux" className="w-full h-full object-contain" />
                 </div>
                 <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">{t('auth.welcomeBack')} 👋</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Sign in to your farm intelligence dashboard</p>
+                <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">{t('auth.loginSubtitle')}</p>
             </div>
 
             {/* Desktop Message Header */}
             <div className="mb-8 hidden lg:block">
                 <h2 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">{t('auth.welcomeBack')} 👋</h2>
-                <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">Sign in to access premium agricultural insights.</p>
+                <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">{t('auth.loginDesktopDesc')}</p>
             </div>
 
             {/* Login Mode Tabs (Matching Website Style) */}
@@ -204,7 +208,7 @@ const Login: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                 <div className="space-y-1.5">
-                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">Email Address</label>
+                    <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">{t('auth.email')}</label>
                     <div className="relative group">
                         <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                         <input
@@ -213,7 +217,7 @@ const Login: React.FC = () => {
                             value={identifier}
                             onChange={e => setIdentifier(e.target.value)}
                             className="input-field pl-12 h-12 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
-                            placeholder="Enter email"
+                            placeholder={t('auth.placeholderEmail')}
                             autoComplete="off"
                             required
                         />
@@ -258,7 +262,7 @@ const Login: React.FC = () => {
                     {isLoading ? (
                         <span className="flex items-center justify-center gap-2">
                             <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
-                            Authenticating...
+                            {t('auth.authenticating')}
                         </span>
                     ) : t('auth.login')}
                 </button>
@@ -273,7 +277,7 @@ const Login: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                     {[
-                        { id: 'google', icon: <GoogleIcon />, action: () => googleLogin() },
+                        { id: 'google', icon: <GoogleIcon />, action: () => handleSocialLogin('google') },
                         { id: 'microsoft', icon: <MicrosoftIcon />, action: () => openMockProviderPopup('microsoft') },
                         { id: 'apple', icon: <AppleIcon className={isDark ? 'text-white' : 'text-black'} />, action: () => openMockProviderPopup('apple') }
                     ].map(provider => (

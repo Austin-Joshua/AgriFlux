@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
+import { auth, googleProvider } from '../lib/firebase';
+import { signInWithPopup, getAdditionalUserInfo, signOut } from 'firebase/auth';
 
 export type UserRole = 'farmer' | 'agronomist' | 'admin';
 
@@ -14,6 +16,7 @@ export interface User {
     role: UserRole;
     avatar?: string;
     expertise?: string;
+    emailVerified?: boolean;
 }
 
 interface AuthContextType {
@@ -23,8 +26,10 @@ interface AuthContextType {
     loginWithProvider: (provider: 'google' | 'microsoft' | 'apple', role?: UserRole) => Promise<void>;
     logout: () => void;
     register: (data: RegisterData) => Promise<void>;
+    completeOnboarding: (farmName: string, location: string) => Promise<void>;
     isLoading: boolean;
     isAuthenticated: boolean;
+    requiresOnboarding: boolean;
 }
 
 interface RegisterData {
@@ -43,14 +48,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [requiresOnboarding, setRequiresOnboarding] = useState(false);
 
+    // Restore session from localStorage on mount
     useEffect(() => {
         const savedToken = localStorage.getItem('agriflux-token');
         const savedUser = localStorage.getItem('agriflux-user');
         if (savedToken && savedUser) {
-            setToken(savedToken);
-            setUser(JSON.parse(savedUser));
-            axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+            try {
+                const parsedUser = JSON.parse(savedUser);
+                setToken(savedToken);
+                setUser(parsedUser);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+            } catch {
+                // Corrupted storage — clear it
+                localStorage.removeItem('agriflux-token');
+                localStorage.removeItem('agriflux-user');
+            }
         }
         setIsLoading(false);
     }, []);
@@ -63,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
     };
 
+    // ── Password Login ────────────────────────────────────────────────────────
     const login = async (identifier: string, password: string) => {
         setIsLoading(true);
         try {
@@ -77,14 +92,96 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    // ── Social / Google Login ─────────────────────────────────────────────────
     const loginWithProvider = async (provider: string, role: UserRole = 'farmer') => {
-        // Social login would normally follow a similar flow to a dedicated endpoint
-        console.log(`Simulating social login with ${provider} for role ${role}`);
         setIsLoading(true);
-        await new Promise(r => setTimeout(r, 1000));
-        setIsLoading(false);
+        try {
+            if (provider === 'google') {
+                // Step 1 - Authenticate with Firebase in the browser
+                const result = await signInWithPopup(auth, googleProvider);
+                const firebaseUser = result.user;
+                const additionalInfo = getAdditionalUserInfo(result);
+
+                // Step 2 - Get the Firebase ID token to verify server-side
+                const idToken = await firebaseUser.getIdToken();
+
+                // Step 3 - Send the token to our backend for verification & DB sync
+                try {
+                    const response = await axios.post(`${API_URL}/auth/social-login`, {
+                        idToken,
+                        role,
+                    });
+
+                    handleAuthResponse(response.data);
+
+                    // Trigger onboarding if it's the first time
+                    if (response.data.isNewUser || additionalInfo?.isNewUser) {
+                        setRequiresOnboarding(true);
+                    }
+                } catch (backendErr: any) {
+                    // Backend not reachable (e.g. local dev without backend running)
+                    // Fall back to a client-only session so the UI still works
+                    console.warn('Backend sync failed, using client-only session:', backendErr.message);
+                    const fallbackUser: User = {
+                        id: firebaseUser.uid,
+                        name: firebaseUser.displayName || 'Farmer',
+                        email: firebaseUser.email || '',
+                        phone: '',
+                        role,
+                        avatar: firebaseUser.photoURL || '',
+                        emailVerified: firebaseUser.emailVerified,
+                    };
+                    const fallbackToken = idToken; // Use Firebase token as session token
+                    handleAuthResponse({ token: fallbackToken, user: fallbackUser });
+
+                    // Always trigger onboarding on fallback (no DB to check)
+                    if (additionalInfo?.isNewUser) {
+                        setRequiresOnboarding(true);
+                    }
+                }
+            } else {
+                // Microsoft / Apple — mocked for now
+                console.log(`Social login with ${provider} (mocked)`);
+                await new Promise(r => setTimeout(r, 1000));
+            }
+        } catch (error: any) {
+            // Sign-in was cancelled or popup was blocked
+            if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+                console.error(`${provider} login error:`, error.message);
+            }
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
     };
 
+    // ── Onboarding Completion ─────────────────────────────────────────────────
+    const completeOnboarding = async (farmName: string, location: string) => {
+        if (!user) return;
+        setIsLoading(true);
+        try {
+            const updatedUser = { ...user, farmName, location };
+
+            // Sync back to our backend (best-effort)
+            try {
+                await axios.post(`${API_URL}/auth/social-login`, {
+                    idToken: token,   // Pass current token for re-verification
+                    farmName,
+                    location,
+                });
+            } catch {
+                // Backend not required for completing onboarding locally
+            }
+
+            setUser(updatedUser);
+            localStorage.setItem('agriflux-user', JSON.stringify(updatedUser));
+            setRequiresOnboarding(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // ── Registration ──────────────────────────────────────────────────────────
     const register = async (data: RegisterData) => {
         setIsLoading(true);
         try {
@@ -98,16 +195,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const logout = () => {
+    // ── Logout ────────────────────────────────────────────────────────────────
+    const logout = async () => {
+        // Sign out from Firebase as well to clear the Google session
+        try { await signOut(auth); } catch { /* ignore */ }
         setUser(null);
         setToken(null);
+        setRequiresOnboarding(false);
         localStorage.removeItem('agriflux-token');
         localStorage.removeItem('agriflux-user');
         delete axios.defaults.headers.common['Authorization'];
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, loginWithProvider, logout, register, isLoading, isAuthenticated: !!user && !!token }}>
+        <AuthContext.Provider value={{
+            user, token, login, loginWithProvider, logout, register,
+            completeOnboarding, isLoading, isAuthenticated: !!user && !!token,
+            requiresOnboarding
+        }}>
             {children}
         </AuthContext.Provider>
     );

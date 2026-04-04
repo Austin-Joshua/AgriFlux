@@ -89,27 +89,30 @@
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  opacity: 0;
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.animate-slide-down {
-  animation: slide-down 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  transform-origin: top;
+.animate-slide-up-fade {
+  animation: slide-up-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.animate-slide-up {
-  animation: slide-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  opacity: 0;
+@keyframes shimmer-fast {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.animate-slide-in-left {
-  animation: slide-in-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+.shimmer-fast {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 25%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 75%);
+  background-size: 200% 100%;
+  animation: shimmer-fast 1s infinite linear;
 }
 
 /* ================================
@@ -472,5 +475,237 @@
 
   .dark .branding-bg {
     background: linear-gradient(160deg, #0a2e1a 0%, #0f4a2a 40%, #0d3a20 100%);
+  }
+
+  /* Glass card utility (used in Marketplace analytics) */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    border-radius: 1rem;
+    padding: 1.25rem;
+  }
+
+  .dark .glass-card {
+    background: rgba(31, 41, 55, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* ================================
+   PRINT / PDF STYLES
+   Used by SmartFarmReport Download
+================================ */
+@media print {
+  /* Hide everything except the modal content */
+  body > *:not(.fixed) {
+    display: none !important;
+  }
+
+  /* Show the report modal full-page */
+  .fixed {
+    position: static !important;
+    inset: auto !important;
+    background: white !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Remove backdrop overlay */
+  .fixed > div:first-child {
+    display: none !important;
+  }
+
+  /* Expand the modal to full-page */
+  .fixed > div:last-child {
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+
+  /* Hide all scrollbars and max-height limits */
+  .max-h-\[75vh\] {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Remove print button (it has print:hidden) */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure gradients render in print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+}
+
+/* ================================
+   PRODUCTION POLISH & MOBILE CSS
+================================ */
+
+/* Smooth fade-in-up for page-level elements (404, Error) */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Shimmer skeleton animation */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+.dark .shimmer {
+  background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
+  background-size: 800px 100%;
+}
+
+/* ================================
+   MOBILE NATIVE-APP FEEL
+================================ */
+
+/* Disable tap highlight on all interactive elements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Minimum 44px touch targets on mobile */
+@media (max-width: 1023px) {
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception: icon-only small buttons inside cards */
+  .touch-sm {
+    min-height: 32px !important;
+    min-width: 32px !important;
+  }
+}
+
+/* Smooth momentum scrolling on iOS */
+.overflow-auto,
+.overflow-y-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS safe-area bottom padding for bottom nav */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Hide scrollbar but keep scroll functioning */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Tap feedback — scale on active for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .card-clickable:active,
+  button:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* ================================
+   CONSISTENT SHADOW DEPTH SYSTEM
+================================ */
+
+/* Elevation 1 — Cards */
+.shadow-card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Elevation 2 — Hovered Cards */
+.shadow-card-hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.07);
+}
+
+/* Elevation 3 — Dropdowns / Modals */
+.shadow-panel {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Elevation 4 — Floating / Overlays */
+.shadow-floating {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.20), 0 4px 16px rgba(0,0,0,0.10);
+}
+
+/* ================================
+   TYPOGRAPHY CONSISTENCY
+================================ */
+
+/* Fluid heading scale */
+@media (max-width: 480px) {
+  .page-header {
+    font-size: 1.3rem !important;
+    line-height: 1.35;
+  }
+  .section-header {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Body text readability */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ================================
+   PAGE TRANSITION
+================================ */
+
+/* Applied via animate-fade-in on .max-w-7xl wrapper in Layout */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: page-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ================================
+   RESPONSIVE CARD GRID HELPERS
+================================ */
+
+/* Prevent card text overflow on small screens */
+@media (max-width: 640px) {
+  .card, .glass-card {
+    padding: 1rem;
+  }
+
+  /* Ensure text doesn't overflow narrow mobile viewports */
+  p, h1, h2, h3, span {
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 }

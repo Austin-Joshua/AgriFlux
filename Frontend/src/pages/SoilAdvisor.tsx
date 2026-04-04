@@ -15,7 +15,7 @@ interface CropRec {
     tenYearTrend: string; color: string;
 }
 
-const SoilPlantAdvisor: React.FC = () => {
+const SoilAdvisor: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [mode, setMode] = useState<'soil' | 'plant'>('soil');
@@ -403,4 +403,4 @@ const SoilPlantAdvisor: React.FC = () => {
     );
 };
 
-export default SoilPlantAdvisor;
+export default SoilAdvisor;

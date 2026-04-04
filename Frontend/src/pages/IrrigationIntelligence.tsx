@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { Droplets, Clock, AlertTriangle, CheckCircle, Thermometer, Wind } from 'lucide-react';
+import { Droplets, Clock, AlertTriangle, CheckCircle, Thermometer, Wind, Zap, Activity } from 'lucide-react';
 import ReportModal from '../components/ReportModal';
+import { useIoT } from '../hooks/useIoT';
+import { toast } from 'react-toastify';
 
 const scheduleData = [
     { day: 'Mon', required: 25, recommended: 20 },
@@ -25,6 +27,8 @@ const IrrigationIntelligence: React.FC = () => {
     const [area, setArea] = useState('5');
     const [soilType, setSoilType] = useState('Clay Loam');
     const [calculated, setCalculated] = useState(false);
+    const { moisture, pumpActive, pumpStatus, togglePump, lastSync, isSimulated } = useIoT();
+    const [isToggling, setIsToggling] = useState(false);
     const [reportModal, setReportModal] = useState<{ isOpen: boolean; title: string; content: React.ReactNode; type: 'success' | 'warning' | 'info' }>({
         isOpen: false,
         title: '',
@@ -59,7 +63,7 @@ const IrrigationIntelligence: React.FC = () => {
         } else if (label === 'Soil Moisture') {
             content = (
                 <div className="space-y-4">
-                    <p>Current moisture level: <strong>45% (Optimal)</strong></p>
+                    <p>Current moisture level: <strong>{moisture}% ({moisture > 40 ? 'Optimal' : 'Low'})</strong></p>
                     <p>Maintaining soil moisture within the "Management Allowed Depletion" (MAD) range ensures plants never reach the permanent wilting point, preventing irreversible cellular damage.</p>
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                         <h4 className="font-bold text-blue-700 dark:text-blue-300 mb-2">Moisture Analysis</h4>
@@ -113,6 +117,11 @@ const IrrigationIntelligence: React.FC = () => {
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
                         ⚡ Precision Water Management
                     </span>
+                    {isSimulated && (
+                        <span className="flex items-center gap-1.5 bg-blue-500/10 text-blue-500 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-blue-500/20 animate-pulse">
+                            <Activity size={12} /> SIMULATION MODE
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -120,7 +129,7 @@ const IrrigationIntelligence: React.FC = () => {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                     { label: 'Water Efficiency', value: `${efficiency}%`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '⚡' },
-                    { label: 'Soil Moisture', value: '45%', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '💧' },
+                    { label: 'Soil Moisture', value: `${moisture}%`, color: moisture > 35 ? 'text-blue-600' : 'text-red-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '💧' },
                     { label: 'Water Conserved', value: '2,400 L', color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '🌍' },
                     { label: 'Et Rate (Today)', value: '2.8 mm', color: 'text-orange-600', bg: 'bg-orange-50 dark:bg-orange-900/20', icon: '☀️' },
                 ].map(s => (
@@ -152,84 +161,161 @@ const IrrigationIntelligence: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Config Form */}
-                <div className="card">
-                    <h3 className="section-header mb-4">Farm Configuration</h3>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="label">Crop Type</label>
-                            <select className="input-field" value={cropType} onChange={e => setCropType(e.target.value)}>
-                                {['Rice', 'Wheat', 'Corn', 'Cotton', 'Sugarcane'].map(c => <option key={c}>{c}</option>)}
-                            </select>
+                <div className="card h-full flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="section-header">Farm Config</h3>
                         </div>
-                        <div>
-                            <label className="label">Farm Area (hectares)</label>
-                            <input type="number" className="input-field" value={area} onChange={e => setArea(e.target.value)} min="0.1" step="0.1" />
+                        <div className="space-y-4">
+                            <div>
+                                <label className="label">Crop Type</label>
+                                <select className="input-field" value={cropType} onChange={e => setCropType(e.target.value)}>
+                                    {['Rice', 'Wheat', 'Corn', 'Cotton', 'Sugarcane'].map(c => <option key={c}>{c}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="label">Area (ha)</label>
+                                <input type="number" className="input-field" value={area} onChange={e => setArea(e.target.value)} min="0.1" step="0.1" />
+                            </div>
+                            <div>
+                                <label className="label">Soil Type</label>
+                                <select className="input-field" value={soilType} onChange={e => setSoilType(e.target.value)}>
+                                    {['Sandy Loam', 'Clay Loam', 'Silt Loam', 'Sandy Clay', 'Heavy Clay'].map(s => <option key={s}>{s}</option>)}
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label className="label">Soil Type</label>
-                            <select className="input-field" value={soilType} onChange={e => setSoilType(e.target.value)}>
-                                {['Sandy Loam', 'Clay Loam', 'Silt Loam', 'Sandy Clay', 'Heavy Clay'].map(s => <option key={s}>{s}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="label">Current Soil Moisture (%)</label>
-                            <input type="number" className="input-field" defaultValue="45" min="0" max="100" />
-                        </div>
-
-                        <button onClick={() => setCalculated(true)} className="btn-primary w-full">
-                            <span className="flex items-center justify-center gap-2"><Droplets size={16} /> Calculate Schedule</span>
-                        </button>
                     </div>
 
-                    {/* Stats */}
-                    <div className="mt-6 grid grid-cols-2 gap-3">
+                    <div className="mt-6 flex flex-col gap-3">
+                        <button onClick={() => setCalculated(true)} className="btn-primary w-full h-12">
+                            <span className="flex items-center justify-center gap-2"><Droplets size={16} /> Update Plan</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Relay Control Card */}
+                <div className="card glass-gold border-gold-300 relative overflow-hidden flex flex-col justify-between h-full">
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="section-header text-gold-700 dark:text-gold-300">Relay Control</h3>
+                            <div className={`w-2.5 h-2.5 rounded-full ${pumpActive ? 'bg-green-500 shadow-glow-green animate-pulse' : 'bg-red-500'}`} />
+                        </div>
+                        <div className="space-y-4">
+                            <div className="p-4 bg-white/40 dark:bg-black/20 rounded-2xl border border-gold-200/50">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-gold-700/60 dark:text-gold-400/60 flex items-center gap-1.5">
+                                    <Zap size={10} /> Pump Status
+                                </p>
+                                <p className={`text-4xl font-black font-display tracking-tight mt-1 ${pumpActive ? 'text-green-600' : 'text-red-500'}`}>
+                                    {pumpStatus}
+                                </p>
+                                <p className="text-[9px] text-gold-600/60 mt-1 font-medium">Last sync: {lastSync.toLocaleTimeString()}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                                    <p className="text-[10px] font-bold uppercase text-blue-500/70">Moisture</p>
+                                    <p className="text-xl font-bold text-blue-600 mt-1">{moisture}%</p>
+                                </div>
+                                <div className="p-3 bg-primary-500/5 rounded-xl border border-primary-500/10">
+                                    <p className="text-[10px] font-bold uppercase text-primary-500/70">Health</p>
+                                    <p className="text-xl font-bold text-primary-600 mt-1">Excellent</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={async () => {
+                            setIsToggling(true);
+                            try {
+                                const newState = await togglePump();
+                                toast.success(`Irrigation Pump turned ${newState ? 'ON' : 'OFF'}`);
+                            } finally {
+                                setIsToggling(false);
+                            }
+                        }}
+                        disabled={isToggling}
+                        className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all duration-300 shadow-lg relative z-10 ${
+                            pumpActive 
+                                ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20' 
+                                : 'bg-green-600 hover:bg-green-700 text-white shadow-green-600/20'
+                        }`}
+                    >
+                        {isToggling ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Syncing...
+                            </div>
+                        ) : (
+                            pumpActive ? 'Stop Pump' : 'Start Pump'
+                        )}
+                    </button>
+
+                    {/* Background Graphic */}
+                    <div className="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
+                        <Activity size={120} className="text-gold-600 rotate-12" />
+                    </div>
+                </div>
+
+                {/* Stats Dashboard */}
+                <div className="card flex flex-col justify-between h-full">
+                    <h3 className="section-header mb-4">Resource Metrics</h3>
+                    <div className="space-y-4">
                         <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-center">
                             <p className="text-2xl font-bold text-blue-600 font-display">{waterSaved.toLocaleString()}</p>
                             <p className="text-xs text-blue-500 mt-0.5">Liters Saved</p>
                         </div>
                         <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-xl text-center">
                             <p className="text-2xl font-bold text-primary-600 font-display">{efficiency}%</p>
-                            <p className="text-xs text-primary-500 mt-0.5">Efficiency</p>
+                            <p className="text-xs text-primary-500 mt-0.5">Efficiency Score</p>
                         </div>
                     </div>
-                </div>
-
-                {/* Schedule Chart */}
-                <div className="lg:col-span-2 card">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="section-header">Weekly Irrigation Schedule</h3>
-                        <span className="badge-blue">Required vs Recommended</span>
+                    <div className="mt-auto pt-6 text-[10px] text-center text-gray-400 font-medium italic">
+                        Real-time agricultural intelligence provided by AgriFlux v2.0
                     </div>
-                    <ResponsiveContainer width="100%" height={200}>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Schedule Chart */}
+                <div className="card">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="section-header">Weekly Schedule</h3>
+                        <span className="badge-blue">Required vs AI Recommended</span>
+                    </div>
+                    <ResponsiveContainer width="100%" height={240}>
                         <BarChart data={scheduleData}>
                             <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
                             <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#6b7280' }} />
                             <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} unit="mm" />
                             <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                            <Bar dataKey="required" name="Crop Requirement" fill="#bfdbfe" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="recommended" name="AI Recommended" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="required" name="Crop Need" fill="#bfdbfe" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="recommended" name="AI Optimal" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
+                </div>
 
-                    {/* ET Chart */}
-                    <div className="mt-4">
-                        <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-3">Evapotranspiration Today (mm/hr)</h4>
-                        <ResponsiveContainer width="100%" height={140}>
-                            <AreaChart data={etData}>
-                                <defs>
-                                    <linearGradient id="etGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                                <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#6b7280' }} />
-                                <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                                <Area type="monotone" dataKey="et" stroke="#f97316" fill="url(#etGrad)" strokeWidth={2} name="ET Rate" />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                {/* ET Chart */}
+                <div className="card">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="section-header">Evapotranspiration Today</h3>
+                        <span className="badge-gold">Thermal Intensity</span>
                     </div>
+                    <ResponsiveContainer width="100%" height={240}>
+                        <AreaChart data={etData}>
+                            <defs>
+                                <linearGradient id="etGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                            <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} />
+                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
+                            <Area type="monotone" dataKey="et" stroke="#f97316" fill="url(#etGrad)" strokeWidth={2} name="ET Rate" />
+                        </AreaChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
 
@@ -242,18 +328,18 @@ const IrrigationIntelligence: React.FC = () => {
                         { day: 'Friday', time: '5:30 AM', duration: '60 min', amount: '22mm', status: 'scheduled', icon: Clock },
                         { day: 'Sunday', time: '6:00 AM', duration: '50 min', amount: '20mm', status: 'scheduled', icon: Clock },
                     ].map(s => (
-                        <div key={s.day} className={`card p-4 ${s.status === 'rain' ? 'border-blue-200 dark:border-blue-800' : ''}`}>
+                        <div key={s.day} className={`card p-4 transition-all hover:-translate-y-1 ${s.status === 'rain' ? 'border-blue-200 dark:border-blue-800 bg-blue-50/5' : ''}`}>
                             <div className="flex items-start justify-between mb-2">
                                 <p className="font-semibold text-sm text-gray-800 dark:text-gray-200">{s.day}</p>
                                 {s.status === 'rain'
-                                    ? <span className="badge-blue">🌧️ Rain</span>
-                                    : <span className="badge-green">Scheduled</span>
+                                    ? <span className="badge-blue text-[9px]">🌧️ Rain</span>
+                                    : <span className="badge-green text-[9px]">Scheduled</span>
                                 }
                             </div>
                             <p className="text-gray-500 dark:text-gray-400 text-xs">{s.time}</p>
-                            <div className="mt-2 flex items-center justify-between">
-                                <span className="text-xs text-gray-500">Duration: {s.duration}</span>
-                                <span className="text-xs font-semibold text-blue-500">{s.amount}</span>
+                            <div className="mt-3 flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-2">
+                                <span className="text-[10px] text-gray-400 font-medium">Qty: <span className="text-gray-700 dark:text-gray-300 font-bold">{s.amount}</span></span>
+                                <span className="text-[10px] text-gray-400 font-medium">Dur: <span className="text-gray-700 dark:text-gray-300 font-bold">{s.duration}</span></span>
                             </div>
                         </div>
                     ))}

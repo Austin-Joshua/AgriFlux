@@ -1,72 +1,99 @@
 import React from 'react';
-import { Leaf, TrendingUp, Droplets, FlaskConical, Award, Satellite } from 'lucide-react';
+import { Leaf, Target, ShieldCheck, Globe, Users, TrendingUp } from 'lucide-react';
 
 const About: React.FC = () => (
-    <div className="space-y-6 max-w-5xl">
-        <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
-            <div>
-                <h1 className="page-header text-gradient font-extrabold">About AgriFlux</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">Empowering Sustainable Agriculture through Climate Intelligence</p>
+    <div className="space-y-8 max-w-5xl mx-auto pb-12 animate-fade-in">
+        {/* Hero Section */}
+        <div className="text-center space-y-4 py-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-bold uppercase tracking-widest border border-primary-200 dark:border-primary-800 animate-slide-up-fade">
+                <Globe size={14} /> Global Agriculture Intelligence
             </div>
-            <div className="flex gap-2">
-                <span className="badge-gold px-3 py-1 shadow-sm border border-gold-200 dark:border-gold-800">Production Ready</span>
-                <span className="badge-green px-3 py-1 shadow-sm border border-primary-200 dark:border-primary-800">v1.0.4</span>
-            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white leading-tight animate-slide-up-fade" style={{ animationDelay: '100ms' }}>
+                AgriFlux AI: The Future of <span className="text-gradient">Precision Farming</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto font-medium animate-slide-up-fade" style={{ animationDelay: '200ms' }}>
+                Bridging the gap between traditional agricultural wisdom and modern artificial intelligence to empower the next generation of farmers.
+            </p>
         </div>
 
-        <div className="card glass-gold border-gold-300 dark:border-gold-800/40 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-gold-400/20 transition-all duration-700" />
-            <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
-                <div className="w-20 h-20 gradient-gold-green rounded-3xl flex items-center justify-center shadow-2xl rotate-3 group-hover:rotate-6 transition-transform">
-                    <Leaf size={40} className="text-white drop-shadow-lg" />
+        {/* Our Mission Card */}
+        <div className="card glass-gold border-gold-300 dark:border-gold-800/40 relative overflow-hidden group animate-slide-up-fade" style={{ animationDelay: '300ms' }}>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gold-400/10 blur-3xl rounded-full -mr-32 -mt-32 transition-all duration-700" />
+            <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                <div className="w-24 h-24 gradient-gold-green rounded-3xl flex items-center justify-center shadow-2xl rotate-3 flex-shrink-0">
+                    <Leaf size={48} className="text-white drop-shadow-lg" />
                 </div>
                 <div>
-                    <h2 className="text-3xl font-extrabold font-display text-gray-900 dark:text-white mb-2">AgriFlux Intelligence</h2>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                        AgriFlux is a premier, data-driven agricultural intelligence engine designed for the next generation of farming. By fusing real-time climate data, satellite imagery, and advanced machine learning, we provide farmers with the precision tools needed to maximize yields while ensuring ecological sustainability.
+                    <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-3">Our Mission</h2>
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg font-medium">
+                        At AgriFlux, we believe every farmer deserves access to the world's most advanced intelligence. Our mission is to eliminate uncertainty in agriculture by providing actionable, data-driven insights that increase profitability while preserving our planet's most vital resources.
                     </p>
                 </div>
             </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Three Pillars */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-                { icon: TrendingUp, color: 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 border-primary-100 dark:border-primary-800', title: 'AI Yield Forecast', desc: 'Predict crop yield with 92% ML precision.' },
-                { icon: Droplets, color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 border-blue-100 dark:border-blue-800', title: 'Smart Water', desc: 'Optimized irrigation based on AI weather tools.' },
-                { icon: FlaskConical, color: 'bg-earth-50 dark:bg-earth-900/20 text-earth-600 border-earth-100 dark:border-earth-800', title: 'Soil Advisor', desc: 'NPK analysis and fertilizer optimization.' },
-                { icon: Satellite, color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 border-purple-100 dark:border-purple-800', title: 'NDVI Vision', desc: 'Satellite health monitoring for every acre.' },
-                { icon: Award, color: 'bg-gold-50 dark:bg-gold-900/20 text-gold-600 border-gold-100 dark:border-gold-800', title: 'Eco Score', desc: 'Total farm sustainability & eco-compliance.' },
-                { icon: Leaf, color: 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 border-primary-100 dark:border-primary-800', title: 'Climate Sim', desc: 'Proactive future scenario simulations.' },
-            ].map(item => (
-                <div key={item.title} className={`card-clickable !p-4 border shadow-sm ${item.color}`}>
-                    <div className="flex items-center gap-3 mb-2">
-                        <item.icon size={20} />
-                        <h3 className="font-bold text-sm tracking-tight">{item.title}</h3>
+                { 
+                    icon: Target, 
+                    title: 'Precision Intelligence', 
+                    desc: 'We replace guesswork with science. AgriFlux analyzes your soil\'s unique DNA to provide exact nutrient recommendations for record-breaking yields.',
+                    delay: '400ms'
+                },
+                { 
+                    icon: ShieldCheck, 
+                    title: 'Climate Resilience', 
+                    desc: 'Shield your crops from the unpredictable. Our predictive AI models simulate climate scenarios to help you stay ahead of weather risks.',
+                    delay: '500ms'
+                },
+                { 
+                    icon: Users, 
+                    title: 'Market Empowerment', 
+                    desc: 'Direct connectivity to global demand. We provide real-time market trends and verified trading channels to ensure you get the best price for your hard work.',
+                    delay: '600ms'
+                },
+            ].map((pillar) => (
+                <div key={pillar.title} className="card p-6 border border-gray-100 dark:border-gray-800 shadow-sm animate-slide-up-fade flex flex-col h-full" style={{ animationDelay: pillar.delay }}>
+                    <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4 flex-shrink-0">
+                        <pillar.icon size={24} />
                     </div>
-                    <p className="text-[10px] sm:text-xs opacity-80 leading-snug">{item.desc}</p>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{pillar.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed flex-1 italic">{pillar.desc}</p>
                 </div>
             ))}
         </div>
 
-        <div className="card">
-            <h3 className="section-header mb-4">Tech Stack</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Impact Stats Card */}
+        <div className="card bg-gray-900 text-white border-none shadow-glow-green animate-slide-up-fade" style={{ animationDelay: '700ms' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-4">
                 {[
-                    { layer: 'Frontend', tech: 'React + Vite + TypeScript + TailwindCSS' },
-                    { layer: 'Backend', tech: 'Node.js + Express + TypeScript + JWT' },
-                    { layer: 'AI/ML', tech: 'Python + Random Forest + XGBoost + rule-based engine' },
-                    { layer: 'Charts', tech: 'Recharts + SVG custom visualizations' },
-                ].map(t => (
-                    <div key={t.layer} className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                        <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 mb-1">{t.layer}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{t.tech}</p>
+                    { label: 'Yield Increase', value: '30%', trend: 'Avg. Profit Growth' },
+                    { label: 'Water Savings', value: '25%', trend: 'Precision Irrigation' },
+                    { label: 'Input Efficiency', value: '15%', trend: 'Reduced Fertilizer' },
+                    { label: 'Data Accuracy', value: '92%', trend: 'ML Confidence' },
+                ].map((stat) => (
+                    <div key={stat.label} className="text-center space-y-1">
+                        <p className="text-4xl font-black text-primary-400">{stat.value}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{stat.label}</p>
+                        <p className="text-[8px] text-primary-600 font-black uppercase">{stat.trend}</p>
                     </div>
                 ))}
             </div>
         </div>
 
-        <div className="text-center text-xs text-gray-400 dark:text-gray-500 py-4">
-            <p>Built with ❤️ for sustainable farming · AgriFlux v1.0 · 2026</p>
+        {/* Final Vision Statement */}
+        <div className="text-center p-8 bg-gray-50 dark:bg-white/5 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 animate-slide-up-fade" style={{ animationDelay: '800ms' }}>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
+                <TrendingUp className="text-primary-500" /> Shaping the Future Heritage
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm italic max-w-2xl mx-auto leading-relaxed">
+                "AgriFlux is not just a platform; it's a commitment to the soil. We are building the tools today to ensure that the farmers of tomorrow inherit a land that is more fertile, more predictable, and more profitable than ever before."
+            </p>
+        </div>
+
+        <div className="text-center text-[10px] font-bold text-gray-400 dark:text-gray-500 py-4 uppercase tracking-[0.2em]">
+            AgriFlux Intelligence Platform · v1.0.4 · Sustaining the Future
         </div>
     </div>
 );
