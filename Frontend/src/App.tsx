@@ -9,7 +9,6 @@ import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import PageLoader from './components/PageLoader';
-import DemoMode from './components/DemoMode';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Layouts
@@ -62,8 +61,6 @@ const App: React.FC = () => {
                 <AuthProvider>
                         <ErrorBoundary>
                             <BrowserRouter>
-                            {/* Demo Mode controller — mounted inside BrowserRouter for navigate access */}
-                            <DemoMode />
                             <Routes>
                                 {/* Authentication */}
                                 <Route element={<AuthLayout />}>

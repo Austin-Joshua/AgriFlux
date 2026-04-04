@@ -9,10 +9,10 @@ import { useRealisticData } from '../hooks/useRealisticData';
 interface SmartFarmReportProps {
     isOpen: boolean;
     onClose: () => void;
+    reportData?: ReportData;
 }
 
-// Generates a random number in a range with 1 decimal
-interface ReportData {
+export interface ReportData {
     crop: string;
     variety: string;
     yieldEstimate: string;
@@ -43,7 +43,7 @@ const riskColor = (r: 'Low' | 'Medium' | 'High') =>
     : r === 'Medium' ? 'text-yellow-600 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-400'
     : 'text-red-600 bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400';
 
-const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose }) => {
+const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, reportData }) => {
     const [phase, setPhase] = useState<'loading' | 'done'>('loading');
     const [stepIdx, setStepIdx] = useState(0);
     const [report, setReport] = useState<ReportData | null>(null);
@@ -62,30 +62,34 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose }) =>
             if (i >= STEPS.length - 1) {
                 clearInterval(iv);
                 setTimeout(() => {
-                    // Sync with hook data
-                    setReport({
-                        crop: data.crop,
-                        variety: data.variety,
-                        yieldEstimate: `${data.yieldKgHa.toLocaleString()} kg/ha`,
-                        priceMin: data.priceMin,
-                        priceMax: data.priceMax,
-                        bestRegion: data.bestMarket,
-                        confidence: data.confidenceScore,
-                        soilPh: data.soilPh,
-                        humidity: data.humidity,
-                        rainfall: data.rainfall,
-                        demandScore: data.demandScore,
-                        profitEstimate: `₹${data.profitMin.toLocaleString()} – ₹${data.profitMax.toLocaleString()}`,
-                        riskLevel: data.confidenceScore >= 93 ? 'Low' : data.confidenceScore >= 88 ? 'Medium' : 'High',
-                        factors: data.factors,
-                    });
+                    if (reportData) {
+                        setReport(reportData);
+                    } else {
+                        // Sync with hook data as fallback
+                        setReport({
+                            crop: data.crop,
+                            variety: data.variety,
+                            yieldEstimate: `${data.yieldKgHa.toLocaleString()} kg/ha`,
+                            priceMin: data.priceMin,
+                            priceMax: data.priceMax,
+                            bestRegion: data.bestMarket,
+                            confidence: data.confidenceScore,
+                            soilPh: data.soilPh,
+                            humidity: data.humidity,
+                            rainfall: data.rainfall,
+                            demandScore: data.demandScore,
+                            profitEstimate: `₹${data.profitMin.toLocaleString()} – ₹${data.profitMax.toLocaleString()}`,
+                            riskLevel: data.confidenceScore >= 93 ? 'Low' : data.confidenceScore >= 88 ? 'Medium' : 'High',
+                            factors: data.factors,
+                        });
+                    }
                     setPhase('done');
                 }, 600);
             }
         }, 480); // Slightly faster for snappier feel
 
         return () => clearInterval(iv);
-    }, [isOpen, data]);
+    }, [isOpen, reportData, data]);
 
     const handlePrint = () => window.print();
 

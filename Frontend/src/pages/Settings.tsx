@@ -68,8 +68,8 @@ const Settings: React.FC = () => {
                                 id={`settings-${item.key}`}
                                 onClick={() => setActiveSection(item.key)}
                                 className={activeSection === item.key
-                                    ? 'flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-glow-gold w-full'
-                                    : 'flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gold-50 dark:hover:bg-gold-900/20 hover:text-gold-700 w-full'}
+                                    ? 'flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg w-full'
+                                    : 'flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-700 w-full'}
                             >
                                 <item.icon size={16} />
                                 {item.label}
@@ -85,10 +85,10 @@ const Settings: React.FC = () => {
                         <div className="space-y-5">
                             <div className="flex items-center gap-4 pb-5 border-b border-gray-100 dark:border-gray-700">
                                 <div className="relative">
-                                    <div className="w-20 h-20 bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-glow-gold">
+                                    <div className="w-20 h-20 bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600 rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-lg">
                                         {user?.name?.charAt(0) || 'F'}
                                     </div>
-                                    <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-gold-600 rounded-full flex items-center justify-center text-white shadow-md hover:bg-gold-700 transition-colors border-2 border-white dark:border-gray-800">
+                                    <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-md hover:bg-primary-700 transition-colors border-2 border-white dark:border-gray-800">
                                         <Camera size={12} />
                                     </button>
                                 </div>
@@ -96,8 +96,8 @@ const Settings: React.FC = () => {
                                     <h3 className="font-black text-xl text-gray-900 dark:text-white font-display tracking-tight">{user?.name}</h3>
                                     <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">{user?.email}</p>
                                     <div className="flex items-center gap-2 mt-1">
-                                        <span className="badge-gold px-2 py-0.5 text-[10px]">VERIFIED FARMER</span>
-                                        <span className="text-[10px] text-primary-600 font-bold uppercase tracking-widest">PRO PLAN</span>
+                                        <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-2 py-0.5 rounded text-[10px] font-bold">VERIFIED FARMER</span>
+                                        <span className="text-[10px] text-green-600 font-bold uppercase tracking-widest">PRO PLAN</span>
                                     </div>
                                 </div>
                             </div>

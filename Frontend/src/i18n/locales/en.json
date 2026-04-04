@@ -261,7 +261,7 @@
         "placeholderFarm": "Name of your agricultural estate",
         "placeholderPhone": "+91 98765 43210",
         "placeholderLocation": "State, Country",
-        "authenticating": "Verifying Credentials...",
+        "authenticating": "Signing in...",
         "creatingAccount": "Establishing Account...",
         "passwordsMatchError": "Passwords must match for security",
         "email_placeholder": "farmer@example.com"
@@ -413,7 +413,10 @@
         "pending": "Pending",
         "settings": "Settings",
         "signout": "Sign Out",
-        "daysAgo": "days ago"
+        "daysAgo": "days ago",
+        "contact": "Contact",
+        "stage": "Stage",
+        "email": "Email"
     },
     "ai": {
         "title": "AgriFlux AI",

@@ -102,7 +102,26 @@ const Dashboard: React.FC = () => {
             <SEO title="Dashboard" />
 
             {/* Smart Farm Report Modal */}
-            <SmartFarmReport isOpen={reportOpen} onClose={() => setReportOpen(false)} />
+            <SmartFarmReport 
+                isOpen={reportOpen} 
+                onClose={() => setReportOpen(false)} 
+                reportData={{
+                    crop: data.crop,
+                    variety: data.variety,
+                    yieldEstimate: `${data.yieldKgHa.toLocaleString()} kg/ha`,
+                    priceMin: data.priceMin,
+                    priceMax: data.priceMax,
+                    bestRegion: data.bestMarket,
+                    confidence: data.confidenceScore,
+                    soilPh: data.soilPh,
+                    humidity: data.humidity,
+                    rainfall: data.rainfall,
+                    demandScore: data.demandScore,
+                    profitEstimate: `₹${data.profitMin.toLocaleString()} – ₹${data.profitMax.toLocaleString()}`,
+                    riskLevel: data.confidenceScore >= 93 ? 'Low' : data.confidenceScore >= 88 ? 'Medium' : 'High',
+                    factors: data.factors,
+                }}
+            />
 
             {/* Welcome Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -121,10 +140,6 @@ const Dashboard: React.FC = () => {
                         <Sparkles size={16} className="text-yellow-200" />
                         Generate Smart Farm Report
                     </button>
-                    <div className="flex items-center gap-2 text-sm bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 px-4 py-2 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
-                        <Zap size={15} className="text-gold-500" />
-                        <span className="font-semibold">AI Engine Active</span>
-                    </div>
                 </div>
             </div>
 
