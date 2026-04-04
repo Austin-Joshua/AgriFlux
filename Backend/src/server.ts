@@ -7,6 +7,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import { connectDB } from './config/db';
+import { env } from './config/env';
 import authRoutes from './routes/auth.routes';
 import aiRoutes from './routes/ai.routes';
 import consultationRoutes from './routes/consultation.routes';
@@ -14,8 +15,6 @@ import integrationRoutes from './routes/integration.routes';
 
 import cluster from 'cluster';
 import os from 'os';
-
-dotenv.config();
 
 /**
  * Handle uncaught exceptions and unhandled rejections globally 
@@ -36,13 +35,13 @@ process.on('unhandledRejection', (err: any) => {
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = env.PORT;
 
 // Global Middleware
 app.use(helmet()); 
 app.use(hpp()); 
 app.use(compression()); 
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); 
+app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev')); 
 
 // Rate Limiting (Optimized for higher traffic)
 const limiter = rateLimit({
@@ -56,14 +55,14 @@ app.use('/api/', limiter);
 
 // CORS
 const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
+    env.FRONTEND_URL,
     'https://citizenone.vercel.app',
     'https://agriflux.vercel.app',
     'https://agri-flux-sandy.vercel.app'
 ];
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app')) || process.env.NODE_ENV === 'development') {
+        if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app')) || env.NODE_ENV === 'development') {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -96,7 +95,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || 500;
     const message = err.message || 'Server error';
     
-    if (process.env.NODE_ENV === 'production') {
+    if (env.NODE_ENV === 'production') {
         console.error(`[Error] ${err.name}: ${message}`);
     } else {
         console.error(err);
@@ -105,16 +104,14 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     res.status(status).json({ 
         success: false, 
         message,
-        stack: process.env.NODE_ENV === 'production' ? undefined : err.stack
+        stack: env.NODE_ENV === 'production' ? undefined : err.stack
     });
 });
 
 /**
  * Cluster Deployment:
- * Spawns a worker for every CPU core to handle high traffic and provide 
- * automatic zero-downtime restarts.
  */
-if (cluster.isPrimary && process.env.NODE_ENV === 'production') {
+if (cluster.isPrimary && env.NODE_ENV === 'production') {
     const numCPUs = os.cpus().length;
     console.log(`🚀 Primary process ${process.pid} is running. Spawning ${numCPUs} workers...`);
 

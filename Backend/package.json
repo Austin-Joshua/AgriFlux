@@ -4,10 +4,10 @@
   "description": "Backend API for AgriFlux",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node dist/Backend/src/server.js",
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "lint": "eslint src --ext ts --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {

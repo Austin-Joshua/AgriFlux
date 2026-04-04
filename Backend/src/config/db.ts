@@ -1,12 +1,8 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import User from '../../../Database/Models/User';
-
-dotenv.config();
-
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/agriflux';
+import { env } from './env';
 
 export let isDBConnected = false;
 
@@ -38,7 +34,7 @@ const seedDefaultAccounts = async () => {
 
 export const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(MONGODB_URI, {
+        const conn = await mongoose.connect(env.MONGODB_URI, {
             serverSelectionTimeoutMS: 5000,
             maxPoolSize: 100, // Handle 100 simultaneous connections
             socketTimeoutMS: 45000, // 45s socket timeout
