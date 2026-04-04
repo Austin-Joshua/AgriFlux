@@ -8,7 +8,7 @@ import {
     Landmark, BarChart3, Handshake, TestTube, Map, Store, Tractor
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/new-leaf-logo.png';
+import logo from '../assets/logo-icon.png';
 
 interface SidebarProps {
     isOpen: boolean;

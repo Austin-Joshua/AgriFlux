@@ -3,7 +3,7 @@ import { useLocation, Outlet, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon, ArrowLeft, ArrowRight, Globe, ChevronDown, Bell, Settings, LogOut, ChevronRight, CheckCircle, AlertTriangle, Droplets, Leaf } from 'lucide-react';
-import logo from '../assets/new-leaf-logo.png';
+import logo from '../assets/logo-icon.png';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 
