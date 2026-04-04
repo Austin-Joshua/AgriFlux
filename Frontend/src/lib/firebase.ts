@@ -12,15 +12,26 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Prevent re-initialization in hot-reload dev mode
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+let app;
 
-export const auth = getAuth(app);
+try {
+  if (import.meta.env.VITE_FIREBASE_API_KEY) {
+    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  } else {
+    console.warn('⚠️ Firebase config is missing. Please add VITE_FIREBASE_* variables to Vercel.');
+  }
+} catch (error) {
+  console.error('🔥 Firebase initialization failed:', error);
+}
+
+export const auth = app ? getAuth(app) : null as any;
 export const googleProvider = new GoogleAuthProvider();
 
 // Only initialize analytics in-browser (not SSR / tests)
-isSupported().then((supported) => {
-  if (supported) getAnalytics(app);
-});
+if (app) {
+  isSupported().then((supported) => {
+    if (supported) getAnalytics(app);
+  }).catch(() => {});
+}
 
 export default app;
