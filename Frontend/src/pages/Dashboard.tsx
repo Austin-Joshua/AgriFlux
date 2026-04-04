@@ -58,7 +58,7 @@ const StatCard: React.FC<{
         >
             <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-glow-gold"
                 style={{ background: `linear-gradient(135deg, ${accentColor}10 0%, transparent 60%)` }} />
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex items-start justify-between mb-2">
                 <div className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                     {icon}
                 </div>
@@ -99,7 +99,7 @@ const Dashboard: React.FC = () => {
     const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <SEO title="Dashboard" />
 
             {/* Smart Farm Report Modal */}
@@ -125,7 +125,7 @@ const Dashboard: React.FC = () => {
             />
 
             {/* Welcome Header — Standardized */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="page-header">
                         {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`)}, <span className="text-gradient font-black">{user?.name?.split(' ')[0] || 'Farmer'}</span> 👋
@@ -149,7 +149,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Stat Cards Grid — Standardized to 3-column focus on wider screens if appropriate, but keeping 4 for dashboard symmetry in stat row might be okay; however user said 3. Let's try 3 for main blocks. */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
                 <StatCard
                     title={t('dashboard.soilHealth')} value={`${soilScore}/100`} change="+5 pts"
                     icon={<Leaf size={22} className="text-earth-600" />}
@@ -180,7 +180,7 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-slide-up-fade" style={{ animationDelay: '200ms' }}>
                 {/* Yield Chart */}
                 <div className="lg:col-span-2 card">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-2">
                         <div>
                             <h3 className="section-header">Crop Yield Trend</h3>
                             <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">Actual vs AI Forecast (kg/ha)</p>
@@ -200,7 +200,7 @@ const Dashboard: React.FC = () => {
                         className="cursor-pointer group/chart" 
                         onClick={() => toast.info('📊 AI Insight: Yield expected to peak in May due to optimized irrigation.')}
                     >
-                        <ResponsiveContainer width="100%" height={200}>
+                        <ResponsiveContainer width="100%" height={160}>
                             {activeChart === 'area' ? (
                                 <AreaChart data={yieldData}>
                                     <defs>
@@ -239,7 +239,7 @@ const Dashboard: React.FC = () => {
 
                 {/* 7-Day Weather */}
                 <div className="card group/weather cursor-pointer hover:border-blue-500/30 transition-all" onClick={() => toast.success('🌤️ Weather Analysis: Stable conditions for harvest.')}>
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-2">
                         <h3 className="section-header">7-Day Weather</h3>
                         <Droplets size={18} className="text-blue-400 group-hover/weather:scale-125 transition-transform" />
                     </div>
@@ -280,7 +280,7 @@ const Dashboard: React.FC = () => {
                         <h3 className="section-header">🗺️ Farm Location</h3>
                         <Map size={16} className="text-primary-500" />
                     </div>
-                    <div className="relative w-full group/map" style={{ height: '220px' }}>
+                    <div className="relative w-full group/map" style={{ height: '180px' }}>
                         <iframe
                             title="Farm Location Map"
                             className="w-full h-full border-0 transition-all duration-700 grayscale group-hover/map:grayscale-0"

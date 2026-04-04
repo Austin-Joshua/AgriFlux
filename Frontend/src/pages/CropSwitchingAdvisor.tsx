@@ -60,7 +60,7 @@ const CropSwitchingAdvisor: React.FC = () => {
     );
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Header — Standardized */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
@@ -82,8 +82,8 @@ const CropSwitchingAdvisor: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Config */}
                 <div className="card glass-gold border-gold-300 dark:border-gold-800/40">
-                    <h3 className="section-header text-gold-700 dark:text-gold-400">Farm Conditions</h3>
-                    <div className="space-y-5">
+                    <h3 className="section-header text-gold-700 dark:text-gold-400 mb-2">Farm Conditions</h3>
+                    <div className="space-y-3">
                         <div>
                             <label className="label">Current Crop</label>
                             <select className="input-field" value={currentCrop} onChange={e => { setCurrentCrop(e.target.value); setAnalyzed(false); }}>
@@ -136,19 +136,21 @@ const CropSwitchingAdvisor: React.FC = () => {
 
                 {/* Recommendations */}
                 <div className="lg:col-span-2 space-y-4">
-                    {/* Risk Summary — Standardized */}
+                    {/* Risk Summary — Standardized & Compact */}
                     <div className={`card overflow-hidden transition-all duration-500 border-l-[6px] ${overallRisk > 40 ? 'border-red-500 bg-red-50/10' : overallRisk > 20 ? 'border-amber-500 bg-amber-50/10' : 'border-primary-500 bg-primary-50/10'}`}>
-                        <div className="flex items-center justify-between p-2">
-                            <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Risk Assessment</p>
-                                <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Climate Threat for {submittedData.crop}</p>
-                                <div className="flex items-baseline gap-2 mt-2">
-                                    <p className={`text-5xl font-black font-display tracking-tight ${overallRisk > 40 ? 'text-red-600' : overallRisk > 20 ? 'text-amber-600' : 'text-primary-600'}`}>{overallRisk}%</p>
-                                    <p className="text-xs font-bold text-gray-400 uppercase">Risk Level</p>
+                        <div className="flex items-center justify-between p-1">
+                            <div className="flex items-center gap-6">
+                                <div>
+                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Risk Assessment</p>
+                                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Climate Threat for {submittedData.crop}</p>
+                                </div>
+                                <div className="flex items-baseline gap-2">
+                                    <p className={`text-4xl font-black font-display tracking-tight ${overallRisk > 40 ? 'text-red-600' : overallRisk > 20 ? 'text-amber-600' : 'text-primary-600'}`}>{overallRisk}%</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase">Risk Level</p>
                                 </div>
                             </div>
-                            <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 ${overallRisk > 40 ? 'bg-red-100 dark:bg-red-900/40' : overallRisk > 20 ? 'bg-amber-100 dark:bg-amber-900/40' : 'bg-primary-100 dark:bg-primary-900/40'}`}>
-                                {overallRisk > 40 ? <AlertTriangle size={32} className="text-red-500" /> : <TrendingDown size={32} className="text-amber-500" />}
+                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 ${overallRisk > 40 ? 'bg-red-100 dark:bg-red-900/40' : overallRisk > 20 ? 'bg-amber-100 dark:bg-amber-900/40' : 'bg-primary-100 dark:bg-primary-900/40'}`}>
+                                {overallRisk > 40 ? <AlertTriangle size={24} className="text-red-500" /> : <TrendingDown size={24} className="text-amber-500" />}
                             </div>
                         </div>
                     </div>

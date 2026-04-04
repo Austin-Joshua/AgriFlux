@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, Map as MapIcon, Maximize2, Calculator, TrendingUp, AlertCircle, CheckCircle2, FileImage, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ReportModal from '../components/ReportModal';
+import SEO from '../components/SEO';
 
 const LandIntelligence: React.FC = () => {
     const { t } = useTranslation();
@@ -59,9 +60,11 @@ const LandIntelligence: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
+            <SEO title="Land Intelligence" />
+            
             {/* Header — Standardized */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
                 <div>
                     <h1 className="page-header flex items-center gap-3">
                         <MapIcon className="text-primary-600 dark:text-primary-400" />
@@ -78,10 +81,10 @@ const LandIntelligence: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Upload & Preview */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="card h-full min-h-[400px] flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="lg:col-span-2 space-y-4">
+                    <div className="card h-full min-h-[320px] flex flex-col items-center justify-center relative overflow-hidden">
                         {!image ? (
                             <div
                                 className={`w-full h-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 transition-all
@@ -153,19 +156,19 @@ const LandIntelligence: React.FC = () => {
                 </div>
 
                 {/* Analysis Results */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                     <div className="card">
-                        <h3 className="section-header mb-4">{t('land.params')}</h3>
+                        <h3 className="section-header mb-2">{t('land.params')}</h3>
                         {!result ? (
                             <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
                                 <MapIcon size={40} className="mb-4 opacity-20" />
                                 <p className="text-sm">{t('land.uploadToSee')}</p>
                             </div>
                         ) : (
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 {/* Main Stats */}
-                                <div className="grid grid-cols-1 gap-4">
-                                    <div className="p-4 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-800/50">
+                                <div className="grid grid-cols-1 gap-3">
+                                    <div className="p-3 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-800/50">
                                         <div className="flex items-center gap-2 mb-1">
                                             <Maximize2 size={16} className="text-primary-600" />
                                             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('land.predictedSize')}</span>
@@ -173,7 +176,7 @@ const LandIntelligence: React.FC = () => {
                                         <p className="text-3xl font-black text-primary-700 dark:text-primary-400">{result.size} <span className="text-sm">{t('land.acres')}</span></p>
                                     </div>
 
-                                    <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/50">
+                                    <div className="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/50">
                                         <div className="flex items-center gap-2 mb-1">
                                             <TrendingUp size={16} className="text-amber-600" />
                                             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('land.marketVal')}</span>
@@ -184,11 +187,11 @@ const LandIntelligence: React.FC = () => {
 
                                 {/* Heatmap Legend */}
                                 <div>
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{t('land.zones')}</h4>
-                                    <div className="space-y-3">
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('land.zones')}</h4>
+                                    <div className="space-y-2">
                                         {result.zones.map(z => (
                                             <div key={z.type} className="flex items-center justify-between">
-                                                <div className="flex items-center justify-center md:justify-start gap-2">
+                                                <div className="flex items-center gap-2">
                                                     <div className={`w-3 h-3 rounded-full ${z.color}`} />
                                                     <span className="text-sm text-gray-600 dark:text-gray-300">{z.type}</span>
                                                 </div>
@@ -199,12 +202,12 @@ const LandIntelligence: React.FC = () => {
                                 </div>
 
                                 {/* Summary */}
-                                <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
                                     <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 mb-2">
-                                        <CheckCircle2 size={16} />
+                                        <CheckCircle2 size={14} />
                                         <span className="text-xs font-bold">{t('land.reliability')}: 92%</span>
                                     </div>
-                                    <p className="text-xs text-gray-500 leading-relaxed italic mb-4">
+                                    <p className="text-[10px] text-gray-500 leading-relaxed italic mb-3">
                                         {t('land.disclaimer')}
                                     </p>
                                     <button
@@ -234,21 +237,21 @@ const LandIntelligence: React.FC = () => {
                                                 </div>
                                             )
                                         })}
-                                        className="w-full btn-outline border-primary-200 dark:border-primary-800 text-primary-700 py-2.5 flex items-center justify-center gap-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-900/50 transition-colors"
+                                        className="w-full btn-outline border-primary-200 dark:border-primary-800 text-primary-700 py-2 flex items-center justify-center gap-2 text-xs hover:bg-primary-50 dark:hover:bg-primary-900/50 transition-colors"
                                     >
-                                        <FileText size={16} /> View Comprehensive Report
+                                        <FileText size={14} /> View Report
                                     </button>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    <div className="card bg-gradient-to-br from-primary-600 to-primary-700 text-white border-none shadow-glow-green">
-                        <div className="flex items-center gap-3 mb-4">
-                            <AlertCircle size={20} className="text-white/60" />
-                            <h3 className="font-bold">{t('land.nextSteps')}</h3>
+                    <div className="card bg-gradient-to-br from-primary-600 to-primary-700 text-white border-none shadow-glow-green !p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                            <AlertCircle size={18} className="text-white/60" />
+                            <h3 className="font-bold text-sm">{t('land.nextSteps')}</h3>
                         </div>
-                        <ul className="text-xs space-y-3 opacity-90">
+                        <ul className="text-[11px] space-y-2 opacity-90">
                             <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-white mt-1 shrink-0" />
                                 {t('land.step1')}
