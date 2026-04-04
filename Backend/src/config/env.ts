@@ -34,12 +34,14 @@ const getEnv = (): EnvConfig => {
         'FIREBASE_PRIVATE_KEY'
     ];
     
-    for (const key of requiredEnv) {
-        if (!process.env[key]) {
-            console.warn(`⚠️  [SECURITY WARNING] Missing environment variable: ${key}. Setting a fallback for development.`);
-            if (envStatus === 'production') {
-                throw new Error(`💥 [CRITICAL ERROR] Fatal: ${key} MUST be defined in production environment.`);
-            }
+    const missingEnv = requiredEnv.filter(key => !process.env[key]);
+
+    if (missingEnv.length > 0) {
+        if (envStatus === 'production') {
+            console.error(`💥 [CRITICAL ERROR] Missing production secrets: ${missingEnv.join(', ')}`);
+            throw new Error(`💥 [CRITICAL ERROR] Fatal: ${missingEnv.length} variable(s) must be defined in production.`);
+        } else {
+            console.warn(`⚠️  [SECURITY WARNING] Missing environment variables: ${missingEnv.join(', ')}. Using fallbacks.`);
         }
     }
 
