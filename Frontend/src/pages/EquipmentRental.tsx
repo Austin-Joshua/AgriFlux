@@ -24,7 +24,7 @@ const mockEquipment: Equipment[] = [
     owner: 'Singh Agri Equipments',
     pricePerDay: 1500,
     location: 'Ludhiana, Punjab',
-    image: 'https://images.unsplash.com/photo-1592860822606-44477c77d461?auto=format&fit=crop&w=400&q=80',
+    image: '/equipments/mahindra-tractor.png',
     distance: 4.2,
     availability: true,
     features: ['47 HP', 'Power Steering', 'Oil Immersed Brakes']
@@ -36,7 +36,7 @@ const mockEquipment: Equipment[] = [
     owner: 'Kisan Rentals',
     pricePerDay: 1800,
     location: 'Amritsar, Punjab',
-    image: 'https://images.unsplash.com/photo-1629854483785-5a50e906b3a0?auto=format&fit=crop&w=400&q=80',
+    image: '/equipments/johndeere-tractor.png',
     distance: 8.5,
     availability: true,
     features: ['50 HP', '4WD Options', 'High Backup Torque']
@@ -48,7 +48,7 @@ const mockEquipment: Equipment[] = [
     owner: 'Green Farms Coop',
     pricePerDay: 600,
     location: 'Jalandhar, Punjab',
-    image: 'https://images.unsplash.com/photo-1605330383321-df62eb012a67?auto=format&fit=crop&w=400&q=80',
+    image: '/equipments/seed-drill.png',
     distance: 12.1,
     availability: false,
     features: ['11 Tynes', 'Fertilizer Box', 'Adjustable Depth']
@@ -60,10 +60,34 @@ const mockEquipment: Equipment[] = [
     owner: 'Punjab Agro Services',
     pricePerDay: 4500,
     location: 'Patiala, Punjab',
-    image: 'https://images.unsplash.com/photo-1598282361732-cbf1dabae573?auto=format&fit=crop&w=400&q=80',
+    image: '/equipments/harvester.png',
     distance: 18.4,
     availability: true,
     features: ['A/C Cabin', '14Ft Cutter Bar', 'Grain Tank']
+  },
+  {
+    id: '5',
+    name: 'Heavy Duty Rotavator',
+    type: 'Implement',
+    owner: 'Dhillon Machinery',
+    pricePerDay: 800,
+    location: 'Moga, Punjab',
+    image: '/equipments/rotavator.png',
+    distance: 15.2,
+    availability: true,
+    features: ['42 Blades', 'Gear Drive', 'High Trailing Board']
+  },
+  {
+    id: '6',
+    name: 'Agri Spraying Drone',
+    type: 'Drone',
+    owner: 'SkyFarms Tech',
+    pricePerDay: 2500,
+    location: 'Chandigarh',
+    image: '/equipments/drone.png',
+    distance: 22.0,
+    availability: true,
+    features: ['16L Tank', 'Auto Route', 'Obstacle Avoidance']
   }
 ];
 
@@ -115,8 +139,8 @@ const EquipmentRental: React.FC = () => {
             className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all dark:text-white text-lg"
           />
         </div>
-        <div className="flex gap-2">
-            {['All', 'Tractor', 'Implement', 'Harvester'].map(cat => (
+        <div className="flex flex-wrap gap-2">
+            {['All', 'Tractor', 'Implement', 'Harvester', 'Drone'].map(cat => (
                 <button 
                   key={cat}
                   onClick={() => setCategory(cat)}
@@ -132,18 +156,18 @@ const EquipmentRental: React.FC = () => {
       </div>
 
       {/* Results Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
         {filteredEquipment.map((eq, i) => (
           <motion.div
             key={eq.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="glass-card flex flex-col md:flex-row overflow-hidden rounded-3xl border border-gray-100 dark:border-gray-800 hover:shadow-2xl transition-all duration-300 group"
+            className="glass-card flex flex-col overflow-hidden rounded-3xl border border-gray-100 dark:border-gray-800 hover:shadow-2xl transition-all duration-300 group"
           >
             {/* Image Box */}
-            <div className="md:w-2/5 p-3">
-               <div className="relative w-full h-48 md:h-full rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+            <div className="w-full p-3">
+               <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
                   <img src={eq.image} alt={eq.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   <div className="absolute top-2 left-2 flex gap-2">
                      <span className={`px-2.5 py-1 text-xs font-bold rounded-lg shadow-sm backdrop-blur-md ${eq.availability ? 'bg-green-500/90 text-white' : 'bg-red-500/90 text-white'}`}>
@@ -154,7 +178,7 @@ const EquipmentRental: React.FC = () => {
             </div>
 
             {/* Details Box */}
-            <div className="md:w-3/5 p-5 flex flex-col justify-between">
+            <div className="w-full px-5 pb-5 pt-2 flex flex-col justify-between flex-1">
               <div>
                  <div className="flex justify-between items-start">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">{eq.name}</h3>

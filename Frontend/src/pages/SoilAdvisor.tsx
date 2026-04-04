@@ -25,6 +25,66 @@ const SoilAdvisor: React.FC = () => {
     const [alerts, setAlerts] = useState<string[]>([]);
     const [selectedReport, setSelectedReport] = useState<{ title: string; content: React.ReactNode } | null>(null);
 
+    // Plant Analysis State
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+    const [isScanning, setIsScanning] = useState(false);
+    const [scanProgress, setScanProgress] = useState(0);
+    const [scanResult, setScanResult] = useState<{ health: string; issues: string[]; nutrition: string } | null>(null);
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setUploadedImage(reader.result as string);
+                startScanning();
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const startScanning = () => {
+        setIsScanning(true);
+        setScanProgress(0);
+        setScanResult(null);
+
+        const outcomes = [
+            {
+                health: 'Excellent (96%)',
+                issues: ['No pathogens detected', 'Optimal leaf turgor'],
+                nutrition: 'Nitrogen: High, Potassium: Optimal, Phosphorus: Optimal.'
+            },
+            {
+                health: 'Fair (72%)',
+                issues: ['Early signs of Leaf Spot (Cercospora)', 'Minor Aphid infestation'],
+                nutrition: 'Nitrogen levels slightly low; Potassium optimal.'
+            },
+            {
+                health: 'Critical (48%)',
+                issues: ['Severe Fusarium Wilt detected', 'Advanced nutrient leaching'],
+                nutrition: 'Severe Phosphorus deficiency; Micro-nutrients unbalanced.'
+            },
+            {
+                health: 'Good (88%)',
+                issues: ['Minor heat stress detected (Stomata closing)', 'No pest activity'],
+                nutrition: 'Magnesium deficiency detected; Nitrogen optimal.'
+            }
+        ];
+
+        const interval = setInterval(() => {
+            setScanProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(interval);
+                    setIsScanning(false);
+                    // Select a random outcome
+                    setScanResult(outcomes[Math.floor(Math.random() * outcomes.length)]);
+                    return 100;
+                }
+                return prev + 5;
+            });
+        }, 120);
+    };
+
     const getRecommendations = (data: SoilInput): CropRec[] => {
         const sal = parseFloat(data.salinity);
         const ph = parseFloat(data.ph);
@@ -297,47 +357,110 @@ const SoilAdvisor: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="relative aspect-video rounded-3xl bg-gray-900 overflow-hidden group mb-6">
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="text-center text-white/50">
-                                        <Camera size={48} className="mx-auto mb-2 opacity-20" />
-                                        <p className="text-xs font-bold uppercase tracking-widest">{t('soilAdvisor.uploadScan')}</p>
+                            <div className="relative aspect-video rounded-3xl bg-gray-900 overflow-hidden group mb-6 border-2 border-gray-100 dark:border-gray-800 shadow-inner">
+                                {uploadedImage ? (
+                                    <img src={uploadedImage} alt="Uploaded Plant" className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="text-center text-white/50">
+                                            <Camera size={48} className="mx-auto mb-2 opacity-20" />
+                                            <p className="text-xs font-bold uppercase tracking-widest">{t('soilAdvisor.uploadScan')}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="absolute top-4 right-4 bg-primary-500 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-pulse">
-                                    LIVE SCANNING...
-                                </div>
-                                {/* Simulated Analysis Overlay */}
-                                <div className="absolute inset-0 pointer-events-none border-2 border-primary-500/30 m-8 rounded-2xl">
-                                    <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary-500" />
-                                    <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary-500" />
-                                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary-500" />
-                                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary-500" />
+                                )}
+                                
+                                {isScanning && (
+                                    <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center">
+                                        <div className="w-full max-w-xs space-y-4">
+                                            <div className="relative h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                                                <div 
+                                                    className="absolute inset-y-0 left-0 bg-primary-500 transition-all duration-300"
+                                                    style={{ width: `${scanProgress}%` }}
+                                                />
+                                            </div>
+                                            <p className="text-xs font-black text-white uppercase tracking-widest animate-pulse">
+                                                AI ANALYZING PATTERNS... {scanProgress}%
+                                            </p>
+                                        </div>
+                                        {/* Scanner Beam Animation */}
+                                        <div className="absolute top-0 left-0 w-full h-1 bg-primary-400/50 shadow-[0_0_20px_#22c55e] animate-scan-beam" />
+                                    </div>
+                                )}
+
+                                {!uploadedImage && !isScanning && (
+                                    <label className="absolute inset-0 cursor-pointer opacity-0">
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                    </label>
+                                )}
+                                
+                                <div className="absolute top-4 right-4 bg-primary-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
+                                    {isScanning ? 'SCANNING...' : uploadedImage ? 'IMAGE LOADED' : 'READY'}
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <Activity size={16} className="text-primary-500" />
-                                        <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">{t('soilAdvisor.vitals')}</h4>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center text-xs">
-                                            <span className="text-gray-500">Chlorophyll Index</span>
-                                            <span className="font-bold text-green-500">82% (Excellent)</span>
+                            {scanResult ? (
+                                <div className="space-y-4 animate-slide-up-fade">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Activity size={14} className="text-primary-500" />
+                                                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Health Status</h4>
+                                            </div>
+                                            <p className="text-sm font-black text-gray-900 dark:text-white">{scanResult.health}</p>
                                         </div>
-                                        <div className="flex justify-between items-center text-xs">
-                                            <span className="text-gray-500">Pest Probability</span>
-                                            <span className="font-bold text-amber-500">12% (Low)</span>
+                                        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <AlertTriangle size={14} className="text-amber-500" />
+                                                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Detected Issues</h4>
+                                            </div>
+                                            <div className="space-y-1">
+                                                {scanResult.issues.map((issue, idx) => (
+                                                    <p key={idx} className="text-[11px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                                        <div className="w-1 h-1 bg-amber-500 rounded-full" /> {issue}
+                                                    </p>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <FlaskConical size={14} className="text-blue-500" />
+                                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Nutrition Insights</h4>
+                                        </div>
+                                        <p className="text-xs font-bold text-blue-800 dark:text-blue-400 leading-relaxed">{scanResult.nutrition}</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => { setUploadedImage(null); setScanResult(null); }}
+                                        className="w-full py-3 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:bg-primary-50/10 transition-all text-xs font-black text-gray-400 hover:text-primary-600 flex items-center justify-center gap-2"
+                                    >
+                                        <Camera size={16} /> {t('soilAdvisor.newScan')}
+                                    </button>
                                 </div>
-                                <button className="p-4 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:bg-primary-50/10 transition-all flex flex-col items-center justify-center gap-2">
-                                    <Camera size={20} className="text-gray-400" />
-                                    <span className="text-xs font-bold text-gray-500">{t('soilAdvisor.newScan')}</span>
-                                </button>
-                            </div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Activity size={16} className="text-primary-500" />
+                                            <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">{t('soilAdvisor.vitals')}</h4>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-gray-500">Chlorophyll Index</span>
+                                                <span className="font-bold text-gray-300">--</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-gray-500">Disease Probability</span>
+                                                <span className="font-bold text-gray-300">--</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label className="p-4 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:bg-primary-50/10 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer">
+                                        <Camera size={20} className="text-gray-400 group-hover:text-primary-500" />
+                                        <span className="text-xs font-bold text-gray-500">{t('soilAdvisor.uploadScan')}</span>
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                    </label>
+                                </div>
+                            )}
                         </div>
                     )}
 

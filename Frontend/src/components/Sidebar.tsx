@@ -5,7 +5,7 @@ import {
     LayoutDashboard, TrendingUp, Droplets, FlaskConical,
     Satellite, CloudLightning, Thermometer, Sprout,
     Award, Settings, Info, X, Leaf, LogOut, PanelLeftClose, PanelLeft,
-    Landmark, BarChart3, Handshake, TestTube, Map, Store, Tractor
+    Landmark, BarChart3, Handshake, TestTube, Map, Store, Tractor, PhoneCall
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo-icon.png';
@@ -29,6 +29,7 @@ const navItems = [
     { to: '/market', icon: BarChart3, labelKey: 'nav.market' },
     { to: '/investors', icon: Handshake, labelKey: 'nav.investors' },
     { to: '/land-intelligence', icon: Map, labelKey: 'nav.landIntelligence' },
+    { to: '/book-consultation', icon: PhoneCall, labelKey: 'nav.bookConsultation' },
 ];
 
 const bottomItems = [

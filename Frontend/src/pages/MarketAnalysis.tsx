@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { AreaChart, Area, ComposedChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { TrendingUp, TrendingDown, Star, Search, ArrowUpDown, AlertCircle, Maximize2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,12 +13,40 @@ interface Crop {
     high: number;
     low: number;
     volume: string;
-    trends: { t: string; v: number }[];
+    trends: { t: string; v: number; open: number; close: number; high: number; low: number }[];
 }
 
 // Simulated market data
 const generateData = (base: number, points: number, label: string[]) =>
-    label.map((t, i) => ({ t, v: Math.round(base + (Math.random() - 0.48) * base * 0.04 * (i + 1)) }));
+    label.map((t, i) => {
+        const volatility = base * 0.04;
+        const open = base + (Math.random() - 0.5) * volatility;
+        const close = open + (Math.random() - 0.5) * volatility;
+        const high = Math.max(open, close) + Math.random() * Math.abs(volatility) * 0.5;
+        const low = Math.min(open, close) - Math.random() * Math.abs(volatility) * 0.5;
+        return { t, v: Math.round(close), open: Math.round(open), close: Math.round(close), high: Math.round(high), low: Math.round(low) };
+    });
+
+const Candlestick = (props: any) => {
+    const { x, y, width, height, payload } = props;
+    const { open, close, high, low } = payload;
+    const isUp = close >= open;
+    const fill = isUp ? '#22c55e' : '#ef4444';
+    
+    const range = high - low;
+    if (range === 0) return null;
+    const pxPerUnit = height / range;
+        
+    const bodyTop = y + (high - Math.max(open, close)) * pxPerUnit;
+    const bodyHeight = Math.abs(open - close) * pxPerUnit;
+    
+    return (
+        <g>
+            <line x1={x + width/2} y1={y} x2={x + width/2} y2={y + height} stroke={fill} strokeWidth={2} />
+            <rect x={x + width * 0.2} y={bodyTop} width={width * 0.6} height={Math.max(bodyHeight, 2)} fill={fill} rx={2} />
+        </g>
+    );
+};
 const dayLabels = ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM'];
 const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const monthLabels = ['W1', 'W2', 'W3', 'W4'];
@@ -45,16 +73,16 @@ const MarketAnalysis: React.FC = () => {
     const marketData: Crop[] = [
         generateCrop('rice', 'Rice', '🌾', 2450, 2183),
         generateCrop('wheat', 'Wheat', '🌿', 2380, 2275),
+        generateCrop('mustard', 'Mustard', '🌼', 5450, 5650),
+        generateCrop('bajra', 'Bajra', '🌾', 2350, 2500),
+        generateCrop('ragi', 'Ragi', '🍪', 3800, 3846),
+        generateCrop('jute', 'Jute', '🧶', 5000, 5050),
         generateCrop('maize', 'Maize', '🌽', 1890, 1962),
         generateCrop('cotton', 'Cotton', '🌱', 6520, 6620),
         generateCrop('soybean', 'Soybean', '🫘', 4250, 4600),
         generateCrop('groundnut', 'Groundnut', '🥜', 5720, 5850),
         generateCrop('onion', 'Onion', '🧅', 1840, 1700),
         generateCrop('tomato', 'Tomato', '🍅', 2100, 2000),
-        generateCrop('potato', 'Potato', '🥔', 1280, 1100),
-        generateCrop('sugarcane', 'Sugarcane', '🎋', 380, 340),
-        generateCrop('turmeric', 'Turmeric', '🌕', 14800, 12000),
-        generateCrop('chilli', 'Red Chilli', '🌶️', 9200, 8000),
     ];
 
     const [selectedCrop, setSelectedCrop] = useState<Crop>(marketData[0]);
@@ -125,25 +153,48 @@ const MarketAnalysis: React.FC = () => {
                             </p>
                         </div>
 
+                        {/* Timeframe Toggle */}
+                        <div className="flex gap-2 mb-4 bg-gray-50 dark:bg-gray-800 p-1 rounded-lg w-fit">
+                            {(['1D', '1W', '1M', '1Y'] as const).map(tf => (
+                                <button key={tf} onClick={() => setTimeframe(tf)}
+                                    className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${timeframe === tf ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                                    {tf}
+                                </button>
+                            ))}
+                        </div>
+
                         {/* Chart Area */}
                         <div className="h-[280px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={selectedCrop.trends}>
-                                    <defs>
-                                        <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="opacity-30" />
-                                    <XAxis dataKey="t" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} dy={10} />
-                                    <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
-                                    <Tooltip
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                        labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
-                                    />
-                                    <Area type="monotone" dataKey="v" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" />
-                                </AreaChart>
+                                {(timeframe === '1D' || timeframe === '1M') ? (
+                                    <ComposedChart data={chartData}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="opacity-30" />
+                                        <XAxis dataKey="t" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} dy={10} />
+                                        <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                            labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                                        />
+                                        <Bar dataKey={['low', 'high'] as any} shape={<Candlestick />} />
+                                    </ComposedChart>
+                                ) : (
+                                    <AreaChart data={chartData}>
+                                        <defs>
+                                            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="opacity-30" />
+                                        <XAxis dataKey="t" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} dy={10} />
+                                        <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                            labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                                        />
+                                        <Area type="monotone" dataKey="v" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" />
+                                    </AreaChart>
+                                )}
                             </ResponsiveContainer>
                         </div>
 

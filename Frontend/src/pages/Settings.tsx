@@ -25,7 +25,7 @@ const Settings: React.FC = () => {
     const [profile, setProfile] = useState({
         name: user?.name || '',
         email: user?.email || '',
-        phone: '',
+        phone: user?.phone || '',
         farmName: user?.farmName || '',
         location: user?.location || '',
         cropTypes: 'Rice, Wheat',

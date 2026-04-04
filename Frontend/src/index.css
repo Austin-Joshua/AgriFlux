@@ -100,6 +100,17 @@
   }
 }
 
+@keyframes scan-beam {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.animate-scan-beam {
+  animation: scan-beam 2s linear infinite;
+}
+
 .animate-slide-up-fade {
   animation: slide-up-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
 import SmartFarmReport from '../components/SmartFarmReport';
+import { toast } from 'react-toastify';
 import { useRealisticData } from '../hooks/useRealisticData';
 import AIDecisionPanel from '../components/AIDecisionPanel';
 import ProfitRiskIntelligence from '../components/ProfitRiskIntelligence';
@@ -195,7 +196,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
                             {(['area', 'bar'] as const).map(type => (
-                                <button key={type} onClick={() => setActiveChart(type)}
+                                <button key={type} onClick={(e) => { e.stopPropagation(); setActiveChart(type); }}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${activeChart === type
                                         ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400 scale-105'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
@@ -204,57 +205,68 @@ const Dashboard: React.FC = () => {
                             ))}
                         </div>
                     </div>
-                    <ResponsiveContainer width="100%" height={200}>
-                        {activeChart === 'area' ? (
-                            <AreaChart data={yieldData}>
-                                <defs>
-                                    <linearGradient id="yieldGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
-                                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                                    </linearGradient>
-                                    <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
-                                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
-                                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
-                                <Area type="monotone" dataKey="yield" stroke="#22c55e" fill="url(#yieldGrad)" strokeWidth={2.5} name="Actual" />
-                                <Area type="monotone" dataKey="forecast" stroke="#f59e0b" fill="url(#forecastGrad)" strokeWidth={2} strokeDasharray="5 3" name="AI Forecast" />
-                            </AreaChart>
-                        ) : (
-                            <BarChart data={yieldData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
-                                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
-                                <Bar dataKey="yield" fill="#22c55e" radius={[6, 6, 0, 0]} name="Actual" />
-                                <Bar dataKey="forecast" fill="#f59e0b" radius={[6, 6, 0, 0]} name="AI Forecast" />
-                            </BarChart>
-                        )}
-                    </ResponsiveContainer>
+                    <div 
+                        className="cursor-pointer group/chart" 
+                        onClick={() => toast.info('📊 AI Insight: Yield expected to peak in May due to optimized irrigation.')}
+                    >
+                        <ResponsiveContainer width="100%" height={200}>
+                            {activeChart === 'area' ? (
+                                <AreaChart data={yieldData}>
+                                    <defs>
+                                        <linearGradient id="yieldGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
+                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
+                                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
+                                    <Area type="monotone" dataKey="yield" stroke="#22c55e" fill="url(#yieldGrad)" strokeWidth={2.5} name="Actual" />
+                                    <Area type="monotone" dataKey="forecast" stroke="#f59e0b" fill="url(#forecastGrad)" strokeWidth={2} strokeDasharray="5 3" name="AI Forecast" />
+                                </AreaChart>
+                            ) : (
+                                <BarChart data={yieldData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
+                                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
+                                    <Bar dataKey="yield" fill="#22c55e" radius={[6, 6, 0, 0]} name="Actual" />
+                                    <Bar dataKey="forecast" fill="#f59e0b" radius={[6, 6, 0, 0]} name="AI Forecast" />
+                                </BarChart>
+                            )}
+                        </ResponsiveContainer>
+                        <div className="mt-2 text-[10px] text-gray-400 text-center opacity-0 group-hover/chart:opacity-100 transition-opacity font-bold uppercase tracking-widest">
+                            Click for Deep Analysis Insights
+                        </div>
+                    </div>
                 </div>
 
                 {/* 7-Day Weather */}
-                <div className="card">
+                <div className="card group/weather cursor-pointer hover:border-blue-500/30 transition-all" onClick={() => toast.success('🌤️ Weather Analysis: Stable conditions for harvest.')}>
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="section-header">7-Day Weather</h3>
-                        <Droplets size={18} className="text-blue-400" />
+                        <Droplets size={18} className="text-blue-400 group-hover/weather:scale-125 transition-transform" />
                     </div>
                     <div className="space-y-2">
                         {weatherData.map(d => (
-                            <div key={d.day} className="flex items-center gap-3 py-1 border-b border-gray-50 dark:border-gray-700/30 last:border-0">
-                                <span className="text-sm text-gray-500 dark:text-gray-400 w-8">{d.day}</span>
+                            <div key={d.day} className="flex items-center gap-3 py-1 border-b border-gray-50 dark:border-gray-700/30 last:border-0 group/row">
+                                <span className="text-sm text-gray-500 dark:text-gray-400 w-8 group-hover/row:text-primary-600 transition-colors">{d.day}</span>
                                 <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
                                     <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700"
                                         style={{ width: `${Math.min(100, (d.rain / 30) * 100)}%` }} />
                                 </div>
-                                <span className="text-xs text-blue-500 w-8 text-right">{d.rain}mm</span>
+                                <span className="text-xs text-blue-500 w-8 text-right font-bold">{d.rain}mm</span>
                                 <span className="text-sm font-bold text-gold-500 w-8 text-right">{d.temp}°</span>
                             </div>
                         ))}
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-gray-50 dark:border-gray-800 flex items-center justify-center gap-2 text-[10px] font-black text-blue-500 uppercase tracking-widest opacity-0 group-hover/weather:opacity-100 transition-opacity">
+                        <Sparkles size={10} /> View Historical Comparison
                     </div>
                 </div>
             </div>
@@ -277,18 +289,29 @@ const Dashboard: React.FC = () => {
                         <h3 className="section-header">🗺️ Farm Location</h3>
                         <Map size={16} className="text-primary-500" />
                     </div>
-                    <div className="relative w-full" style={{ height: '220px' }}>
+                    <div className="relative w-full group/map" style={{ height: '220px' }}>
                         <iframe
                             title="Farm Location Map"
-                            className="w-full h-full border-0"
+                            className="w-full h-full border-0 transition-all duration-700 grayscale group-hover/map:grayscale-0"
                             loading="lazy"
                             allowFullScreen
                             referrerPolicy="no-referrer-when-downgrade"
                             src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d248849.886527!2d77.6309395!3d12.9539974!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1709000000000!5m2!1sen!2sin&maptype=satellite"
                         />
-                        <div className="absolute top-3 left-3 glass rounded-xl px-3 py-1.5 text-xs font-semibold text-primary-700 dark:text-primary-300 shadow-md flex items-center gap-1.5">
+                        <div className="absolute top-3 left-3 glass rounded-xl px-3 py-1.5 text-xs font-semibold text-primary-700 dark:text-primary-300 shadow-md flex items-center gap-1.5 border border-white/20">
                             <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
-                            Green Valley Farm
+                            Live Satellite Feed
+                        </div>
+                        <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end opacity-0 group-hover/map:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <div className="glass px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-tighter">Lat: 12.95° N · Lon: 77.63° E</div>
+                            <div className="flex gap-1 pointer-events-auto">
+                                <button className="p-1.5 bg-black/60 hover:bg-primary-600 rounded-lg text-white transition-all backdrop-blur-sm" onClick={() => toast.info('🗺️ Map Layer: Terrain Enabled')}>
+                                    <Map size={12} />
+                                </button>
+                                <button className="p-1.5 bg-primary-600 rounded-lg text-white transition-all shadow-lg shadow-primary-500/30">
+                                    <Sparkles size={12} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div className="px-5 py-3 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">

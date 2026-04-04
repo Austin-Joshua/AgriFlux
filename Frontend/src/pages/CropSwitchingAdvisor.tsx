@@ -42,19 +42,21 @@ const CropSwitchingAdvisor: React.FC = () => {
     const [analyzed, setAnalyzed] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedReport, setSelectedReport] = useState<{ title: string; content: React.ReactNode } | null>(null);
+    const [submittedData, setSubmittedData] = useState({ crop: 'Rice', rain: 25, temp: 2.5 });
 
-    const cropInfo = CROPS_DB[currentCrop] || CROPS_DB['Rice'];
-    const overallRisk = Math.round((rainfallRisk * 0.6 + tempRisk * 8) / 2);
+    const cropInfo = CROPS_DB[submittedData.crop] || CROPS_DB['Rice'];
+    const overallRisk = Math.round((submittedData.rain * 0.6 + submittedData.temp * 8) / 2);
 
     const handleAnalyze = async () => {
         setLoading(true);
         await new Promise(r => setTimeout(r, 900));
+        setSubmittedData({ crop: currentCrop, rain: rainfallRisk, temp: tempRisk });
         setAnalyzed(true);
         setLoading(false);
     };
 
     const activeRules = cropInfo.switchRules.filter((_, i) =>
-        (i === 0 && rainfallRisk > 20) || (i === 1 && tempRisk > 2) || (i === 2 && rainfallRisk > 35)
+        (i === 0 && submittedData.rain > 20) || (i === 1 && submittedData.temp > 2) || (i === 2 && submittedData.rain > 35)
     );
 
     return (
@@ -136,7 +138,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Risk Assessment</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Overall Climate Risk for {currentCrop}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Overall Climate Risk for {submittedData.crop}</p>
                                 <p className={`text-4xl font-black font-display mt-1 ${overallRisk > 40 ? 'text-red-600' : overallRisk > 20 ? 'text-gold-600' : 'text-primary-600'}`}>{overallRisk}% Risk</p>
                             </div>
                             <div className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-xl ${overallRisk > 40 ? 'bg-red-50 dark:bg-red-900/40' : overallRisk > 20 ? 'bg-gold-50 dark:bg-gold-900/40' : 'bg-primary-50 dark:bg-primary-900/40'}`}>
@@ -167,7 +169,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                                                     <h4 className="font-bold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Expected Impact Analysis</h4>
                                                     <ul className="space-y-3 text-sm">
                                                         <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Yield Protection:</strong> Up to 85% higher yield retention under predicted stress conditions.</li>
-                                                        <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Water Savings:</strong> Significant reduction in irrigation requirements compared to {currentCrop}.</li>
+                                                        <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Water Savings:</strong> Significant reduction in irrigation requirements compared to {submittedData.crop}.</li>
                                                         <li className="flex gap-2"><CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" /> <strong>Market Outlook:</strong> {rule.alternative} has a strong baseline profit score of {CROPS_DB[rule.alternative]?.profitScore || 75}/100 with growing demand.</li>
                                                     </ul>
                                                 </div>
@@ -183,7 +185,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                                                 <p className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">{rule.condition}</p>
                                             </div>
                                             <div className="flex items-center justify-center md:justify-start gap-2">
-                                                <span className="font-semibold text-gray-800 dark:text-gray-200">{currentCrop}</span>
+                                                <span className="font-semibold text-gray-800 dark:text-gray-200">{submittedData.crop}</span>
                                                 <ArrowRight size={16} className="text-primary-500 group-hover:translate-x-1 transition-transform" />
                                                 <span className="font-bold text-primary-600 dark:text-primary-400">{rule.alternative}</span>
                                             </div>
