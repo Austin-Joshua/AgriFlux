@@ -165,12 +165,18 @@ const SoilAdvisor: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="page-header">🔬 {t('soilAdvisor.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('soilAdvisor.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <FlaskConical className="text-primary-600 dark:text-primary-400" />
+                        {t('soilAdvisor.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('soilAdvisor.subtitle')}
+                    </p>
                 </div>
-                <div className="flex items-center justify-center md:justify-start gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-center md:justify-start gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700 h-fit">
                     <button
                         onClick={() => setMode('soil')}
                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mode === 'soil' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
@@ -201,17 +207,16 @@ const SoilAdvisor: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                                     {[
                                         { label: 'pH Level', value: '6.8', status: 'Optimal', color: 'text-green-500' },
                                         { label: 'Nitrogen (N)', value: '42%', status: 'Medium', color: 'text-amber-500' },
-                                        { label: 'Phosphorus (P)', value: '18%', status: 'Low', color: 'text-red-500' },
                                         { label: 'Potassium (K)', value: '55%', status: 'High', color: 'text-blue-500' },
                                     ].map(stat => (
-                                        <div key={stat.label} className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
-                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                                            <p className="text-lg font-black text-gray-900 dark:text-white">{stat.value}</p>
-                                            <p className={`text-[10px] font-bold ${stat.color}`}>{stat.status}</p>
+                                        <div key={stat.label} className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 transition-all group/stat cursor-default">
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                                            <p className="text-2xl font-black text-gray-900 dark:text-white group-hover/stat:text-primary-600 transition-colors">{stat.value}</p>
+                                            <p className={`text-[11px] font-bold ${stat.color} mt-1`}>{stat.status}</p>
                                         </div>
                                     ))}
                                 </div>

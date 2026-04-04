@@ -96,17 +96,20 @@ const SustainabilityScore: React.FC = () => {
                 content={reportModal.content}
                 type={reportModal.type}
             />
-            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="page-header text-gradient font-extrabold">{t('sustainability.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('sustainability.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <Award className="text-primary-600 dark:text-primary-400" />
+                        {t('sustainability.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('sustainability.subtitle')}
+                    </p>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
                         🌟 Premium Farm Score
-                    </span>
-                    <span className="badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
-                        🏆 Precision Intelligence
                     </span>
                 </div>
             </div>
@@ -114,8 +117,10 @@ const SustainabilityScore: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Score */}
                 <div className="card flex flex-col items-center py-8">
-                    <Award size={32} className="text-primary-500 mb-4" />
-                    <p className="section-header mb-4">Your Farm Score</p>
+                    <h3 className="section-header mb-4 flex items-center gap-3">
+                        <Award size={20} className="text-primary-500" />
+                        Our Analysis
+                    </h3>
 
                     <div className="relative w-44 h-44 mb-4">
                         <svg className="w-44 h-44 -rotate-90" viewBox="0 0 36 36">

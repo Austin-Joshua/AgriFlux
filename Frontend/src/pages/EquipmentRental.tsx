@@ -105,23 +105,22 @@ const EquipmentRental: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-primary-900 to-green-900 p-8 rounded-3xl relative overflow-hidden text-white shadow-xl">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute -right-20 -top-20 opacity-10">
-           <Tractor size={300} />
+      {/* Header — Standardized Glassmorph with subtle accents */}
+      <div className="relative overflow-hidden rounded-3xl p-8 shadow-xl bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700/30 backdrop-blur-md">
+        <div className="absolute -right-20 -top-20 opacity-5 dark:opacity-10 pointer-events-none transition-transform duration-1000 group-hover:scale-110">
+           <Tractor size={300} className="text-primary-600" />
         </div>
         <div className="relative z-10 max-w-xl">
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Tractor className="text-primary-300" />
-            Smart Equipment Rental
+          <h1 className="page-header flex items-center gap-3">
+            <Tractor className="text-primary-600 dark:text-primary-400" />
+            {t('nav.equipmentRental')}
           </h1>
-          <p className="text-primary-100 mt-2 text-lg">
-            Rent high-quality agricultural machinery from trusted owners near you.
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg font-medium">
+            {t('nav.smartFarmingDesc')}
           </p>
         </div>
-        <div className="relative z-10 flex gap-3">
-          <button className="px-5 py-2.5 bg-white text-primary-900 rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-all hover:scale-105">
+        <div className="relative z-10 flex gap-3 mt-6 sm:mt-0">
+          <button className="btn-primary">
             List Equipment
           </button>
         </div>
@@ -155,8 +154,8 @@ const EquipmentRental: React.FC = () => {
         </div>
       </div>
 
-      {/* Results Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
+      {/* Results Grid — Standard 3-column on desktop */}
+      <div className="standard-grid mt-6">
         {filteredEquipment.map((eq, i) => (
           <motion.div
             key={eq.id}

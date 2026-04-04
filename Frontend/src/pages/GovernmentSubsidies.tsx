@@ -96,11 +96,16 @@ const GovernmentSubsidies: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="page-header flex items-center gap-2">🏛️ {t('subsidies.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">{t('subsidies.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <Globe className="text-primary-600 dark:text-primary-400" />
+                        {t('subsidies.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('subsidies.subtitle')}
+                    </p>
                 </div>
                 <div className="flex items-center gap-2 text-sm bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800">
                     <IndianRupee size={15} />
@@ -130,8 +135,8 @@ const GovernmentSubsidies: React.FC = () => {
             {/* Results */}
             <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{filtered.length} {t('subsidies.found')}</p>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {/* Grid — Standard 3-column */}
+            <div className="standard-grid">
                 {filtered.map(scheme => (
                     <div key={scheme.id} className="card group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
                         <div className="flex items-start justify-between mb-3">

@@ -227,14 +227,14 @@
 
   /* Glass Card — 3D feel */
   .card {
-    @apply relative overflow-hidden;
+    @apply relative overflow-hidden h-full;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
     border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(0, 0, 0, 0.04),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border-radius: 1rem;
+    border-radius: 1.25rem;
     padding: 1.5rem;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -386,11 +386,20 @@
 
   /* Typography */
   .page-header {
-    @apply text-2xl font-bold text-gray-900 dark:text-white font-display;
+    @apply text-2xl lg:text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight leading-tight;
+  }
+  
+  .dark .page-header {
+    @apply text-white;
   }
 
   .section-header {
-    @apply text-lg font-semibold text-gray-800 dark:text-gray-100;
+    @apply text-lg font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider;
+  }
+
+  /* Standardized Grid — 3 columns on desktop as requested */
+  .standard-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
   }
 }
 

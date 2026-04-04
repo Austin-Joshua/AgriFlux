@@ -278,21 +278,23 @@ const Marketplace: React.FC = () => {
                 {showPostModal && <PostCropModal onClose={() => setShowPostModal(false)} />}
             </AnimatePresence>
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-slide-up-fade">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <ShoppingCart className="text-primary-600" />
-                        {t('nav.marketplace', 'Agri Marketplace')}
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">Connect directly with verified farmers and buyers.</p>
-                </div>
-                <button onClick={() => setShowPostModal(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all font-semibold hover:scale-105 active:scale-95">
-                    <Plus size={18} />
-                    Post a Listing
-                </button>
-            </div>
+            {/* Header — Standardized */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+        <div>
+          <h1 className="page-header flex items-center gap-3">
+            <ShoppingCart className="text-primary-600 dark:text-primary-400" />
+            {t('nav.marketplace')}
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+            Browse and purchase high-quality crops directly from certified farms.
+          </p>
+        </div>
+        <button onClick={() => setShowPostModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all font-semibold hover:scale-105 active:scale-95">
+            <Plus size={18} />
+            Post a Listing
+        </button>
+      </div>
 
             {/* Analytics Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-slide-up-fade" style={{ animationDelay: '100ms' }}>
@@ -330,8 +332,8 @@ const Marketplace: React.FC = () => {
                 </button>
             </div>
 
-            {/* Listings Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-slide-up-fade" style={{ animationDelay: '200ms' }}>
+            {/* Crop Grid — Standard 3-column on desktop */}
+            <div className="standard-grid mt-6 animate-slide-up-fade" style={{ animationDelay: '200ms' }}>
                 {isDataLoading ? (
                     // Skeleton Loaders
                     Array.from({ length: 4 }).map((_, i) => (

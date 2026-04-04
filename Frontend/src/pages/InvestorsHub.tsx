@@ -26,10 +26,16 @@ const InvestorsHub: React.FC = () => {
 
     return (
         <div className="space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Header — Standardized */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                 <div>
-                    <h1 className="page-header">🤝 {t('investors.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">{t('investors.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <Users className="text-primary-600 dark:text-primary-400" />
+                        {t('investors.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('investors.subtitle')}
+                    </p>
                 </div>
             </div>
 
@@ -44,7 +50,7 @@ const InvestorsHub: React.FC = () => {
 
             {tab === 'investors' && (
                 <div className="space-y-8 animate-fade-in">
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="standard-grid">
                         {investors.map(inv => (
                             <div key={inv.id} className="card group hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col border-b-4 border-transparent hover:border-primary-500">
                                 <div className="flex items-start gap-4 mb-4">
@@ -69,11 +75,11 @@ const InvestorsHub: React.FC = () => {
                     </div>
                     <div className="card !p-8 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 blur-3xl -mr-32 -mt-32" />
-                        <h3 className="text-xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-xl"><TrendingUp size={20} className="text-primary-600" /></div>
+                        <h3 className="section-header flex items-center gap-3 mb-6">
+                            <TrendingUp size={20} className="text-primary-600" />
                             {t('investors.successStories')}
                         </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="standard-grid">
                             {successStories.map(s => (
                                 <div key={s.name} className="p-5 rounded-2xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:shadow-xl hover:-translate-y-0.5 transition-all group cursor-default">
                                     <div className="text-3xl mb-3 group-hover:scale-125 transition-transform duration-300 origin-left">{s.emoji}</div>

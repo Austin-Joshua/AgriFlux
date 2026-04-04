@@ -60,10 +60,21 @@ const LandIntelligence: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="page-header">🗺️ {t('land.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('land.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <MapIcon className="text-primary-600 dark:text-primary-400" />
+                        {t('land.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('land.subtitle')}
+                    </p>
+                </div>
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                    <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
+                        🛰️ Satellite AI Mapping
+                    </span>
                 </div>
             </div>
 

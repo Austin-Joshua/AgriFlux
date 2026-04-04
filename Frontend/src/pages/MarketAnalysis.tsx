@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AreaChart, Area, ComposedChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { TrendingUp, TrendingDown, Star, Search, ArrowUpDown, AlertCircle, Maximize2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Search, ArrowUpDown, AlertCircle, Maximize2, LineChart as LucideLineChart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface Crop {
@@ -106,11 +106,16 @@ const MarketAnalysis: React.FC = () => {
 
     return (
         <div className="space-y-5">
-            {/* Header */}
-            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="page-header">📈 {t('market.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('market.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <LucideLineChart className="text-primary-600 dark:text-primary-400" />
+                        {t('market.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('market.subtitle')}
+                    </p>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary-100/50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-200 dark:border-primary-800/50">
                     <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />

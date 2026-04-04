@@ -124,19 +124,18 @@ const Dashboard: React.FC = () => {
                 }}
             />
 
-            {/* Welcome Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Welcome Header — Standardized */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                 <div>
                     <h1 className="page-header">
-                        {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`)}, <span className="text-gradient font-extrabold">{user?.name?.split(' ')[0] || 'Farmer'}</span> 👋
+                        {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`)}, <span className="text-gradient font-black">{user?.name?.split(' ')[0] || 'Farmer'}</span> 👋
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">{t('dashboard.subtitle')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    {/* Generate Smart Farm Report CTA */}
                     <button
                         onClick={() => setReportOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-green-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all font-semibold text-sm"
+                        className="btn-primary flex items-center gap-2 !py-2.5"
                     >
                         <Sparkles size={16} className="text-yellow-200" />
                         Generate Smart Farm Report
@@ -149,8 +148,8 @@ const Dashboard: React.FC = () => {
                 <AIDecisionPanel />
             </div>
 
-            {/* Stat Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
+            {/* Stat Cards Grid — Standardized to 3-column focus on wider screens if appropriate, but keeping 4 for dashboard symmetry in stat row might be okay; however user said 3. Let's try 3 for main blocks. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
                 <StatCard
                     title={t('dashboard.soilHealth')} value={`${soilScore}/100`} change="+5 pts"
                     icon={<Leaf size={22} className="text-earth-600" />}
@@ -174,14 +173,6 @@ const Dashboard: React.FC = () => {
                     bgColor="bg-blue-100 dark:bg-blue-900/30"
                     accentColor="#3b82f6"
                     route="/irrigation"
-                />
-                <StatCard
-                    title={t('dashboard.climateRisk')} value="Low" change="Stable"
-                    icon={<ThermometerSun size={22} className="text-gold-600" />}
-                    color="text-gold-600 dark:text-gold-400"
-                    bgColor="bg-gold-100 dark:bg-gold-900/30"
-                    accentColor="#f59e0b"
-                    route="/climate"
                 />
             </div>
 

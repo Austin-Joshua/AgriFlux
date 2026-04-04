@@ -108,42 +108,42 @@ const IrrigationIntelligence: React.FC = () => {
                 content={reportModal.content}
                 type={reportModal.type}
             />
-            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="page-header text-gradient font-extrabold">{t('irrigation.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium">{t('irrigation.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <Droplets className="text-primary-600 dark:text-primary-400" />
+                        {t('irrigation.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('irrigation.subtitle')}
+                    </p>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
                         ⚡ Precision Water Management
                     </span>
-                    {isSimulated && (
-                        <span className="flex items-center gap-1.5 bg-blue-500/10 text-blue-500 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-blue-500/20 animate-pulse">
-                            <Activity size={12} /> SIMULATION MODE
-                        </span>
-                    )}
                 </div>
             </div>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Summary Cards — Standardized to 3-column */}
+            <div className="standard-grid">
                 {[
                     { label: 'Water Efficiency', value: `${efficiency}%`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '⚡' },
                     { label: 'Soil Moisture', value: `${moisture}%`, color: moisture > 35 ? 'text-blue-600' : 'text-red-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '💧' },
                     { label: 'Water Conserved', value: '2,400 L', color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '🌍' },
-                    { label: 'Et Rate (Today)', value: '2.8 mm', color: 'text-orange-600', bg: 'bg-orange-50 dark:bg-orange-900/20', icon: '☀️' },
                 ].map(s => (
                     <div
                         key={s.label}
                         onClick={() => openReport(s.label)}
-                        className={`card p-4 transition-all hover:scale-105 hover:shadow-xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
+                        className={`card !p-6 transition-all hover:scale-[1.02] hover:shadow-2xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
                     >
                         <div className="flex justify-between items-start">
-                            <span className="text-2xl group-hover:rotate-12 transition-transform">{s.icon}</span>
-                            <span className="text-[8px] font-bold uppercase tracking-tighter text-gray-400 group-hover:text-primary-500 transition-colors">Click for report</span>
+                            <span className="text-3xl group-hover:rotate-12 transition-transform">{s.icon}</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary-500 transition-colors">Resource Report</span>
                         </div>
-                        <p className={`text-2xl font-black font-display mt-2 ${s.color}`}>{s.value}</p>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">{s.label}</p>
+                        <p className={`text-3xl font-black mt-4 ${s.color}`}>{s.value}</p>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{s.label}</p>
                     </div>
                 ))}
             </div>
@@ -319,27 +319,26 @@ const IrrigationIntelligence: React.FC = () => {
                 </div>
             </div>
 
-            {/* Irrigation Schedule Cards */}
+            {/* Irrigation Schedule Cards — Standardized to 3-column */}
             {(calculated || true) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="standard-grid mt-6">
                     {[
                         { day: 'Monday', time: '6:00 AM', duration: '45 min', amount: '20mm', status: 'scheduled', icon: Clock },
                         { day: 'Wednesday', time: 'Skipped', duration: '—', amount: '0mm', status: 'rain', icon: AlertTriangle },
                         { day: 'Friday', time: '5:30 AM', duration: '60 min', amount: '22mm', status: 'scheduled', icon: Clock },
-                        { day: 'Sunday', time: '6:00 AM', duration: '50 min', amount: '20mm', status: 'scheduled', icon: Clock },
                     ].map(s => (
-                        <div key={s.day} className={`card p-4 transition-all hover:-translate-y-1 ${s.status === 'rain' ? 'border-blue-200 dark:border-blue-800 bg-blue-50/5' : ''}`}>
-                            <div className="flex items-start justify-between mb-2">
-                                <p className="font-semibold text-sm text-gray-800 dark:text-gray-200">{s.day}</p>
+                        <div key={s.day} className={`card !p-6 transition-all hover:-translate-y-1 ${s.status === 'rain' ? 'border-blue-200 dark:border-blue-800 bg-blue-50/5' : ''}`}>
+                            <div className="flex items-start justify-between mb-3">
+                                <p className="font-black text-sm text-gray-900 dark:text-white uppercase tracking-tight">{s.day}</p>
                                 {s.status === 'rain'
-                                    ? <span className="badge-blue text-[9px]">🌧️ Rain</span>
-                                    : <span className="badge-green text-[9px]">Scheduled</span>
+                                    ? <span className="badge-blue text-[9px] font-black uppercase tracking-widest px-2 py-0.5">🌧️ Rain Early</span>
+                                    : <span className="badge-green text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border border-primary-200">Scheduled</span>
                                 }
                             </div>
-                            <p className="text-gray-500 dark:text-gray-400 text-xs">{s.time}</p>
-                            <div className="mt-3 flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-2">
-                                <span className="text-[10px] text-gray-400 font-medium">Qty: <span className="text-gray-700 dark:text-gray-300 font-bold">{s.amount}</span></span>
-                                <span className="text-[10px] text-gray-400 font-medium">Dur: <span className="text-gray-700 dark:text-gray-300 font-bold">{s.duration}</span></span>
+                            <p className="text-gray-400 dark:text-gray-500 text-xs font-bold font-mono">{s.time}</p>
+                            <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-3">
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Qty: <span className="text-gray-900 dark:text-gray-200 font-black">{s.amount}</span></span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Dur: <span className="text-gray-900 dark:text-gray-200 font-black">{s.duration}</span></span>
                             </div>
                         </div>
                     ))}

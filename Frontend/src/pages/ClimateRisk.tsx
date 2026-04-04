@@ -31,10 +31,16 @@ const ClimateRisk: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
                 <div>
-                    <h1 className="page-header text-gradient font-extrabold">{t('climate.title')}</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">{t('climate.subtitle')}</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <Sun className="text-primary-600 dark:text-primary-400" />
+                        {t('climate.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        {t('climate.subtitle')}
+                    </p>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
@@ -46,8 +52,10 @@ const ClimateRisk: React.FC = () => {
             {/* Risk Score + Alerts */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="card glass-gold border-gold-300 dark:border-gold-800/40 flex flex-col items-center justify-center text-center">
-                    <CloudLightning size={28} className="text-gold-600 mb-3" />
-                    <p className="text-sm font-bold text-gold-700 dark:text-gold-400 mb-2 uppercase tracking-widest text-[10px]">Risk Score</p>
+                    <div className="p-3 bg-gold-100 dark:bg-gold-900/30 rounded-2xl text-gold-600 mb-4">
+                        <CloudLightning size={24} />
+                    </div>
+                    <p className="section-header mb-4">Risk Assessment</p>
                     <div className="relative w-36 h-36 mb-3">
                         <svg className="w-36 h-36 -rotate-90" viewBox="0 0 36 36">
                             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"

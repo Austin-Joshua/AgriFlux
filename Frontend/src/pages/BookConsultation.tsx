@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Clock, MessageSquare, User, Video, CheckCircle, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { Calendar, Clock, MessageSquare, User, Video, CheckCircle, ShieldCheck, Sparkles, PhoneCall } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -123,21 +123,19 @@ const BookConsultation: React.FC = () => {
     }
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-10 px-4 animate-fade-in">
+        <div className="max-w-6xl mx-auto space-y-8 pb-10 px-4 animate-fade-in">
             <SEO title="Book Consultation" />
             
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => navigate(-1)} className="p-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl transition-all shadow-sm border border-gray-100 dark:border-gray-700">
-                        <ArrowLeft size={20} />
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-                            {t('advisor.expertHelp', 'Expert Consultation')}
-                            <Sparkles className="text-gold-500" size={24} />
-                        </h1>
-                        <p className="text-gray-500 text-sm font-medium">Connect with India's leading agronomists for personalized advice.</p>
-                    </div>
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="page-header flex items-center gap-3">
+                        <PhoneCall className="text-primary-600 dark:text-primary-400" />
+                        {t('nav.bookConsultation')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        Connect with certified agronomists for professional farm guidance.
+                    </p>
                 </div>
                 <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800/50">
                     <ShieldCheck size={18} className="text-primary-600" />
@@ -153,7 +151,7 @@ const BookConsultation: React.FC = () => {
                         className="card !p-8 space-y-8 shadow-2xl relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 blur-3xl -mr-16 -mt-16" />
-                        <h3 className="section-header flex items-center gap-3"><MessageSquare size={20} className="text-primary-500" /> {t('advisor.sessionDetails', 'Session Details')}</h3>
+                        <h3 className="section-header flex items-center gap-3"><MessageSquare size={20} className="text-primary-500" /> Session Details</h3>
 
                         <div className="space-y-6">
                             <div className="space-y-2">
@@ -225,7 +223,7 @@ const BookConsultation: React.FC = () => {
                 <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
                     <div className="card space-y-6 shadow-2xl relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-b from-primary-500/5 to-transparent opacity-50 pointer-events-none" />
-                        <h3 className="section-header flex items-center gap-3"><User size={20} className="text-primary-500" /> {t('advisor.selectExpert', 'Select Expert')}</h3>
+                        <h3 className="section-header flex items-center gap-3"><User size={20} className="text-primary-500" /> Select Expert</h3>
                         <div className="space-y-4">
                             {experts.map(expert => (
                                 <motion.div

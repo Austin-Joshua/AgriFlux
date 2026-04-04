@@ -26,10 +26,10 @@ const navItems = [
     { to: '/crop-switching', icon: Sprout, labelKey: 'nav.cropSwitching' },
     { to: '/sustainability', icon: Award, labelKey: 'nav.sustainability' },
     { to: '/subsidies', icon: Landmark, labelKey: 'nav.subsidies' },
+    { to: '/book-consultation', icon: PhoneCall, labelKey: 'nav.bookConsultation' },
     { to: '/market', icon: BarChart3, labelKey: 'nav.market' },
     { to: '/investors', icon: Handshake, labelKey: 'nav.investors' },
     { to: '/land-intelligence', icon: Map, labelKey: 'nav.landIntelligence' },
-    { to: '/book-consultation', icon: PhoneCall, labelKey: 'nav.bookConsultation' },
 ];
 
 const bottomItems = [

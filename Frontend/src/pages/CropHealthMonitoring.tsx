@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Activity } from 'lucide-react';
 import ReportModal from '../components/ReportModal';
 
 const NDVI_ZONES = [
@@ -123,40 +124,42 @@ const CropHealthMonitoring: React.FC = () => {
                 content={reportModal.content}
                 type={reportModal.type}
             />
-            <div className="flex flex-col items-center md:flex-row md:items-start justify-between gap-4 text-center md:text-left">
+            {/* Header — Standardized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="page-header text-gradient font-extrabold">Satellite Crop Health</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">Precision NDVI & EVI vegetation analytics via satellite vision</p>
+                    <h1 className="page-header flex items-center gap-3">
+                        <Activity className="text-primary-600 dark:text-primary-400" />
+                        Satellite Crop Health
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                        Precision NDVI & EVI vegetation analytics via satellite vision
+                    </p>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
                         🛰️ Satellite AI Vision
                     </span>
-                    <span className="badge bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
-                        🏆 Precision Intelligence
-                    </span>
                 </div>
             </div>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Summary Cards — Standardized to 3-column */}
+            <div className="standard-grid">
                 {[
                     { label: 'Avg NDVI Score', value: avgNDVI, color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '🌿' },
-                    { label: 'Healthy Zones', value: `${healthyCount}/${NDVI_ZONES.length}`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '✅' },
-                    { label: 'Stress Zones', value: NDVI_ZONES.filter(z => z.status === 'Stressed').length, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', icon: '⚠️' },
+                    { label: 'Field Health', value: `${healthyCount}/${NDVI_ZONES.length} Healthy`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '✅' },
                     { label: 'Total Farm Area', value: '9.0 ha', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '🗺️' },
                 ].map(s => (
                     <div
                         key={s.label}
-                        onClick={() => openReport(s.label)}
-                        className={`card p-4 transition-all hover:scale-105 hover:shadow-xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
+                        onClick={() => openReport(s.label === 'Field Health' ? 'Healthy Zones' : s.label)}
+                        className={`card !p-6 transition-all hover:scale-[1.02] hover:shadow-2xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
                     >
                         <div className="flex justify-between items-start">
-                            <span className="text-2xl group-hover:rotate-12 transition-transform">{s.icon}</span>
-                            <span className="text-[8px] font-bold uppercase tracking-tighter text-gray-400 group-hover:text-primary-500 transition-colors">Click for report</span>
+                            <span className="text-3xl group-hover:rotate-12 transition-transform">{s.icon}</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary-500 transition-colors">Analytical Report</span>
                         </div>
-                        <p className={`text-2xl font-black font-display mt-2 ${s.color}`}>{s.value}</p>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">{s.label}</p>
+                        <p className={`text-3xl font-black mt-4 ${s.color}`}>{s.value}</p>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{s.label}</p>
                     </div>
                 ))}
             </div>
