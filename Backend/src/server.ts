@@ -1,4 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
+import { createServer } from 'http';
+import { Server as SocketServer } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -12,6 +14,7 @@ import authRoutes from './routes/auth.routes';
 import aiRoutes from './routes/ai.routes';
 import consultationRoutes from './routes/consultation.routes';
 import integrationRoutes from './routes/integration.routes';
+import iotRoutes from './routes/iot.routes';
 
 import cluster from 'cluster';
 import os from 'os';
@@ -34,7 +37,56 @@ process.on('unhandledRejection', (err: any) => {
 // Connect to Database
 connectDB();
 
+// CORS Configuration
+const allowedOrigins = [
+    env.FRONTEND_URL,
+    'https://citizenone.vercel.app',
+    'https://agriflux.vercel.app',
+    'https://agri-flux-sandy.vercel.app'
+];
+
 const app = express();
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app')) || env.NODE_ENV === 'development') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
+
+const httpServer = createServer(app);
+const io = new SocketServer(httpServer, {
+    cors: {
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app')) || env.NODE_ENV === 'development') {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
+
+/**
+ * Socket.IO Connection Handler
+ */
+io.on('connection', (socket) => {
+    console.log(`🔌 [SOCKET] New client connected: ${socket.id}`);
+    socket.on('disconnect', () => {
+        console.log(`🔌 [SOCKET] Client disconnected: ${socket.id}`);
+    });
+});
+
+/**
+ * Export io instance for use in other files
+ */
+export { io };
+
 const PORT = env.PORT;
 
 // Global Middleware
@@ -53,23 +105,6 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS
-const allowedOrigins = [
-    env.FRONTEND_URL,
-    'https://citizenone.vercel.app',
-    'https://agriflux.vercel.app',
-    'https://agri-flux-sandy.vercel.app'
-];
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app')) || env.NODE_ENV === 'development') {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-}));
 
 app.use(express.json({ limit: '50kb' })); // Increased limit slightly for analysis data
 app.use(express.urlencoded({ extended: true, limit: '50kb' }));
@@ -84,6 +119,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/integration', integrationRoutes);
+app.use('/api/iot-data', iotRoutes);
 
 // 404
 app.use((_req: Request, res: Response) => {
@@ -124,7 +160,8 @@ if (cluster.isPrimary && env.NODE_ENV === 'production') {
         cluster.fork();
     });
 } else {
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
         console.log(`🚀 Worker ${process.pid} started. AgriFlux API: http://localhost:${PORT}`);
+        console.log(`📡 WebSocket Gateway: ws://localhost:${PORT}`);
     });
 }
