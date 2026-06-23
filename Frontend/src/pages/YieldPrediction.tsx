@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';
-import { TrendingUp, AlertTriangle, CheckCircle, Lightbulb, ChevronDown } from 'lucide-react';
+import { ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';
+import { TrendingUp, CheckCircle, Lightbulb, ChevronDown } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import ReportModal from '../components/ReportModal';
 

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { CloudLightning, Thermometer, Droplets, Wind, AlertTriangle, TrendingDown, Sun } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { CloudLightning, Thermometer, Droplets, Wind, Sun } from 'lucide-react';
 
 const rainfallData = [
     { month: 'Jan', actual: 45, forecast: 50, avg: 55 },

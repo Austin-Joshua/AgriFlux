@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { Thermometer, Droplets, CloudSun, Play, RefreshCcw } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 const BASE_YIELD: Record<string, number> = {
     Rice: 4500, Wheat: 3800, Corn: 5000, Millet: 1800, Sorghum: 2200
@@ -31,7 +31,6 @@ const ClimateSimulator: React.FC = () => {
     const [rainfallChange, setRainfallChange] = useState(0);
     const [tempChange, setTempChange] = useState(0);
     const [drought, setDrought] = useState(0);
-    const [simulated, setSimulated] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const result = simulateScenario(crop, rainfallChange, tempChange, drought);
@@ -47,7 +46,6 @@ const ClimateSimulator: React.FC = () => {
     const handleSimulate = async () => {
         setLoading(true);
         await new Promise(r => setTimeout(r, 800));
-        setSimulated(true);
         setLoading(false);
     };
 
@@ -134,7 +132,7 @@ const ClimateSimulator: React.FC = () => {
                     <div>
                         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">Quick Scenarios</p>
                         {SCENARIOS.slice(1).map(s => (
-                            <button key={s.label} onClick={() => { setRainfallChange(s.rainfall); setTempChange(s.temp); setDrought(s.drought); setSimulated(true); }}
+                            <button key={s.label} onClick={() => { setRainfallChange(s.rainfall); setTempChange(s.temp); setDrought(s.drought); }}
                                 className="w-full text-left text-xs py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
                                 {s.label}
