@@ -120,10 +120,77 @@ const LandIntelligence: React.FC = () => {
                                 <div className="relative flex-1 bg-black/5 dark:bg-black/20 rounded-xl overflow-hidden group">
                                     <img src={image} alt="Land Preview" className="w-full h-full object-contain" />
 
-                                    {/* Mock Heatmap Overlay */}
+                                    {/* Precise SVG Telemetry Outlines & Coordinates */}
                                     {result && (
-                                        <div className="absolute inset-0 opacity-40 mix-blend-overlay animate-pulse pointer-events-none"
-                                            style={{ background: 'radial-gradient(circle at 30% 20%, #22c55e 0%, transparent 40%), radial-gradient(circle at 70% 60%, #eab308 0%, transparent 50%), radial-gradient(circle at 40% 80%, #ef4444 0%, transparent 30%)' }} />
+                                        <div className="absolute inset-0 pointer-events-none w-full h-full">
+                                            <svg viewBox="0 0 800 500" className="w-full h-full absolute inset-0" preserveAspectRatio="none">
+                                                {/* Grid coordinates */}
+                                                <g stroke="rgba(20, 184, 166, 0.25)" strokeWidth="0.5" strokeDasharray="4,4">
+                                                    {[100, 200, 300, 400, 500, 600, 700].map(x => (
+                                                        <line key={`x-${x}`} x1={x} y1="0" x2={x} y2="500" />
+                                                    ))}
+                                                    {[100, 200, 300, 400].map(y => (
+                                                        <line key={`y-${y}`} x1="0" y1={y} x2="800" y2={y} />
+                                                    ))}
+                                                </g>
+                                                
+                                                {/* Corner Coordinates text */}
+                                                <text x="15" y="25" fill="#14b8a6" fontSize="10" fontWeight="bold" fontFamily="monospace" opacity="0.8">11°56'24" N</text>
+                                                <text x="15" y="38" fill="#14b8a6" fontSize="10" fontWeight="bold" fontFamily="monospace" opacity="0.8">79°12'05" E</text>
+                                                
+                                                <text x="710" y="25" fill="#14b8a6" fontSize="10" fontWeight="bold" fontFamily="monospace" opacity="0.8">11°56'24" N</text>
+                                                <text x="710" y="38" fill="#14b8a6" fontSize="10" fontWeight="bold" fontFamily="monospace" opacity="0.8">79°12'42" E</text>
+                                                
+                                                <text x="15" y="475" fill="#14b8a6" fontSize="10" fontWeight="bold" fontFamily="monospace" opacity="0.8">11°56'02" N</text>
+                                                <text x="15" y="488" fill="#14b8a6" fontSize="10" fontWeight="bold" fontFamily="monospace" opacity="0.8">79°12'05" E</text>
+
+                                                {/* Zone Telemetry Polygons */}
+                                                {/* Zone 1: Highly Productive (Teal/Green) */}
+                                                <polygon 
+                                                    points="120,80 380,110 420,320 180,290" 
+                                                    fill="rgba(20, 184, 166, 0.25)" 
+                                                    stroke="#14b8a6" 
+                                                    strokeWidth="1.5" 
+                                                    strokeDasharray="3,3" 
+                                                />
+                                                <text x="240" y="180" fill="#14b8a6" fontSize="11" fontWeight="extrabold" fontFamily="sans-serif">ZONE A: HIGHLY PRODUCTIVE (8.2 Ac)</text>
+                                                <text x="240" y="195" fill="#14b8a6" fontSize="9" fontWeight="medium" fontFamily="monospace">NDVI: 0.84 | pH: 6.4</text>
+                                                
+                                                {/* Zone 2: Moderate Yield (Lime/Cyan) */}
+                                                <polygon 
+                                                    points="380,110 720,150 640,380 420,320" 
+                                                    fill="rgba(34, 197, 94, 0.2)" 
+                                                    stroke="#22c55e" 
+                                                    strokeWidth="1.5" 
+                                                    strokeDasharray="3,3" 
+                                                />
+                                                <text x="480" y="220" fill="#22c55e" fontSize="11" fontWeight="extrabold" fontFamily="sans-serif">ZONE B: MODERATE YIELD (4.5 Ac)</text>
+                                                <text x="480" y="235" fill="#22c55e" fontSize="9" fontWeight="medium" fontFamily="monospace">NDVI: 0.65 | pH: 6.8</text>
+
+                                                {/* Zone 3: Low Productivity (Orange/Amber) */}
+                                                <polygon 
+                                                    points="180,290 420,320 520,460 80,440" 
+                                                    fill="rgba(245, 158, 11, 0.15)" 
+                                                    stroke="#f59e0b" 
+                                                    strokeWidth="1.5" 
+                                                    strokeDasharray="3,3" 
+                                                />
+                                                <text x="220" y="380" fill="#f59e0b" fontSize="11" fontWeight="extrabold" fontFamily="sans-serif">ZONE C: LOW STRESS (2.7 Ac)</text>
+                                                <text x="220" y="395" fill="#f59e0b" fontSize="9" fontWeight="medium" fontFamily="monospace">NDVI: 0.42 | pH: 7.2</text>
+                                                
+                                                {/* Scanning telemetric sweep line */}
+                                                <line x1="0" y1="10" x2="800" y2="10" stroke="#14b8a6" strokeWidth="2.5" opacity="0.8">
+                                                    <animate attributeName="y1" values="10;490;10" dur="8s" repeatCount="indefinite" />
+                                                    <animate attributeName="y2" values="10;490;10" dur="8s" repeatCount="indefinite" />
+                                                </line>
+                                            </svg>
+                                            
+                                            {/* Corner brackets simulating HUD corners */}
+                                            <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-teal-500" />
+                                            <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-teal-500" />
+                                            <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-teal-500" />
+                                            <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-teal-500" />
+                                        </div>
                                     )}
 
                                     {analyzing && (

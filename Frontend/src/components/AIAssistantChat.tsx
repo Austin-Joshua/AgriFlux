@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Mic, MicOff, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 
 interface Message {
     role: 'user' | 'assistant';
@@ -43,6 +44,7 @@ const TAMIL_RESPONSES: Record<string, string> = {
 
 const AIAssistantChat: React.FC = () => {
     const { t } = useTranslation();
+    const { user } = useAuth();
     const [open, setOpen] = useState(false);
     const [lang, setLang] = useState<'en' | 'ta'>('en');
     const [messages, setMessages] = useState<Message[]>([]);
@@ -54,59 +56,147 @@ const AIAssistantChat: React.FC = () => {
 
     useEffect(() => {
         if (messages.length === 0) {
+            let greet = "👋 Hi! I'm AgriFlux AI. Ask me anything about farming, crops, or climate!";
+            if (user?.role === 'agronomist') {
+                greet = `👋 Hello Dr. ${user.name.split(' ')[0]}! I'm AgriFlux AI. Ready to retrieve soil analytics, pathological trends, or consultation schedules.`;
+            } else if (user?.role === 'admin') {
+                greet = "👋 Welcome System Admin! I'm AgriFlux AI. I can monitor active IoT nodes, system metrics, and warning dispatch logs.";
+            } else if (user?.role === 'farmer') {
+                greet = `👋 Hi ${user.name}! I'm AgriFlux AI. Ask me about crop yields, soil advice, weather forecast, or local mandi prices!`;
+            }
+            if (lang === 'ta') {
+                greet = "வணக்கம்! நான் AgriFlux AI. விவசாயம், மண், பயிர் மற்றும் நீர்ப்பாசனம் பற்றிய உங்கள் கேள்விகளுக்கு பதிலளிக்க தயாராக உள்ளேன்.";
+                if (user?.role === 'agronomist') {
+                    greet = "வணக்கம் வேளாண் வல்லுநரே! நான் AgriFlux AI. மண் பகுப்பாய்வு, பயிர் நோயியல் மற்றும் ஆலோசனை சந்திப்புகளை நிர்வகிக்க உதவ தயாராக உள்ளேன்.";
+                } else if (user?.role === 'admin') {
+                    greet = "நிர்வாகி பகுதிக்கு வரவேற்கிறோம்! கணினி நிலை மற்றும் நேரடி IoT முனைகளை நிர்வகிக்க நான் தயாராக உள்ளேன்.";
+                }
+            }
             setMessages([{
                 role: 'assistant',
-                text: t('ai.responses.greeting', "👋 Hi! I'm AgriFlux AI. Ask me anything about farming, crops, or climate!"),
+                text: greet,
                 confidence: 100,
             }]);
         }
-    }, [t, messages.length]);
+    }, [user, lang, messages.length]);
 
-    // Build responses based on active language
+    // Build responses based on active language and user role
     const getResponse = (msg: string): { text: string; confidence: number } => {
         const lower = msg.toLowerCase();
-        const conf = rndInt(86, 97);
+        const conf = rndInt(92, 99);
+        const role = user?.role || 'farmer';
 
         if (lang === 'ta') {
-            if (lower.includes('விளைச்சல்') || lower.includes('yield') || lower.includes('crop')) return { text: TAMIL_RESPONSES.yield, confidence: conf };
-            if (lower.includes('மண்') || lower.includes('soil'))         return { text: TAMIL_RESPONSES.soil, confidence: conf };
-            if (lower.includes('நீர்') || lower.includes('irrigation') || lower.includes('water')) return { text: TAMIL_RESPONSES.irrigation, confidence: conf };
-            if (lower.includes('வானிலை') || lower.includes('climate') || lower.includes('weather')) return { text: TAMIL_RESPONSES.climate, confidence: conf };
-            if (lower.includes('விலை') || lower.includes('market') || lower.includes('price'))  return { text: TAMIL_RESPONSES.market, confidence: conf };
-            return { text: TAMIL_RESPONSES.default, confidence: conf };
+            if (role === 'farmer') {
+                if (lower.includes('விளைச்சல்') || lower.includes('yield') || lower.includes('crop') || lower.includes('பயிர்')) {
+                    return { text: 'நெல் மற்றும் கரும்பு சாகுபடியில் ஏக்கருக்கு முறையே 4,200 கிலோ மற்றும் 45 டன்கள் வரை விளைச்சல் பெறலாம். உகந்த உரம் மற்றும் நீர்ப்பாசனத்தால் 15% வரை விளைச்சல் அதிகரிக்கும்.', confidence: conf };
+                }
+                if (lower.includes('மண்') || lower.includes('soil')) {
+                    return { text: 'உங்கள் மண்ணின் pH அளவு 6.5 ஆகவும், NPK சத்துக்கள் நடுத்தர அளவிலும் உள்ளன. நைட்ரஜன் பற்றாக்குறையை போக்க ஏக்கருக்கு 50 கிலோ யூரியா அல்லது இயற்கை மண்புழு உரம் பயன்படுத்துங்கள்.', confidence: conf };
+                }
+                if (lower.includes('நீர்') || lower.includes('irrigation') || lower.includes('water')) {
+                    return { text: 'சொட்டு நீர்ப்பாசன முறையை கடைப்பிடிப்பதன் மூலம் 30% தண்ணீர் சேமிப்புடன் பயிர் வளர்ச்சி சீராகும். இந்த வாரம் 3 நாட்கள் மட்டுமே நீர்ப்பாசனம் போதுமானது.', confidence: conf };
+                }
+                if (lower.includes('வானிலை') || lower.includes('climate') || lower.includes('weather')) {
+                    return { text: 'அடுத்த 5 நாட்களில் லேசான மழை பெய்ய 65% வாய்ப்புள்ளது. அதிகபட்ச வெப்பநிலை 33°C ஆக இருக்கும். பூச்சி மருந்து தெளிப்பதை 2 நாட்களுக்கு ஒத்திவைக்கவும்.', confidence: conf };
+                }
+                if (lower.includes('விலை') || lower.includes('market') || lower.includes('price')) {
+                    return { text: `தற்போது உங்கள் வட்டார மண்டி நிலவரப்படி நெல் சன்ன ரகம் குவிண்டாலுக்கு ₹${rndInt(2100, 2300)} வரையிலும், தக்காளி பெட்டிக்கு ₹${rndInt(350, 480)} வரையிலும் விற்பனையாகிறது.`, confidence: conf };
+                }
+                if (lower.includes('உரம்') || lower.includes('fertilizer') || lower.includes('organic')) {
+                    return { text: 'அங்கக வேளாண்மைக்கு வேப்பம்பிண்ணாக்கு, பஞ்சகவ்யா மற்றும் தொழு உரம் சிறந்தவை. யூரியா பயன்பாட்டை குறைத்து திரவ நானோ யூரியா பயன்படுத்துவது செலவை மிச்சப்படுத்தும்.', confidence: conf };
+                }
+                return { text: 'விவசாயி கணக்கில் உள்நுழைந்துள்ளீர்கள். பயிர் சாகுபடி, உரம், நீர்ப்பாசனம், வானிலை மற்றும் மண்டி விலை பற்றி தமிழில் கேளுங்கள்!', confidence: conf };
+            }
+
+            if (role === 'agronomist') {
+                if (lower.includes('விளைச்சல்') || lower.includes('yield') || lower.includes('crop') || lower.includes('பயிர்')) {
+                    return { text: 'விளைச்சல் பகுப்பாய்வின்படி, சராசரி NDVI 0.68 ஆக பதிவாகியுள்ளது. நைட்ரஜன் குறைபாடுள்ள மண்டலங்களை கண்டறிந்து தழைச்சத்து மேலாண்மை அட்டவணையை தயாரிக்குமாறு பரிந்துரைக்கப்படுகிறது.', confidence: conf };
+                }
+                if (lower.includes('மண்') || lower.includes('soil') || lower.includes('npk')) {
+                    return { text: 'மண்ணின் மின் கடத்துத்திறன் (EC) மற்றும் கரிம கார்பன் அளவுகள் பகுப்பாய்வு செய்யப்பட்டுள்ளன. காரத்தன்மை அதிகம் உள்ள நிலங்களுக்கு ஜிப்சம் இடுதல் உகந்தது.', confidence: conf };
+                }
+                if (lower.includes('நோய்') || lower.includes('disease') || lower.includes('pest') || lower.includes('பூச்சி')) {
+                    return { text: 'நெல் குலை நோய் (Blast) மற்றும் இலைக்கருகல் அறிகுறிகள் சில பகுதிகளில் தென்படுகின்றன. ட்ரைசைக்ளோசோல் 1.0 கிராம்/லிட்டர் அளவில் தெளிக்க விவசாயிகளுக்கு அறிவுறுத்தவும்.', confidence: conf };
+                }
+                if (lower.includes('கலந்தரையாடல்') || lower.includes('consultation') || lower.includes('schedule') || lower.includes('கூட்டம்')) {
+                    return { text: 'உங்களுக்கு புதிய ஆலோசனை கோரிக்கைகள் நிலுவையில் உள்ளன. வீடியோ சந்திப்புக்கான நேரங்களை உங்கள் சுயவிவர பக்கத்தில் சரிபார்த்து உறுதி செய்யவும்.', confidence: conf };
+                }
+                return { text: 'வேளாண் வல்லுநரே! மண்ணின் வேதியியல் பண்புகள், பயிர் நோயியல், ஆலோசனைகள் மற்றும் NDVI பகுப்பாய்வுகள் பற்றி ஏதேனும் உதவி தேவையா?', confidence: conf };
+            }
+
+            if (role === 'admin') {
+                if (lower.includes('கணினி') || lower.includes('system') || lower.includes('health') || lower.includes('நிலை')) {
+                    return { text: 'அனைத்து சேவையகங்களும் (Servers) மற்றும் Socket.IO நுழைவாயிலும் சீராக இயங்குகின்றன. சராசரி API பதில் நேரம் 45ms ஆகும்.', confidence: conf };
+                }
+                if (lower.includes('சாதனம்') || lower.includes('node') || lower.includes('telemetry') || lower.includes('iot')) {
+                    return { text: 'தற்போது 12 IoT சாதனங்கள் நேரலையில் தரவை அனுப்புகின்றன. ESP32 முனையங்கள் 5 வினாடி இடைவெளியில் வெற்றிகரமாக ஒத்திசைக்கப்படுகின்றன.', confidence: conf };
+                }
+                if (lower.includes('பயனர்') || lower.includes('user') || lower.includes('account')) {
+                    return { text: 'இயங்குதளத்தில் மொத்தம் 1,240 விவசாயிகள் மற்றும் 42 வேளாண் வல்லுநர்கள் பதிவு செய்துள்ளனர். புதிய பதிவுகள் இன்று: +18.', confidence: conf };
+                }
+                return { text: 'தரவுத்தள நிலை, நேரடி IoT முனைகள், கணினி பயன்பாடு மற்றும் எச்சரிக்கை அறிவிப்புகளை நிர்வகிக்க நான் தயாராக உள்ளேன்.', confidence: conf };
+            }
         }
 
-        // English responses
-        if (lower.includes('yield') || lower.includes('crop')) 
-            return { text: t('ai.responses.yield'), confidence: conf };
-        if (lower.includes('irrigation') || lower.includes('water'))
-            return { text: t('ai.responses.irrigation'), confidence: conf };
-        if (lower.includes('soil') || lower.includes('npk'))
-            return { text: t('ai.responses.soil'), confidence: conf };
-        if (lower.includes('climate') || lower.includes('weather'))
-            return { text: t('ai.responses.climate'), confidence: conf };
-        if (lower.includes('fertilizer') || lower.includes('urea'))
-            return { text: t('ai.responses.fertilizer'), confidence: conf };
-        if (lower.includes('sustainabl') || lower.includes('eco'))
-            return { text: t('ai.responses.sustainability'), confidence: conf };
-        if (lower.includes('pest') || lower.includes('insect'))
-            return { text: t('ai.responses.pests'), confidence: conf };
-        if (lower.includes('disease') || lower.includes('fungus'))
-            return { text: t('ai.responses.diseases'), confidence: conf };
-        if (lower.includes('market') || lower.includes('price'))
-            return { text: `${t('ai.responses.market')} Current mandi price: ₹${rndInt(21, 26)}–₹${rndInt(27, 33)}/kg.`, confidence: conf };
-        if (lower.includes('subsidy') || lower.includes('government'))
-            return { text: t('ai.responses.subsidies'), confidence: conf };
-        if (lower.includes('loan') || lower.includes('kcc'))
-            return { text: t('ai.responses.loans'), confidence: conf };
-        if (lower.includes('machine') || lower.includes('tractor') || lower.includes('rent'))
-            return { text: t('ai.responses.machinery'), confidence: conf };
-        if (lower.includes('seed'))
-            return { text: t('ai.responses.seeds'), confidence: conf };
-        if (lower.includes('harvest'))
-            return { text: t('ai.responses.harvest'), confidence: conf };
-        if (lower.includes('organic'))
-            return { text: t('ai.responses.organic'), confidence: conf };
+        // English responses based on roles
+        if (role === 'farmer') {
+            if (lower.includes('yield') || lower.includes('crop') || lower.includes('harvest')) {
+                return { text: 'Based on current soil conditions, your rice crop yield is projected at 4,200 kg/acre. Keep moisture above 40% to achieve this potential.', confidence: conf };
+            }
+            if (lower.includes('irrigation') || lower.includes('water')) {
+                return { text: 'Smart irrigation schedule recommends watering every 3 days. Drip system is running optimally, reducing water footprint by 30%.', confidence: conf };
+            }
+            if (lower.includes('soil') || lower.includes('npk')) {
+                return { text: 'Your nitrogen (N) levels are slightly low. Apply 45-50 kg/acre Urea or organic compost. Current soil pH is 6.5, which is highly suitable.', confidence: conf };
+            }
+            if (lower.includes('climate') || lower.includes('weather')) {
+                return { text: '7-day forecast shows 65% chance of light rain on Thursday. Temperatures: 24°C - 32°C. postpone spray treatments for 48 hours.', confidence: conf };
+            }
+            if (lower.includes('fertilizer') || lower.includes('urea') || lower.includes('organic')) {
+                return { text: 'For premium crop output, combine bio-fertilizers with nano-urea. Neem-coated urea helps release nutrients slowly and effectively.', confidence: conf };
+            }
+            if (lower.includes('pest') || lower.includes('disease') || lower.includes('insect')) {
+                return { text: 'Warning: High humidity levels increase fungal risks. Apply Pseudomonas fluorescens at 2.5 kg/ha as a preventive biological agent.', confidence: conf };
+            }
+            if (lower.includes('market') || lower.includes('price')) {
+                return { text: `Local Mandi price for Grade A Rice is ₹${rndInt(21, 23)}/kg. Demand is up in Southern markets due to season trends.`, confidence: conf };
+            }
+            return { text: "As a registered Farmer, I can guide you on crop yields, soil health, drip irrigation, local weather, and mandi prices. Ask me anything!", confidence: conf };
+        }
+
+        if (role === 'agronomist') {
+            if (lower.includes('soil') || lower.includes('npk') || lower.includes('microbiology') || lower.includes('ph')) {
+                return { text: 'Soil chemical profiling shows a cation exchange capacity (CEC) of 18 meq/100g. Recommended treatment: sulfur application to reduce alkalinity in Zone C.', confidence: conf };
+            }
+            if (lower.includes('disease') || lower.includes('pathology') || lower.includes('pest')) {
+                return { text: 'Reported symptoms in NW region point to early leaf blast (Pyricularia oryzae). Suggest Tricyclazole 75% WP spray to prevent spore dissemination.', confidence: conf };
+            }
+            if (lower.includes('thermal') || lower.includes('intensity') || lower.includes('ndvi') || lower.includes('satellite')) {
+                return { text: 'NDVI vegetation indices are stable at 0.68. Sector C shows localized vegetative stress due to lower chlorophyll absorption. Recommended targeted fertilizer.', confidence: conf };
+            }
+            if (lower.includes('consultation') || lower.includes('schedule') || lower.includes('appointment')) {
+                return { text: 'You have video consultation calls scheduled for tomorrow. Please check the Consultations tab to review farmer query logs and join.', confidence: conf };
+            }
+            return { text: "As an Agronomist, you have access to detailed soil chemistry reports, pathology trends, NDVI maps, and direct booking consultations. Let me know what data you need.", confidence: conf };
+        }
+
+        if (role === 'admin') {
+            if (lower.includes('system') || lower.includes('status') || lower.includes('health') || lower.includes('cpu')) {
+                return { text: 'System status: Normal. CPU utilization is at 12%, RAM usage at 45%. Database replica lag is < 5ms. Redis cache hit rate is 94%.', confidence: conf };
+            }
+            if (lower.includes('node') || lower.includes('sensor') || lower.includes('telemetry') || lower.includes('iot')) {
+                return { text: 'All 12 active ESP32 nodes are successfully pushing telemetry. Zero packet loss reported in the last 60 minutes.', confidence: conf };
+            }
+            if (lower.includes('user') || lower.includes('account') || lower.includes('login')) {
+                return { text: 'User Registry database holds 1,240 active farmers and 42 expert agronomists. Auth tokens are fully rate-limited and signed.', confidence: conf };
+            }
+            if (lower.includes('database') || lower.includes('db') || lower.includes('mongo')) {
+                return { text: 'MongoDB connection pool is holding 15 active connections. Dynamic query optimization is active.', confidence: conf };
+            }
+            return { text: "System Administrator dashboard connected. I am ready to retrieve logs, report telemetry cluster status, monitor worker processes, or manage active alerts.", confidence: conf };
+        }
+
         return { text: t('ai.responses.default'), confidence: conf };
     };
 
@@ -179,7 +269,7 @@ const AIAssistantChat: React.FC = () => {
             <button
                 id="ai-chat-button"
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 w-14 h-14 gradient-green rounded-full shadow-lg dark:shadow-dark-xl flex items-center justify-center text-white hover:scale-110 transition-all duration-200 z-50"
+                className="fixed bottom-28 lg:bottom-6 right-4 lg:right-6 w-14 h-14 gradient-green rounded-full shadow-lg dark:shadow-dark-xl flex items-center justify-center text-white hover:scale-110 transition-all duration-200 z-50"
                 aria-label="AI Assistant"
             >
                 {open ? <X size={22} /> : <MessageCircle size={22} />}

@@ -5,7 +5,7 @@ import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle } from
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo-icon.png';
 import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
@@ -132,8 +132,10 @@ const Register: React.FC = () => {
             
             {/* Mobile Branding */}
             <div className="lg:hidden flex flex-col items-center mb-6 text-center">
-                <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center shadow-xl mb-3 p-2">
-                    <img src={logo} alt="AgriFlux" className="w-full h-full object-contain" />
+                <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-xl shadow-primary-500/20 mb-3 flex-shrink-0">
+                    <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-[14px] flex items-center justify-center p-2">
+                        <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
+                    </div>
                 </div>
                 <h1 className="text-2xl font-black text-gray-900 dark:text-white font-display leading-tight">{t('auth.joinTitle')}</h1>
                 <p className="text-primary-600 dark:text-amber-400/80 text-[10px] font-bold uppercase tracking-widest mt-1">{t('auth.register')}</p>

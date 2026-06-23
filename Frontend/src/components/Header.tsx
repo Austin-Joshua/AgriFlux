@@ -102,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
             </button>
 
             {/* Search */}
-            <div ref={searchRef} className="relative flex-1 max-w-[120px] sm:max-w-xs md:max-w-sm">
+            <div ref={searchRef} className="relative flex-1 max-w-[200px] sm:max-w-md md:max-w-lg lg:max-w-xl">
                 <div className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 ${searchOpen ? 'glass-input ring-2 ring-primary-400/50 shadow-glow-green' : 'bg-gray-100/80 dark:bg-gray-800/80'}`}>
                     <Search size={16} className="text-gray-400 flex-shrink-0" />
                     <input
@@ -146,19 +146,19 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
                 )}
             </div>
 
-            <div className="hidden md:block flex-1" />
+            <div className="flex-1" />
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-1 sm:gap-1.5">
+            <div className="flex items-center gap-3 sm:gap-4">
 
                 {/* Notifications */}
                 <div ref={notifRef} className="relative flex-shrink-0">
                     <button id="notification-bell" onClick={() => { setNotifOpen(!notifOpen); setAccountOpen(false); setLangOpen(false); }}
-                        className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-gold-500 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
+                        className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
                         aria-label="Notifications">
                         <Bell size={20} />
                         {unreadCount > 0 && (
-                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-br from-gold-400 to-gold-600 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" />
+                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" />
                         )}
                     </button>
 
@@ -188,7 +188,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-start justify-between gap-2">
                                                         <p className={`text-sm tracking-tight ${n.unread ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-600 dark:text-gray-400'}`}>{n.title}</p>
-                                                        {n.unread && <span className="w-2 h-2 bg-gold-400 rounded-full flex-shrink-0 mt-1.5 shadow-glow-gold" />}
+                                                        {n.unread && <span className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1.5 shadow-glow-green" />}
                                                     </div>
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">{n.body}</p>
                                                     <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 mt-2 uppercase">{n.time}</p>
@@ -258,10 +258,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
 
                 {/* Theme Toggle */}
                 <button id="theme-toggle" onClick={toggleTheme}
-                    className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-gold-500 dark:hover:text-gold-400 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
+                    className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
                     aria-label="Toggle theme">
                     {isDark
-                        ? <Sun size={20} className="text-gold-400 drop-shadow-[0_0_6px_rgba(250,180,50,0.8)]" />
+                        ? <Sun size={20} className="text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_6px_rgba(234,179,8,0.6)]" />
                         : <Moon size={20} />}
                 </button>
 

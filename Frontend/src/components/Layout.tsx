@@ -58,7 +58,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     onCollapseToggle={() => setSidebarCollapsed(prev => !prev)}
                 />
                 {/* Extra top padding if CitizenOne banner is visible; extra bottom padding on mobile for bottom nav */}
-                <main className={`flex-1 p-4 md:p-6 overflow-auto pb-24 lg:pb-6 ${isFromCitizenOne ? 'pt-16' : ''}`}>
+                <main className={`flex-1 p-4 md:p-6 overflow-auto pb-36 lg:pb-6 ${isFromCitizenOne ? 'pt-16' : ''}`}>
                     <div className="max-w-7xl mx-auto animate-fade-in">
                         {children}
                     </div>

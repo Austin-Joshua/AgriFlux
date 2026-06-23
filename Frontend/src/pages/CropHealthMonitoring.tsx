@@ -145,7 +145,7 @@ const CropHealthMonitoring: React.FC = () => {
             {/* Summary Cards — Standardized to 3-column */}
             <div className="standard-grid">
                 {[
-                    { label: 'Avg NDVI Score', value: avgNDVI, color: 'text-gold-600', bg: 'glass-gold border-gold-200', icon: '🌿' },
+                    {label: 'Avg NDVI Score', value: avgNDVI, color: 'text-primary-600', bg: 'glass-gold border-gold-200', icon: '🌿' },
                     { label: 'Field Health', value: `${healthyCount}/${NDVI_ZONES.length} Healthy`, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/20', icon: '✅' },
                     { label: 'Total Farm Area', value: '9.0 ha', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20', icon: '🗺️' },
                 ].map(s => (
@@ -178,41 +178,109 @@ const CropHealthMonitoring: React.FC = () => {
                     </div>
 
                     {/* SVG Farm Heatmap */}
-                    <div className="relative w-full h-72 bg-gray-100 dark:bg-gray-700/50 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600">
-                        <svg viewBox="0 0 400 280" className="w-full h-full">
-                            {/* Background */}
-                            <rect width="400" height="280" fill="#f0fdf4" />
-                            {/* Grid lines */}
-                            {[0, 1, 2, 3].map(i => (
-                                <line key={i} x1={i * 100} y1="0" x2={i * 100} y2="280" stroke="#d1d5db" strokeWidth="0.5" />
-                            ))}
-                            {[0, 1, 2].map(i => (
-                                <line key={i} x1="0" y1={i * 140} x2="400" y2={i * 140} stroke="#d1d5db" strokeWidth="0.5" />
-                            ))}
-                            {/* Zones */}
-                            <rect x="5" y="5" width="185" height="130" rx="6" fill="#22c55e" opacity="0.7" className="cursor-pointer hover:opacity-90" onClick={() => setSelectedZone(0)} />
-                            <text x="97" y="70" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">Zone A</text>
-                            <text x="97" y="85" textAnchor="middle" fill="white" fontSize="10">NDVI: 0.72</text>
+                    <div className="relative w-full h-80 bg-slate-950 rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
+                        <svg viewBox="0 0 400 280" className="w-full h-full" preserveAspectRatio="none">
+                            {/* Grid system */}
+                            <g stroke="rgba(20, 184, 166, 0.15)" strokeWidth="0.5" strokeDasharray="3,3">
+                                {[50, 100, 150, 200, 250, 300, 350].map(x => (
+                                    <line key={`map-x-${x}`} x1={x} y1="0" x2={x} y2="280" />
+                                ))}
+                                {[50, 100, 150, 200, 250].map(y => (
+                                    <line key={`map-y-${y}`} x1="0" y1={y} x2="400" y2={y} />
+                                ))}
+                            </g>
 
-                            <rect x="210" y="5" width="185" height="130" rx="6" fill="#f59e0b" opacity="0.75" className="cursor-pointer hover:opacity-90" onClick={() => setSelectedZone(1)} />
-                            <text x="302" y="70" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">Zone B</text>
-                            <text x="302" y="85" textAnchor="middle" fill="white" fontSize="10">NDVI: 0.58</text>
+                            {/* Coordinate ticks */}
+                            <text x="5" y="12" fill="#14b8a6" fontSize="6" fontFamily="monospace" opacity="0.6">11°56'24" N | 79°12'05" E</text>
+                            <text x="310" y="12" fill="#14b8a6" fontSize="6" fontFamily="monospace" opacity="0.6">11°56'24" N | 79°12'42" E</text>
+                            <text x="5" y="275" fill="#14b8a6" fontSize="6" fontFamily="monospace" opacity="0.6">11°56'02" N | 79°12'05" E</text>
+                            <text x="310" y="275" fill="#14b8a6" fontSize="6" fontFamily="monospace" opacity="0.6">11°56'02" N | 79°12'42" E</text>
 
-                            <rect x="210" y="145" width="185" height="130" rx="6" fill="#ef4444" opacity="0.75" className="cursor-pointer hover:opacity-90" onClick={() => setSelectedZone(2)} />
-                            <text x="302" y="213" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">Zone C</text>
-                            <text x="302" y="228" textAnchor="middle" fill="white" fontSize="10">NDVI: 0.41</text>
+                            {/* Irregular Zones */}
+                            {/* Zone A (NW) */}
+                            <polygon 
+                                points="15,20 175,15 190,120 10,105" 
+                                fill="#22c55e" 
+                                fillOpacity={selectedZone === 0 ? "0.6" : "0.35"} 
+                                stroke="#22c55e" 
+                                strokeWidth={selectedZone === 0 ? "2" : "1"} 
+                                className="cursor-pointer transition-all duration-200 hover:fill-opacity-50" 
+                                onClick={() => setSelectedZone(0)} 
+                            />
+                            <text x="90" y="65" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" opacity="0.9">Zone A</text>
+                            <text x="90" y="75" textAnchor="middle" fill="white" fontSize="7" opacity="0.7">NDVI: 0.72</text>
 
-                            <rect x="5" y="145" width="185" height="130" rx="6" fill="#22c55e" opacity="0.7" className="cursor-pointer hover:opacity-90" onClick={() => setSelectedZone(3)} />
-                            <text x="97" y="213" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">Zone D</text>
-                            <text x="97" y="228" textAnchor="middle" fill="white" fontSize="10">NDVI: 0.65</text>
+                            {/* Zone B (NE) */}
+                            <polygon 
+                                points="215,25 385,15 375,125 200,120" 
+                                fill="#f59e0b" 
+                                fillOpacity={selectedZone === 1 ? "0.6" : "0.35"} 
+                                stroke="#f59e0b" 
+                                strokeWidth={selectedZone === 1 ? "2" : "1"} 
+                                className="cursor-pointer transition-all duration-200 hover:fill-opacity-50" 
+                                onClick={() => setSelectedZone(1)} 
+                            />
+                            <text x="290" y="65" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" opacity="0.9">Zone B</text>
+                            <text x="290" y="75" textAnchor="middle" fill="white" fontSize="7" opacity="0.7">NDVI: 0.58</text>
 
-                            <circle cx="200" cy="140" r="45" fill="#16a34a" opacity="0.8" className="cursor-pointer hover:opacity-90" onClick={() => setSelectedZone(4)} />
-                            <text x="200" y="136" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">Zone E</text>
-                            <text x="200" y="150" textAnchor="middle" fill="white" fontSize="10">NDVI: 0.79</text>
+                            {/* Zone C (SE) */}
+                            <polygon 
+                                points="205,135 380,140 390,260 215,255" 
+                                fill="#ef4444" 
+                                fillOpacity={selectedZone === 2 ? "0.6" : "0.35"} 
+                                stroke="#ef4444" 
+                                strokeWidth={selectedZone === 2 ? "2" : "1"} 
+                                className="cursor-pointer transition-all duration-200 hover:fill-opacity-50" 
+                                onClick={() => setSelectedZone(2)} 
+                            />
+                            <text x="295" y="200" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" opacity="0.9">Zone C</text>
+                            <text x="295" y="210" textAnchor="middle" fill="white" fontSize="7" opacity="0.7">NDVI: 0.41</text>
+
+                            {/* Zone D (SW) */}
+                            <polygon 
+                                points="10,120 185,130 195,250 20,260" 
+                                fill="#22c55e" 
+                                fillOpacity={selectedZone === 3 ? "0.6" : "0.35"} 
+                                stroke="#22c55e" 
+                                strokeWidth={selectedZone === 3 ? "2" : "1"} 
+                                className="cursor-pointer transition-all duration-200 hover:fill-opacity-50" 
+                                onClick={() => setSelectedZone(3)} 
+                            />
+                            <text x="100" y="190" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" opacity="0.9">Zone D</text>
+                            <text x="100" y="200" textAnchor="middle" fill="white" fontSize="7" opacity="0.7">NDVI: 0.65</text>
+
+                            {/* Zone E (Center) */}
+                            <polygon 
+                                points="120,80 270,90 280,180 130,175" 
+                                fill="#16a34a" 
+                                fillOpacity={selectedZone === 4 ? "0.65" : "0.4"} 
+                                stroke="#16a34a" 
+                                strokeWidth={selectedZone === 4 ? "2" : "1"} 
+                                className="cursor-pointer transition-all duration-200 hover:fill-opacity-50" 
+                                onClick={() => setSelectedZone(4)} 
+                            />
+                            <text x="200" y="130" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" opacity="0.9">Zone E</text>
+                            <text x="200" y="140" textAnchor="middle" fill="white" fontSize="7" opacity="0.7">NDVI: 0.79</text>
                         </svg>
 
+                        {/* Corner HUD overlays */}
+                        <div className="absolute top-2 left-2 w-3 h-3 border-t border-l border-teal-500/60" />
+                        <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-teal-500/60" />
+                        <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-teal-500/60" />
+                        <div className="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-teal-500/60" />
+
+                        {/* HUD Scanning line */}
+                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-teal-500/80 to-transparent pointer-events-none animate-scan-line" 
+                            style={{
+                                animation: 'scan-line 6s linear infinite'
+                            }} 
+                        />
+
                         {/* Legend */}
-                        <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+                        <div className="absolute bottom-2 right-3 text-[9px] font-black uppercase tracking-widest text-teal-400/80 bg-slate-900/80 px-2 py-0.5 rounded border border-teal-500/30 backdrop-blur-sm">
+                            Telemetric Scan Active
+                        </div>
+                        <div className="absolute bottom-2 left-3 text-[9px] font-bold text-gray-400">
                             Click zones for details
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,7 +8,7 @@ import {
 import {
     TrendingUp, Droplets, ThermometerSun, Leaf,
     AlertTriangle, CheckCircle, ArrowUpRight, ArrowDownRight,
-    Zap, Map, ArrowRight, Sparkles, ShieldCheck, Lock
+    Zap, Map, ArrowRight, Sparkles, ShieldCheck, Lock, Calendar, Clock, Video, Loader
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
@@ -18,6 +18,8 @@ import { useRealisticData } from '../hooks/useRealisticData';
 import AIDecisionPanel from '../components/AIDecisionPanel';
 import ProfitRiskIntelligence from '../components/ProfitRiskIntelligence';
 import SmartAlerts from '../components/SmartAlerts';
+import axios from 'axios';
+import { API_URL } from '../config';
 
 // Dynamic data seeded fresh on each page-load
 const rndInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -80,11 +82,36 @@ const StatCard: React.FC<{
 
 const Dashboard: React.FC = () => {
     const { t } = useTranslation();
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const navigate = useNavigate();
     const [activeChart, setActiveChart] = useState<'area' | 'bar'>('area');
     const [reportOpen, setReportOpen] = useState(false);
+    const [bookings, setBookings] = useState<any[]>([]);
+    const [loadingBookings, setLoadingBookings] = useState(false);
     const data = useRealisticData();
+
+    const fetchBookings = async () => {
+        if (!token) return;
+        setLoadingBookings(true);
+        try {
+            const res = await axios.get(`${API_URL}/consultations/my-bookings`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.success) {
+                setBookings(res.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching bookings:', error);
+        } finally {
+            setLoadingBookings(false);
+        }
+    };
+
+    useEffect(() => {
+        if (token) {
+            fetchBookings();
+        }
+    }, [token]);
 
     // Randomized on mount — simulates live data
     const yieldData = useMemo(buildYieldData, []);
@@ -314,6 +341,58 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Expert Consultations Bookings Section */}
+            <div className="card animate-slide-up-fade" style={{ animationDelay: '380ms' }}>
+                <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                    <div>
+                        <h3 className="section-header">📅 My Expert Consultations</h3>
+                        <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">Track requested sessions and their confirmation status</p>
+                    </div>
+                    <button 
+                        onClick={() => navigate('/book-consultation')}
+                        className="btn-primary !py-2 !px-4 text-xs font-bold uppercase tracking-wider"
+                    >
+                        + Book Consultation
+                    </button>
+                </div>
+                {loadingBookings ? (
+                    <div className="flex justify-center py-6">
+                        <Loader className="animate-spin text-primary-600" />
+                    </div>
+                ) : bookings.length === 0 ? (
+                    <div className="text-center py-6">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No consultations booked yet.</p>
+                        <p className="text-xs text-gray-400 mt-1">Connect with our certified network of soil & crop experts to optimize your farm yield.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {bookings.slice(0, 3).map(b => (
+                            <div key={b._id} className="p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800 flex flex-col justify-between gap-3 hover:shadow-sm transition-all">
+                                <div>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full
+                                            ${b.status === 'confirmed' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400' : b.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                                            {b.status}
+                                        </span>
+                                        <span className="text-[10px] text-gray-400 font-medium flex items-center gap-1"><Calendar size={10} />{b.date}</span>
+                                    </div>
+                                    <h4 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight mt-3">{b.expertName}</h4>
+                                    <p className="text-[10px] text-primary-600 font-bold uppercase tracking-wider">{b.specialization}</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2 italic">"{b.query}"</p>
+                                </div>
+                                <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800/50 pt-2 text-[11px] text-gray-500 font-medium mt-1">
+                                    <span className="flex items-center gap-1"><Clock size={11} />{b.time}</span>
+                                    {b.status === 'confirmed' && (
+                                        <span className="flex items-center gap-1 text-primary-500 font-bold"><Video size={11} /> Link Sent</span>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
             {/* Trust / Security Badges */}
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2 pb-1 animate-slide-up-fade" style={{ animationDelay: '400ms' }}>
                 {[

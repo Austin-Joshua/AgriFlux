@@ -11,7 +11,7 @@ export const useIoT = () => {
     const demoData = useRealisticData();
     
     // UI & Connection State
-    const [isLiveMode, setIsLiveMode] = useState(false);
+    const [isLiveMode, setIsLiveMode] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [isOnline, setIsOnline] = useState(false);
     const [socketConnected, setSocketConnected] = useState(false);
@@ -135,10 +135,34 @@ export const useIoT = () => {
     }, [isLiveMode, socketConnected, fetchLatestData]);
 
     const togglePump = useCallback(async () => {
-        await new Promise(r => setTimeout(r, 600)); // Latency sim
-        setPumpActive(prev => !prev);
-        return !pumpActive;
-    }, [pumpActive]);
+        const targetState = !pumpActive;
+        // Optimistic local state update
+        setPumpActive(targetState);
+        setLastSync(new Date());
+
+        if (socketConnected && socketRef.current) {
+            console.log('📡 [IoT] Emitting pump status to Socket:', targetState);
+            socketRef.current.emit('iot-control', { pumpStatus: targetState });
+        } else {
+            console.log('📡 [IoT] Fallback to POST control endpoint:', targetState);
+            try {
+                const response = await fetch('/api/iot-data/control', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pumpStatus: targetState })
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    // Revert on failure
+                    setPumpActive(!targetState);
+                }
+            } catch (error) {
+                console.error("❌ Failed to toggle pump remotely:", error);
+                setPumpActive(!targetState);
+            }
+        }
+        return targetState;
+    }, [pumpActive, socketConnected]);
 
     const toggleMode = () => setIsLiveMode(prev => !prev);
 

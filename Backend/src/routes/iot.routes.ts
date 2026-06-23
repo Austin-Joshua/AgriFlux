@@ -10,6 +10,12 @@ const router = Router();
 router.post('/', iotController.postIoTData);
 
 /**
+ * Route: POST /api/iot-data/control
+ * Receives remote pump control commands from frontend clients
+ */
+router.post('/control', iotController.controlPump);
+
+/**
  * Route: GET /api/iot-data
  * Sends latest sensor data to frontend
  */

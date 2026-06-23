@@ -5,7 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import PageLoader from './components/PageLoader';
@@ -54,6 +54,27 @@ const P = ({ children }: { children: React.ReactNode }) => (
     </ProtectedRoute>
 );
 
+// Helper: Root home route redirect based on user role
+const HomeRedirect: React.FC = () => {
+    const { isAuthenticated, user, isLoading } = useAuth();
+    
+    if (isLoading) {
+        return <PageLoader />;
+    }
+    
+    if (!isAuthenticated || !user) {
+        return <Navigate to="/login" replace />;
+    }
+    
+    if (user.role === 'admin') {
+        return <Navigate to="/admin" replace />;
+    }
+    if (user.role === 'agronomist') {
+        return <Navigate to="/agronomist" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+};
+
 const App: React.FC = () => {
     return (
         <HelmetProvider>
@@ -94,7 +115,7 @@ const App: React.FC = () => {
                                 <Route path="/admin"            element={<P><AdminDashboard /></P>} />
 
                                 {/* Redirects */}
-                                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                                <Route path="/" element={<HomeRedirect />} />
                                 <Route path="/404" element={<Suspense fallback={<PageLoader />}><NotFoundPage /></Suspense>} />
                                 <Route path="*" element={<Navigate to="/404" replace />} />
                             </Routes>

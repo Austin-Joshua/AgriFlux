@@ -133,22 +133,7 @@ const IrrigationIntelligence: React.FC = () => {
                         )}
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="bg-gray-100 dark:bg-white/5 p-1 rounded-xl flex items-center border border-gray-200 dark:border-white/10">
-                        <button 
-                            onClick={() => isLiveMode && toggleMode()}
-                            className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${!isLiveMode ? 'bg-white dark:bg-primary-600 text-primary-600 dark:text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                        >
-                            Demo Mode
-                        </button>
-                        <button 
-                            onClick={() => !isLiveMode && toggleMode()}
-                            className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${isLiveMode ? 'bg-white dark:bg-primary-600 text-primary-600 dark:text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                        >
-                            Live Mode
-                        </button>
-                    </div>
-                </div>
+
             </div>
 
             {/* Performance Banner for Offline state */}

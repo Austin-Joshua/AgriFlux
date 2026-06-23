@@ -85,3 +85,37 @@ export const getIoTData = async (_req: Request, res: Response) => {
         });
     }
 };
+
+/**
+ * POST /api/iot-data/control
+ * Allows dashboard clients to toggle pump state remotely
+ */
+export const controlPump = async (req: Request, res: Response) => {
+    try {
+        const { pumpStatus } = req.body;
+        
+        latestIoTData = {
+            ...latestIoTData,
+            pumpStatus: Boolean(pumpStatus),
+            timestamp: new Date().toISOString()
+        };
+
+        console.log(`📡 [IoT CONTROL] Remote command received: Pump is now ${latestIoTData.pumpStatus ? 'ON' : 'OFF'}`);
+
+        // Broadcast to all sockets (ESP32 and other frontends)
+        io.emit('iot-update', latestIoTData);
+        io.emit('iot-control', { pumpStatus: latestIoTData.pumpStatus });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Pump toggled successfully',
+            pumpStatus: latestIoTData.pumpStatus
+        });
+    } catch (error: any) {
+        console.error('❌ [IoT CONTROL ERROR]', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Error toggling pump'
+        });
+    }
+};

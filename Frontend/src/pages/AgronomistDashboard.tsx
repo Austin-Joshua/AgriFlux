@@ -1,15 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { FlaskConical, MapPin, Calendar, CheckCircle, Clock, AlertTriangle, Leaf, Users, BookOpen, ClipboardList, Send, FileText, TrendingUp } from 'lucide-react';
+import { FlaskConical, MapPin, Calendar, CheckCircle, Clock, AlertTriangle, Leaf, Users, BookOpen, ClipboardList, Send, FileText, TrendingUp, XCircle, Loader } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config';
+import { toast } from 'react-toastify';
 
 const AgronomistDashboard: React.FC = () => {
     const { t } = useTranslation();
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [activeTab, setActiveTab] = useState<'overview' | 'soilReports' | 'fieldVisits' | 'advisory'>('overview');
     const [advisoryText, setAdvisoryText] = useState('');
     const [sentAdvisories, setSentAdvisories] = useState<{ to: string; msg: string; time: string }[]>([]);
+    const [consultations, setConsultations] = useState<any[]>([]);
+    const [loadingConsultations, setLoadingConsultations] = useState(false);
+
+    const fetchConsultations = async () => {
+        if (!token) return;
+        setLoadingConsultations(true);
+        try {
+            const res = await axios.get(`${API_URL}/consultations/all`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.success) {
+                setConsultations(res.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching consultations:', error);
+            toast.error('Failed to load consultations.');
+        } finally {
+            setLoadingConsultations(false);
+        }
+    };
+
+    const handleUpdateStatus = async (id: string, newStatus: 'confirmed' | 'cancelled') => {
+        try {
+            const res = await axios.patch(`${API_URL}/consultations/${id}/status`, { status: newStatus }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.success) {
+                toast.success(`Consultation ${newStatus} successfully!`);
+                fetchConsultations();
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            toast.error('Failed to update consultation status.');
+        }
+    };
+
+    useEffect(() => {
+        if (token) {
+            fetchConsultations();
+        }
+    }, [token]);
 
     const visitData = [
         { week: 'W1', visits: 6 }, { week: 'W2', visits: 9 }, { week: 'W3', visits: 7 },
@@ -29,11 +73,7 @@ const AgronomistDashboard: React.FC = () => {
         { farm: 'Lotus Fields', farmer: 'Meena Sharma', pH: 8.1, N: 'Low', P: 'Low', K: 'Adequate', salinity: 4.2, status: 'Action Required', date: '2026-02-25' },
     ];
 
-    const upcomingVisits = [
-        { id: 1, farm: 'Green Valley Farm', farmer: 'Ravi Kumar', location: 'Mysuru, KA', date: '2026-03-06', type: 'Soil Assessment', priority: 'High' },
-        { id: 2, farm: 'Sunrise Fields', farmer: 'Anita Patil', location: 'Nashik, MH', date: '2026-03-07', type: 'Crop Disease Check', priority: 'Medium' },
-        { id: 3, farm: 'Mango Grove', farmer: 'Suresh Reddy', location: 'Guntur, AP', date: '2026-03-10', type: 'Irrigation Advisory', priority: 'Low' },
-    ];
+
 
     const diseaseAlerts = [
         { crop: 'Tomato', disease: 'Early Blight', farms: 3, severity: 'High', region: 'Karnataka' },
@@ -154,26 +194,76 @@ const AgronomistDashboard: React.FC = () => {
             )}
 
             {activeTab === 'fieldVisits' && (
-                <div className="space-y-3">
-                    <h3 className="section-header">📅 {t('agronomist.upcomingVisits')}</h3>
-                    {upcomingVisits.map(v => (
-                        <div key={v.id} className="card flex items-start sm:items-center justify-between gap-3 flex-col sm:flex-row hover:shadow-md transition-all">
-                            <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${v.priority === 'High' ? 'bg-red-100 dark:bg-red-900/30' : v.priority === 'Medium' ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-primary-100 dark:bg-primary-900/30'}`}>
-                                    {v.priority === 'High' ? '🚨' : v.priority === 'Medium' ? '📋' : '✅'}
-                                </div>
-                                <div>
-                                    <p className="font-bold text-gray-900 dark:text-white">{v.farm}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">{v.farmer} · <span className="inline-flex items-center gap-0.5"><MapPin size={10} />{v.location}</span></p>
-                                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">{v.type}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3 sm:flex-col sm:items-end">
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${v.priority === 'High' ? 'bg-red-100 text-red-700' : v.priority === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-primary-100 text-primary-700'}`}>{v.priority}</span>
-                                <p className="text-xs text-gray-400 flex items-center gap-1"><Calendar size={10} />{v.date}</p>
-                            </div>
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="section-header">📅 Expert Consultations & Bookings</h3>
+                        <button onClick={fetchConsultations} className="text-xs text-primary-600 hover:underline">Refresh</button>
+                    </div>
+                    {loadingConsultations ? (
+                        <div className="flex justify-center py-8">
+                            <Loader className="animate-spin text-primary-600" />
                         </div>
-                    ))}
+                    ) : consultations.length === 0 ? (
+                        <p className="text-sm text-gray-400 text-center py-8">No consultations requested yet.</p>
+                    ) : (
+                        <div className="space-y-3">
+                            {consultations.map(v => {
+                                const farmerName = v.userId?.name || 'Demo Farmer';
+                                const farmName = v.userId?.farmName || 'Green Valley Farm';
+                                const location = v.userId?.location || 'Mysuru, KA';
+                                return (
+                                    <div key={v._id} className="card flex items-start justify-between gap-4 flex-col md:flex-row hover:shadow-md transition-all border-l-4 border-l-primary-500">
+                                        <div className="flex items-start gap-3">
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0
+                                                ${v.status === 'confirmed' ? 'bg-primary-100 text-primary-700' : v.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                {v.status === 'confirmed' ? '✅' : v.status === 'cancelled' ? '❌' : '⏳'}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="font-bold text-gray-900 dark:text-white">{farmName}</p>
+                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider
+                                                        ${v.status === 'confirmed' ? 'bg-primary-100 text-primary-700' : v.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                        {v.status}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                                    Farmer: <strong>{farmerName}</strong> · Location: <strong>{location}</strong>
+                                                </p>
+                                                <p className="text-xs text-primary-700 dark:text-primary-400 mt-1">
+                                                    Requested Expert: <strong>{v.expertName}</strong> ({v.specialization})
+                                                </p>
+                                                <div className="mt-2 p-2.5 bg-gray-50 dark:bg-gray-800/40 rounded-xl text-xs text-gray-600 dark:text-gray-300 font-medium italic border border-gray-100 dark:border-gray-800">
+                                                    " {v.query} "
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-row md:flex-col items-end justify-between w-full md:w-auto gap-3 self-stretch md:self-auto border-t md:border-t-0 pt-3 md:pt-0 border-gray-100 dark:border-gray-800">
+                                            <div className="text-right">
+                                                <p className="text-xs text-gray-400 flex items-center gap-1"><Calendar size={12} />{v.date}</p>
+                                                <p className="text-[11px] text-gray-500 font-bold mt-0.5">Time: {v.time}</p>
+                                            </div>
+                                            {v.status === 'pending' && (
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(v._id, 'confirmed')}
+                                                        className="px-3 py-1.5 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(v._id, 'cancelled')}
+                                                        className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             )}
 

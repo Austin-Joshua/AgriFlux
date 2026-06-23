@@ -104,10 +104,12 @@ const AuthLayout: React.FC = () => {
                             <div className="space-y-8">
                                 <div className="flex items-center gap-4">
                                     <motion.div
-                                        whileHover={{ scale: 1.05, rotate: 5 }}
-                                        className="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center border border-white/20 shadow-2xl overflow-hidden ring-1 ring-white/30"
+                                        whileHover={{ scale: 1.05, rotate: 3 }}
+                                        className="relative p-0.5 rounded-[1.5rem] bg-gradient-to-tr from-white/30 via-white/15 to-gold-400/40 shadow-2xl flex-shrink-0"
                                     >
-                                        <img src={logo} alt="AgriFlux" className="w-10 h-10 object-contain" />
+                                        <div className="w-14 h-14 bg-white/15 dark:bg-black/30 backdrop-blur-xl rounded-[22px] flex items-center justify-center border border-white/25">
+                                            <img src={logo} alt="AgriFlux Logo" className="w-9 h-9 object-contain" />
+                                        </div>
                                     </motion.div>
                                     <div className="flex flex-col text-left">
                                         <span className="text-2xl font-black text-white leading-none tracking-tight">{t('common.agriflux', 'AgriFlux')}</span>

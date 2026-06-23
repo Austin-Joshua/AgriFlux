@@ -77,6 +77,13 @@ const io = new SocketServer(httpServer, {
  */
 io.on('connection', (socket) => {
     console.log(`🔌 [SOCKET] New client connected: ${socket.id}`);
+    
+    // Broadcast real-time pump controls to ESP32 and other dashboard clients
+    socket.on('iot-control', (data) => {
+        console.log('📡 [SOCKET] Control event received:', data);
+        socket.broadcast.emit('iot-control', data);
+    });
+
     socket.on('disconnect', () => {
         console.log(`🔌 [SOCKET] Client disconnected: ${socket.id}`);
     });

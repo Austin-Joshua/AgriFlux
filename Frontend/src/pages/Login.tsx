@@ -5,13 +5,13 @@ import { Eye, EyeOff, Leaf, Phone, Lock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo-icon.png';
 import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
-    const { login, loginWithProvider, isLoading, requiresOnboarding } = useAuth();
+    const { login, loginWithProvider, isLoading, requiresOnboarding, isAuthenticated, user } = useAuth();
     const { isDark } = useTheme();
     const navigate = useNavigate();
 
@@ -28,15 +28,20 @@ const Login: React.FC = () => {
     const [socialLoading, setSocialLoading] = useState<string | null>(null);
     const [loginMode, setLoginMode] = useState<'farmer' | 'agronomist' | 'admin'>('farmer');
 
-    // Handle redirection after auth state updates
+    // Handle redirection after auth state updates or if already authenticated
     useEffect(() => {
-        if (!isLoading && requiresOnboarding) {
-            navigate('/onboarding');
-        } else if (!isLoading && !requiresOnboarding && identifier && password) {
-             // Redirection for normal login is handled in handleSubmit but this 
-             // handles the social login redirect too.
+        if (!isLoading && isAuthenticated && user) {
+            if (requiresOnboarding) {
+                navigate('/onboarding');
+            } else if (user.role === 'admin') {
+                navigate('/admin');
+            } else if (user.role === 'agronomist') {
+                navigate('/agronomist');
+            } else {
+                navigate('/dashboard');
+            }
         }
-    }, [isLoading, requiresOnboarding, navigate]);
+    }, [isLoading, isAuthenticated, user, requiresOnboarding, navigate]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -163,8 +168,10 @@ const Login: React.FC = () => {
             
             {/* Mobile Branding (only visible on mobile) */}
             <div className="lg:hidden flex flex-col items-center mb-10 text-center">
-                <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-xl mb-4 p-2">
-                    <img src={logo} alt="AgriFlux" className="w-full h-full object-contain" />
+                <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-xl shadow-primary-500/20 mb-4 flex-shrink-0">
+                    <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-[14px] flex items-center justify-center p-2">
+                        <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
+                    </div>
                 </div>
                 <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">{t('auth.welcomeBack')} 👋</h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">{t('auth.loginSubtitle')}</p>
@@ -192,12 +199,7 @@ const Login: React.FC = () => {
                 ))}
             </div>
 
-            {/* Role Demo Hint */}
-            <div className="mb-6 p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/50 text-[11px] text-primary-700 dark:text-primary-400 flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
-                <span className="font-bold">{loginMode.toUpperCase()} Mode:</span>
-                <span className="font-mono opacity-80">{roleCreds[loginMode].email}</span>
-            </div>
+
 
             {error && (
                 <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-bold">

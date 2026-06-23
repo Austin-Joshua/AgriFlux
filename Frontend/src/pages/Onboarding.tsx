@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Wheat, MapPin, Sparkles, ArrowRight, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo-icon.png';
 import SEO from '../components/SEO';
 
 const Onboarding: React.FC = () => {
@@ -35,8 +35,10 @@ const Onboarding: React.FC = () => {
             <div className="max-w-md w-full">
                 {/* Header */}
                 <div className="text-center mb-10">
-                    <div className="w-20 h-20 bg-primary-600 rounded-3xl flex items-center justify-center shadow-2xl mx-auto mb-6 p-3 animate-bounce-slow">
-                        <img src={logo} alt="AgriFlux" className="w-full h-full object-contain" />
+                    <div className="relative p-0.5 rounded-3xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-2xl mx-auto mb-6 w-20 h-20 flex-shrink-0 animate-pulse-slow">
+                        <div className="w-full h-full bg-white dark:bg-gray-800 rounded-[22px] flex items-center justify-center p-3.5">
+                            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
+                        </div>
                     </div>
                     <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">
                         Almost there, <span className="text-gradient">{user?.name?.split(' ')[0]}</span>!

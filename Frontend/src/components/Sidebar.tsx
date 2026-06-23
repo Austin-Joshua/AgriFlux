@@ -84,19 +84,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                 <div className={`flex items-center justify-between px-4 py-5 border-b border-white/10 dark:border-gray-700/30 ${collapsed ? 'px-3' : ''}`}>
                     <div
                         onClick={() => navigate('/dashboard')}
-                        className={`flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity ${collapsed ? 'justify-center w-full' : ''}`}
+                        className={`flex items-center gap-2.5 cursor-pointer transition-transform duration-200 hover:scale-[1.03] ${collapsed ? 'justify-center w-full' : ''}`}
                     >
                         {!collapsed ? (
-                            <div className="flex items-center gap-2.5">
-                                <img src={logo} alt="AgriFlux Logo" className="h-9 w-9 object-contain rounded-xl shadow-sm" />
+                            <div className="flex items-center gap-3">
+                                <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-md shadow-primary-500/20">
+                                    <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
+                                        <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
+                                    </div>
+                                </div>
                                 <div className="flex flex-col text-left">
                                     <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">{t('common.agriflux', 'AgriFlux')}</span>
                                     <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">{t('common.intelligencePlatform', 'Intelligence Platform')}</span>
                                 </div>
                             </div>
                         ) : (
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0 bg-black">
-                                <img src={logo} alt="AgriFlux Logo" className="h-full w-auto max-w-none object-cover" style={{ objectPosition: '15% center' }} />
+                            <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-md shadow-primary-500/25 flex-shrink-0">
+                                <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
+                                    <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
+                                </div>
                             </div>
                         )}
                     </div>
