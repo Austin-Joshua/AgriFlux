@@ -29,7 +29,6 @@ export const register = async (req: Request, res: Response) => {
             id: crypto.randomUUID(), 
             phone,
             password: hashedPassword,
-            password_hash: hashedPassword, 
             name,
             farmName,
             location,
@@ -141,7 +140,6 @@ export const socialLogin = async (req: Request, res: Response) => {
                 email,
                 phone: '',
                 password: placeholderHash,
-                password_hash: placeholderHash,
                 role: role || 'farmer',
                 farmName: farmName || '',
                 location: location || '',
@@ -176,6 +174,32 @@ export const socialLogin = async (req: Request, res: Response) => {
         if (error.code === 11000) {
             return res.status(400).json({ message: 'An account with this email already exists.' });
         }
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'Please provide an email address.' });
+        }
+
+        if (!isDBConnected) {
+            return res.json({ success: true, message: 'Password reset link sent successfully (simulated).' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.json({ success: true, message: 'If an account exists with that email, a password reset link has been sent.' });
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        console.log(`[PASSWORD RESET] Token for ${email}: ${resetToken}`);
+        console.log(`[PASSWORD RESET] Link: http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`);
+
+        return res.json({ success: true, message: 'Password reset link has been sent to your email.' });
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };

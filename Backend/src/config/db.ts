@@ -21,7 +21,6 @@ const seedDefaultAccounts = async () => {
                 await User.create({ 
                     ...acc, 
                     password: hashed,
-                    password_hash: hashed, // CitizenOne compatibility
                     id: acc.id // Pre-defined UUIDs for seeds
                 });
                 console.log(`🌱 Seeded ${acc.role} account (${acc.email})`);

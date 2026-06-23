@@ -58,3 +58,30 @@ export const getFarmerStats = async (req: Request, res: Response) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+/**
+ * GET /api/integration/status
+ * Public health check for the integration system.
+ */
+export const getIntegrationStatus = async (req: Request, res: Response) => {
+    try {
+        const secret = process.env.CITIZENONE_INTEGRATION_KEY || 'agriflux_default_integration_secret';
+        const integrationKey = req.headers['x-integration-key'];
+        
+        const isKeyConfigured = secret !== 'agriflux_default_integration_secret';
+        const isClientAuthorized = integrationKey === secret;
+
+        res.status(200).json({
+            success: true,
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+            service: 'AgriFlux-CitizenOne-Link',
+            configuration: {
+                isKeyConfigured,
+                isClientAuthorized
+            }
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

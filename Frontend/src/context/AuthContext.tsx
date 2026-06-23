@@ -50,23 +50,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true);
     const [requiresOnboarding, setRequiresOnboarding] = useState(false);
 
-    // Restore session from localStorage on mount
+    // Restore session from localStorage on mount and check expiry
     useEffect(() => {
         const savedToken = localStorage.getItem('agriflux-token');
         const savedUser = localStorage.getItem('agriflux-user');
-        if (savedToken && savedUser) {
+
+        const isTokenExpired = (tokenStr: string | null): boolean => {
+            if (!tokenStr) return true;
             try {
-                const parsedUser = JSON.parse(savedUser);
-                setToken(savedToken);
-                setUser(parsedUser);
-                axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+                const parts = tokenStr.split('.');
+                if (parts.length !== 3) return true;
+                const payload = JSON.parse(atob(parts[1]));
+                if (payload && typeof payload.exp === 'number') {
+                    return Date.now() >= payload.exp * 1000;
+                }
+                return false;
             } catch {
-                // Corrupted storage — clear it
+                return true;
+            }
+        };
+
+        if (savedToken && savedUser) {
+            if (isTokenExpired(savedToken)) {
                 localStorage.removeItem('agriflux-token');
                 localStorage.removeItem('agriflux-user');
+                setUser(null);
+                setToken(null);
+            } else {
+                try {
+                    const parsedUser = JSON.parse(savedUser);
+                    setToken(savedToken);
+                    setUser(parsedUser);
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+                } catch {
+                    // Corrupted storage — clear it
+                    localStorage.removeItem('agriflux-token');
+                    localStorage.removeItem('agriflux-user');
+                }
             }
         }
         setIsLoading(false);
+
+        // Periodically check token expiry every 30 seconds
+        const interval = setInterval(() => {
+            const currentToken = localStorage.getItem('agriflux-token');
+            if (currentToken && isTokenExpired(currentToken)) {
+                console.warn('Session expired. Logging out.');
+                setUser(null);
+                setToken(null);
+                setRequiresOnboarding(false);
+                localStorage.removeItem('agriflux-token');
+                localStorage.removeItem('agriflux-user');
+                delete axios.defaults.headers.common['Authorization'];
+            }
+        }, 30000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const handleAuthResponse = (data: { token: string; user: User }) => {

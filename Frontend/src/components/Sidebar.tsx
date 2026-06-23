@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                 <>
                     {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-gradient-to-b from-primary-500 to-gold-500 rounded-r-full" />}
                     <Icon size={18} className={`flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-primary-600 dark:text-primary-400' : ''}`} />
-                    {!collapsed && <span className="truncate">{t(labelKey)}</span>}
+                    {!collapsed && <span className="truncate max-w-[160px] xl:max-w-[180px]">{t(labelKey)}</span>}
                 </>
             )}
         </NavLink>

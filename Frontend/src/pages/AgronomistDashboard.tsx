@@ -115,26 +115,30 @@ const AgronomistDashboard: React.FC = () => {
                 ))}
             </div>
 
-            <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 w-fit flex-wrap">
-                {(['overview', 'soilReports', 'fieldVisits', 'advisory'] as const).map(tab => (
-                    <button key={tab} onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'}`}>
-                        {tab === 'overview' ? `📊 ${t('common.overview')}` : tab === 'soilReports' ? `🧪 ${t('agronomist.soilReports')}` : tab === 'fieldVisits' ? `🗺️ ${t('agronomist.fieldVisits')}` : `📡 ${t('agronomist.advisoryTab')}`}
-                    </button>
-                ))}
+            <div className="overflow-x-auto max-w-full scrollbar-none pb-1">
+                <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 w-max">
+                    {(['overview', 'soilReports', 'fieldVisits', 'advisory'] as const).map(tab => (
+                        <button key={tab} onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'}`}>
+                            {tab === 'overview' ? `📊 ${t('common.overview')}` : tab === 'soilReports' ? `🧪 ${t('agronomist.soilReports')}` : tab === 'fieldVisits' ? `🗺️ ${t('agronomist.fieldVisits')}` : `📡 ${t('agronomist.advisoryTab')}`}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {activeTab === 'overview' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div className="lg:col-span-2 card">
                         <h3 className="section-header mb-4">{t('agronomist.fieldVisitsTrend')}</h3>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <AreaChart data={visitData}>
-                                <defs><linearGradient id="visitGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} /><stop offset="95%" stopColor="#3b82f6" stopOpacity={0} /></linearGradient></defs>
-                                <CartesianGrid strokeDasharray="3 3" className="opacity-30" /><XAxis dataKey="week" tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} />
-                                <Tooltip /><Area type="monotone" dataKey="visits" stroke="#3b82f6" fill="url(#visitGrad)" strokeWidth={2} />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                        <div role="img" aria-label="Weekly field visits trend chart">
+                            <ResponsiveContainer width="100%" height={200}>
+                                <AreaChart data={visitData}>
+                                    <defs><linearGradient id="visitGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} /><stop offset="95%" stopColor="#3b82f6" stopOpacity={0} /></linearGradient></defs>
+                                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" /><XAxis dataKey="week" tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} />
+                                    <Tooltip /><Area type="monotone" dataKey="visits" stroke="#3b82f6" fill="url(#visitGrad)" strokeWidth={2} />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
                         <div className="mt-4">
                             <h4 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2"><AlertTriangle size={14} className="text-red-500" /> {t('agronomist.activeAlerts')}</h4>
                             <div className="space-y-2">

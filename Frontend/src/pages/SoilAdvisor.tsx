@@ -24,6 +24,13 @@ const SoilAdvisor: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [alerts, setAlerts] = useState<string[]>([]);
     const [selectedReport, setSelectedReport] = useState<{ title: string; content: React.ReactNode } | null>(null);
+    const [reportStats, setReportStats] = useState({
+        ph: 6.8,
+        nitrogen: 42,
+        potassium: 55,
+        salinity: 1.2,
+        moisture: 65
+    });
 
     // Plant Analysis State
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -107,8 +114,12 @@ const SoilAdvisor: React.FC = () => {
             let s = 70;
             if (crop.name === 'Rice') {
                 if (sal <= 2) s += 15; else if (sal <= 4) s += 5; else s -= 20;
-                if (ph >= 5.5 && ph <= 7) s += 10; else s -= 10;
+                if (ph >= 5.0 && ph <= 7) s += 10; else s -= 10;
                 if (moist >= 70) s += 10; else s -= 15;
+            } else if (crop.name === 'Soybean') {
+                if (ph >= 6.0 && ph <= 7.5) s += 15; else s -= 10;
+                if (sal <= 2.5) s += 10; else s -= 15;
+                if (moist >= 50 && moist <= 75) s += 10; else s -= 10;
             } else if (crop.name === 'Barley') {
                 if (sal >= 4) s += 20; else s += 5;
                 if (ph >= 7 && ph <= 8.5) s += 15; else s -= 5;
@@ -152,10 +163,19 @@ const SoilAdvisor: React.FC = () => {
         const warns: string[] = [];
         if (parseFloat(input.salinity) > 6) warns.push('⚠️ High salinity detected. Consider leaching with fresh water and gypsum treatment before planting.');
         if (parseFloat(input.ph) > 8.5) warns.push('⚠️ Highly alkaline soil. Apply gypsum (2–4 t/ha) and sulphur to reduce pH before sowing.');
-        if (parseFloat(input.ph) < 5.5) warns.push('⚠️ Acidic soil. Lime application recommended at 1–2 tonnes/ha. Improves nutrient availability.');
+        if (parseFloat(input.ph) < 5.0) warns.push('⚠️ Highly acidic soil (pH < 5.0). Lime application recommended at 1–2 tonnes/ha to improve nutrient availability.');
         if (parseFloat(input.moisture) < 30) warns.push('⚠️ Low soil moisture. Schedule irrigation or mulching before planting to avoid germination failure.');
         if (parseFloat(input.waterLevel) < 0.5) warns.push('⚠️ Very shallow water table — waterlogging risk. Raised-bed farming recommended.');
         setAlerts(warns);
+
+        setReportStats({
+            ph: parseFloat(input.ph) || 6.8,
+            nitrogen: Math.min(100, Math.max(15, Math.round((parseFloat(input.germination) || 85) * 0.55))),
+            potassium: Math.min(100, Math.max(20, Math.round((parseFloat(input.moisture) || 60) * 0.85))),
+            salinity: parseFloat(input.salinity) || 1.2,
+            moisture: parseFloat(input.moisture) || 65
+        });
+
         await new Promise(r => setTimeout(r, 1200));
         setRecs(getRecommendations(input));
         setLoading(false);
@@ -209,9 +229,24 @@ const SoilAdvisor: React.FC = () => {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                                     {[
-                                        { label: 'pH Level', value: '6.8', status: 'Optimal', color: 'text-green-500' },
-                                        { label: 'Nitrogen (N)', value: '42%', status: 'Medium', color: 'text-amber-500' },
-                                        { label: 'Potassium (K)', value: '55%', status: 'High', color: 'text-blue-500' },
+                                        { 
+                                            label: 'pH Level', 
+                                            value: reportStats.ph.toFixed(1), 
+                                            status: reportStats.ph < 5.0 ? 'Highly Acidic' : reportStats.ph < 6.0 ? 'Acidic' : reportStats.ph > 8.0 ? 'Alkaline' : 'Optimal', 
+                                            color: reportStats.ph < 5.0 || reportStats.ph > 8.0 ? 'text-red-500' : 'text-green-500' 
+                                        },
+                                        { 
+                                            label: 'Nitrogen (N)', 
+                                            value: `${reportStats.nitrogen}%`, 
+                                            status: reportStats.nitrogen < 30 ? 'Deficient' : reportStats.nitrogen > 75 ? 'Abundant' : 'Optimal', 
+                                            color: reportStats.nitrogen < 30 ? 'text-red-500' : 'text-green-500' 
+                                        },
+                                        { 
+                                            label: 'Potassium (K)', 
+                                            value: `${reportStats.potassium}%`, 
+                                            status: reportStats.potassium < 35 ? 'Deficient' : reportStats.potassium > 80 ? 'High' : 'Optimal', 
+                                            color: reportStats.potassium < 35 ? 'text-red-500' : 'text-green-500' 
+                                        },
                                     ].map(stat => (
                                         <div key={stat.label} className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 transition-all group/stat cursor-default">
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>

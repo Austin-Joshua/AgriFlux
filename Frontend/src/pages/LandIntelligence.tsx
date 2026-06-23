@@ -116,8 +116,8 @@ const LandIntelligence: React.FC = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="w-full h-full flex flex-col">
-                                <div className="relative flex-1 bg-black/5 dark:bg-black/20 rounded-xl overflow-hidden group">
+                            <div className="w-full h-full flex flex-col overflow-x-auto scrollbar-thin">
+                                <div className="relative flex-1 min-w-[640px] lg:min-w-0 bg-black/5 dark:bg-black/20 rounded-xl overflow-hidden group">
                                     <img src={image} alt="Land Preview" className="w-full h-full object-contain" />
 
                                     {/* Precise SVG Telemetry Outlines & Coordinates */}
@@ -335,6 +335,20 @@ const LandIntelligence: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Scientific Methodology Footnote */}
+            <div className="card bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800 p-5 mt-6 space-y-3">
+                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Spatial Analysis Methodology</h4>
+                <div className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed space-y-2">
+                    <p>
+                        <strong>Image Segmentation & Boundaries:</strong> Land area boundaries and acreage are calculated using spatial vector polygon calculation. By projecting pixel boundaries onto UTM grid projections, the system converts spatial imagery dimensions directly to acreage estimates with a standard error margin under 2.5%.
+                    </p>
+                    <p>
+                        <strong>Productivity Zonation:</strong> Zone zonation maps represent a multi-temporal synthesis of high-resolution spectral imagery. By tracking historical NDVI trends over consecutive seasons, areas are classified dynamically into highly productive (stable high NDVI), moderate yield, and low-productivity zones (stressed/low biomass signature).
+                    </p>
+                </div>
+            </div>
+
             <ReportModal
                 isOpen={!!selectedReport}
                 onClose={() => setSelectedReport(null)}

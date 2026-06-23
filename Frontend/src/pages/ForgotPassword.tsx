@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Leaf, Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config';
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSent(true);
+        setError('');
+        setIsLoading(true);
+        try {
+            await axios.post(`${API_URL}/auth/forgot-password`, { email });
+            setSent(true);
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'An error occurred. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -38,6 +51,13 @@ const ForgotPassword: React.FC = () => {
                             <h2 className="text-2xl font-bold text-gray-900 dark:text-white font-display mb-1">Forgot Password?</h2>
                             <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Enter your email to receive a reset link</p>
 
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-2 text-sm text-red-600 dark:text-red-400">
+                                    <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                                    <span>{error}</span>
+                                </div>
+                            )}
+
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="label">Email Address</label>
@@ -54,7 +74,13 @@ const ForgotPassword: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <button type="submit" className="btn-primary w-full py-3">Send Reset Link</button>
+                                <button 
+                                    type="submit" 
+                                    disabled={isLoading}
+                                    className="btn-primary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+                                >
+                                    {isLoading ? 'Sending Link...' : 'Send Reset Link'}
+                                </button>
                             </form>
 
                             <div className="mt-4 text-center">

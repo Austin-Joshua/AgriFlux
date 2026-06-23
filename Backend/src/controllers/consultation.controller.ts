@@ -51,6 +51,14 @@ export const bookConsultation = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Please provide all required fields' });
         }
 
+        if (query.length < 10) {
+            return res.status(400).json({ message: 'Query description must be at least 10 characters long.' });
+        }
+
+        if (query.length > 500) {
+            return res.status(400).json({ message: 'Query description cannot exceed 500 characters.' });
+        }
+
         if (!isDBConnected) {
             const newConsultation: MockConsultation = {
                 _id: 'mock-' + Math.random().toString(36).substring(2, 9),

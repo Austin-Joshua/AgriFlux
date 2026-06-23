@@ -176,7 +176,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Stat Cards Grid — Standardized to 3-column focus on wider screens if appropriate, but keeping 4 for dashboard symmetry in stat row might be okay; however user said 3. Let's try 3 for main blocks. */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
                 <StatCard
                     title={t('dashboard.soilHealth')} value={`${soilScore}/100`} change="+5 pts"
                     icon={<Leaf size={22} className="text-earth-600" />}
@@ -227,37 +227,39 @@ const Dashboard: React.FC = () => {
                         className="cursor-pointer group/chart" 
                         onClick={() => toast.info('📊 AI Insight: Yield expected to peak in May due to optimized irrigation.')}
                     >
-                        <ResponsiveContainer width="100%" height={160}>
-                            {activeChart === 'area' ? (
-                                <AreaChart data={yieldData}>
-                                    <defs>
-                                        <linearGradient id="yieldGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
-                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
-                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
-                                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
-                                    <Area type="monotone" dataKey="yield" stroke="#22c55e" fill="url(#yieldGrad)" strokeWidth={2.5} name="Actual" />
-                                    <Area type="monotone" dataKey="forecast" stroke="#f59e0b" fill="url(#forecastGrad)" strokeWidth={2} strokeDasharray="5 3" name="AI Forecast" />
-                                </AreaChart>
-                            ) : (
-                                <BarChart data={yieldData}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
-                                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
-                                    <Bar dataKey="yield" fill="#22c55e" radius={[6, 6, 0, 0]} name="Actual" />
-                                    <Bar dataKey="forecast" fill="#f59e0b" radius={[6, 6, 0, 0]} name="AI Forecast" />
-                                </BarChart>
-                            )}
-                        </ResponsiveContainer>
+                        <div role="img" aria-label="Crop Yield Trend Chart comparing actual yield and AI forecast over the last 6 months">
+                            <ResponsiveContainer width="100%" height={160}>
+                                {activeChart === 'area' ? (
+                                    <AreaChart data={yieldData}>
+                                        <defs>
+                                            <linearGradient id="yieldGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
+                                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                            </linearGradient>
+                                            <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+                                                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
+                                        <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                        <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
+                                        <Area type="monotone" dataKey="yield" stroke="#22c55e" fill="url(#yieldGrad)" strokeWidth={2.5} name="Actual" />
+                                        <Area type="monotone" dataKey="forecast" stroke="#f59e0b" fill="url(#forecastGrad)" strokeWidth={2} strokeDasharray="5 3" name="AI Forecast" />
+                                    </AreaChart>
+                                ) : (
+                                    <BarChart data={yieldData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
+                                        <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                        <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: 12 }} />
+                                        <Bar dataKey="yield" fill="#22c55e" radius={[6, 6, 0, 0]} name="Actual" />
+                                        <Bar dataKey="forecast" fill="#f59e0b" radius={[6, 6, 0, 0]} name="AI Forecast" />
+                                    </BarChart>
+                                )}
+                            </ResponsiveContainer>
+                        </div>
                         <div className="mt-2 text-[10px] text-gray-400 text-center opacity-0 group-hover/chart:opacity-100 transition-opacity font-bold uppercase tracking-widest">
                             Click for Deep Analysis Insights
                         </div>

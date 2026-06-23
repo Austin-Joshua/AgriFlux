@@ -25,5 +25,6 @@ const socialLimiter = rateLimit({
 router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);
 router.post('/social-login', socialLimiter, authController.socialLogin);
+router.post('/forgot-password', authLimiter, authController.forgotPassword);
 
 export default router;

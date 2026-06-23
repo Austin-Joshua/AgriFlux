@@ -33,6 +33,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+            {/* Skip to Content link for accessibility */}
+            <a 
+                href="#main-content" 
+                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg z-[200] font-bold text-xs"
+            >
+                Skip to main content
+            </a>
+
+            {/* Accessible Live Region Announcer */}
+            <div aria-live="polite" aria-atomic="true" className="sr-only" id="accessibility-announcer"></div>
+
             {isFromCitizenOne && (
                 <a
                     href="https://citizenone.vercel.app"
@@ -58,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     onCollapseToggle={() => setSidebarCollapsed(prev => !prev)}
                 />
                 {/* Extra top padding if CitizenOne banner is visible; extra bottom padding on mobile for bottom nav */}
-                <main className={`flex-1 p-4 md:p-6 overflow-auto pb-36 lg:pb-6 ${isFromCitizenOne ? 'pt-16' : ''}`}>
+                <main id="main-content" className={`flex-1 p-4 md:p-6 overflow-auto pb-36 lg:pb-6 ${isFromCitizenOne ? 'pt-16' : ''}`}>
                     <div className="max-w-7xl mx-auto animate-fade-in">
                         {children}
                     </div>

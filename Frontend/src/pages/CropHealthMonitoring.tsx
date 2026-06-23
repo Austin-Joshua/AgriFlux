@@ -327,6 +327,27 @@ const CropHealthMonitoring: React.FC = () => {
                     ))}
                 </div>
             </div>
+
+            {/* Scientific Footnotes & Data Source Disclaimer */}
+            <div className="card bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800 p-5 mt-6 space-y-3">
+                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Scientific Methodology & Data Sources</h4>
+                <div className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed space-y-2">
+                    <p>
+                        <strong>Data Source:</strong> Remote sensing spectral data is retrieved from the Copernicus Sentinel-2 satellite constellation at a spatial resolution of 10 meters, with a 5-day revisit cycle. Ground-level validation is synced with our local IoT soil moisture arrays.
+                    </p>
+                    <p>
+                        <strong>Vegetation Indices Formulae:</strong>
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1">
+                        <li>
+                            <strong>Normalized Difference Vegetation Index (NDVI):</strong> <code className="bg-gray-100 dark:bg-gray-800/60 px-1 py-0.5 rounded font-mono text-primary-600 dark:text-primary-400">NDVI = (NIR - Red) / (NIR + Red)</code>. Used to estimate vegetation health, density, and chlorophyll concentration.
+                        </li>
+                        <li>
+                            <strong>Enhanced Vegetation Index (EVI):</strong> <code className="bg-gray-100 dark:bg-gray-800/60 px-1 py-0.5 rounded font-mono text-primary-600 dark:text-primary-400">EVI = 2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))</code>. Optimized to reduce soil background and atmospheric scatter in high biomass density plots.
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     );
 };

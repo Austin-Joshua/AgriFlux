@@ -266,6 +266,8 @@ const IrrigationIntelligence: React.FC = () => {
                                 ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20' 
                                 : 'bg-green-600 hover:bg-green-700 text-white shadow-green-600/20'
                         }`}
+                        aria-label={pumpActive ? "Stop Irrigation Pump" : "Start Irrigation Pump"}
+                        aria-pressed={pumpActive}
                     >
                         {isLoading ? 'Connecting...' : isToggling ? 'Syncing...' : pumpActive ? 'Stop Pump' : 'Start Pump'}
                     </button>
