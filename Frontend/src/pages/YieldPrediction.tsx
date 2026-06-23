@@ -17,13 +17,16 @@ const predictYield = (inputs: Record<string, number | string>) => {
     const n = Number(inputs.nitrogen), p = Number(inputs.phosphorus), k = Number(inputs.potassium);
     const rain = Number(inputs.rainfall), temp = Number(inputs.temperature);
     const fert = Number(inputs.fertilizerUsed);
+    const hum = Number(inputs.humidity);
 
     const nutrientScore = Math.min((n / 100 + p / 50 + k / 60) / 3, 1.3);
     const weatherScore = rain > 600 && rain < 1200 ? 1.2 : rain < 300 ? 0.7 : 1.0;
     const tempScore = temp >= 20 && temp <= 30 ? 1.1 : temp < 15 || temp > 38 ? 0.7 : 1.0;
     const fertScore = fert > 200 ? 1.15 : fert < 50 ? 0.85 : 1.0;
+    // Humidity: high humidity (>85%) increases disease pressure; low (<40%) increases drought stress
+    const humidityScore = hum > 85 ? 0.88 : hum < 40 ? 0.92 : 1.0;
 
-    const predicted = Math.round(base * nutrientScore * weatherScore * tempScore * fertScore);
+    const predicted = Math.round(base * nutrientScore * weatherScore * tempScore * fertScore * humidityScore);
     const historical = Number(inputs.historicalYield) || base;
     const improvement = (((predicted - historical) / historical) * 100).toFixed(1);
     const risk = predicted < historical * 0.85 ? 'High' : predicted < historical * 0.95 ? 'Medium' : 'Low';
@@ -59,7 +62,7 @@ const YieldPrediction: React.FC = () => {
             content = (
                 <div className="space-y-4">
                     <p>Current Predicted Yield: <strong>{val} kg</strong></p>
-                    <p>This prediction uses a Deep Neural Network (DNN) trained on regional data. It considers nutrient availability, historical weather patterns, and current crop stage.</p>
+                    <p>This prediction uses a multi-factor crop yield model incorporating nutrient availability (NPK), rainfall, temperature, humidity, and fertilizer usage. The model is calibrated against regional baseline yields for each crop type.</p>
                 </div>
             );
             type = 'success';

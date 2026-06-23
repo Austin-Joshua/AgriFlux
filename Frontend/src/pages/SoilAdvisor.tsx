@@ -384,7 +384,7 @@ const SoilAdvisor: React.FC = () => {
                                                 />
                                             </div>
                                             <p className="text-xs font-black text-white uppercase tracking-widest animate-pulse">
-                                                AI ANALYZING PATTERNS... {scanProgress}%
+                                                DEMO SIMULATION ACTIVE... {scanProgress}%
                                             </p>
                                         </div>
                                         {/* Scanner Beam Animation */}

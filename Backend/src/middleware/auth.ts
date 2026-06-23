@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { env } from '../config/env';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'agriflux_secret_key_2026';
+const JWT_SECRET = env.JWT_SECRET;
+
 
 export const auth = (req: Request, res: Response, next: NextFunction) => {
     try {

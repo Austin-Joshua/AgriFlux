@@ -4,11 +4,10 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import User from '../../../Database/Models/User';
 import { isDBConnected } from '../config/db';
+import { env } from '../config/env';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'agriflux_secret_key_2026';
+const JWT_SECRET = env.JWT_SECRET;
 
-    // Demo mode: simulate registration
-    // No longer supported in production
 
 export const register = async (req: Request, res: Response) => {
     try {
