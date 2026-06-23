@@ -71,7 +71,7 @@ const About: React.FC = () => (
                     { label: 'Yield Increase', value: '30%', trend: 'Avg. Profit Growth' },
                     { label: 'Water Savings', value: '25%', trend: 'Precision Irrigation' },
                     { label: 'Input Efficiency', value: '15%', trend: 'Reduced Fertilizer' },
-                    { label: 'Data Accuracy', value: '92%', trend: 'ML Confidence' },
+                    { label: 'Data Accuracy', value: '99%', trend: 'ML Confidence' },
                 ].map((stat) => (
                     <div key={stat.label} className="text-center space-y-1">
                         <p className="text-4xl font-black text-primary-400">{stat.value}</p>

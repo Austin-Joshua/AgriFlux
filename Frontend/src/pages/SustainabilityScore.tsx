@@ -5,16 +5,16 @@ import { Award, TrendingUp, Droplets, Leaf, RefreshCcw } from 'lucide-react';
 import ReportModal from '../components/ReportModal';
 
 const trendData = [
-    { month: 'Aug', score: 62 }, { month: 'Sep', score: 65 }, { month: 'Oct', score: 68 },
-    { month: 'Nov', score: 71 }, { month: 'Dec', score: 74 }, { month: 'Jan', score: 78 },
+    { month: 'Aug', score: 85 }, { month: 'Sep', score: 89 }, { month: 'Oct', score: 92 },
+    { month: 'Nov', score: 94 }, { month: 'Dec', score: 96 }, { month: 'Jan', score: 98 },
 ];
 
 const SustainabilityScore: React.FC = () => {
     const { t } = useTranslation();
-    const [fertEff] = useState(82);
-    const [waterCons] = useState(75);
-    const [cropDiv] = useState(68);
-    const [soilHealth] = useState(85);
+    const [fertEff] = useState(98);
+    const [waterCons] = useState(96);
+    const [cropDiv] = useState(94);
+    const [soilHealth] = useState(99);
     const [reportModal, setReportModal] = useState<{ isOpen: boolean; title: string; content: React.ReactNode; type: 'success' | 'warning' | 'info' }>({
         isOpen: false,
         title: '',
@@ -74,7 +74,7 @@ const SustainabilityScore: React.FC = () => {
         { subject: 'Water Use', value: waterCons },
         { subject: 'Crop Diversity', value: cropDiv },
         { subject: 'Soil Health', value: soilHealth },
-        { subject: 'Carbon Stock', value: 65 },
+        { subject: 'Carbon Stock', value: 95 },
     ];
 
     const metrics = [

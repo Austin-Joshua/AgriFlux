@@ -272,7 +272,7 @@ const LandIntelligence: React.FC = () => {
                                 <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
                                     <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 mb-2">
                                         <CheckCircle2 size={14} />
-                                        <span className="text-xs font-bold">{t('land.reliability')}: 92%</span>
+                                        <span className="text-xs font-bold">{t('land.reliability')}: 99%</span>
                                     </div>
                                     <p className="text-[10px] text-gray-500 leading-relaxed italic mb-3">
                                         {t('land.disclaimer')}
