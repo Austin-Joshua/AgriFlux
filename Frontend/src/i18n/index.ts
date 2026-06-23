@@ -10,20 +10,20 @@ import kn from './locales/kn.json';
 import ml from './locales/ml.json';
 
 i18next
-    .use(LanguageDetector)
-    .use(initReactI18next)
-    .init({
-        fallbackLng: 'en',
-        debug: false,
-        resources: {
-            en: { translation: en },
-            hi: { translation: hi },
-            ta: { translation: ta },
-            te: { translation: te },
-            kn: { translation: kn },
-            ml: { translation: ml },
-        },
-        interpolation: { escapeValue: false },
-    });
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    fallbackLng: 'en',
+    debug: false,
+    resources: {
+      en: { translation: en },
+      hi: { translation: hi },
+      ta: { translation: ta },
+      te: { translation: te },
+      kn: { translation: kn },
+      ml: { translation: ml },
+    },
+    interpolation: { escapeValue: false },
+  });
 
 export default i18next;

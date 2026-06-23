@@ -2,9 +2,9 @@
 /* stylelint-disable at-rule-no-unknown */
 /* css-lint-disable */
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* ================================
    CUSTOM KEYFRAMES
@@ -78,7 +78,6 @@
 }
 
 @keyframes glow-pulse {
-
   0%,
   100% {
     box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
@@ -101,10 +100,20 @@
 }
 
 @keyframes scan-beam {
-  0% { top: 0%; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
 }
 
 .animate-scan-beam {
@@ -116,12 +125,21 @@
 }
 
 @keyframes shimmer-fast {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .shimmer-fast {
-  background: linear-gradient(90deg, rgba(255,255,255,0) 25%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 25%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer-fast 1s infinite linear;
 }
@@ -136,7 +154,19 @@
     --color-dark-surface-elevated: #21262d;
   }
 
-  a, button, input, select, textarea, [role="button"], .card, .glass-card, .btn-primary, .btn-outline, .nav-item, .nav-item-active, .card-clickable {
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [role='button'],
+  .card,
+  .glass-card,
+  .btn-primary,
+  .btn-outline,
+  .nav-item,
+  .nav-item-active,
+  .card-clickable {
     transition-property: color, background-color, border-color, box-shadow, transform, opacity;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
@@ -179,7 +209,6 @@
    GLASS & 3D COMPONENTS
 ================================ */
 @layer components {
-
   /* Glass Sidebar */
   .glass-sidebar {
     background: rgba(255, 255, 255, 0.85);
@@ -216,13 +245,17 @@
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.12),
+      0 4px 16px rgba(0, 0, 0, 0.06);
   }
 
   .dark .glass-panel {
     background: rgba(31, 41, 55, 0.97);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      0 4px 16px rgba(0, 0, 0, 0.3);
   }
 
   /* Glass Card — 3D feel */
@@ -232,35 +265,44 @@
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
     border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(0, 0, 0, 0.04),
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.07),
+      0 1px 4px rgba(0, 0, 0, 0.04),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
     border-radius: 1.25rem;
     padding: 1rem;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark .card {
     background: rgba(18, 25, 38, 0.8);
     border: 1px solid rgba(34, 197, 94, 0.15);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 1px 4px rgba(0, 0, 0, 0.35),
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      0 1px 4px rgba(0, 0, 0, 0.35),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .card:hover {
     transform: translateY(-3px) scale(1.005);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06),
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.12),
+      0 4px 12px rgba(0, 0, 0, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   .dark .card:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3),
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 4px 12px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   /* Glass shine effect */
   .card::after {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: -100%;
@@ -283,12 +325,16 @@
 
   .card-clickable:hover {
     transform: translateY(-5px) scale(1.01);
-    box-shadow: 0 16px 48px rgba(34, 197, 94, 0.15), 0 4px 16px rgba(0, 0, 0, 0.07),
+    box-shadow:
+      0 16px 48px rgba(34, 197, 94, 0.15),
+      0 4px 16px rgba(0, 0, 0, 0.07),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   .dark .card-clickable:hover {
-    box-shadow: 0 16px 48px rgba(34, 197, 94, 0.12), 0 4px 16px rgba(0, 0, 0, 0.4),
+    box-shadow:
+      0 16px 48px rgba(34, 197, 94, 0.12),
+      0 4px 16px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
@@ -388,7 +434,7 @@
   .page-header {
     @apply text-2xl lg:text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight leading-tight;
   }
-  
+
   .dark .page-header {
     @apply text-white;
   }
@@ -469,7 +515,12 @@
 
   /* Shimmer loading effect */
   .shimmer {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
     background-size: 200px 100%;
     animation: shimmer 1.5s infinite;
   }
@@ -577,8 +628,14 @@
 
 /* Smooth fade-in-up for page-level elements (404, Error) */
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .animate-fade-in-up {
   animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -586,8 +643,12 @@
 
 /* Shimmer skeleton animation */
 @keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
 }
 .shimmer {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -612,7 +673,7 @@
 @media (max-width: 1023px) {
   button,
   a,
-  [role="button"] {
+  [role='button'] {
     min-height: 44px;
     min-width: 44px;
   }
@@ -660,22 +721,30 @@
 
 /* Elevation 1 — Cards */
 .shadow-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Elevation 2 — Hovered Cards */
 .shadow-card-hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 8px 24px rgba(0,0,0,0.07);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.07);
 }
 
 /* Elevation 3 — Dropdowns / Modals */
 .shadow-panel {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.14),
+    0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Elevation 4 — Floating / Overlays */
 .shadow-floating {
-  box-shadow: 0 16px 48px rgba(0,0,0,0.20), 0 4px 16px rgba(0,0,0,0.10);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* ================================
@@ -706,8 +775,14 @@ body {
 
 /* Applied via animate-fade-in on .max-w-7xl wrapper in Layout */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .animate-fade-in {
   animation: page-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -719,12 +794,17 @@ body {
 
 /* Prevent card text overflow on small screens */
 @media (max-width: 640px) {
-  .card, .glass-card {
+  .card,
+  .glass-card {
     padding: 1rem;
   }
 
   /* Ensure text doesn't overflow narrow mobile viewports */
-  p, h1, h2, h3, span {
+  p,
+  h1,
+  h2,
+  h3,
+  span {
     overflow-wrap: break-word;
     word-break: break-word;
   }

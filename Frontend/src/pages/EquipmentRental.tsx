@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tractor, Calendar, Search, MapPin, Gauge, Fuel, Info, CheckCircle2 } from 'lucide-react';
+import { Tractor, Calendar, Search, MapPin, Fuel, Info, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Equipment {
@@ -27,7 +27,7 @@ const mockEquipment: Equipment[] = [
     image: '/equipments/mahindra-tractor.png',
     distance: 4.2,
     availability: true,
-    features: ['47 HP', 'Power Steering', 'Oil Immersed Brakes']
+    features: ['47 HP', 'Power Steering', 'Oil Immersed Brakes'],
   },
   {
     id: '2',
@@ -39,7 +39,7 @@ const mockEquipment: Equipment[] = [
     image: '/equipments/johndeere-tractor.png',
     distance: 8.5,
     availability: true,
-    features: ['50 HP', '4WD Options', 'High Backup Torque']
+    features: ['50 HP', '4WD Options', 'High Backup Torque'],
   },
   {
     id: '3',
@@ -51,7 +51,7 @@ const mockEquipment: Equipment[] = [
     image: '/equipments/seed-drill.png',
     distance: 12.1,
     availability: false,
-    features: ['11 Tynes', 'Fertilizer Box', 'Adjustable Depth']
+    features: ['11 Tynes', 'Fertilizer Box', 'Adjustable Depth'],
   },
   {
     id: '4',
@@ -63,7 +63,7 @@ const mockEquipment: Equipment[] = [
     image: '/equipments/harvester.png',
     distance: 18.4,
     availability: true,
-    features: ['A/C Cabin', '14Ft Cutter Bar', 'Grain Tank']
+    features: ['A/C Cabin', '14Ft Cutter Bar', 'Grain Tank'],
   },
   {
     id: '5',
@@ -75,7 +75,7 @@ const mockEquipment: Equipment[] = [
     image: '/equipments/rotavator.png',
     distance: 15.2,
     availability: true,
-    features: ['42 Blades', 'Gear Drive', 'High Trailing Board']
+    features: ['42 Blades', 'Gear Drive', 'High Trailing Board'],
   },
   {
     id: '6',
@@ -87,8 +87,8 @@ const mockEquipment: Equipment[] = [
     image: '/equipments/drone.png',
     distance: 22.0,
     availability: true,
-    features: ['16L Tank', 'Auto Route', 'Obstacle Avoidance']
-  }
+    features: ['16L Tank', 'Auto Route', 'Obstacle Avoidance'],
+  },
 ];
 
 const EquipmentRental: React.FC = () => {
@@ -100,7 +100,7 @@ const EquipmentRental: React.FC = () => {
     (eq) =>
       (category === 'All' || eq.type === category) &&
       (eq.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       eq.location.toLowerCase().includes(searchTerm.toLowerCase()))
+        eq.location.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -108,7 +108,7 @@ const EquipmentRental: React.FC = () => {
       {/* Header — Standardized Glassmorph with subtle accents */}
       <div className="relative overflow-hidden rounded-3xl p-8 shadow-xl bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700/30 backdrop-blur-md">
         <div className="absolute -right-20 -top-20 opacity-5 dark:opacity-10 pointer-events-none transition-transform duration-1000 group-hover:scale-110">
-           <Tractor size={300} className="text-primary-600" />
+          <Tractor size={300} className="text-primary-600" />
         </div>
         <div className="relative z-10 max-w-xl">
           <h1 className="page-header flex items-center gap-3">
@@ -120,9 +120,7 @@ const EquipmentRental: React.FC = () => {
           </p>
         </div>
         <div className="relative z-10 flex gap-3 mt-6 sm:mt-0">
-          <button className="btn-primary">
-            List Equipment
-          </button>
+          <button className="btn-primary">List Equipment</button>
         </div>
       </div>
 
@@ -139,18 +137,20 @@ const EquipmentRental: React.FC = () => {
           />
         </div>
         <div className="flex flex-wrap gap-2">
-            {['All', 'Tractor', 'Implement', 'Harvester', 'Drone'].map(cat => (
-                <button 
-                  key={cat}
-                  onClick={() => setCategory(cat)}
-                  className={`px-5 py-3 rounded-2xl font-medium transition-all shadow-sm border
-                  ${category === cat 
-                    ? 'bg-primary-600 border-primary-600 text-white' 
-                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-primary-500/50'}`}
-                >
-                  {cat}
-                </button>
-            ))}
+          {['All', 'Tractor', 'Implement', 'Harvester', 'Drone'].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={`px-5 py-3 rounded-2xl font-medium transition-all shadow-sm border
+                  ${
+                    category === cat
+                      ? 'bg-primary-600 border-primary-600 text-white'
+                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-primary-500/50'
+                  }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -166,54 +166,81 @@ const EquipmentRental: React.FC = () => {
           >
             {/* Image Box */}
             <div className="w-full p-3">
-               <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                  <img src={eq.image} alt={eq.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute top-2 left-2 flex gap-2">
-                     <span className={`px-2.5 py-1 text-xs font-bold rounded-lg shadow-sm backdrop-blur-md ${eq.availability ? 'bg-green-500/90 text-white' : 'bg-red-500/90 text-white'}`}>
-                        {eq.availability ? 'Available Now' : 'Currently Rented'}
-                     </span>
-                  </div>
-               </div>
+              <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <img
+                  src={eq.image}
+                  alt={eq.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute top-2 left-2 flex gap-2">
+                  <span
+                    className={`px-2.5 py-1 text-xs font-bold rounded-lg shadow-sm backdrop-blur-md ${eq.availability ? 'bg-green-500/90 text-white' : 'bg-red-500/90 text-white'}`}
+                  >
+                    {eq.availability ? 'Available Now' : 'Currently Rented'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Details Box */}
             <div className="w-full px-5 pb-5 pt-2 flex flex-col justify-between flex-1">
               <div>
-                 <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">{eq.name}</h3>
-                    <div className="bg-primary-50 dark:bg-primary-900/30 px-3 py-1.5 rounded-xl border border-primary-100 dark:border-primary-800/50 text-right">
-                       <span className="block text-xs text-primary-600 dark:text-primary-400 font-medium">Rent</span>
-                       <span className="block text-lg font-black text-primary-700 dark:text-primary-300">₹{eq.pricePerDay}<span className="text-xs font-normal">/day</span></span>
-                    </div>
-                 </div>
-                 
-                 <div className="flex gap-4 mt-3 text-sm text-gray-600 dark:text-gray-400 font-medium">
-                    <div className="flex items-center gap-1.5"><MapPin size={16} className="text-gray-400" /> {eq.distance} km away</div>
-                    <div className="flex items-center gap-1.5"><Fuel size={16} className="text-gray-400" /> Diesel</div>
-                 </div>
+                <div className="flex justify-between items-start">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+                    {eq.name}
+                  </h3>
+                  <div className="bg-primary-50 dark:bg-primary-900/30 px-3 py-1.5 rounded-xl border border-primary-100 dark:border-primary-800/50 text-right">
+                    <span className="block text-xs text-primary-600 dark:text-primary-400 font-medium">
+                      Rent
+                    </span>
+                    <span className="block text-lg font-black text-primary-700 dark:text-primary-300">
+                      ₹{eq.pricePerDay}
+                      <span className="text-xs font-normal">/day</span>
+                    </span>
+                  </div>
+                </div>
 
-                 <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 uppercase font-bold tracking-wider">Key Features</p>
-                    <div className="flex flex-wrap gap-2">
-                       {eq.features.map(f => (
-                          <span key={f} className="px-2.5 py-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                             <CheckCircle2 size={12} className="text-green-500" /> {f}
-                          </span>
-                       ))}
-                    </div>
-                 </div>
+                <div className="flex gap-4 mt-3 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <MapPin size={16} className="text-gray-400" /> {eq.distance} km away
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Fuel size={16} className="text-gray-400" /> Diesel
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 uppercase font-bold tracking-wider">
+                    Key Features
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {eq.features.map((f) => (
+                      <span
+                        key={f}
+                        className="px-2.5 py-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 flex items-center gap-1"
+                      >
+                        <CheckCircle2 size={12} className="text-green-500" /> {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="mt-5 flex gap-3">
-                 <button className={`flex-1 py-2.5 rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2
+                <button
+                  className={`flex-1 py-2.5 rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2
                      ${eq.availability ? 'bg-primary-600 hover:bg-primary-700 text-white hover:scale-[1.02]' : 'bg-gray-200 dark:bg-gray-800 text-gray-400 cursor-not-allowed'}`}
-                     disabled={!eq.availability}>
-                    <Calendar size={18} />
-                    {eq.availability ? 'Book Now' : 'Not Available'}
-                 </button>
-                 <button className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-all" title="Owner Details">
-                    <Info size={20} />
-                 </button>
+                  disabled={!eq.availability}
+                >
+                  <Calendar size={18} />
+                  {eq.availability ? 'Book Now' : 'Not Available'}
+                </button>
+                <button
+                  className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-all"
+                  title="Owner Details"
+                >
+                  <Info size={20} />
+                </button>
               </div>
             </div>
           </motion.div>
@@ -221,11 +248,11 @@ const EquipmentRental: React.FC = () => {
       </div>
 
       {filteredEquipment.length === 0 && (
-         <div className="text-center py-16">
-            <Tractor size={48} className="mx-auto text-gray-300 dark:text-gray-700 mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">No equipment found</h3>
-            <p className="text-gray-500 mt-2">Try adjusting your filters or search terms.</p>
-         </div>
+        <div className="text-center py-16">
+          <Tractor size={48} className="mx-auto text-gray-300 dark:text-gray-700 mb-4" />
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">No equipment found</h3>
+          <p className="text-gray-500 mt-2">Try adjusting your filters or search terms.</p>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -24,14 +24,16 @@ try {
   console.error('🔥 Firebase initialization failed:', error);
 }
 
-export const auth = app ? getAuth(app) : null as any;
+export const auth = app ? getAuth(app) : (null as any);
 export const googleProvider = new GoogleAuthProvider();
 
 // Only initialize analytics in-browser (not SSR / tests)
 if (app) {
-  isSupported().then((supported) => {
-    if (supported) getAnalytics(app);
-  }).catch(() => {});
+  isSupported()
+    .then((supported) => {
+      if (supported) getAnalytics(app);
+    })
+    .catch(() => {});
 }
 
 export default app;

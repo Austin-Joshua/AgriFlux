@@ -1,7 +1,13 @@
 export class AIService {
   static async predictYield(data: any) {
     const crop = data.cropType || 'Rice';
-    const baseYields: Record<string, number> = { Rice: 4500, Wheat: 3800, Maize: 5000, Cotton: 2200, Soybean: 3100 };
+    const baseYields: Record<string, number> = {
+      Rice: 4500,
+      Wheat: 3800,
+      Maize: 5000,
+      Cotton: 2200,
+      Soybean: 3100,
+    };
     const base = baseYields[crop] || 3000;
 
     const n = Number(data.nitrogen) || 60;
@@ -30,8 +36,10 @@ export class AIService {
     if (n < 60) suggestions.push('Replenish Nitrogen via Urea or organic compost.');
     if (p < 35) suggestions.push('Apply Single Superphosphate (SSP) to improve root development.');
     if (k < 45) suggestions.push('Incorporate Muriate of Potash (MOP) or organic wood ash.');
-    if (ph < 5.8) suggestions.push('Apply agricultural lime (calcium carbonate) to neutralize soil acidity.');
-    if (ph > 7.6) suggestions.push('Apply elemental sulfur or organic mulch to reduce alkaline pH.');
+    if (ph < 5.8)
+      suggestions.push('Apply agricultural lime (calcium carbonate) to neutralize soil acidity.');
+    if (ph > 7.6)
+      suggestions.push('Apply elemental sulfur or organic mulch to reduce alkaline pH.');
 
     if (suggestions.length === 0) {
       suggestions.push('Maintain current NPK replenishment cycle and soil aeration.');
@@ -52,20 +60,36 @@ export class AIService {
     const schedule = [];
     if (moisture > 70) {
       schedule.push(
-        { day: 'Wednesday', amount: '10mm', note: 'Suppressed watering due to high soil moisture levels.' },
+        {
+          day: 'Wednesday',
+          amount: '10mm',
+          note: 'Suppressed watering due to high soil moisture levels.',
+        },
         { day: 'Saturday', amount: '12mm', note: 'Routine soil hydration.' }
       );
     } else {
       const heatFactor = temp > 35 ? 'Increased volume' : 'Standard volume';
       if (crop.toLowerCase() === 'rice') {
         schedule.push(
-          { day: 'Monday', amount: temp > 35 ? '25mm' : '20mm', note: `${heatFactor} for seedling sub-flooding.` },
+          {
+            day: 'Monday',
+            amount: temp > 35 ? '25mm' : '20mm',
+            note: `${heatFactor} for seedling sub-flooding.`,
+          },
           { day: 'Wednesday', amount: '15mm', note: 'Mid-week moisture maintenance.' },
-          { day: 'Friday', amount: temp > 35 ? '25mm' : '20mm', note: `${heatFactor} to support high transpiration.` }
+          {
+            day: 'Friday',
+            amount: temp > 35 ? '25mm' : '20mm',
+            note: `${heatFactor} to support high transpiration.`,
+          }
         );
       } else {
         schedule.push(
-          { day: 'Tuesday', amount: temp > 35 ? '18mm' : '15mm', note: `${heatFactor} for crop root zone.` },
+          {
+            day: 'Tuesday',
+            amount: temp > 35 ? '18mm' : '15mm',
+            note: `${heatFactor} for crop root zone.`,
+          },
           { day: 'Saturday', amount: temp > 35 ? '20mm' : '15mm', note: 'Weekend crop irrigation.' }
         );
       }
@@ -109,7 +133,9 @@ export class AIService {
     score = Math.max(30, Math.min(98, score));
 
     if (recommendations.length === 0) {
-      recommendations.push('Soil NPK levels and pH are optimal. Add green manure to maintain organic carbon.');
+      recommendations.push(
+        'Soil NPK levels and pH are optimal. Add green manure to maintain organic carbon.'
+      );
     }
 
     return {
@@ -129,35 +155,68 @@ export class AIService {
 
     if (temp > 38) {
       riskScore += 25;
-      alerts.push({ type: 'danger', title: 'Severe Heatwave Alert', body: 'Temperatures exceeding crop threshold. Increase watering schedule.' });
+      alerts.push({
+        type: 'danger',
+        title: 'Severe Heatwave Alert',
+        body: 'Temperatures exceeding crop threshold. Increase watering schedule.',
+      });
     } else if (temp > 34) {
       riskScore += 10;
-      alerts.push({ type: 'warning', title: 'High Temperature Advisory', body: 'Monitor soil moisture evaporation rate.' });
+      alerts.push({
+        type: 'warning',
+        title: 'High Temperature Advisory',
+        body: 'Monitor soil moisture evaporation rate.',
+      });
     }
 
     if (humidity < 35 && temp > 32) {
       riskScore += 15;
-      alerts.push({ type: 'warning', title: 'Dry Air Stress', body: 'Low atmospheric moisture. High risk of transpiration shock.' });
+      alerts.push({
+        type: 'warning',
+        title: 'Dry Air Stress',
+        body: 'Low atmospheric moisture. High risk of transpiration shock.',
+      });
     }
 
     if (windSpeed > 35) {
       riskScore += 20;
-      alerts.push({ type: 'danger', title: 'High Wind Velocity', body: 'Crop lodging risk. Postpone any foliar spray applications.' });
+      alerts.push({
+        type: 'danger',
+        title: 'High Wind Velocity',
+        body: 'Crop lodging risk. Postpone any foliar spray applications.',
+      });
     }
 
     if (rainfall > 250) {
       riskScore += 30;
-      alerts.push({ type: 'danger', title: 'Excess Rainfall / Flooding', body: 'Risk of waterlogging. Clear drainage channels immediately.' });
+      alerts.push({
+        type: 'danger',
+        title: 'Excess Rainfall / Flooding',
+        body: 'Risk of waterlogging. Clear drainage channels immediately.',
+      });
     } else if (rainfall < 40) {
       riskScore += 15;
-      alerts.push({ type: 'warning', title: 'Low Precipitation', body: 'Deficit rainfall. Rely on alternate irrigation supply.' });
+      alerts.push({
+        type: 'warning',
+        title: 'Low Precipitation',
+        body: 'Deficit rainfall. Rely on alternate irrigation supply.',
+      });
     }
 
     riskScore = Math.min(100, riskScore);
 
     return {
       riskScore,
-      alerts: alerts.length > 0 ? alerts : [{ type: 'info', title: 'Stable Climate', body: 'No immediate agricultural risks detected.' }],
+      alerts:
+        alerts.length > 0
+          ? alerts
+          : [
+              {
+                type: 'info',
+                title: 'Stable Climate',
+                body: 'No immediate agricultural risks detected.',
+              },
+            ],
     };
   }
 
