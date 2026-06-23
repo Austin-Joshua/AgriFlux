@@ -68,7 +68,7 @@ const ProfitRiskIntelligence: React.FC = () => {
 
                     <div className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/20">
                         <div className="flex items-center gap-2 mb-2">
-                            <PieChart size={14} className="text-gold-500" />
+                            <PieChart size={14} className="text-teal-500" />
                             <span className="text-[10px] font-bold text-gray-500 uppercase">Market Risk</span>
                         </div>
                         <div className="flex items-center gap-2">

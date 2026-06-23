@@ -56,12 +56,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer group relative overflow-hidden
         ${collapsed ? 'justify-center' : ''}
         ${isActive
-                    ? 'bg-gradient-to-r from-primary-500/20 to-gold-500/10 text-primary-700 dark:text-primary-300 shadow-sm border border-primary-200/50 dark:border-primary-700/30'
+                    ? 'bg-gradient-to-r from-primary-500/20 to-teal-500/10 text-primary-700 dark:text-primary-300 shadow-sm border border-primary-200/50 dark:border-primary-700/30'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/40 hover:text-primary-700 dark:hover:text-primary-300'}`
             }>
             {({ isActive }) => (
                 <>
-                    {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-gradient-to-b from-primary-500 to-gold-500 rounded-r-full" />}
+                    {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-gradient-to-b from-primary-500 to-teal-500 rounded-r-full" />}
                     <Icon size={18} className={`flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-primary-600 dark:text-primary-400' : ''}`} />
                     {!collapsed && <span className="truncate max-w-[160px] xl:max-w-[180px]">{t(labelKey)}</span>}
                 </>
@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                     >
                         {!collapsed ? (
                             <div className="flex items-center gap-3">
-                                <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-md shadow-primary-500/20">
+                                <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-md shadow-primary-500/25 flex-shrink-0">
                                     <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
                                         <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
                                     </div>
@@ -99,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                                 </div>
                             </div>
                         ) : (
-                            <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-md shadow-primary-500/25 flex-shrink-0">
+                            <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-md shadow-primary-500/25 flex-shrink-0">
                                 <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
                                     <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
                                 </div>
@@ -125,7 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollaps
                     {/* User profile */}
                     {!collapsed ? (
                         <div className="mt-2 flex items-center gap-3 px-3 py-2.5 rounded-xl glass-card-sm">
-                            <div className="w-8 h-8 gradient-gold-green rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-md">
+                            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-teal-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-md">
                                 {user?.name?.charAt(0).toUpperCase() || 'F'}
                             </div>
                             <div className="flex-1 min-w-0">

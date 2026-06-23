@@ -73,7 +73,7 @@ const AuthLayout: React.FC = () => {
                         opacity: [0.1, 0.15, 0.1],
                     }}
                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold-500/20 blur-[130px] rounded-full"
+                    className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-500/20 blur-[130px] rounded-full"
                 />
             </div>
 
@@ -141,7 +141,7 @@ const AuthLayout: React.FC = () => {
                                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-200/60">
                                         AGRIFLUX INTELLIGENCE
                                     </p>
-                                    <div className="h-1 w-12 bg-gold-500 rounded-full" />
+                                    <div className="h-1 w-12 bg-teal-400 rounded-full" />
                                 </div>
 
                                 <Link

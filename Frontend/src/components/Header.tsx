@@ -21,7 +21,7 @@ const LANGUAGES = [
 
 const NOTIFICATIONS = [
     { id: 1, icon: CheckCircle, color: 'text-primary-500', bg: 'bg-primary-50 dark:bg-primary-900/20', title: 'Yield Prediction Ready', body: 'Your Rice crop yield forecast is available.', time: '2 min ago', unread: true },
-    { id: 2, icon: AlertTriangle, color: 'text-gold-500', bg: 'bg-gold-50 dark:bg-gold-900/20', title: 'Heatwave Alert 🔥', body: 'Extreme heat expected Thursday in your region.', time: '15 min ago', unread: true },
+    { id: 2, icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', title: 'Heatwave Alert 🔥', body: 'Extreme heat expected Thursday in your region.', time: '15 min ago', unread: true },
     { id: 3, icon: Droplets, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', title: 'Irrigation Optimized', body: 'Schedule updated — saving 18mm water this week.', time: '1 hr ago', unread: false },
     { id: 4, icon: Leaf, color: 'text-earth-500', bg: 'bg-earth-50 dark:bg-earth-900/20', title: 'Soil Report Generated', body: 'AI detected low Potassium levels in Zone B.', time: '3 hr ago', unread: false },
 ];

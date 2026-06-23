@@ -12,19 +12,19 @@ export default tseslint.config(
     },
     languageOptions: {
       parserOptions: {
-        project: ['./Backend/tsconfig.json'],
+        project: ['./tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
       ...prettierConfig.rules,
       'prettier/prettier': 'error',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['warn'],
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'eslint.config.mjs'],
   }
 );

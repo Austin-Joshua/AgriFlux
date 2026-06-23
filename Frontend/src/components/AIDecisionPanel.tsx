@@ -24,7 +24,7 @@ const AIDecisionPanel: React.FC = () => {
         <div className="card-gradient overflow-hidden relative group">
             {/* Background Accent */}
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-500/10 blur-3xl rounded-full" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gold-500/5 blur-3xl rounded-full" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-teal-500/5 blur-3xl rounded-full" />
 
             <div className="relative flex flex-col lg:flex-row gap-6">
                 {/* Main Identity */}
@@ -86,7 +86,7 @@ const AIDecisionPanel: React.FC = () => {
                     {/* Best Market */}
                     <div className="p-4 rounded-2xl bg-white/40 dark:bg-gray-800/30 border border-white/40 dark:border-gray-700/40 hover:scale-[1.02] transition-transform">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/30 flex items-center justify-center text-gold-600">
+                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
                                 <MapPin size={18} />
                             </div>
                             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Regional Demand</span>

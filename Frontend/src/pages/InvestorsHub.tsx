@@ -63,7 +63,7 @@ const InvestorsHub: React.FC = () => {
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-5 flex-1 leading-relaxed line-clamp-3">{inv.description}</p>
                                 <div className="space-y-2.5 mb-5 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
                                     <div className="flex items-center gap-2.5 text-xs"><Briefcase size={14} className="text-primary-500" /><span className="text-gray-400 font-bold uppercase tracking-tighter">{t('investors.ticket')}:</span><span className="font-black text-gray-800 dark:text-gray-200">{inv.ticketSize}</span></div>
-                                    <div className="flex items-center gap-2.5 text-xs"><Star size={14} className="text-gold-500 fill-gold-500/20" /><span className="font-bold text-gray-700 dark:text-gray-300 line-clamp-1">{inv.portfolio}</span></div>
+                                    <div className="flex items-center gap-2.5 text-xs"><Star size={14} className="text-amber-500 fill-amber-500/20" /><span className="font-bold text-gray-700 dark:text-gray-300 line-clamp-1">{inv.portfolio}</span></div>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5 mb-6">{inv.focus.map(f => <span key={f} className="text-[10px] font-bold px-2 py-1 rounded-md bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 border border-primary-100 dark:border-primary-800/50">{f}</span>)}</div>
                                 <div className="flex gap-3 mt-auto">
@@ -108,7 +108,7 @@ const InvestorsHub: React.FC = () => {
                         <div className="card !p-0 overflow-hidden border-t-4 border-primary-500 shadow-2xl">
                             <div className="p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
                                 <div className="mb-8">
-                                    <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><Lightbulb size={28} className="text-gold-500" /> {t('investors.submitIdea', 'Submit Your Idea')}</h2>
+                                    <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><Lightbulb size={28} className="text-amber-500" /> {t('investors.submitIdea', 'Submit Your Idea')}</h2>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">{t('investors.pitchSubtitle')}</p>
                                 </div>
                                 <form onSubmit={e => { e.preventDefault(); setSubmitted(true); }} className="space-y-6">

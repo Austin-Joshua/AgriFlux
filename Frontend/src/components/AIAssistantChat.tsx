@@ -33,15 +33,6 @@ declare global {
 
 const rndInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-const TAMIL_RESPONSES: Record<string, string> = {
-    yield:       'உங்கள் நிலத்தில் நெல் சாகுபடி ஏக்கருக்கு 4,200 கிலோ வரை விளைச்சல் கிடைக்கும். உரம் மற்றும் நீர்ப்பாசனம் சரியாக இருந்தால் 15% வரை அதிகரிக்கலாம்.',
-    soil:        'உங்கள் மண்ணின் pH அளவு 6.5 ஆக உள்ளது. நைட்ரஜன் சத்து சற்று குறைவாக உள்ளது. இயற்கை உரம் பயன்படுத்துவது நல்லது.',
-    irrigation:  'இந்த வாரம் மழை வரும் வாய்ப்பு 70%. நீர்ப்பாசனத்தை 2 நாட்கள் தள்ளிப்போடுங்கள். சொட்டு நீர்ப்பாசனம் 30% நீரை மிச்சப்படுத்தும்.',
-    climate:     'வட கிழக்கு பருவமழை நன்றாக இருக்கும். வெப்பநிலை 28°C முதல் 32°C வரை இருக்கும். பயிர்களுக்கு ஏற்ற சீதோஷ்ண நிலை.',
-    market:      `தற்போது நெல் விலை கிலோவுக்கு ₹${rndInt(21, 26)} முதல் ₹${rndInt(27, 32)} வரை உள்ளது. ஆந்திரா மற்றும் தெலங்கானா மண்டிகளில் நல்ல தேவை உள்ளது.`,
-    default:     'நான் AgriFlux AI. விவசாயம், மண், பயிர், சந்தை விலை பற்றிய கேள்விகளுக்கு உதவுகிறேன். தமிழிலோ அல்லது ஆங்கிலத்திலோ கேளுங்கள்!',
-};
-
 const AIAssistantChat: React.FC = () => {
     const { t } = useTranslation();
     const { user } = useAuth();
@@ -142,59 +133,83 @@ const AIAssistantChat: React.FC = () => {
         // English responses based on roles
         if (role === 'farmer') {
             if (lower.includes('yield') || lower.includes('crop') || lower.includes('harvest')) {
-                return { text: 'Based on current soil conditions, your rice crop yield is projected at 4,200 kg/acre. Keep moisture above 40% to achieve this potential.', confidence: conf };
+                return { text: `Based on current soil conditions, your rice crop yield is projected at 4,200–4,800 kg/acre. Optimized irrigation timing and NPK replenishment can push this to 5,100+ kg. Current AI confidence: ${conf}%.`, confidence: conf };
             }
             if (lower.includes('irrigation') || lower.includes('water')) {
-                return { text: 'Smart irrigation schedule recommends watering every 3 days. Drip system is running optimally, reducing water footprint by 30%.', confidence: conf };
+                return { text: 'Smart irrigation recommends watering every 3 days in morning hours. Drip system is running at 94% efficiency, reducing water usage by 30%. Consider soil moisture sensors for Zone B.', confidence: conf };
             }
             if (lower.includes('soil') || lower.includes('npk')) {
-                return { text: 'Your nitrogen (N) levels are slightly low. Apply 45-50 kg/acre Urea or organic compost. Current soil pH is 6.5, which is highly suitable.', confidence: conf };
+                return { text: 'Soil nitrogen (N) is slightly low at 72 kg/ha. Apply 45-50 kg/acre Urea or 2 tons of organic compost. pH is 6.5 — ideal for most crops. Phosphorus and Potassium levels are adequate.', confidence: conf };
             }
-            if (lower.includes('climate') || lower.includes('weather')) {
-                return { text: '7-day forecast shows 65% chance of light rain on Thursday. Temperatures: 24°C - 32°C. postpone spray treatments for 48 hours.', confidence: conf };
+            if (lower.includes('climate') || lower.includes('weather') || lower.includes('rain') || lower.includes('forecast')) {
+                return { text: '7-day forecast: 65% chance of moderate rain Thursday–Friday. Temperatures: 24–32°C. Postpone chemical spray treatments for 48 hours. Ideal harvest window opens next Monday.', confidence: conf };
             }
             if (lower.includes('fertilizer') || lower.includes('urea') || lower.includes('organic')) {
-                return { text: 'For premium crop output, combine bio-fertilizers with nano-urea. Neem-coated urea helps release nutrients slowly and effectively.', confidence: conf };
+                return { text: 'For premium output: combine nano-urea (500ml/acre) with bio-stimulants. Neem-coated urea reduces nitrogen loss by 25%. For organic: vermicompost at 3 tons/acre improves soil microbiome significantly.', confidence: conf };
             }
-            if (lower.includes('pest') || lower.includes('disease') || lower.includes('insect')) {
-                return { text: 'Warning: High humidity levels increase fungal risks. Apply Pseudomonas fluorescens at 2.5 kg/ha as a preventive biological agent.', confidence: conf };
+            if (lower.includes('pest') || lower.includes('disease') || lower.includes('insect') || lower.includes('fungus')) {
+                return { text: '⚠️ High humidity increases fungal risk. Preventive measure: Pseudomonas fluorescens 2.5 kg/ha or Trichoderma viride 4 kg/ha. For stem borers: apply Chlorantraniliprole 0.4ml/L at tillering stage.', confidence: conf };
             }
-            if (lower.includes('market') || lower.includes('price')) {
-                return { text: `Local Mandi price for Grade A Rice is ₹${rndInt(21, 23)}/kg. Demand is up in Southern markets due to season trends.`, confidence: conf };
+            if (lower.includes('market') || lower.includes('price') || lower.includes('mandi') || lower.includes('sell')) {
+                return { text: `Current Mandi rates: Grade A Rice ₹${rndInt(2100, 2350)}/quintal, Wheat ₹${rndInt(2050, 2200)}/quintal. Southern markets showing 12% demand increase. Best trading window: next 4–6 days before seasonal price correction.`, confidence: conf };
             }
-            return { text: "As a registered Farmer, I can guide you on crop yields, soil health, drip irrigation, local weather, and mandi prices. Ask me anything!", confidence: conf };
+            if (lower.includes('subsidy') || lower.includes('scheme') || lower.includes('pm-kisan') || lower.includes('government') || lower.includes('loan')) {
+                return { text: '📋 Available schemes: PM-KISAN (₹6,000/year direct transfer), PM Fasal Bima Yojana (crop insurance), Soil Health Card scheme. Apply via Aadhaar at your nearest CSC center or the AgriFlux Subsidies page.', confidence: conf };
+            }
+            if (lower.includes('equipment') || lower.includes('tractor') || lower.includes('rent') || lower.includes('machine')) {
+                return { text: 'AgriFlux Equipment Rental has 23 machines available within 15km of your farm. Tractors from ₹800/hr, drip irrigation kits from ₹1,200/day. Book via the Equipment Rental page.', confidence: conf };
+            }
+            if (lower.includes('seed') || lower.includes('variety') || lower.includes('sowing')) {
+                return { text: 'Recommended seeds for this season: Rice – IR64, Swarna Sub1 (flood resistant). Wheat – GW-322, HD-2967. For Kharif: Maize Pioneer 30B07. Always use certified seeds from approved dealers.', confidence: conf };
+            }
+            return { text: `Hello ${user?.name?.split(' ')[0] || 'Farmer'}! I can guide you on: crop yields 🌾, soil health 🧪, smart irrigation 💧, weather forecasts ☁️, mandi prices 📈, government subsidies 🏛️, and pest management 🐛. What would you like to know?`, confidence: conf };
         }
 
         if (role === 'agronomist') {
             if (lower.includes('soil') || lower.includes('npk') || lower.includes('microbiology') || lower.includes('ph')) {
-                return { text: 'Soil chemical profiling shows a cation exchange capacity (CEC) of 18 meq/100g. Recommended treatment: sulfur application to reduce alkalinity in Zone C.', confidence: conf };
+                return { text: 'Soil profiling: CEC 18 meq/100g, organic carbon 0.72%. Zone B shows EC above 2.8 dS/m — gypsum application recommended at 500 kg/ha. Alkaline zones may need sulfur amendment. Detailed report available on Soil Advisor page.', confidence: conf };
             }
-            if (lower.includes('disease') || lower.includes('pathology') || lower.includes('pest')) {
-                return { text: 'Reported symptoms in NW region point to early leaf blast (Pyricularia oryzae). Suggest Tricyclazole 75% WP spray to prevent spore dissemination.', confidence: conf };
+            if (lower.includes('disease') || lower.includes('pathology') || lower.includes('pest') || lower.includes('blast') || lower.includes('blight')) {
+                return { text: '🔬 Reported symptoms: Rice leaf blast (Pyricularia oryzae) spreading in NW sector. Recommend Tricyclazole 75% WP at 0.6g/L. Cotton: Bollworm pressure high — suggest pheromone traps + Chlorantraniliprole spray. 3 farms need immediate attention.', confidence: conf };
             }
-            if (lower.includes('thermal') || lower.includes('intensity') || lower.includes('ndvi') || lower.includes('satellite')) {
-                return { text: 'NDVI vegetation indices are stable at 0.68. Sector C shows localized vegetative stress due to lower chlorophyll absorption. Recommended targeted fertilizer.', confidence: conf };
+            if (lower.includes('ndvi') || lower.includes('satellite') || lower.includes('thermal') || lower.includes('remote')) {
+                return { text: 'NDVI analysis: Zone A (0.72, healthy), Zone B (0.54, stressed), Zone C (0.41, critical). Chlorophyll absorption deficit detected in south parcels. Recommend targeted N-P-K application + canopy density assessment.', confidence: conf };
             }
-            if (lower.includes('consultation') || lower.includes('schedule') || lower.includes('appointment')) {
-                return { text: 'You have video consultation calls scheduled for tomorrow. Please check the Consultations tab to review farmer query logs and join.', confidence: conf };
+            if (lower.includes('consultation') || lower.includes('schedule') || lower.includes('appointment') || lower.includes('booking')) {
+                return { text: 'You have 3 pending consultation requests from farmers. 2 are confirmed for video sessions tomorrow. Check the Field Visits tab to approve/reject pending bookings.', confidence: conf };
             }
-            return { text: "As an Agronomist, you have access to detailed soil chemistry reports, pathology trends, NDVI maps, and direct booking consultations. Let me know what data you need.", confidence: conf };
+            if (lower.includes('irrigation') || lower.includes('water') || lower.includes('drip')) {
+                return { text: 'Aggregate farm irrigation data: 8 farms using drip (avg 28% water savings), 5 using sprinkler, 4 using flood. Recommend transitioning flood irrigators to drip — potential 30,000L/acre/season savings.', confidence: conf };
+            }
+            if (lower.includes('yield') || lower.includes('forecast') || lower.includes('production')) {
+                return { text: 'Regional yield model predicts 4,100–4,600 kg/ha for Kharif Rice across your assigned farms. Farms with optimized NPK show 18% above-average yield. Advisory: increase micronutrient supplementation in deficient zones.', confidence: conf };
+            }
+            if (lower.includes('advisory') || lower.includes('message') || lower.includes('broadcast')) {
+                return { text: 'You can send bulk advisories to all 42 monitored farms via the Advisory tab. Use region-specific targeting for precision. Previous advisory (Heatwave Alert) reached 38/42 farmers within 2 hours.', confidence: conf };
+            }
+            return { text: `Welcome Dr. ${user?.name?.split(' ')[0] || 'Expert'}! Your dashboard shows: 42 farms monitored, 24 active cases, 3 pending consultations. I can help with soil chemistry 🧪, pathology 🔬, NDVI maps 🛰️, or send farm advisories 📡. What do you need?`, confidence: conf };
         }
 
         if (role === 'admin') {
-            if (lower.includes('system') || lower.includes('status') || lower.includes('health') || lower.includes('cpu')) {
-                return { text: 'System status: Normal. CPU utilization is at 12%, RAM usage at 45%. Database replica lag is < 5ms. Redis cache hit rate is 94%.', confidence: conf };
+            if (lower.includes('system') || lower.includes('status') || lower.includes('health') || lower.includes('cpu') || lower.includes('server')) {
+                return { text: '✅ All systems operational. CPU: 12%, RAM: 45%, Disk I/O: 8%. Database replica lag: <5ms. Redis cache hit rate: 94%. Socket.IO gateway: 43 active connections. Zero critical alerts.', confidence: conf };
             }
-            if (lower.includes('node') || lower.includes('sensor') || lower.includes('telemetry') || lower.includes('iot')) {
-                return { text: 'All 12 active ESP32 nodes are successfully pushing telemetry. Zero packet loss reported in the last 60 minutes.', confidence: conf };
+            if (lower.includes('node') || lower.includes('sensor') || lower.includes('telemetry') || lower.includes('iot') || lower.includes('esp32')) {
+                return { text: '📡 IoT Status: 12/12 ESP32 nodes online. Telemetry push interval: 5s. Soil moisture nodes: 8 active. Weather sensors: 4 active. Last full sync: 3 minutes ago. Zero packet loss in past 60 mins.', confidence: conf };
             }
-            if (lower.includes('user') || lower.includes('account') || lower.includes('login')) {
-                return { text: 'User Registry database holds 1,240 active farmers and 42 expert agronomists. Auth tokens are fully rate-limited and signed.', confidence: conf };
+            if (lower.includes('user') || lower.includes('account') || lower.includes('login') || lower.includes('register')) {
+                return { text: '👥 User Registry: 1,240 active farmers, 42 agronomists, 5 admins. New registrations today: +18. Failed login attempts flagged: 2 (rate-limited). 3 accounts pending email verification.', confidence: conf };
             }
-            if (lower.includes('database') || lower.includes('db') || lower.includes('mongo')) {
-                return { text: 'MongoDB connection pool is holding 15 active connections. Dynamic query optimization is active.', confidence: conf };
+            if (lower.includes('database') || lower.includes('db') || lower.includes('mongo') || lower.includes('backup')) {
+                return { text: '🗄️ MongoDB: 15 active connections, 2ms avg query response. Last automated backup: 4 hours ago (S3). Collection sizes: Users 18MB, Consultations 4MB, Reports 142MB. No slow queries detected.', confidence: conf };
             }
-            return { text: "System Administrator dashboard connected. I am ready to retrieve logs, report telemetry cluster status, monitor worker processes, or manage active alerts.", confidence: conf };
+            if (lower.includes('security') || lower.includes('alert') || lower.includes('threat') || lower.includes('breach')) {
+                return { text: '🔐 Security Status: JWT tokens rotated every 7 days. Rate limiting: 100 req/min per IP. 2 suspicious login attempts blocked today. SSL certificates valid for 287 days. No breach incidents detected.', confidence: conf };
+            }
+            if (lower.includes('api') || lower.includes('uptime') || lower.includes('performance') || lower.includes('latency')) {
+                return { text: '⚡ API Performance: 99.8% uptime this month. Avg response: 142ms. Peak load handled: 847 concurrent users (no degradation). Railway deployment healthy. Cold start: 340ms avg.', confidence: conf };
+            }
+            return { text: `System Admin dashboard connected. Platform health is excellent. I can retrieve: system metrics ⚙️, IoT telemetry 📡, user analytics 👥, security logs 🔐, or database stats 🗄️. What do you need?`, confidence: conf };
         }
 
         return { text: t('ai.responses.default'), confidence: conf };
@@ -277,7 +292,7 @@ const AIAssistantChat: React.FC = () => {
 
             {/* Chat Panel */}
             {open && (
-                <div className="fixed bottom-40 lg:bottom-24 right-4 lg:right-6 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-dark-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col overflow-hidden animate-slide-up" style={{ maxHeight: '480px' }}>
+            <div className="fixed bottom-40 lg:bottom-24 right-4 lg:right-6 w-[340px] sm:w-[420px] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200/60 dark:border-gray-700/60 z-50 flex flex-col overflow-hidden animate-slide-up" style={{ maxHeight: '540px' }}>
                     {/* Header */}
                     <div className="gradient-green p-4 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -342,23 +357,23 @@ const AIAssistantChat: React.FC = () => {
                     </div>
 
                     {/* Quick suggestions */}
-                    <div className="px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar">
+                    <div className="px-3 py-2 flex gap-2 overflow-x-auto no-scrollbar border-t border-gray-100 dark:border-gray-700/50">
                         {(lang === 'en'
-                            ? [t('ai.tags.yield', 'Yield tips'), t('ai.tags.irrigation', 'Irrigation'), t('ai.tags.soil', 'Soil health'), 'Market price', 'Disease']
-                            : ['விளைச்சல்', 'நீர்ப்பாசனம்', 'மண் ஆரோக்கியம்', 'சந்தை விலை']
+                            ? ['Yield tips', 'Soil health', 'Irrigation', 'Market price', 'Pest control', 'Subsidies', 'Seed variety', 'Weather']
+                            : ['விளைச்சல்', 'மண் ஆரோக்கியம்', 'நீர்ப்பாசனம்', 'சந்தை விலை', 'பூச்சி', 'திட்டங்கள்']
                         ).map(s => (
                             <button key={s} onClick={() => { setInput(s); sendMessage(s); }}
-                                className="flex-shrink-0 text-xs font-medium px-3 py-1.5 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors border border-primary-100/50 dark:border-primary-800/50">
+                                className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full hover:bg-primary-100 dark:hover:bg-primary-800/40 transition-colors border border-primary-100 dark:border-primary-800/50">
                                 {s}
                             </button>
                         ))}
                     </div>
 
                     {/* Input */}
-                    <div className="p-3 border-t border-gray-100 dark:border-gray-700 flex gap-2">
+                    <div className="p-3 border-t border-gray-100 dark:border-gray-700 flex gap-2 items-center bg-gray-50/50 dark:bg-gray-800/50">
                         <button
                             onClick={toggleVoice}
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${listening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-primary-600'}`}
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${listening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30'}`}
                             title="Voice Input"
                         >
                             {listening ? <MicOff size={16} /> : <Mic size={16} />}
@@ -367,11 +382,11 @@ const AIAssistantChat: React.FC = () => {
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && sendMessage()}
-                            placeholder={lang === 'ta' ? 'கேள்வி கேளுங்கள்...' : t('ai.placeholder', 'Ask about crops, soil, weather...')}
-                            className="flex-1 text-sm px-3 py-2 bg-gray-100 dark:bg-gray-700/50 rounded-xl border-0 focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-gray-800 dark:text-gray-200 placeholder-gray-400 transition-all"
+                            placeholder={lang === 'ta' ? 'கேள்வி கேளுங்கள்...' : 'Ask about crops, soil, weather, prices...'}
+                            className="flex-1 text-sm px-4 py-2.5 bg-white dark:bg-gray-700/70 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400 dark:focus:border-primary-500 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 transition-all"
                         />
                         <button onClick={() => sendMessage()} disabled={!input.trim()}
-                            className="w-9 h-9 gradient-green rounded-xl flex items-center justify-center text-white disabled:opacity-50 hover:scale-105 transition-transform">
+                            className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center text-white disabled:opacity-50 hover:scale-105 active:scale-95 transition-transform flex-shrink-0 shadow-md shadow-primary-500/20">
                             <Send size={15} />
                         </button>
                     </div>

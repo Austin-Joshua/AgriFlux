@@ -189,7 +189,7 @@ const Marketplace: React.FC = () => {
                             initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
                             className="relative z-10 w-full max-w-2xl bg-white dark:bg-gray-900 rounded-[32px] shadow-3xl overflow-hidden border border-white/20"
                         >
-                            <div className="h-2 bg-gradient-to-r from-primary-500 via-green-500 to-gold-500" />
+                            <div className="h-2 bg-gradient-to-r from-primary-500 via-green-500 to-teal-400" />
                             <div className="p-8">
                                 <div className="flex justify-between items-start mb-8">
                                     <div className="flex items-center gap-4">
@@ -360,7 +360,7 @@ const Marketplace: React.FC = () => {
                                             AI Match: {listing.matchScore}%
                                         </div>
                                         {listing.cropType === SESSION_CROP && (
-                                            <div className="px-2.5 py-1 bg-gold-500 text-white rounded-lg text-[10px] font-black shadow-lg animate-pulse-slow">
+                                            <div className="px-2.5 py-1 bg-teal-500 text-white rounded-lg text-[10px] font-black shadow-lg animate-pulse-slow">
                                                 HIGH DEMAND
                                             </div>
                                         )}

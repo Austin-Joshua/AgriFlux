@@ -168,7 +168,7 @@ const Login: React.FC = () => {
             
             {/* Mobile Branding (only visible on mobile) */}
             <div className="lg:hidden flex flex-col items-center mb-10 text-center">
-                <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-primary-500 via-primary-600 to-gold-500 shadow-xl shadow-primary-500/20 mb-4 flex-shrink-0">
+                <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-xl shadow-primary-500/20 mb-4 flex-shrink-0">
                     <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-[14px] flex items-center justify-center p-2">
                         <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
                     </div>

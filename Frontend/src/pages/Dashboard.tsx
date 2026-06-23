@@ -52,13 +52,13 @@ const StatCard: React.FC<{
 
     return (
         <div
-            className="card-clickable group border-b-2 border-transparent hover:border-gold-500"
+            className="card-clickable group border-b-2 border-transparent hover:border-primary-500"
             onClick={() => navigate(route)}
             role="button"
             tabIndex={0}
             onKeyDown={e => e.key === 'Enter' && navigate(route)}
         >
-            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-glow-gold"
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-glow-green"
                 style={{ background: `linear-gradient(135deg, ${accentColor}10 0%, transparent 60%)` }} />
             <div className="flex items-start justify-between mb-2">
                 <div className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
@@ -281,7 +281,7 @@ const Dashboard: React.FC = () => {
                                         style={{ width: `${Math.min(100, (d.rain / 30) * 100)}%` }} />
                                 </div>
                                 <span className="text-xs text-blue-500 w-8 text-right font-bold">{d.rain}mm</span>
-                                <span className="text-sm font-bold text-gold-500 w-8 text-right">{d.temp}°</span>
+                                <span className="text-sm font-bold text-amber-500 dark:text-amber-400 w-8 text-right">{d.temp}°</span>
                             </div>
                         ))}
                     </div>
@@ -401,7 +401,7 @@ const Dashboard: React.FC = () => {
                     { icon: Lock, label: 'Secure Login Enabled', color: 'text-blue-500' },
                     { icon: Sparkles, label: 'AI Powered Insights', color: 'text-primary-500' },
                     { icon: ShieldCheck, label: 'Data Encrypted (AES-256)', color: 'text-green-500' },
-                    { icon: Zap, label: 'JWT + Rate-Limited APIs', color: 'text-gold-500' },
+                    { icon: Zap, label: 'JWT + Rate-Limited APIs', color: 'text-teal-500' },
                 ].map(({ icon: Icon, label, color }) => (
                     <div key={label} className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-800">
                         <Icon size={12} className={color} />

@@ -203,7 +203,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                                         </div>
                                         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4">
                                             <div className="flex items-center gap-2 mb-2">
-                                                <BarChart3 size={16} className="text-gold-500" />
+                                                <BarChart3 size={16} className="text-teal-500" />
                                                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Predicted Price Range</span>
                                             </div>
                                             <p className="text-xl font-black text-gray-900 dark:text-white">₹{report.priceMin}–₹{report.priceMax}/kg</p>
@@ -220,12 +220,12 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                                     </div>
 
                                     {/* Profit Estimate */}
-                                    <div className="bg-gradient-to-r from-gold-50 to-yellow-50 dark:from-gold-900/10 dark:to-yellow-900/10 border border-gold-200 dark:border-gold-800 rounded-2xl p-4 flex items-center justify-between">
+                                    <div className="bg-gradient-to-r from-primary-50 to-teal-50 dark:from-primary-900/20 dark:to-teal-900/10 border border-primary-200 dark:border-teal-800 rounded-2xl p-4 flex items-center justify-between">
                                         <div>
-                                            <p className="text-xs font-bold text-gold-600 dark:text-gold-400 uppercase tracking-wider mb-1">Estimated Profit (per season)</p>
+                                            <p className="text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider mb-1">Estimated Profit (per season)</p>
                                             <p className="text-2xl font-black text-gray-900 dark:text-white">{report.profitEstimate}</p>
                                         </div>
-                                        <Zap size={36} className="text-gold-400 opacity-60" />
+                                        <Zap size={36} className="text-teal-400 opacity-60" />
                                     </div>
 
                                     {/* AI Inputs — Explainability */}

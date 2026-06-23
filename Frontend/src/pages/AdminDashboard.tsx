@@ -79,26 +79,30 @@ const AdminDashboard: React.FC = () => {
                 ))}
             </div>
 
-            <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 w-fit flex-wrap">
-                {(['overview', 'users', 'activity', 'system'] as const).map(tab => (
-                    <button key={tab} onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'}`}>
-                        {tab === 'overview' ? `📊 ${t('common.overview')}` : tab === 'users' ? `👤 ${t('admin.usersTab')}` : tab === 'activity' ? `📋 ${t('admin.activityTab')}` : `⚙️ ${t('common.settings')}`}
-                    </button>
-                ))}
+            <div className="overflow-x-auto max-w-full scrollbar-none pb-1">
+                <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 w-max">
+                    {(['overview', 'users', 'activity', 'system'] as const).map(tab => (
+                        <button key={tab} onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white dark:bg-gray-600 shadow text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'}`}>
+                            {tab === 'overview' ? `📊 ${t('common.overview')}` : tab === 'users' ? `👤 ${t('admin.usersTab')}` : tab === 'activity' ? `📋 ${t('admin.activityTab')}` : `⚙️ ${t('common.settings')}`}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {activeTab === 'overview' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div className="lg:col-span-2 card">
                         <h3 className="section-header mb-4">{t('admin.userGrowthTrend')}</h3>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <BarChart data={monthlyUsers}>
-                                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                                <XAxis dataKey="m" tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} />
-                                <Tooltip /><Bar dataKey="users" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                        <div role="img" aria-label="Monthly user registration growth trend chart">
+                            <ResponsiveContainer width="100%" height={200}>
+                                <BarChart data={monthlyUsers}>
+                                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                                    <XAxis dataKey="m" tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} />
+                                    <Tooltip /><Bar dataKey="users" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
                     <div className="card">
                         <h3 className="section-header mb-4">{t('admin.userBreakdown')}</h3>

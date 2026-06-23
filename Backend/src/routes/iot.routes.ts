@@ -10,15 +10,15 @@ const router = Router();
  * Frontend dashboard commands use JWT Bearer auth instead (see /control route).
  */
 const iotDeviceAuth = (req: Request, res: Response, next: NextFunction) => {
-    const apiKey = req.headers['x-iot-api-key'];
-    if (apiKey && apiKey === (process.env.IOT_API_KEY || 'agriflux-iot-key-dev')) {
-        return next();
-    }
-    // Also allow JWT-authenticated dashboard users to push test data
-    const bearer = req.headers['authorization'];
-    if (bearer) return auth(req, res, next);
+  const apiKey = req.headers['x-iot-api-key'];
+  if (apiKey && apiKey === (process.env.IOT_API_KEY || 'agriflux-iot-key-dev')) {
+    return next();
+  }
+  // Also allow JWT-authenticated dashboard users to push test data
+  const bearer = req.headers['authorization'];
+  if (bearer) return auth(req, res, next);
 
-    return res.status(401).json({ success: false, message: 'IoT API key required.' });
+  return res.status(401).json({ success: false, message: 'IoT API key required.' });
 };
 
 /**

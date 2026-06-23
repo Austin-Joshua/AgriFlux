@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { AreaChart, Area, ComposedChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { TrendingUp, TrendingDown, Star, Search, ArrowUpDown, AlertCircle, Maximize2, LineChart as LucideLineChart } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { AreaChart, Area, ComposedChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { TrendingUp, TrendingDown, Star, Search, ArrowUpDown, AlertCircle, LineChart as LucideLineChart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface Crop {
@@ -18,7 +18,7 @@ interface Crop {
 
 // Simulated market data
 const generateData = (base: number, points: number, label: string[]) =>
-    label.map((t, i) => {
+    label.map((t) => {
         const volatility = base * 0.04;
         const open = base + (Math.random() - 0.5) * volatility;
         const close = open + (Math.random() - 0.5) * volatility;
@@ -70,7 +70,7 @@ const MarketAnalysis: React.FC = () => {
         };
     };
 
-    const marketData: Crop[] = [
+    const marketData = useMemo<Crop[]>(() => [
         generateCrop('rice', 'Rice', '🌾', 2450, 2183),
         generateCrop('wheat', 'Wheat', '🌿', 2380, 2275),
         generateCrop('mustard', 'Mustard', '🌼', 5450, 5650),
@@ -83,7 +83,7 @@ const MarketAnalysis: React.FC = () => {
         generateCrop('groundnut', 'Groundnut', '🥜', 5720, 5850),
         generateCrop('onion', 'Onion', '🧅', 1840, 1700),
         generateCrop('tomato', 'Tomato', '🍅', 2100, 2000),
-    ];
+    ], []);
 
     const [selectedCrop, setSelectedCrop] = useState<Crop>(marketData[0]);
     const [watchlist, setWatchlist] = useState<string[]>(['Wheat', 'Rice']);
@@ -101,8 +101,6 @@ const MarketAnalysis: React.FC = () => {
             timeframe === '1M' ? generateData(selectedCrop.price, 4, monthLabels) :
                 generateData(selectedCrop.price, 12, yearLabels);
 
-    const aboveMSP = selectedCrop.msp > 0 && selectedCrop.price >= selectedCrop.msp;
-    const below = selectedCrop.msp > 0 && selectedCrop.price < selectedCrop.msp;
 
     return (
         <div className="space-y-5">

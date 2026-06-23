@@ -243,7 +243,7 @@ const YieldPrediction: React.FC = () => {
 
                     {result && (
                         <div className={`mt-4 p-5 rounded-2xl border-b-4 shadow-xl transition-all animate-scale-in ${result.risk === 'Low' ? 'border-primary-500 bg-white dark:bg-gray-800' :
-                            result.risk === 'Medium' ? 'border-gold-500 bg-white dark:bg-gray-800' :
+                            result.risk === 'Medium' ? 'border-amber-500 bg-white dark:bg-gray-800' :
                                 'border-red-500 bg-white dark:bg-gray-800'
                             }`}>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{t('yield.predictedYield')}</p>
