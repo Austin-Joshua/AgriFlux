@@ -454,9 +454,10 @@ const AgronomistDashboard: React.FC = () => {
             <div className="space-y-3">
               {consultations.map((v) => {
                 const isUserObj = typeof v.userId === 'object' && v.userId !== null;
-                const farmerName = (isUserObj ? (v.userId as any).name : null) || 'Demo Farmer';
-                const farmName = (isUserObj ? (v.userId as any).farmName : null) || 'Green Valley Farm';
-                const location = (isUserObj ? (v.userId as any).location : null) || 'Mysuru, KA';
+                const userProps = isUserObj ? v.userId as { name?: string; farmName?: string; location?: string } : null;
+                const farmerName = (userProps?.name) || 'Demo Farmer';
+                const farmName = (userProps?.farmName) || 'Green Valley Farm';
+                const location = (userProps?.location) || 'Mysuru, KA';
                 return (
                   <div
                     key={v._id}
