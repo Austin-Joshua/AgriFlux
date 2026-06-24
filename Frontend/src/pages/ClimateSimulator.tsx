@@ -93,7 +93,7 @@ const ClimateSimulator: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Controls */}
-        <div className="card glass-gold border-gold-300 dark:border-gold-800/40 space-y-5">
+        <div className="card border border-yellow-200/50 dark:border-yellow-800/30 space-y-5">
           <h3 className="section-header text-gold-700 dark:text-gold-400">Scenario Controls</h3>
 
           <div>
@@ -259,7 +259,7 @@ const ClimateSimulator: React.FC = () => {
           {/* Scenario Comparison Chart */}
           <div className="card">
             <h3 className="section-header mb-4">Scenario Comparison</h3>
-            <ResponsiveContainer width="100%" height={260}>
+            <ResponsiveContainer width="100%" height={320}>
               <BarChart data={chartData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#6b7280' }} unit=" kg" />

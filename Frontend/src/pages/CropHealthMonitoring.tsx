@@ -307,7 +307,7 @@ const CropHealthMonitoring: React.FC = () => {
           </div>
 
           {/* SVG Farm Heatmap */}
-          <div className="relative w-full h-80 bg-slate-950 rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
+          <div className="relative w-full h-[60vh] min-h-[400px] bg-slate-950 rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
             <svg viewBox="0 0 400 280" className="w-full h-full" preserveAspectRatio="none">
               {/* Grid system */}
               <g stroke="rgba(20, 184, 166, 0.15)" strokeWidth="0.5" strokeDasharray="3,3">

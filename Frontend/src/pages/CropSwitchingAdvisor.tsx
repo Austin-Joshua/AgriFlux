@@ -134,7 +134,7 @@ const CropSwitchingAdvisor: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Config */}
-        <div className="card glass-gold border-gold-300 dark:border-gold-800/40">
+        <div className="card space-y-3">
           <h3 className="section-header text-gold-700 dark:text-gold-400 mb-2">Farm Conditions</h3>
           <div className="space-y-3">
             <div>
@@ -377,7 +377,7 @@ const CropSwitchingAdvisor: React.FC = () => {
               {cropInfo.alternatives.map((alt) => (
                 <div
                   key={alt}
-                  className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
+                  className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"
                 >
                   <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Sprout size={18} className="text-primary-600 dark:text-primary-400" />

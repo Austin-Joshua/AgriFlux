@@ -260,7 +260,7 @@
 
   /* Glass Card — 3D feel */
   .card {
-    @apply relative overflow-hidden h-full p-3 md:p-4;
+    @apply relative overflow-hidden h-fit p-3 md:p-4;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);

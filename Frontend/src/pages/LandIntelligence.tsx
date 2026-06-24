@@ -121,7 +121,7 @@ const LandIntelligence: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Upload & Preview */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="card h-full min-h-[320px] flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="card min-h-[420px] flex flex-col items-center justify-center relative overflow-hidden">
             {!image ? (
               <div
                 className={`w-full h-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 transition-all
@@ -424,7 +424,7 @@ const LandIntelligence: React.FC = () => {
               <div className="space-y-4">
                 {/* Main Stats */}
                 <div className="grid grid-cols-1 gap-3">
-                  <div className="p-3 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-800/50">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-2xl border border-primary-100 dark:border-primary-800/50 shadow-sm">
                     <div className="flex items-center gap-2 mb-1">
                       <Maximize2 size={16} className="text-primary-600" />
                       <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
@@ -436,7 +436,7 @@ const LandIntelligence: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/50">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-2xl border border-amber-100 dark:border-amber-800/50 shadow-sm">
                     <div className="flex items-center gap-2 mb-1">
                       <TrendingUp size={16} className="text-amber-600" />
                       <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">

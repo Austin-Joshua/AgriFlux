@@ -458,7 +458,7 @@ const SoilAdvisor: React.FC = () => {
                   ].map((stat) => (
                     <div
                       key={stat.label}
-                      className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 transition-all group/stat cursor-default"
+                      className="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all group/stat cursor-default"
                     >
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
                         {stat.label}
@@ -473,7 +473,7 @@ const SoilAdvisor: React.FC = () => {
 
                 <div className="space-y-4">
                   <h3 className="section-header">{t('soilAdvisor.recommendations')}</h3>
-                  <div className="p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800/50 flex gap-4">
+                  <div className="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex gap-4">
                     <div className="p-2 bg-white dark:bg-gray-800 rounded-xl h-fit shadow-sm">
                       <Droplets size={20} className="text-primary-500" />
                     </div>
@@ -487,7 +487,7 @@ const SoilAdvisor: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 flex gap-4">
+                  <div className="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex gap-4">
                     <div className="p-2 bg-white dark:bg-gray-800 rounded-xl h-fit shadow-sm">
                       <Sprout size={20} className="text-amber-500" />
                     </div>
@@ -596,7 +596,7 @@ const SoilAdvisor: React.FC = () => {
                   {alerts.map((a, i) => (
                     <div
                       key={i}
-                      className="p-3 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 text-red-700 dark:text-red-400 text-xs font-bold flex items-center gap-2"
+                      className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-red-100 dark:border-red-800/50 text-red-700 dark:text-red-400 text-xs font-bold flex items-center gap-2 shadow-sm"
                     >
                       <AlertTriangle size={14} /> {a}
                     </div>
@@ -611,7 +611,7 @@ const SoilAdvisor: React.FC = () => {
                             title: `${rec.name} Suitability Report`,
                             content: (
                               <div className="space-y-6 text-gray-700 dark:text-gray-300">
-                                <div className="p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl">
+                                <div className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                                   <h4 className="font-bold text-primary-700 dark:text-primary-400 mb-2 flex items-center gap-2">
                                     <Sprout size={18} /> Primary Guidance
                                   </h4>
@@ -645,7 +645,7 @@ const SoilAdvisor: React.FC = () => {
                                     </li>
                                   </ul>
                                 </div>
-                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                                <div className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                                   <h4 className="font-bold text-amber-700 dark:text-amber-500 mb-2 flex items-center gap-2">
                                     <TrendingUp size={18} /> 10-Year Market Trend
                                   </h4>
