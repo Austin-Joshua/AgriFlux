@@ -1,18 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useRealisticData } from './useRealisticData';
 
 /**
  * useIoT Hook (Real-Time WebSocket Edition)
  * Provides instant IoT data syncing via Socket.IO with a robust polling fallback.
  */
 export const useIoT = () => {
-  // Demo Mode data generator
-  const demoData = useRealisticData();
-
   // UI & Connection State
   const [isLiveMode, setIsLiveMode] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
 
@@ -115,7 +111,7 @@ export const useIoT = () => {
         setLastSync(new Date(data.timestamp));
         setIsOnline(data.isOnline);
       }
-    } catch (error) {
+    } catch {
       setIsOnline(false);
     }
   }, []);

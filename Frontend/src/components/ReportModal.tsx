@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, FileText, Download, Share2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { useTranslation } from 'react-i18next';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -18,7 +18,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
   content,
   type = 'success',
 }) => {
-
+  useTranslation();
 
   if (!isOpen) return null;
 

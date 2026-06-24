@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, Auth } from 'firebase/auth';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
@@ -24,7 +24,7 @@ try {
   console.error('🔥 Firebase initialization failed:', error);
 }
 
-export const auth = app ? getAuth(app) : (null as any);
+export const auth = app ? getAuth(app) : (null as unknown as Auth);
 export const googleProvider = new GoogleAuthProvider();
 
 // Only initialize analytics in-browser (not SSR / tests)

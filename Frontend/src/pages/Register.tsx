@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/logo-icon.png';
 import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';

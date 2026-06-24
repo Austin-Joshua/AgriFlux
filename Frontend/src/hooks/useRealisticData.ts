@@ -227,6 +227,5 @@ export function useRealisticData(crop: CropKey = SESSION_CROP): RealisticCropDat
       trendLabel: trends[rndInt(0, trends.length - 1)],
       factors: d.factors,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crop]); // Compute once per mount OR on crop change
 }

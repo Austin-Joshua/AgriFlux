@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
@@ -123,8 +124,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await axios.post(`${API_URL}/auth/login`, { identifier, password });
       handleAuthResponse(response.data);
       return response.data.user;
-    } catch (error: any) {
-      console.error('Login error:', error.response?.data?.message || error.message);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Login error:', error.response?.data?.message || error.message);
+      } else if (error instanceof Error) {
+        console.error('Login error:', error.message);
+      }
       throw error;
     } finally {
       setIsLoading(false);
@@ -157,10 +162,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (response.data.isNewUser || additionalInfo?.isNewUser) {
             setRequiresOnboarding(true);
           }
-        } catch (backendErr: any) {
+        } catch (backendErr) {
           // Backend not reachable (e.g. local dev without backend running)
           // Fall back to a client-only session so the UI still works
-          console.warn('Backend sync failed, using client-only session:', backendErr.message);
+          const message = backendErr instanceof Error ? backendErr.message : String(backendErr);
+          console.warn('Backend sync failed, using client-only session:', message);
           const fallbackUser: User = {
             id: firebaseUser.uid,
             name: firebaseUser.displayName || 'Farmer',
@@ -183,13 +189,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log(`Social login with ${provider} (mocked)`);
         await new Promise((r) => setTimeout(r, 1000));
       }
-    } catch (error: any) {
+    } catch (error) {
       // Sign-in was cancelled or popup was blocked
+      const err = error as { code?: string; message?: string };
       if (
-        error.code !== 'auth/popup-closed-by-user' &&
-        error.code !== 'auth/cancelled-popup-request'
+        err.code !== 'auth/popup-closed-by-user' &&
+        err.code !== 'auth/cancelled-popup-request'
       ) {
-        console.error(`${provider} login error:`, error.message);
+        console.error(`${provider} login error:`, err.message);
       }
       throw error;
     } finally {
@@ -229,8 +236,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await axios.post(`${API_URL}/auth/register`, data);
       handleAuthResponse(response.data);
-    } catch (error: any) {
-      console.error('Registration error:', error.response?.data?.message || error.message);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Registration error:', error.response?.data?.message || error.message);
+      } else if (error instanceof Error) {
+        console.error('Registration error:', error.message);
+      }
       throw error;
     } finally {
       setIsLoading(false);

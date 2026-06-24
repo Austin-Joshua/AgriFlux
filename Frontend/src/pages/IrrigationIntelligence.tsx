@@ -79,6 +79,8 @@ const IrrigationIntelligence: React.FC = () => {
     type: 'info',
   });
 
+  const [cropType, setCropType] = useState('Rice');
+  const [soilType, setSoilType] = useState('Sandy Loam');
   const waterSaved = 2400;
   const efficiency = 84;
 

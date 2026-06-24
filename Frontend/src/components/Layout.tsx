@@ -66,7 +66,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         isOpen={sidebarOpen}
         collapsed={sidebarCollapsed}
         onClose={() => setSidebarOpen(false)}
-        onCollapseToggle={() => setSidebarCollapsed((prev) => !prev)}
       />
 
       {/* Main content area */}

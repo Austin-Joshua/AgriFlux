@@ -30,7 +30,6 @@ interface SidebarProps {
   isOpen: boolean;
   collapsed: boolean;
   onClose: () => void;
-  onCollapseToggle: () => void;
 }
 
 const navItems = [
@@ -57,7 +56,7 @@ const bottomItems = [
   { to: '/settings', icon: Settings, labelKey: 'nav.settings' },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose, onCollapseToggle: _onCollapseToggle }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();

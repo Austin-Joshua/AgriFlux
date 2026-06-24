@@ -13,7 +13,12 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { Calendar, AlertTriangle, Send, Loader } from 'lucide-react';
+import {
+  Calendar,
+  AlertTriangle,
+  Send,
+  Loader,
+} from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { toast } from 'react-toastify';
@@ -448,9 +453,10 @@ const AgronomistDashboard: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {consultations.map((v) => {
-                const farmerName = v.userId?.name || 'Demo Farmer';
-                const farmName = v.userId?.farmName || 'Green Valley Farm';
-                const location = v.userId?.location || 'Mysuru, KA';
+                const isUserObj = typeof v.userId === 'object' && v.userId !== null;
+                const farmerName = (isUserObj ? (v.userId as any).name : null) || 'Demo Farmer';
+                const farmName = (isUserObj ? (v.userId as any).farmName : null) || 'Green Valley Farm';
+                const location = (isUserObj ? (v.userId as any).location : null) || 'Mysuru, KA';
                 return (
                   <div
                     key={v._id}

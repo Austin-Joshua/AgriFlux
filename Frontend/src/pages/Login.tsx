@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Phone, Lock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/logo-icon.png';
 import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
+  const { isDark } = useTheme();
   const { login, loginWithProvider, isLoading, requiresOnboarding, isAuthenticated, user } =
     useAuth();
   const navigate = useNavigate();
