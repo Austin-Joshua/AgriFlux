@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Upload,
   Map as MapIcon,
@@ -12,6 +12,17 @@ import {
 import { useTranslation } from 'react-i18next';
 import ReportModal from '../components/ReportModal';
 import SEO from '../components/SEO';
+
+const toDMS = (coordinate: number, isLat: boolean, secondOffset = 0) => {
+  let absolute = Math.abs(coordinate);
+  absolute += secondOffset * 0.000277;
+  const degrees = Math.floor(absolute);
+  const minutesNotTruncated = (absolute - degrees) * 60;
+  const minutes = Math.floor(minutesNotTruncated);
+  const seconds = Math.floor((minutesNotTruncated - minutes) * 60);
+  const dir = isLat ? (coordinate >= 0 ? 'N' : 'S') : (coordinate >= 0 ? 'E' : 'W');
+  return `${degrees}°${minutes}'${seconds}" ${dir}`;
+};
 
 const LandIntelligence: React.FC = () => {
   const { t } = useTranslation();
@@ -29,6 +40,20 @@ const LandIntelligence: React.FC = () => {
     content: React.ReactNode;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [baseCoords, setBaseCoords] = useState<{lat: number, lng: number} | null>(null);
+
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setBaseCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
+        },
+        (error) => {
+          console.warn('Geolocation error:', error);
+        }
+      );
+    }
+  }, []);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -176,7 +201,7 @@ const LandIntelligence: React.FC = () => {
                           fontFamily="monospace"
                           opacity="0.8"
                         >
-                          11°56'24" N
+                          {baseCoords ? toDMS(baseCoords.lat, true, 22) : "11°56'24\" N"}
                         </text>
                         <text
                           x="15"
@@ -187,7 +212,7 @@ const LandIntelligence: React.FC = () => {
                           fontFamily="monospace"
                           opacity="0.8"
                         >
-                          79°12'05" E
+                          {baseCoords ? toDMS(baseCoords.lng, false, 0) : "79°12'05\" E"}
                         </text>
 
                         <text
@@ -199,7 +224,7 @@ const LandIntelligence: React.FC = () => {
                           fontFamily="monospace"
                           opacity="0.8"
                         >
-                          11°56'24" N
+                          {baseCoords ? toDMS(baseCoords.lat, true, 22) : "11°56'24\" N"}
                         </text>
                         <text
                           x="710"
@@ -210,7 +235,7 @@ const LandIntelligence: React.FC = () => {
                           fontFamily="monospace"
                           opacity="0.8"
                         >
-                          79°12'42" E
+                          {baseCoords ? toDMS(baseCoords.lng, false, 37) : "79°12'42\" E"}
                         </text>
 
                         <text
@@ -222,7 +247,7 @@ const LandIntelligence: React.FC = () => {
                           fontFamily="monospace"
                           opacity="0.8"
                         >
-                          11°56'02" N
+                          {baseCoords ? toDMS(baseCoords.lat, true, 0) : "11°56'02\" N"}
                         </text>
                         <text
                           x="15"
@@ -233,7 +258,7 @@ const LandIntelligence: React.FC = () => {
                           fontFamily="monospace"
                           opacity="0.8"
                         >
-                          79°12'05" E
+                          {baseCoords ? toDMS(baseCoords.lng, false, 0) : "79°12'05\" E"}
                         </text>
 
                         {/* Zone Telemetry Polygons */}

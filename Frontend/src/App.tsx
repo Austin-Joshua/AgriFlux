@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,10 +44,12 @@ const EquipmentRental = lazy(() => import('./pages/EquipmentRental'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Helper: Wrap protected lazy routes
-const P = ({ children }: { children: React.ReactNode }) => (
+const P = () => (
   <ProtectedRoute>
     <Layout>
-      <Suspense fallback={<PageLoader />}>{children}</Suspense>
+      <Suspense fallback={<PageLoader />}>
+        <Outlet />
+      </Suspense>
     </Layout>
   </ProtectedRoute>
 );
@@ -97,174 +99,29 @@ const App: React.FC = () => {
                 />
 
                 {/* Protected lazy routes */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <P>
-                      <Dashboard />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/marketplace"
-                  element={
-                    <P>
-                      <Marketplace />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/equipment-rental"
-                  element={
-                    <P>
-                      <EquipmentRental />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/yield"
-                  element={
-                    <P>
-                      <YieldPrediction />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/irrigation"
-                  element={
-                    <P>
-                      <IrrigationIntelligence />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/soil"
-                  element={
-                    <P>
-                      <SoilAdvisor />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/crop-health"
-                  element={
-                    <P>
-                      <CropHealthMonitoring />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/climate"
-                  element={
-                    <P>
-                      <ClimateRisk />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/simulator"
-                  element={
-                    <P>
-                      <ClimateSimulator />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/crop-switching"
-                  element={
-                    <P>
-                      <CropSwitchingAdvisor />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/sustainability"
-                  element={
-                    <P>
-                      <SustainabilityScore />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <P>
-                      <Settings />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/about"
-                  element={
-                    <P>
-                      <About />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/subsidies"
-                  element={
-                    <P>
-                      <GovernmentSubsidies />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/market"
-                  element={
-                    <P>
-                      <MarketAnalysis />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/investors"
-                  element={
-                    <P>
-                      <InvestorsHub />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/soil-advisor"
-                  element={
-                    <P>
-                      <SoilAdvisor />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/book-consultation"
-                  element={
-                    <P>
-                      <BookConsultation />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/land-intelligence"
-                  element={
-                    <P>
-                      <LandIntelligence />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/agronomist"
-                  element={
-                    <P>
-                      <AgronomistDashboard />
-                    </P>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <P>
-                      <AdminDashboard />
-                    </P>
-                  }
-                />
+                <Route element={<P />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/marketplace" element={<Marketplace />} />
+                  <Route path="/equipment-rental" element={<EquipmentRental />} />
+                  <Route path="/yield" element={<YieldPrediction />} />
+                  <Route path="/irrigation" element={<IrrigationIntelligence />} />
+                  <Route path="/soil" element={<SoilAdvisor />} />
+                  <Route path="/crop-health" element={<CropHealthMonitoring />} />
+                  <Route path="/climate" element={<ClimateRisk />} />
+                  <Route path="/simulator" element={<ClimateSimulator />} />
+                  <Route path="/crop-switching" element={<CropSwitchingAdvisor />} />
+                  <Route path="/sustainability" element={<SustainabilityScore />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/subsidies" element={<GovernmentSubsidies />} />
+                  <Route path="/market" element={<MarketAnalysis />} />
+                  <Route path="/investors" element={<InvestorsHub />} />
+                  <Route path="/soil-advisor" element={<SoilAdvisor />} />
+                  <Route path="/book-consultation" element={<BookConsultation />} />
+                  <Route path="/land-intelligence" element={<LandIntelligence />} />
+                  <Route path="/agronomist" element={<AgronomistDashboard />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                </Route>
 
                 {/* Redirects */}
                 <Route path="/" element={<HomeRedirect />} />
