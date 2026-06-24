@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const mainMargin = sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900 flex">
       {/* Skip to Content link for accessibility */}
       <a
         href="#main-content"
@@ -77,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Extra top padding if CitizenOne banner is visible; extra bottom padding on mobile for bottom nav */}
         <main
           id="main-content"
-          className={`flex-1 p-4 md:p-6 overflow-auto pb-36 lg:pb-6 ${isFromCitizenOne ? 'pt-16' : ''}`}
+          className={`flex-1 p-3 md:p-6 overflow-x-hidden overflow-y-auto pb-24 lg:pb-6 ${isFromCitizenOne ? 'pt-16' : ''}`}
         >
           <div className="max-w-7xl mx-auto animate-fade-in">{children}</div>
         </main>
