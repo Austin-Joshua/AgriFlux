@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Mic, MicOff, Globe } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 
@@ -9,29 +9,6 @@ interface Message {
   confidence?: number;
 }
 
-// Web Speech API – local interface (avoids lib.dom TS conflicts)
-interface ISpeechRecognition extends EventTarget {
-  lang: string;
-  interimResults: boolean;
-  maxAlternatives: number;
-  onresult: ((event: ISpeechRecognitionEvent) => void) | null;
-  onerror: (() => void) | null;
-  onend: (() => void) | null;
-  start(): void;
-  stop(): void;
-}
-interface ISpeechRecognitionEvent {
-  results: { [index: number]: { [index: number]: { transcript: string } } };
-}
-interface ISpeechRecognitionConstructor {
-  new (): ISpeechRecognition;
-}
-declare global {
-  interface Window {
-    SpeechRecognition: ISpeechRecognitionConstructor;
-    webkitSpeechRecognition: ISpeechRecognitionConstructor;
-  }
-}
 
 const rndInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -43,9 +20,7 @@ const AIAssistantChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
-  const [listening, setListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const recognitionRef = useRef<ISpeechRecognition | null>(null);
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -474,52 +449,6 @@ const AIAssistantChat: React.FC = () => {
     setMessages((prev) => [...prev, { role: 'assistant', text: responseText, confidence }]);
   };
 
-  // Text-to-Speech (TTS) for responses
-  useEffect(() => {
-    if (messages.length > 0) {
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg.role === 'assistant') {
-        const synth = window.speechSynthesis;
-        if (synth) {
-          synth.cancel(); // Stop any previous speech
-          const utterance = new SpeechSynthesisUtterance(lastMsg.text);
-          utterance.lang = lang === 'ta' ? 'ta-IN' : 'en-IN';
-          utterance.rate = 1.0;
-          utterance.pitch = 1.0;
-          synth.speak(utterance);
-        }
-      }
-    }
-  }, [messages, lang]);
-
-  const toggleVoice = () => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      alert('Voice input not supported in this browser.');
-      return;
-    }
-    if (listening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setListening(false);
-      return;
-    }
-    const recognition = new SR() as ISpeechRecognition;
-    recognition.lang = lang === 'ta' ? 'ta-IN' : 'en-IN';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onresult = (event) => {
-      const spoken = event.results[0][0].transcript;
-      setInput(spoken);
-      setListening(false);
-      // Auto-Submit Feature
-      sendMessage(spoken);
-    };
-    recognition.onerror = () => setListening(false);
-    recognition.onend = () => setListening(false);
-    recognitionRef.current = recognition;
-    recognition.start();
-    setListening(true);
-  };
 
   return (
     <>
@@ -653,13 +582,6 @@ const AIAssistantChat: React.FC = () => {
 
           {/* Input */}
           <div className="p-3 border-t border-gray-100 dark:border-gray-700 flex gap-2 items-center bg-gray-50/50 dark:bg-gray-800/50">
-            <button
-              onClick={toggleVoice}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${listening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30'}`}
-              title="Voice Input"
-            >
-              {listening ? <MicOff size={16} /> : <Mic size={16} />}
-            </button>
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import AIAssistantChat from './AIAssistantChat';
 import MobileBottomNav from './MobileBottomNav';
 import { ArrowLeft } from 'lucide-react';
 
@@ -86,8 +85,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Mobile Bottom Nav (hidden on lg+) */}
       <MobileBottomNav />
 
-      {/* Floating AI Chat — uses fixed positioning internally, offset class applied via CSS */}
-      <AIAssistantChat />
     </div>
   );
 };

@@ -147,15 +147,14 @@ const YieldPrediction: React.FC = () => {
         </div>
       );
       type = val === 'Low' ? 'success' : val === 'Medium' ? 'warning' : 'info';
-    } else if (label === 'Confidence') {
+    } else if (label === 'Confidence' || label === 'Yield Methodology') {
       content = (
         <div className="space-y-4">
           <p>
-            Model Confidence: <strong>99%</strong>
+            Methodology: <strong>Calibrated Agronomic Formula</strong>
           </p>
           <p>
-            Calculated based on the completeness of input data and the prediction model's historical
-            accuracy for this crop in this region.
+            Yield estimates are computed via calibrated agronomic rule-based formulas incorporating base crop potential, NPK stoichiometry, rainfall distribution, and temperature-humidity indices. This deterministic formula provides advisory guidance and is distinct from trained machine-learning empirical models.
           </p>
         </div>
       );
@@ -249,11 +248,11 @@ const YieldPrediction: React.FC = () => {
             icon: '📈',
           },
           {
-            label: 'Yield Confidence',
-            value: '99%',
+            label: 'Yield Methodology',
+            value: 'Agronomic Formula',
             color: 'text-green-600',
             bg: 'bg-green-50 dark:bg-green-900/20',
-            icon: '✅',
+            icon: '📐',
           },
           {
             label: 'Historical Baseline',

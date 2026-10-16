@@ -6,7 +6,6 @@ import {
   Thermometer,
   Satellite,
   Calendar,
-  Sparkles,
   Loader,
   RefreshCw,
   AlertTriangle,
@@ -29,7 +28,6 @@ import {
   Tooltip,
   ComposedChart,
 } from 'recharts';
-import { toast } from 'react-toastify';
 import { API_URL } from '../config';
 
 interface WeatherObservation {
@@ -136,7 +134,6 @@ const EnvironmentalIntelligence: React.FC = () => {
   // Satellite state
   const [satelliteData, setSatelliteData] = useState<SatelliteResponse | null>(null);
   const [loadingSatellite, setLoadingSatellite] = useState<boolean>(true);
-  const [isDemoSubmitting, setIsDemoSubmitting] = useState<boolean>(false);
 
   // Soil state
   const [soilProfile, setSoilProfile] = useState<SoilProfileData | null>(null);
@@ -295,44 +292,6 @@ const EnvironmentalIntelligence: React.FC = () => {
     };
   }, [weatherData]);
 
-  // Demonstration Ingestion of Verified Sentinel-2 L2A Tile
-  const handleIngestDemoSatellite = async () => {
-    setIsDemoSubmitting(true);
-    try {
-      const token = localStorage.getItem('token');
-      const payload = {
-        regionName: 'Thanjavur, Tamil Nadu (Cauvery Delta)',
-        latitude: 10.790861,
-        longitude: 79.098145,
-        tileId: 'T44NPM',
-        productIdentifier: 'S2A_MSIL2A_20240315T050651_N0510_R019_T44NPM_20240315T084422',
-        acquisitionDate: '2024-03-15T05:06:51.000Z',
-        spatialResolutionMeters: 10,
-        reportedCloudCoveragePercentage: 4.2,
-        samples: [
-          { b04_red: 580, b08_nir: 3950, scl_classification: 4 },
-          { b04_red: 620, b08_nir: 4200, scl_classification: 4 },
-          { b04_red: 710, b08_nir: 4050, scl_classification: 4 },
-          { b04_red: 850, b08_nir: 3800, scl_classification: 4 },
-          { b04_red: 1400, b08_nir: 2100, scl_classification: 5 },
-          { b04_red: 520, b08_nir: 4100, scl_classification: 4 },
-        ],
-      };
-
-      await axios.post(`${API_URL}/environmental/ingest/satellite`, payload, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      toast.success('🛰️ Sentinel-2 L2A NDVI observation imported for Thanjavur (Tile T44NPM)!');
-      fetchSatellite();
-    } catch (err: unknown) {
-      console.info('Satellite sample note:', (err as Error).message);
-      toast.info('Satellite sample processed into local session buffer.');
-      fetchSatellite();
-    } finally {
-      setIsDemoSubmitting(false);
-    }
-  };
 
   return (
     <div className="card overflow-hidden">
@@ -384,7 +343,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             }`}
           >
             <FlaskConical size={13} />
-            Soil Health Card
+            Regional Soil Benchmark
           </button>
           <button
             onClick={() => setActiveTab('apy')}
@@ -747,12 +706,14 @@ const EnvironmentalIntelligence: React.FC = () => {
 
               <div className="max-w-md mx-auto">
                 <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                  Awaiting Copernicus Sentinel-2 L2A Raster Upload
+                  Satellite data not connected
                 </h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                  No genuine Copernicus Sentinel-2 Level-2A product has been ingested for the
-                  Thanjavur pilot area yet. AgriFlux enforces strict scientific integrity and
-                  <strong> does not fabricate synthetic satellite vegetation indices</strong>.
+                  No genuine Copernicus Sentinel-2 Level-2A raster product is connected for the
+                  Thanjavur pilot area. AgriFlux enforces strict scientific integrity and does not
+                  fabricate synthetic satellite observations. The processing pipeline is initialized
+                  and ready for orbital raster ingestion when high-resolution imagery is connected.
+                  The rest of AgriFlux remains fully operational without satellite connectivity.
                 </p>
               </div>
 
@@ -779,23 +740,17 @@ const EnvironmentalIntelligence: React.FC = () => {
               </div>
 
               <div className="pt-1">
-                <button
-                  onClick={handleIngestDemoSatellite}
-                  disabled={isDemoSubmitting}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 shadow-sm transition-all"
-                >
-                  <Sparkles size={13} />
-                  {isDemoSubmitting
-                    ? 'Processing Sentinel-2 Band Matrix...'
-                    : 'Process Verified L2A Tile Sample'}
-                </button>
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 shadow-sm">
+                  <Satellite size={13} className="text-blue-500" />
+                  Multispectral Ingestion Pipeline Ready (Awaiting L2A Raster Link)
+                </span>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* TAB 3: SOIL HEALTH CARD & LABORATORY CHEMISTRY */}
+      {/* TAB 3: REGIONAL SOIL BENCHMARK */}
       {activeTab === 'soil' && (
         <div className="pt-4 space-y-4">
           <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
@@ -808,7 +763,7 @@ const EnvironmentalIntelligence: React.FC = () => {
               </span>
             </div>
             <span className="px-2.5 py-0.5 rounded-md bg-amber-200/80 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold text-[10px] tracking-wide uppercase shrink-0">
-              {soilProfile?.status === 'benchmark' ? 'Illustrative Benchmark' : 'Laboratory Verified'}
+              Illustrative Regional Benchmark
             </span>
           </div>
 
@@ -846,7 +801,7 @@ const EnvironmentalIntelligence: React.FC = () => {
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <span className="text-[10px] text-gray-400 block">Testing Authority:</span>
+                  <span className="text-[10px] text-gray-400 block">Regional Survey Authority:</span>
                   <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                     {soilProfile.laboratoryName}
                   </span>
