@@ -15,9 +15,11 @@ import aiRoutes from './routes/ai.routes';
 import consultationRoutes from './routes/consultation.routes';
 import integrationRoutes from './routes/integration.routes';
 import iotRoutes from './routes/iot.routes';
+import fieldIntelligenceRoutes from './routes/field-intelligence.routes';
 
 import cluster from 'cluster';
 import os from 'os';
+import { setIO } from './socket';
 
 /**
  * Handle uncaught exceptions and unhandled rejections globally
@@ -64,6 +66,8 @@ app.use(
   })
 );
 
+import jwt from 'jsonwebtoken';
+
 const httpServer = createServer(app);
 const io = new SocketServer(httpServer, {
   cors: {
@@ -83,16 +87,51 @@ const io = new SocketServer(httpServer, {
     credentials: true,
   },
 });
+setIO(io);
+
+/**
+ * Socket.IO Handshake Auth Middleware
+ */
+io.use((socket, next) => {
+  const token =
+    (socket.handshake.auth?.token as string) ||
+    socket.handshake.headers?.authorization?.replace('Bearer ', '');
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, env.JWT_SECRET);
+      (socket as any).user = decoded;
+    } catch {
+      // Invalid token, socket remains unauthenticated
+    }
+  }
+  next();
+});
 
 /**
  * Socket.IO Connection Handler
  */
 io.on('connection', (socket) => {
-  console.log(`🔌 [SOCKET] New client connected: ${socket.id}`);
+  const user = (socket as any).user;
+  console.log(
+    `🔌 [SOCKET] New client connected: ${socket.id} (user: ${user?.id || 'anonymous'}, role: ${user?.role || 'guest'})`
+  );
 
-  // Broadcast real-time pump controls to ESP32 and other dashboard clients
+  // Broadcast real-time pump controls to ESP32 and other dashboard clients with authorization check
   socket.on('iot-control', (data) => {
-    console.log('📡 [SOCKET] Control event received:', data);
+    const socketUser = (socket as any).user;
+    if (!socketUser || !['farmer', 'admin'].includes(socketUser.role)) {
+      console.warn(`⚠️ [SOCKET] Unauthorized iot-control attempt from socket ${socket.id}`);
+      socket.emit('error', {
+        message: 'Unauthorized: actuator control requires valid farmer/admin token',
+      });
+      return;
+    }
+
+    console.log(
+      `📡 [SOCKET] Authorized control event from ${socketUser.role} (${socketUser.id}):`,
+      data
+    );
     socket.broadcast.emit('iot-control', data);
   });
 
@@ -140,6 +179,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/integration', integrationRoutes);
 app.use('/api/iot-data', iotRoutes);
+app.use('/api/field-intelligence', fieldIntelligenceRoutes);
 
 // 404
 app.use((_req: Request, res: Response) => {

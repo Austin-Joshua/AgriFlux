@@ -59,8 +59,16 @@ export const useIoT = () => {
     }
 
     // Initialize Socket
-    // In local dev, backend is on 5001
-    const socket = io('http://localhost:5001', {
+    const token = localStorage.getItem('agriflux-token');
+    const wsUrl =
+      import.meta.env.VITE_WS_URL ||
+      (typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:5001'
+        : 'https://agriflux-backend.onrender.com');
+
+    const socket = io(wsUrl, {
+      auth: { token: token || '' },
       reconnectionAttempts: 5,
       timeout: 10000,
     });
@@ -100,7 +108,11 @@ export const useIoT = () => {
    */
   const fetchLatestData = useCallback(async () => {
     try {
-      const response = await fetch('/api/iot-data');
+      const token = localStorage.getItem('agriflux-token');
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch('/api/iot-data', { headers });
       const result = await response.json();
       if (result.success && result.data) {
         const { data } = result;
@@ -142,9 +154,13 @@ export const useIoT = () => {
     } else {
       console.log('📡 [IoT] Fallback to POST control endpoint:', targetState);
       try {
+        const token = localStorage.getItem('agriflux-token');
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const response = await fetch('/api/iot-data/control', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({ pumpStatus: targetState }),
         });
         const result = await response.json();

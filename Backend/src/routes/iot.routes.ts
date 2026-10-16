@@ -41,5 +41,6 @@ router.post('/control', auth, iotController.controlPump);
  * Authenticated on frontend via JWT already.
  */
 router.get('/', iotController.getIoTData);
+router.get('/history', iotController.getIoTHistory);
 
 export default router;

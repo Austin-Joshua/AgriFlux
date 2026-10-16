@@ -14,6 +14,7 @@ const char* password = "YOUR_WIFI_PASSWORD";
 // Server Configuration
 // Use your local machine's IP (e.g., 192.168.1.5) if running backend locally
 const char* serverUrl = "http://YOUR_LOCAL_IP:5001/api/iot-data";
+const char* iotApiKey = "agriflux-iot-key-dev"; // Matches IOT_API_KEY on AgriFlux Backend
 
 // Pin Configuration
 const int SOIL_SENSOR_PIN = 34; // Capacitive Soil Moisture Sensor
@@ -46,6 +47,7 @@ void loop() {
     HTTPClient http;
     http.begin(serverUrl);
     http.addHeader("Content-Type", "application/json");
+    http.addHeader("x-iot-api-key", iotApiKey);
 
     // Construct Payload
     String payload = "{";

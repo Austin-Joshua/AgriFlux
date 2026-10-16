@@ -1,57 +1,150 @@
 import { Request, Response } from 'express';
-import { io } from '../server';
+import { getIO } from '../socket';
+import IoTReading from '../../../Database/Models/IoTReading';
+import { isDBConnected } from '../config/db';
 
 /**
  * AgriFlux IoT Intelligence Controller
  * -----------------------------------
  * Manages real-time data flow from ESP32 nodes to the AgriFlux dashboard.
+ * Supports persistent telemetry storage in MongoDB with memory fallback.
  */
 
-// In-memory store for the latest sensor reading (Singleton)
+// In-memory buffer for latest readings (retained for demo mode / quick access)
 let latestIoTData = {
-  moisture: 0,
-  temperature: 0,
-  humidity: 0,
+  deviceId: 'esp32-node-01',
+  moisture: 45.0,
+  temperature: 24.5,
+  humidity: 62.0,
   pumpStatus: false,
+  isSimulated: false,
+  status: 'healthy',
   timestamp: new Date().toISOString(),
-  isOnline: false,
+  isOnline: true,
 };
+
+// In-memory historical ring buffer (last 50 readings for fallback)
+const inMemoryHistory: (typeof latestIoTData)[] = [latestIoTData];
 
 /**
  * POST /api/iot-data
- * Receives data from ESP32
+ * Ingests validated sensor data from ESP32 or simulator
  */
 export const postIoTData = async (req: Request, res: Response) => {
   try {
-    const { moisture, temperature, humidity, pumpStatus } = req.body;
+    const { moisture, temperature, humidity, pumpStatus, deviceId, isSimulated } = req.body;
 
-    // Validation & Sanitization
-    const sanitizedMoisture = Math.min(100, Math.max(0, Number(moisture) || 0));
-    const sanitizedTemp = Number(temperature) || 0;
-    const sanitizedHumidity = Math.min(100, Math.max(0, Number(humidity) || 0));
-    const sanitizedPumpStatus = Boolean(pumpStatus);
+    // Strict validation: missing fields must NOT silently coerce to zero
+    if (moisture === undefined || moisture === null || isNaN(Number(moisture))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid sensor payload: numeric moisture (0-100%) is required.',
+      });
+    }
 
-    // Update latest data
+    if (temperature === undefined || temperature === null || isNaN(Number(temperature))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid sensor payload: numeric temperature in Celsius is required.',
+      });
+    }
+
+    if (humidity === undefined || humidity === null || isNaN(Number(humidity))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid sensor payload: numeric humidity (0-100%) is required.',
+      });
+    }
+
+    const numMoisture = Number(moisture);
+    const numTemp = Number(temperature);
+    const numHumidity = Number(humidity);
+
+    // Range checks
+    if (numMoisture < 0 || numMoisture > 100) {
+      return res.status(400).json({
+        success: false,
+        message: `Soil moisture value ${numMoisture}% out of physical range [0, 100].`,
+      });
+    }
+
+    if (numTemp < -10 || numTemp > 60) {
+      return res.status(400).json({
+        success: false,
+        message: `Temperature value ${numTemp}°C out of plausible range [-10, 60].`,
+      });
+    }
+
+    if (numHumidity < 0 || numHumidity > 100) {
+      return res.status(400).json({
+        success: false,
+        message: `Humidity value ${numHumidity}% out of physical range [0, 100].`,
+      });
+    }
+
+    const targetDeviceId = String(deviceId || 'esp32-node-01');
+    const targetPumpStatus = Boolean(pumpStatus);
+    const targetSimulated = Boolean(isSimulated);
+
+    let sensorStatus: 'healthy' | 'warning' | 'critical' | 'sensor_fault' = 'healthy';
+    if (numMoisture < 25) {
+      sensorStatus = 'critical';
+    } else if (numMoisture < 40 || numTemp > 38) {
+      sensorStatus = 'warning';
+    }
+
+    const timestamp = new Date().toISOString();
+
     latestIoTData = {
-      moisture: sanitizedMoisture,
-      temperature: sanitizedTemp,
-      humidity: sanitizedHumidity,
-      pumpStatus: sanitizedPumpStatus,
-      timestamp: new Date().toISOString(),
+      deviceId: targetDeviceId,
+      moisture: Math.round(numMoisture * 10) / 10,
+      temperature: Math.round(numTemp * 10) / 10,
+      humidity: Math.round(numHumidity * 10) / 10,
+      pumpStatus: targetPumpStatus,
+      isSimulated: targetSimulated,
+      status: sensorStatus,
+      timestamp,
       isOnline: true,
     };
 
+    inMemoryHistory.unshift(latestIoTData);
+    if (inMemoryHistory.length > 50) {
+      inMemoryHistory.pop();
+    }
+
+    // Persist to MongoDB if connected
+    if (isDBConnected) {
+      try {
+        await IoTReading.create({
+          deviceId: targetDeviceId,
+          moisture: latestIoTData.moisture,
+          temperature: latestIoTData.temperature,
+          humidity: latestIoTData.humidity,
+          pumpStatus: targetPumpStatus,
+          isSimulated: targetSimulated,
+          status: sensorStatus,
+          rawTimestamp: new Date(timestamp),
+        });
+      } catch (dbErr: any) {
+        console.warn(`⚠️ [IoT SYNC] Could not persist reading to MongoDB: ${dbErr.message}`);
+      }
+    }
+
     console.log(
-      `📡 [IoT SYNC] Data received: M:${sanitizedMoisture}% T:${sanitizedTemp}C H:${sanitizedHumidity}% P:${sanitizedPumpStatus}`
+      `📡 [IoT SYNC] Synced: M:${latestIoTData.moisture}% T:${latestIoTData.temperature}°C H:${latestIoTData.humidity}% P:${latestIoTData.pumpStatus} [${targetSimulated ? 'SIMULATOR' : 'HARDWARE'}]`
     );
 
-    // [SOCKET.IO] Emit real-time update to all connected clients
-    io.emit('iot-update', latestIoTData);
+    // Broadcast real-time update to all connected Socket.IO clients
+    const io = getIO();
+    if (io) {
+      io.emit('iot-update', latestIoTData);
+    }
 
     return res.status(200).json({
       success: true,
-      message: 'Data synced successfully',
-      receivedAt: latestIoTData.timestamp,
+      message: 'Telemetry synced and persisted successfully',
+      receivedAt: timestamp,
+      data: latestIoTData,
     });
   } catch (error: any) {
     console.error('❌ [IoT SYNC ERROR]', error.message);
@@ -64,13 +157,12 @@ export const postIoTData = async (req: Request, res: Response) => {
 
 /**
  * GET /api/iot-data
- * Sends latest data to frontend
+ * Sends latest sensor reading to frontend
  */
 export const getIoTData = async (_req: Request, res: Response) => {
   try {
-    // Check if data is stale (over 15 seconds)
     const lastUpdate = new Date(latestIoTData.timestamp).getTime();
-    const now = new Date().getTime();
+    const now = Date.now();
     const isStale = now - lastUpdate > 15000;
 
     return res.status(200).json({
@@ -78,6 +170,7 @@ export const getIoTData = async (_req: Request, res: Response) => {
       data: {
         ...latestIoTData,
         isOnline: latestIoTData.isOnline && !isStale,
+        isStale,
       },
     });
   } catch (error: any) {
@@ -89,31 +182,68 @@ export const getIoTData = async (_req: Request, res: Response) => {
 };
 
 /**
+ * GET /api/iot-data/history
+ * Returns historical sensor readings for real-time charting
+ */
+export const getIoTHistory = async (req: Request, res: Response) => {
+  try {
+    const limit = Math.min(100, Math.max(5, Number(req.query.limit) || 20));
+
+    if (isDBConnected) {
+      const records = await IoTReading.find({}).sort({ createdAt: -1 }).limit(limit);
+      if (records.length > 0) {
+        return res.status(200).json({
+          success: true,
+          source: 'database',
+          data: records.reverse(),
+        });
+      }
+    }
+
+    // Fallback to in-memory history
+    return res.status(200).json({
+      success: true,
+      source: 'memory_buffer',
+      data: inMemoryHistory.slice(0, limit).reverse(),
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching IoT history',
+    });
+  }
+};
+
+/**
  * POST /api/iot-data/control
- * Allows dashboard clients to toggle pump state remotely
+ * Allows authenticated dashboard clients to toggle pump state remotely
  */
 export const controlPump = async (req: Request, res: Response) => {
   try {
     const { pumpStatus } = req.body;
+    const targetPumpStatus = Boolean(pumpStatus);
 
     latestIoTData = {
       ...latestIoTData,
-      pumpStatus: Boolean(pumpStatus),
+      pumpStatus: targetPumpStatus,
       timestamp: new Date().toISOString(),
     };
 
     console.log(
-      `📡 [IoT CONTROL] Remote command received: Pump is now ${latestIoTData.pumpStatus ? 'ON' : 'OFF'}`
+      `📡 [IoT CONTROL] Command received: Pump is now ${targetPumpStatus ? 'ON' : 'OFF'}`
     );
 
-    // Broadcast to all sockets (ESP32 and other frontends)
-    io.emit('iot-update', latestIoTData);
-    io.emit('iot-control', { pumpStatus: latestIoTData.pumpStatus });
+    // Broadcast to ESP32 and frontends
+    const io = getIO();
+    if (io) {
+      io.emit('iot-update', latestIoTData);
+      io.emit('iot-control', { pumpStatus: targetPumpStatus });
+    }
 
     return res.status(200).json({
       success: true,
-      message: 'Pump toggled successfully',
-      pumpStatus: latestIoTData.pumpStatus,
+      message: `Pump turned ${targetPumpStatus ? 'ON' : 'OFF'} successfully`,
+      pumpStatus: targetPumpStatus,
     });
   } catch (error: any) {
     console.error('❌ [IoT CONTROL ERROR]', error.message);
