@@ -47,24 +47,70 @@ const FIELDS: FieldOption[] = [
   },
 ];
 
+interface FieldRecommendationData {
+  recommendationId: string;
+  fieldId: string;
+  fieldName: string;
+  cropType: string;
+  cropStage: string;
+  action: string;
+  actionLabel: string;
+  urgency: 'critical' | 'high' | 'medium' | 'low';
+  explanation: string;
+  decisionRules: string[];
+  assumptionsAndLimitations: string[];
+  alternativeActions: Array<{ action: string; tradeOff: string }>;
+  expectedFollowUpCondition?: {
+    parameter: string;
+    targetRange: string;
+    timeframeHours: number;
+    description: string;
+  };
+  supportingObservations: {
+    soilMoisture?: { value: number; unit: string; source: string; freshnessMinutes: number; isStale: boolean };
+    soilTemp?: { value: number; unit: string; source: string };
+    soilPh?: { value: number; unit: string; source: string };
+    soilNitrogen?: { value: number; unit: string };
+    soilPhosphorus?: { value: number; unit: string };
+    soilPotassium?: { value: number; unit: string };
+    ambientTemp?: { value: number; unit: string };
+    humidity?: { value: number; unit: string };
+    forecastRainMm?: { value: number; unit: string };
+    forecastRainProbability?: { value: number; unit: string };
+  };
+  farmerAction?: {
+    actionTaken: string;
+    notes?: string;
+    recordedAt: string;
+  };
+}
+
+interface FollowUpEvaluationData {
+  conditionMet: boolean;
+  status: 'improved' | 'insufficient_change' | 'worsened';
+  observedDelta: string;
+  explanation: string;
+  subsequentReading?: { moisture: number; temperature: number };
+}
+
 const AIDecisionPanel: React.FC = () => {
   const { token } = useAuth();
   const [selectedField, setSelectedField] = useState<FieldOption>(FIELDS[0]);
-  const [recommendation, setRecommendation] = useState<any>(null);
+  const [recommendation, setRecommendation] = useState<FieldRecommendationData | null>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
 
   // Follow-up evaluation state
   const [followUpMoisture, setFollowUpMoisture] = useState('52');
-  const [evaluationResult, setEvaluationResult] = useState<any>(null);
+  const [evaluationResult, setEvaluationResult] = useState<FollowUpEvaluationData | null>(null);
 
   // Fetch structured recommendation from backend
   const fetchRecommendation = useCallback(
     async (field = selectedField, moistureOverride?: number) => {
       setLoading(true);
       try {
-        const payload: Record<string, any> = {
+        const payload: Record<string, string | number> = {
           fieldId: field.id,
           fieldName: field.name,
           cropType: field.crop,
@@ -83,7 +129,7 @@ const AIDecisionPanel: React.FC = () => {
           setRecommendation(res.data.data);
           setEvaluationResult(null);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching field recommendation:', err);
       } finally {
         setLoading(false);
@@ -123,10 +169,14 @@ const AIDecisionPanel: React.FC = () => {
 
       if (res.data?.success) {
         toast.success(`Action '${actionTaken}' recorded and persisted!`);
-        setRecommendation((prev: any) => ({
-          ...prev,
-          farmerAction: res.data.data.farmerAction,
-        }));
+        setRecommendation((prev) =>
+          prev
+            ? {
+                ...prev,
+                farmerAction: res.data.data.farmerAction,
+              }
+            : null
+        );
       }
     } catch {
       toast.error('Failed to record action. Please try again.');

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { API_URL } from '../config';
 
 /**
  * useIoT Hook (Real-Time WebSocket Edition)
@@ -112,7 +113,7 @@ export const useIoT = () => {
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const response = await fetch('/api/iot-data', { headers });
+      const response = await fetch(`${API_URL}/iot-data`, { headers });
       const result = await response.json();
       if (result.success && result.data) {
         const { data } = result;
@@ -158,7 +159,7 @@ export const useIoT = () => {
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const response = await fetch('/api/iot-data/control', {
+        const response = await fetch(`${API_URL}/iot-data/control`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ pumpStatus: targetState }),

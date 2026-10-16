@@ -94,7 +94,13 @@ AgriFlux coordinates activities across three secure, context-specific user porta
     ```bash
     npm run dev
     ```
-    *Launches both the Express Backend (Port 5000) and Vite Frontend (Port 3000) concurrently.*
+    *Launches both the Express Backend (Port 5001) and Vite Frontend (Port 3000) concurrently.*
+
+4.  **Execute Automated Test Suite**:
+    ```bash
+    cd Backend && npm test
+    ```
+    *Executes the 22-test automated verification suite covering RBAC, IoT validation, Field Intelligence, and agronomic calculations.*
 
 ---
 
