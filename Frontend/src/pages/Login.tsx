@@ -224,7 +224,7 @@ const Login: React.FC = () => {
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              className="input-field pl-12 h-12 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+              className="input-field pl-11 h-10 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
               placeholder={t('auth.placeholderEmail')}
               autoComplete="off"
               required
@@ -254,7 +254,7 @@ const Login: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="input-field pl-12 pr-12 h-12 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+              className="input-field pl-11 pr-11 h-10 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
               placeholder="••••••••"
               autoComplete="new-password"
               required
@@ -273,7 +273,7 @@ const Login: React.FC = () => {
           id="login-submit"
           type="submit"
           disabled={isLoading}
-          className="btn-primary w-full py-4 text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/10 mt-4 active:scale-95"
+          className="btn-primary w-full py-2.5 text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/10 mt-4 active:scale-95 transition-all duration-150"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">

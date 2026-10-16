@@ -7,8 +7,19 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5001',
+        target: 'https://agriflux-backend.onrender.com',
         changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  preview: {
+    port: 4173,
+    proxy: {
+      '/api': {
+        target: 'https://agriflux-backend.onrender.com',
+        changeOrigin: true,
+        secure: false,
       },
     },
   },

@@ -306,7 +306,7 @@ const InvestorsHub: React.FC = () => {
                         {t('investors.startupName')}
                       </label>
                       <input
-                        className="input-field !py-3.5"
+                        className="input-field"
                         placeholder="e.g. FarmAI"
                         value={pitch.startup}
                         onChange={(e) => setPitch((p) => ({ ...p, startup: e.target.value }))}
@@ -318,7 +318,7 @@ const InvestorsHub: React.FC = () => {
                         {t('investors.stage')}
                       </label>
                       <select
-                        className="input-field !py-3.5"
+                        className="input-field"
                         value={pitch.stage}
                         onChange={(e) => setPitch((p) => ({ ...p, stage: e.target.value }))}
                       >
@@ -333,7 +333,7 @@ const InvestorsHub: React.FC = () => {
                       {t('investors.problem')}
                     </label>
                     <textarea
-                      className="input-field min-h-[120px] resize-y !py-3.5"
+                      className="input-field min-h-[100px] resize-y"
                       placeholder={t('investors.problemPlaceholder')}
                       value={pitch.problem}
                       onChange={(e) => setPitch((p) => ({ ...p, problem: e.target.value }))}
@@ -345,7 +345,7 @@ const InvestorsHub: React.FC = () => {
                       {t('investors.solution')}
                     </label>
                     <textarea
-                      className="input-field min-h-[120px] resize-y !py-3.5"
+                      className="input-field min-h-[100px] resize-y"
                       placeholder={t('investors.solutionPlaceholder')}
                       value={pitch.solution}
                       onChange={(e) => setPitch((p) => ({ ...p, solution: e.target.value }))}
@@ -358,7 +358,7 @@ const InvestorsHub: React.FC = () => {
                         {t('investors.fundingAsk')}
                       </label>
                       <input
-                        className="input-field !py-3.5"
+                        className="input-field"
                         placeholder="e.g. ₹50 Lakhs Seed Round"
                         value={pitch.ask}
                         onChange={(e) => setPitch((p) => ({ ...p, ask: e.target.value }))}
@@ -370,7 +370,7 @@ const InvestorsHub: React.FC = () => {
                       </label>
                       <input
                         type="email"
-                        className="input-field !py-3.5"
+                        className="input-field"
                         placeholder="founder@startup.com"
                         value={pitch.email}
                         onChange={(e) => setPitch((p) => ({ ...p, email: e.target.value }))}

@@ -262,202 +262,205 @@ const AIDecisionPanel: React.FC = () => {
   const moistureStatus = getMoistureColor(moistureValue);
 
   return (
-    <div className="card-executive overflow-hidden border border-emerald-500/20 shadow-xl transition-all duration-300 hover:shadow-2xl">
-      {/* Ambient Lighting Orbs */}
-      <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none" />
-      <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-teal-500/10 blur-3xl rounded-full pointer-events-none" />
+    <div className="space-y-4">
+      {/* 1. Telemetry Hub Card */}
+      <div className="card-executive overflow-hidden border border-emerald-500/20 shadow-xl transition-all duration-200 hover:shadow-2xl p-4 sm:p-5 relative">
+        {/* Ambient Lighting Orbs */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-teal-500/10 blur-3xl rounded-full pointer-events-none" />
 
-      {/* 1. Header Bar: Status & Field Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-shrink-0">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
-              <Target size={18} />
-            </span>
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
-            </span>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-black tracking-tight text-gray-900 dark:text-white font-display">
-                Field Intelligence Engine
-              </h2>
-              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                Closed-Loop AI
+        {/* Header Bar: Status & Field Switcher */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <div className="relative flex-shrink-0">
+              <span className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
+                <Target size={20} />
+              </span>
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
               </span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Autonomous agronomic decision gates connecting real-time IoT sensors, soil cards, and ERA5 weather.
-            </p>
-          </div>
-        </div>
 
-        {/* Field Switcher Pills */}
-        <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl self-start sm:self-auto border border-gray-200/50 dark:border-white/5">
-          {FIELDS.map((f) => (
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white font-display">
+                  Field Intelligence Engine
+                </h2>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                  Closed-Loop AI
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Autonomous agronomic decision gates connecting real-time IoT sensors & ERA5 weather.
+              </p>
+            </div>
+          </div>
+
+          {/* Field Switcher Pills - Horizontal scrolling on mobile without overflow */}
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl max-w-full overflow-x-auto no-scrollbar border border-gray-200/50 dark:border-white/5 flex-nowrap self-start sm:self-auto flex-shrink-0">
+            {FIELDS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => handleSelectField(f)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-150 active:scale-95 ${
+                  selectedField.id === f.id
+                    ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 scale-[1.02]'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/50'
+                }`}
+              >
+                {f.name.split(' ')[0]} ({f.crop})
+              </button>
+            ))}
             <button
-              key={f.id}
-              onClick={() => handleSelectField(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
-                selectedField.id === f.id
-                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 scale-[1.02]'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/50'
-              }`}
+              onClick={() => fetchRecommendation(selectedField, selectedField.defaultMoisture)}
+              disabled={loading}
+              title="Refresh In-Situ Telemetry"
+              className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex-shrink-0 active:scale-95"
             >
-              {f.name.split(' ')[0]} ({f.crop})
+              <RotateCw size={14} className={loading ? 'animate-spin text-emerald-600' : ''} />
             </button>
-          ))}
-          <button
-            onClick={() => fetchRecommendation(selectedField, selectedField.defaultMoisture)}
-            disabled={loading}
-            title="Refresh In-Situ Telemetry"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-          >
-            <RotateCw size={14} className={loading ? 'animate-spin text-emerald-600' : ''} />
-          </button>
-        </div>
-      </div>
-
-      {/* 2. Visual Telemetry Gauges Grid (Symmetric 4-Card Row) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 py-4 border-b border-gray-100 dark:border-gray-800">
-        {/* Gauge 1: Soil Moisture */}
-        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-              <Droplets size={12} className="text-blue-500" /> Soil Moisture
-            </span>
-            <span className={`text-[10px] font-extrabold ${moistureStatus.text}`}>
-              {moistureStatus.label}
-            </span>
-          </div>
-
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-gray-900 dark:text-white font-display">
-              {moistureValue}%
-            </span>
-            <span className="text-[10px] text-gray-400 font-medium">Root-Zone</span>
-          </div>
-
-          {/* Visual Progress Bar Gauge */}
-          <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ${moistureStatus.bar}`}
-              style={{ width: `${Math.min(100, Math.max(5, moistureValue))}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-            <span>0% Dry</span>
-            <span>50% Target</span>
-            <span>100% Sat</span>
           </div>
         </div>
 
-        {/* Gauge 2: Soil Chemistry */}
-        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-              <Activity size={12} className="text-emerald-500" /> Soil Chemistry
-            </span>
-            <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400">
-              Balanced
-            </span>
+        {/* Telemetry Gauges Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
+          {/* Gauge 1: Soil Moisture */}
+          <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                <Droplets size={12} className="text-blue-500" /> Moisture
+              </span>
+              <span className={`text-[10px] font-extrabold ${moistureStatus.text}`}>
+                {moistureStatus.label}
+              </span>
+            </div>
+
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-display">
+                {moistureValue}%
+              </span>
+              <span className="text-[10px] text-gray-400 font-medium">Root-Zone</span>
+            </div>
+
+            {/* Visual Progress Bar Gauge - Snappy 200ms duration */}
+            <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-200 ease-out ${moistureStatus.bar}`}
+                style={{ width: `${Math.min(100, Math.max(5, moistureValue))}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+              <span>0% Dry</span>
+              <span>50% Target</span>
+              <span>100% Sat</span>
+            </div>
           </div>
 
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
-              pH {obs?.soilPh?.value || 6.4}
-            </span>
-            <span className="text-[10px] text-gray-400 font-medium">Optimal</span>
+          {/* Gauge 2: Soil Chemistry */}
+          <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                <Activity size={12} className="text-emerald-500" /> Chemistry
+              </span>
+              <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400">
+                Balanced
+              </span>
+            </div>
+
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
+                pH {obs?.soilPh?.value || 6.4}
+              </span>
+              <span className="text-[10px] text-gray-400 font-medium">Optimal</span>
+            </div>
+
+            <div className="w-full bg-gradient-to-r from-red-400 via-emerald-400 to-blue-400 rounded-full h-1.5 mt-2 relative">
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-gray-900 dark:bg-white rounded-full border border-emerald-500 shadow-sm transition-all duration-200 ease-out"
+                style={{ left: `${((Number(obs?.soilPh?.value || 6.4) - 4) / 5) * 100}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+              <span>Acidic</span>
+              <span>pH 7.0</span>
+              <span>Alkaline</span>
+            </div>
           </div>
 
-          <div className="w-full bg-gradient-to-r from-red-400 via-emerald-400 to-blue-400 rounded-full h-1.5 mt-2 relative">
-            <div
-              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-gray-900 dark:bg-white rounded-full border border-emerald-500 shadow-sm"
-              style={{ left: `${((Number(obs?.soilPh?.value || 6.4) - 4) / 5) * 100}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-            <span>Acidic</span>
-            <span>pH 7.0</span>
-            <span>Alkaline</span>
-          </div>
-        </div>
+          {/* Gauge 3: Ambient Climate */}
+          <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                <Thermometer size={12} className="text-amber-500" /> Climate
+              </span>
+              <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400">
+                Warm
+              </span>
+            </div>
 
-        {/* Gauge 3: Ambient Climate */}
-        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-              <Thermometer size={12} className="text-amber-500" /> Micro-Climate
-            </span>
-            <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400">
-              Warm
-            </span>
-          </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-display">
+                {obs?.ambientTemp?.value || 28}°C
+              </span>
+              <span className="text-[10px] text-gray-400 font-medium">
+                RH {obs?.humidity?.value || 60}%
+              </span>
+            </div>
 
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-amber-600 dark:text-amber-400 font-display">
-              {obs?.ambientTemp?.value || 28}°C
-            </span>
-            <span className="text-[10px] text-gray-400 font-medium">
-              RH {obs?.humidity?.value || 60}%
-            </span>
-          </div>
-
-          <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-700"
-              style={{ width: `${Math.min(100, ((Number(obs?.ambientTemp?.value || 28) - 10) / 35) * 100)}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-            <span>15°C</span>
-            <span>28°C Normal</span>
-            <span>45°C</span>
-          </div>
-        </div>
-
-        {/* Gauge 4: Precipitation Window */}
-        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-              <CloudRain size={12} className="text-teal-500" /> Rain (24h)
-            </span>
-            <span className="text-[10px] font-extrabold text-teal-600 dark:text-teal-400">
-              {obs?.forecastRainProbability?.value || 15}% Prob
-            </span>
+            <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-200 ease-out"
+                style={{ width: `${Math.min(100, ((Number(obs?.ambientTemp?.value || 28) - 10) / 35) * 100)}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+              <span>15°C</span>
+              <span>28°C Normal</span>
+              <span>45°C</span>
+            </div>
           </div>
 
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-teal-600 dark:text-teal-400 font-display">
-              {obs?.forecastRainMm?.value || 0} mm
-            </span>
-            <span className="text-[10px] text-gray-400 font-medium">Clear Window</span>
-          </div>
+          {/* Gauge 4: Precipitation Window */}
+          <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                <CloudRain size={12} className="text-teal-500" /> Rain (24h)
+              </span>
+              <span className="text-[10px] font-extrabold text-teal-600 dark:text-teal-400">
+                {obs?.forecastRainProbability?.value || 15}% Prob
+              </span>
+            </div>
 
-          <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-teal-400 to-blue-500 rounded-full transition-all duration-700"
-              style={{ width: `${Math.min(100, Math.max(8, Number(obs?.forecastRainProbability?.value || 15)))}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-            <span>Dry</span>
-            <span>Rain Window</span>
-            <span>Heavy</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl sm:text-2xl font-black text-teal-600 dark:text-teal-400 font-display">
+                {obs?.forecastRainMm?.value || 0} mm
+              </span>
+              <span className="text-[10px] text-gray-400 font-medium">Clear Window</span>
+            </div>
+
+            <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-teal-400 to-blue-500 rounded-full transition-all duration-200 ease-out"
+                style={{ width: `${Math.min(100, Math.max(8, Number(obs?.forecastRainProbability?.value || 15)))}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+              <span>Dry</span>
+              <span>Rain Window</span>
+              <span>Heavy</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 3. Main Command Center (Symmetric 2-Column Responsive Grid) */}
-      <div className="pt-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LEFT COLUMN: Agronomic Intelligence & Rationale (7 Cols) */}
-        <div className="lg:col-span-7 flex flex-col justify-between space-y-3">
-          <div className={`p-4 rounded-2xl border ${urgencyStyles.border} bg-gradient-to-br ${urgencyStyles.accent} relative overflow-hidden`}>
+      {/* 2. Autonomous Advisory & Closed-Loop Command Center */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* LEFT CARD: Agronomic Advisory (7 Cols) */}
+        <div className={`lg:col-span-7 card-executive p-4 sm:p-5 border ${urgencyStyles.border} bg-gradient-to-br ${urgencyStyles.accent} relative overflow-hidden flex flex-col justify-between space-y-3.5`}>
+          <div>
             {/* Urgency and Context Badges */}
-            <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
               <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${urgencyStyles.badge}`}>
                 {urgency.toUpperCase()} PRIORITY
               </span>
@@ -472,42 +475,42 @@ const AIDecisionPanel: React.FC = () => {
               {recommendation?.actionLabel || 'Analyzing root-zone telemetry...'}
             </h3>
 
-            {/* Concise Rationale */}
-            <p className="mt-2.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium bg-white/60 dark:bg-gray-900/50 p-3 rounded-xl border border-white/40 dark:border-gray-700/40">
+            {/* Crisp Rationale (Clean, open typography without boxed clutter) */}
+            <p className="mt-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
               {recommendation?.explanation ||
                 `Root-zone sensor telemetry reads ${moistureValue}%. Immediate irrigation is recommended to prevent vegetative stress during the tillering stage.`}
             </p>
 
             {/* Decision Rule Trigger */}
             {recommendation?.decisionRules && recommendation.decisionRules.length > 0 && (
-              <div className="mt-2.5 flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-300">
+              <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-300">
                 <Zap size={14} className="text-amber-500 flex-shrink-0" />
                 <span className="truncate">Rule: {recommendation.decisionRules[0]}</span>
               </div>
             )}
           </div>
 
-          {/* Expected Target Condition */}
-          <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          {/* Expected Target Condition Banner */}
+          <div className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-900/40 text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <CheckCircle2 size={16} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
-              <div>
+              <div className="truncate">
                 <span className="font-bold text-blue-900 dark:text-blue-300">Target Outcome: </span>
                 <span className="text-blue-700 dark:text-blue-400">
                   {recommendation?.expectedFollowUpCondition?.description || 'Soil moisture between 48% - 55% within 2 hours'}
                 </span>
               </div>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 uppercase whitespace-nowrap">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 uppercase whitespace-nowrap flex-shrink-0">
               Target: 48-55%
             </span>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: 2-Step Closed-Loop Action & Outcome Verification (5 Cols) */}
-        <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
+        {/* RIGHT CARD: Closed-Loop Governance & Action Center (5 Cols) */}
+        <div className="lg:col-span-5 card-executive p-4 sm:p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-md flex flex-col justify-between space-y-4">
           {/* STEP 1: Farmer Action Recording */}
-          <div className="p-4 rounded-2xl bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/50 shadow-sm space-y-2.5">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200 font-display flex items-center gap-1.5">
                 <Sparkles size={14} className="text-emerald-500" /> Step 1: Record Farmer Action
@@ -527,7 +530,7 @@ const AIDecisionPanel: React.FC = () => {
               <button
                 onClick={() => handleRecordAction('irrigated')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95 ${
                   recommendation?.farmerAction?.actionTaken === 'irrigated'
                     ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
                     : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/40'
@@ -539,7 +542,7 @@ const AIDecisionPanel: React.FC = () => {
               <button
                 onClick={() => handleRecordAction('postponed')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95 ${
                   recommendation?.farmerAction?.actionTaken === 'postponed'
                     ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
                     : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40 border border-amber-200/50 dark:border-amber-800/40'
@@ -551,7 +554,7 @@ const AIDecisionPanel: React.FC = () => {
               <button
                 onClick={() => handleRecordAction('inspected')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95 ${
                   recommendation?.farmerAction?.actionTaken === 'inspected'
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                     : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/50 dark:border-blue-800/40'
@@ -563,7 +566,7 @@ const AIDecisionPanel: React.FC = () => {
               <button
                 onClick={() => handleRecordAction('dismissed')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95 ${
                   recommendation?.farmerAction?.actionTaken === 'dismissed'
                     ? 'bg-gray-700 text-white shadow-md'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
@@ -575,28 +578,32 @@ const AIDecisionPanel: React.FC = () => {
           </div>
 
           {/* STEP 2: Closed-Loop Outcome Verification */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-gray-800/40 dark:to-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/30 space-y-2.5">
-            <h4 className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-display flex items-center gap-1.5">
-              <RotateCw size={13} /> Step 2: Evaluate Follow-up Outcome
+          <div className="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-2.5">
+            <h4 className="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200 font-display flex items-center gap-1.5">
+              <RotateCw size={13} className="text-emerald-500" /> Step 2: Evaluate Follow-up Outcome
             </h4>
 
+            {/* Refined compact input group on desktop */}
             <div className="flex items-center gap-2">
-              <div className="flex-1">
+              <div className="relative w-28 sm:w-32 flex-shrink-0">
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={followUpMoisture}
                   onChange={(e) => setFollowUpMoisture(e.target.value)}
-                  className="w-full h-9 px-3 text-sm font-bold rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                  placeholder="Subsequent Moisture (%)"
+                  className="w-full h-10 px-3 pr-7 text-sm font-black text-center rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  placeholder="52"
                 />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 pointer-events-none">
+                  %
+                </span>
               </div>
 
               <button
                 onClick={handleEvaluateFollowUp}
                 disabled={evaluating || !recommendation}
-                className="btn-primary h-9 px-4 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 active-press shadow-md shadow-emerald-600/25"
+                className="btn-primary h-10 px-4 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 transition-all duration-150 flex-1 sm:flex-initial shadow-md shadow-emerald-600/20"
               >
                 <Send size={12} /> {evaluating ? 'Evaluating...' : 'Evaluate'}
               </button>
@@ -605,7 +612,7 @@ const AIDecisionPanel: React.FC = () => {
             {/* Outcome Display */}
             {evaluationResult && (
               <div
-                className={`p-3 rounded-xl border text-xs transition-all duration-300 ${
+                className={`p-3 rounded-xl border text-xs transition-all duration-150 ${
                   evaluationResult.conditionMet
                     ? 'bg-emerald-100/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200'
                     : 'bg-amber-100/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200'

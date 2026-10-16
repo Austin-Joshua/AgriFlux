@@ -419,7 +419,7 @@ const Dashboard: React.FC = () => {
                 </span>
                 <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700"
+                    className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-200"
                     style={{ width: `${Math.min(100, (d.rain / 30) * 100)}%` }}
                   />
                 </div>
@@ -465,7 +465,7 @@ const Dashboard: React.FC = () => {
           <div className="relative w-full group/map" style={{ height: '180px' }}>
             <iframe
               title="Farm Location Map"
-              className="w-full h-full border-0 transition-all duration-700 grayscale group-hover/map:grayscale-0"
+              className="w-full h-full border-0 transition-all duration-200 grayscale group-hover/map:grayscale-0"
               loading="lazy"
               allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"

@@ -177,12 +177,17 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
   }
 
   body {
     @apply bg-gray-50 text-gray-900 dark:bg-[#070b0e] dark:text-gray-100;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display, .page-header, .section-header {
@@ -414,10 +419,14 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 hover:border-primary-300 dark:hover:border-primary-600;
+    @apply w-full px-3.5 py-2 text-sm md:h-10 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent bg-white/80 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 hover:border-primary-300 dark:hover:border-primary-600;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  textarea.input-field {
+    @apply md:h-auto;
   }
 
   .label {
@@ -572,7 +581,7 @@
 
   /* Transition-aware backgrounds */
   .login-bg {
-    @apply min-h-screen transition-all duration-700;
+    @apply min-h-screen transition-all duration-200;
     background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0fdfa 100%);
   }
 
@@ -581,7 +590,7 @@
   }
 
   .branding-bg {
-    @apply hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden shadow-2xl border-r border-white/5 transition-all duration-700;
+    @apply hidden lg:flex flex-col justify-between w-1/2 p-12 text-white relative overflow-hidden shadow-2xl border-r border-white/5 transition-all duration-200;
     background: linear-gradient(160deg, #16a34a 0%, #22c55e 40%, #15803d 100%);
   }
 

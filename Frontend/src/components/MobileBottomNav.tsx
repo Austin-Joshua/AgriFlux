@@ -26,10 +26,10 @@ const MobileBottomNav: React.FC = () => {
 
       {/* Bottom bar — lg:hidden so it disappears on desktop */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-inset-bottom"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-inset-bottom w-full max-w-full overflow-hidden pointer-events-auto"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="glass-sidebar border-t border-gray-200/60 dark:border-gray-700/40 px-2 pt-2 pb-3 flex items-center justify-around gap-1">
+        <div className="glass-sidebar border-t border-gray-200/60 dark:border-gray-700/40 px-1 pt-1.5 pb-2 flex items-center justify-between w-full max-w-full">
           {BOTTOM_ITEMS.map(({ to, icon: Icon, label }, i) => {
             // Insert FAB in the middle (after index 1)
             const fab =
@@ -37,13 +37,13 @@ const MobileBottomNav: React.FC = () => {
                 <button
                   key="ai-fab"
                   onClick={() => setReportOpen(true)}
-                  className="flex flex-col items-center -mt-8 group"
+                  className="flex flex-col items-center -mt-6 group px-1 flex-shrink-0 active:scale-95 transition-transform duration-150"
                   aria-label="Generate Smart Farm Report"
                 >
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-r from-primary-600 to-green-500 flex items-center justify-center shadow-xl shadow-primary-500/30 group-hover:scale-110 group-active:scale-95 transition-transform">
-                    <Sparkles size={22} className="text-white" />
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-r from-primary-600 to-green-500 flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:scale-105 group-active:scale-95 transition-transform duration-150">
+                    <Sparkles size={18} className="text-white" />
                   </div>
-                  <span className="text-[10px] font-semibold text-primary-600 dark:text-primary-400 mt-1">
+                  <span className="text-[9px] font-extrabold text-primary-600 dark:text-primary-400 mt-0.5 whitespace-nowrap">
                     AI Report
                   </span>
                 </button>
@@ -54,25 +54,27 @@ const MobileBottomNav: React.FC = () => {
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200 min-w-[52px] ${
+                  `flex-1 min-w-0 flex flex-col items-center justify-center py-0.5 px-0.5 rounded-xl transition-all duration-150 active:scale-95 ${
                     isActive
-                      ? 'text-primary-600 dark:text-primary-400'
-                      : 'text-gray-400 dark:text-gray-500 hover:text-gray-600'
+                      ? 'text-primary-600 dark:text-primary-400 font-bold'
+                      : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${
                         isActive
-                          ? 'bg-primary-50 dark:bg-primary-900/30 scale-110'
+                          ? 'bg-primary-50 dark:bg-primary-900/40 scale-105 shadow-sm'
                           : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                     >
-                      <Icon size={20} />
+                      <Icon size={17} />
                     </div>
-                    <span className="text-[10px] font-semibold leading-none">{label}</span>
+                    <span className="text-[9px] leading-tight mt-0.5 truncate max-w-full">
+                      {label}
+                    </span>
                   </>
                 )}
               </NavLink>

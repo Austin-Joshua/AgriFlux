@@ -225,43 +225,43 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 glass-header px-4 py-3 flex items-center gap-3">
+    <header className="sticky top-0 z-30 glass-header px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 w-full max-w-full overflow-x-clip">
       {/* Mobile Menu Button */}
       <button
         id="mobile-menu-toggle"
         onClick={onMenuClick}
-        className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 lg:hidden transition-all duration-200"
+        className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 lg:hidden transition-all duration-150 flex-shrink-0"
         aria-label="Open mobile menu"
       >
-        <Menu size={22} />
+        <Menu size={20} />
       </button>
 
       {/* Dedicated Hamburger icon for Sidebar Minimization/Maximization (Desktop) */}
       <button
         id="sidebar-collapse-toggle"
         onClick={onCollapseToggle}
-        className="hidden lg:flex p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-200 hover:scale-110 active:scale-95"
+        className="hidden lg:flex p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
         aria-label="Toggle Sidebar"
       >
-        <Menu size={22} />
+        <Menu size={20} />
       </button>
 
       {/* Search */}
       <div
         ref={searchRef}
-        className="relative flex-1 max-w-[200px] sm:max-w-md md:max-w-lg lg:max-w-xl"
+        className="relative flex-1 max-w-[130px] sm:max-w-xs md:max-w-md lg:max-w-lg min-w-0"
       >
         <div
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 ${searchOpen ? 'glass-input ring-2 ring-primary-400/50 shadow-glow-green' : 'bg-gray-100/80 dark:bg-gray-800/80'}`}
+          className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-200 ${searchOpen ? 'glass-input ring-2 ring-primary-400/50 shadow-glow-green' : 'bg-gray-100/80 dark:bg-gray-800/80'}`}
         >
-          <Search size={16} className="text-gray-400 flex-shrink-0" />
+          <Search size={15} className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search crops, insights, modules..."
+            placeholder="Search..."
             value={searchQuery}
             onFocus={() => setSearchOpen(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none flex-1 min-w-0"
+            className="bg-transparent text-xs sm:text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none flex-1 min-w-0"
           />
           {searchQuery && (
             <button
@@ -314,10 +314,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
         )}
       </div>
 
-      <div className="flex-1" />
-
       {/* Action Buttons */}
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         {/* Notifications */}
         <div ref={notifRef} className="relative flex-shrink-0">
           <button
@@ -327,17 +325,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
               setAccountOpen(false);
               setLangOpen(false);
             }}
-            className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
+            className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
             aria-label="Notifications"
           >
-            <Bell size={20} />
+            <Bell size={18} />
             {unreadCount > 0 && (
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" />
             )}
           </button>
 
           {notifOpen && (
-            <div className="absolute -right-24 sm:right-0 top-full mt-2 w-80 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
+            <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm font-display">
                   {t('notifications.title')}
@@ -364,10 +362,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
                           setSelectedNotif(n);
                           handleMarkAsRead(n.id);
                         }}
-                        className={`flex gap-3 px-4 py-4 transition-all duration-300 cursor-pointer group relative hover:bg-white dark:hover:bg-gray-700/60 ${n.unread ? 'bg-primary-50/20 dark:bg-primary-900/10' : ''}`}
+                        className={`flex gap-3 px-4 py-4 transition-all duration-150 cursor-pointer group relative hover:bg-white dark:hover:bg-gray-700/60 ${n.unread ? 'bg-primary-50/20 dark:bg-primary-900/10' : ''}`}
                       >
                         <div
-                          className={`w-10 h-10 rounded-xl ${n.bg} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform`}
+                          className={`w-10 h-10 rounded-xl ${n.bg} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}
                         >
                           <n.icon size={18} className={n.color} />
                         </div>
@@ -439,8 +437,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
           )}
         </div>
 
-        {/* Language Selector */}
-        <div ref={langRef} className="relative flex-shrink-0">
+        {/* Language Selector (hidden on mobile, visible on sm+) */}
+        <div ref={langRef} className="relative flex-shrink-0 hidden sm:block">
           <button
             id="language-selector"
             onClick={() => {
@@ -448,19 +446,19 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
               setNotifOpen(false);
               setAccountOpen(false);
             }}
-            className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-200 hover:scale-105 active:scale-95 text-sm flex-shrink-0"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 text-xs flex-shrink-0"
           >
-            <Globe size={18} />
+            <Globe size={16} />
             <span className="hidden sm:inline font-medium text-xs">
               {currentLang.flag} {currentLang.code.toUpperCase()}
             </span>
             <ChevronDown
-              size={13}
-              className={`transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`}
+              size={12}
+              className={`transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`}
             />
           </button>
           {langOpen && (
-            <div className="absolute -right-12 sm:right-0 top-full mt-2 w-44 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
+            <div className="absolute right-0 top-full mt-2 w-44 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
@@ -483,21 +481,21 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
         <button
           id="theme-toggle"
           onClick={toggleTheme}
-          className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
+          className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
           aria-label="Toggle theme"
         >
           {isDark ? (
             <Sun
-              size={20}
+              size={18}
               className="text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_6px_rgba(234,179,8,0.6)]"
             />
           ) : (
-            <Moon size={20} />
+            <Moon size={18} />
           )}
         </button>
 
-        {/* Settings Icon with Account Preview */}
-        <div ref={accountRef} className="relative flex-shrink-0">
+        {/* Settings Icon with Account Preview (hidden on mobile, visible on sm+) */}
+        <div ref={accountRef} className="relative flex-shrink-0 hidden sm:block">
           <button
             id="settings-icon"
             onClick={() => {
@@ -505,10 +503,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
               setNotifOpen(false);
               setLangOpen(false);
             }}
-            className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0"
+            className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
             aria-label="Settings"
           >
-            <Settings size={20} />
+            <Settings size={18} />
           </button>
 
           {accountOpen && (

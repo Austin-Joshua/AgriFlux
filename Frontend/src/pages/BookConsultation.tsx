@@ -307,7 +307,7 @@ const BookConsultation: React.FC = () => {
                     Describe your query or issue
                   </label>
                   <textarea
-                    className="input-field min-h-[160px] !py-4 resize-none text-base bg-gray-50/50 dark:bg-gray-800/30"
+                    className="input-field min-h-[100px] resize-y text-sm bg-gray-50/50 dark:bg-gray-800/30"
                     placeholder="e.g. My wheat crop shows yellowing at leaf tips. Soil test indicated high pH last season. Need treatment plan..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -322,7 +322,7 @@ const BookConsultation: React.FC = () => {
                     </label>
                     <input
                       type="date"
-                      className="input-field !py-3.5"
+                      className="input-field"
                       min={new Date().toISOString().split('T')[0]}
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
@@ -335,7 +335,7 @@ const BookConsultation: React.FC = () => {
                     </label>
                     <input
                       type="time"
-                      className="input-field !py-3.5"
+                      className="input-field"
                       value={time}
                       onChange={(e) => setTime(e.target.value)}
                       required
