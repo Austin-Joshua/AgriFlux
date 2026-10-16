@@ -1,182 +1,504 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   AlertTriangle,
   CheckCircle,
-  TrendingUp,
-  ArrowRight,
   MapPin,
-  DollarSign,
-  Info,
   Target,
   Zap,
+  Clock,
+  Droplets,
+  RotateCw,
+  Send,
 } from 'lucide-react';
-import { useRealisticData } from '../hooks/useRealisticData';
+import axios from 'axios';
+import { API_URL } from '../config';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
+
+interface FieldOption {
+  id: string;
+  name: string;
+  crop: string;
+  stage: string;
+  defaultMoisture: number;
+}
+
+const FIELDS: FieldOption[] = [
+  {
+    id: 'field-01',
+    name: 'North Acre Parcel A',
+    crop: 'Rice',
+    stage: 'Vegetative (Tillering)',
+    defaultMoisture: 24, // Trigger drought stress for live demo
+  },
+  {
+    id: 'field-02',
+    name: 'South Terrace Plateau',
+    crop: 'Maize',
+    stage: 'Tasseling',
+    defaultMoisture: 52, // Optimal
+  },
+  {
+    id: 'field-03',
+    name: 'Riverside Lowland Parcel',
+    crop: 'Sugarcane',
+    stage: 'Grand Growth',
+    defaultMoisture: 78, // High moisture / postpone
+  },
+];
 
 const AIDecisionPanel: React.FC = () => {
-  const data = useRealisticData();
+  const { token } = useAuth();
+  const [selectedField, setSelectedField] = useState<FieldOption>(FIELDS[0]);
+  const [recommendation, setRecommendation] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [evaluating, setEvaluating] = useState(false);
 
-  // Risk Calculation (Simulation)
-  const getRiskInfo = () => {
-    const ph = data.soilPh;
-    const rain = data.rainfall;
-    if (ph < 6.0 || ph > 7.5 || rain < 400)
-      return {
-        label: 'Medium',
-        color: 'text-yellow-500',
-        bg: 'bg-yellow-50 dark:bg-yellow-900/20',
-        border: 'border-yellow-200 dark:border-yellow-800',
-      };
-    if (ph < 5.5 || rain < 300)
-      return {
-        label: 'High',
-        color: 'text-red-500',
-        bg: 'bg-red-50 dark:bg-red-900/20',
-        border: 'border-red-200 dark:border-red-800',
-      };
-    return {
-      label: 'Low',
-      color: 'text-primary-600',
-      bg: 'bg-primary-50 dark:bg-primary-900/20',
-      border: 'border-primary-200 dark:border-primary-800',
-    };
+  // Follow-up evaluation state
+  const [followUpMoisture, setFollowUpMoisture] = useState('52');
+  const [evaluationResult, setEvaluationResult] = useState<any>(null);
+
+  // Fetch structured recommendation from backend
+  const fetchRecommendation = useCallback(
+    async (field = selectedField, moistureOverride?: number) => {
+      setLoading(true);
+      try {
+        const payload: Record<string, any> = {
+          fieldId: field.id,
+          fieldName: field.name,
+          cropType: field.crop,
+          cropStage: field.stage,
+        };
+
+        if (moistureOverride !== undefined) {
+          payload.soilMoistureOverride = moistureOverride;
+        }
+
+        const res = await axios.post(`${API_URL}/field-intelligence/recommend`, payload, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        if (res.data?.success) {
+          setRecommendation(res.data.data);
+          setEvaluationResult(null);
+        }
+      } catch (err: any) {
+        console.error('Error fetching field recommendation:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [selectedField, token]
+  );
+
+  useEffect(() => {
+    fetchRecommendation(selectedField);
+  }, [fetchRecommendation, selectedField]);
+
+  // Handle field selection
+  const handleSelectField = (field: FieldOption) => {
+    setSelectedField(field);
+    fetchRecommendation(field, field.defaultMoisture);
   };
 
-  const risk = getRiskInfo();
+  // Record Farmer Response
+  const handleRecordAction = async (
+    actionTaken: 'irrigated' | 'postponed' | 'inspected' | 'dismissed'
+  ) => {
+    if (!recommendation?.recommendationId) return;
+    setActionLoading(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/field-intelligence/action`,
+        {
+          recommendationId: recommendation.recommendationId,
+          actionTaken,
+          notes: `Recorded via Farmer Workspace for ${selectedField.name}`,
+        },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+
+      if (res.data?.success) {
+        toast.success(`Action '${actionTaken}' recorded and persisted!`);
+        setRecommendation((prev: any) => ({
+          ...prev,
+          farmerAction: res.data.data.farmerAction,
+        }));
+      }
+    } catch {
+      toast.error('Failed to record action. Please try again.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Evaluate Follow-up Outcome (Closed-Loop verification)
+  const handleEvaluateFollowUp = async () => {
+    if (!recommendation?.recommendationId) return;
+    setEvaluating(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/field-intelligence/evaluate`,
+        {
+          recommendationId: recommendation.recommendationId,
+          subsequentTelemetry: {
+            moisture: Number(followUpMoisture),
+            temperature: 26,
+            notes: 'Post-action sensor reading',
+          },
+        },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+
+      if (res.data?.success) {
+        setEvaluationResult(res.data.data);
+        toast.success('Closed-loop outcome evaluated!');
+      }
+    } catch {
+      toast.error('Evaluation failed. Please verify input value.');
+    } finally {
+      setEvaluating(false);
+    }
+  };
+
+  const obs = recommendation?.supportingObservations;
+  const urgency = recommendation?.urgency || 'medium';
+
+  const urgencyStyles = {
+    critical: {
+      bg: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+      badge: 'bg-red-600 text-white',
+    },
+    high: {
+      bg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
+      badge: 'bg-amber-600 text-white',
+    },
+    medium: {
+      bg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
+      badge: 'bg-blue-600 text-white',
+    },
+    low: {
+      bg: 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border-primary-500/30',
+      badge: 'bg-primary-600 text-white',
+    },
+  }[urgency as 'critical' | 'high' | 'medium' | 'low'];
 
   return (
-    <div className="card-gradient overflow-hidden relative group">
+    <div className="card-gradient overflow-hidden relative group border border-primary-500/20 shadow-xl">
       {/* Background Accent */}
-      <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-500/10 blur-3xl rounded-full" />
-      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-teal-500/5 blur-3xl rounded-full" />
+      <div className="absolute -top-10 -right-10 w-44 h-44 bg-primary-500/10 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-teal-500/5 blur-3xl rounded-full pointer-events-none" />
 
-      <div className="relative flex flex-col lg:flex-row gap-6">
-        {/* Main Identity */}
-        <div className="lg:w-1/3 flex flex-col justify-between">
+      {/* Top Bar: Title & Field Switcher */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-white/5">
+        <div className="flex items-center gap-2.5">
+          <span className="w-8 h-8 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-md">
+            <Target size={18} />
+          </span>
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-600 text-white text-[10px] font-bold uppercase tracking-widest shadow-md">
-                <Target size={12} />
-                Optimized Recommendation
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-black uppercase tracking-wider text-gray-900 dark:text-white">
+                AgriFlux Field Intelligence Engine
+              </h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 uppercase">
+                Closed-Loop Decisions
               </span>
             </div>
-            <h2 className="text-4xl font-black font-display text-gray-800 dark:text-white leading-tight">
-              {data.crop} <br />
-              <span className="text-primary-600 dark:text-primary-400 text-2xl">
-                {data.variety}
-              </span>
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm max-w-xs leading-relaxed">
-              AI analyzed your soil health, local Mandi demand, and 7-day weather forecast to
-              predict a high-yield opportunity.
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Evidence-based agronomic recommendations connecting real-time IoT sensors, soil
+              health, and weather forecasts.
             </p>
-          </div>
-
-          <div className="mt-6 p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter">
-                AI Confidence
-              </span>
-              <span className="text-sm font-bold text-primary-600">{data.confidenceScore}%</span>
-            </div>
-            <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full transition-all duration-1000"
-                style={{ width: `${data.confidenceScore}%` }}
-              />
-            </div>
           </div>
         </div>
 
-        {/* Metrics Grid */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Yield */}
-          <div className="p-4 rounded-2xl bg-white/40 dark:bg-gray-800/30 border border-white/40 dark:border-gray-700/40 hover:scale-[1.02] transition-transform">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
-                <TrendingUp size={18} />
-              </div>
-              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
-                Expected Yield
-              </span>
-            </div>
-            <p className="text-2xl font-black text-gray-800 dark:text-gray-100">
-              {data.yieldKgHa.toLocaleString()} <span className="text-sm font-medium">kg/ha</span>
-            </p>
-          </div>
-
-          {/* Profit */}
-          <div className="p-4 rounded-2xl bg-white/40 dark:bg-gray-800/30 border border-white/40 dark:border-gray-700/40 hover:scale-[1.02] transition-transform">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600">
-                <DollarSign size={18} />
-              </div>
-              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
-                Est. Profit (1ha)
-              </span>
-            </div>
-            <p className="text-2xl font-black text-primary-600">
-              ₹{(data.profitMax / 1000).toFixed(1)}k{' '}
-              <span className="text-sm font-medium text-gray-400">avg.</span>
-            </p>
-          </div>
-
-          {/* Best Market */}
-          <div className="p-4 rounded-2xl bg-white/40 dark:bg-gray-800/30 border border-white/40 dark:border-gray-700/40 hover:scale-[1.02] transition-transform">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
-                <MapPin size={18} />
-              </div>
-              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
-                Regional Demand
-              </span>
-            </div>
-            <p className="text-sm font-bold text-gray-700 dark:text-gray-200 truncate">
-              {data.bestMarket}
-            </p>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500 italic mt-1">
-              {data.trendLabel}
-            </p>
-          </div>
-
-          {/* Risk Level */}
-          <div
-            className={`p-4 rounded-2xl ${risk.bg} border ${risk.border} hover:scale-[1.02] transition-transform flex items-center justify-between`}
+        {/* Field Selection Tabs */}
+        <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl self-start md:self-auto border border-gray-200/50 dark:border-white/5">
+          {FIELDS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => handleSelectField(f)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                selectedField.id === f.id
+                  ? 'bg-primary-600 text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              {f.name.split(' ')[0]} ({f.crop})
+            </button>
+          ))}
+          <button
+            onClick={() => fetchRecommendation(selectedField)}
+            disabled={loading}
+            title="Refresh Recommendation"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 transition-colors"
           >
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle size={14} className={risk.color} />
-                <span className="text-[10px] font-bold text-gray-500 uppercase">Risk Level</span>
+            <RotateCw size={14} className={loading ? 'animate-spin' : ''} />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Workspace Body */}
+      <div className="pt-4 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* LEFT COLUMN: Active Recommendation & Evidence (7 Cols) */}
+        <div className="lg:col-span-7 space-y-4">
+          {/* Main Action Banner */}
+          <div className={`p-4 rounded-2xl border ${urgencyStyles.bg} relative overflow-hidden`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span
+                    className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md ${urgencyStyles.badge}`}
+                  >
+                    {urgency.toUpperCase()} PRIORITY
+                  </span>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                    <MapPin size={12} /> {selectedField.name} · {selectedField.crop} (
+                    {selectedField.stage})
+                  </span>
+                </div>
+                <h3 className="text-xl font-black text-gray-900 dark:text-white leading-snug">
+                  {recommendation?.actionLabel || 'Analyzing field context...'}
+                </h3>
               </div>
-              <span className={`text-xl font-black ${risk.color}`}>{risk.label}</span>
             </div>
-            <div className="text-right">
-              {risk.label === 'Low' && (
-                <CheckCircle size={24} className="text-primary-600 opacity-50" />
-              )}
-              {risk.label === 'Medium' && <Info size={24} className="text-yellow-500 opacity-50" />}
+
+            {/* Explanation */}
+            <p className="mt-3 text-sm text-gray-700 dark:text-gray-200 leading-relaxed font-medium bg-white/50 dark:bg-gray-900/40 p-3 rounded-xl border border-white/20 dark:border-white/5">
+              {recommendation?.explanation || 'Loading agronomic rationale...'}
+            </p>
+
+            {/* Decision Rule Trigger */}
+            {recommendation?.decisionRules && recommendation.decisionRules.length > 0 && (
+              <div className="mt-3 flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300">
+                <Zap size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                <span className="italic">
+                  Rule: {recommendation.decisionRules[0]}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Validated Telemetry Badges */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
+              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
+                Soil Moisture
+              </span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-blue-600 dark:text-blue-400">
+                  {obs?.soilMoisture?.value !== undefined ? `${obs.soilMoisture.value}%` : '---'}
+                </span>
+                <span className="text-[10px] text-gray-400">
+                  {obs?.soilMoisture?.source === 'iot_simulator' ? '(Simulated)' : '(Sensor)'}
+                </span>
+              </div>
+              <p className="text-[9px] text-gray-400 mt-1 flex items-center gap-0.5">
+                <Clock size={10} /> Freshness:{' '}
+                {obs?.soilMoisture?.freshnessMinutes !== undefined
+                  ? `${obs.soilMoisture.freshnessMinutes}m`
+                  : '0m'}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
+              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
+                Soil Chemistry
+              </span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-primary-600 dark:text-primary-400">
+                  pH {obs?.soilPh?.value || 6.4}
+                </span>
+              </div>
+              <p className="text-[9px] text-gray-400 mt-1">
+                K: {obs?.soilPotassium?.value || 48} kg/ha
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
+              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
+                Ambient Temp
+              </span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-amber-600 dark:text-amber-400">
+                  {obs?.ambientTemp?.value || 28}°C
+                </span>
+              </div>
+              <p className="text-[9px] text-gray-400 mt-1">
+                Humidity: {obs?.humidity?.value || 60}%
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
+              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
+                Rain Forecast (24h)
+              </span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-teal-600 dark:text-teal-400">
+                  {obs?.forecastRainMm?.value || 0} mm
+                </span>
+              </div>
+              <p className="text-[9px] text-gray-400 mt-1">
+                Prob: {obs?.forecastRainProbability?.value || 15}%
+              </p>
             </div>
           </div>
+
+          {/* Expected Follow-up Condition */}
+          {recommendation?.expectedFollowUpCondition && (
+            <div className="p-3 rounded-xl bg-blue-50/60 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/30 text-xs">
+              <p className="font-bold text-blue-800 dark:text-blue-300 flex items-center gap-1.5 mb-1">
+                <CheckCircle size={14} className="text-blue-600" />
+                Target Evaluation Criteria (Within {recommendation.expectedFollowUpCondition.timeframeHours}h):
+              </p>
+              <p className="text-blue-700/80 dark:text-blue-300/80">
+                {recommendation.expectedFollowUpCondition.description} (Target: {recommendation.expectedFollowUpCondition.targetRange})
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Logic / Advice */}
-        <div className="lg:w-1/4 bg-gray-50/50 dark:bg-gray-900/40 rounded-2xl p-5 border border-gray-100 dark:border-gray-800">
-          <h3 className="text-xs font-bold text-primary-600 uppercase mb-3 flex items-center gap-1.5">
-            <Zap size={14} className="animate-pulse" />
-            AI Logic Trace
-          </h3>
-          <ul className="space-y-2.5">
-            {data.factors.slice(0, 4).map((f, i) => (
-              <li key={i} className="flex gap-2 text-xs">
-                <span className="w-4 h-4 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
-                  {i + 1}
+        {/* RIGHT COLUMN: Action Execution & Closed-Loop Evaluation (5 Cols) */}
+        <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
+          {/* STEP 1: Farmer Action Recording */}
+          <div className="p-4 rounded-2xl bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-white/10 shadow-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">
+                Step 1: Record Farmer Action
+              </h4>
+              {recommendation?.farmerAction ? (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 uppercase">
+                  Action Recorded ✅
                 </span>
-                <span className="text-gray-600 dark:text-gray-300">{f}</span>
-              </li>
-            ))}
-          </ul>
-          <button className="mt-5 w-full py-2 bg-white dark:bg-gray-800 text-xs font-bold text-gray-600 dark:text-gray-400 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 transition-all">
-            Deep Analysis <ArrowRight size={12} />
-          </button>
+              ) : (
+                <span className="text-[10px] font-bold text-amber-500 uppercase animate-pulse">
+                  Pending Execution
+                </span>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-500">
+              Record your real farm response to ensure traceability and track closed-loop crop
+              responses.
+            </p>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleRecordAction('irrigated')}
+                disabled={actionLoading}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  recommendation?.farmerAction?.actionTaken === 'irrigated'
+                    ? 'bg-primary-600 text-white shadow-md'
+                    : 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-100'
+                }`}
+              >
+                <Droplets size={13} /> Irrigated Field
+              </button>
+
+              <button
+                onClick={() => handleRecordAction('postponed')}
+                disabled={actionLoading}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  recommendation?.farmerAction?.actionTaken === 'postponed'
+                    ? 'bg-amber-600 text-white shadow-md'
+                    : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-100'
+                }`}
+              >
+                <Clock size={13} /> Postponed Cycle
+              </button>
+
+              <button
+                onClick={() => handleRecordAction('inspected')}
+                disabled={actionLoading}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  recommendation?.farmerAction?.actionTaken === 'inspected'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100'
+                }`}
+              >
+                <CheckCircle size={13} /> Inspected Field
+              </button>
+
+              <button
+                onClick={() => handleRecordAction('dismissed')}
+                disabled={actionLoading}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  recommendation?.farmerAction?.actionTaken === 'dismissed'
+                    ? 'bg-gray-600 text-white shadow-md'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
+                }`}
+              >
+                Dismissed
+              </button>
+            </div>
+          </div>
+
+          {/* STEP 2: Closed-Loop Outcome Evaluator */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-primary-50/50 to-teal-50/20 dark:from-gray-800/40 dark:to-gray-900/40 border border-primary-200/50 dark:border-primary-800/30 space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-primary-700 dark:text-primary-400 flex items-center gap-1.5">
+              <RotateCw size={14} /> Step 2: Evaluate Follow-up Outcome
+            </h4>
+
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              Verify if subsequent field telemetry satisfies the expected condition following the
+              recorded action.
+            </p>
+
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">
+                  Subsequent Moisture (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={followUpMoisture}
+                  onChange={(e) => setFollowUpMoisture(e.target.value)}
+                  className="w-full h-9 px-3 text-sm font-bold rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  placeholder="e.g. 52"
+                />
+              </div>
+
+              <button
+                onClick={handleEvaluateFollowUp}
+                disabled={evaluating || !recommendation}
+                className="btn-primary self-end h-9 px-4 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
+              >
+                <Send size={12} /> {evaluating ? 'Evaluating...' : 'Evaluate'}
+              </button>
+            </div>
+
+            {/* Outcome Display */}
+            {evaluationResult && (
+              <div
+                className={`p-3 rounded-xl border mt-2 text-xs ${
+                  evaluationResult.conditionMet
+                    ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-300 dark:border-primary-700 text-primary-800 dark:text-primary-200'
+                    : 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-black uppercase tracking-wider flex items-center gap-1">
+                    {evaluationResult.conditionMet ? (
+                      <CheckCircle size={14} className="text-primary-600" />
+                    ) : (
+                      <AlertTriangle size={14} className="text-amber-600" />
+                    )}
+                    Outcome: {evaluationResult.conditionMet ? 'Condition Satisfied' : 'Review Needed'}
+                  </span>
+                  <span className="font-extrabold text-[11px]">
+                    {evaluationResult.observedDelta}
+                  </span>
+                </div>
+                <p className="mt-1 leading-relaxed opacity-90">{evaluationResult.explanation}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
