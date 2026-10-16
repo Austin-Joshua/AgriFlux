@@ -10,6 +10,8 @@ import { runAuthTests } from './auth.test';
 import { runIoTTests } from './iot.test';
 import { runFieldIntelligenceTests } from './field-intelligence.test';
 import { runAITests } from './ai.test';
+import { runWeatherIngestionTests } from './weather-ingestion.test';
+import { runSatelliteProcessingTests } from './satellite-processing.test';
 
 async function main() {
   console.log('================================================================');
@@ -31,6 +33,14 @@ async function main() {
       runner: runFieldIntelligenceTests,
     },
     { name: 'Suite 4: AI & Agronomic Prediction Services', runner: runAITests },
+    {
+      name: 'Suite 5: Historical Weather CSV Ingestion & Idempotency',
+      runner: runWeatherIngestionTests,
+    },
+    {
+      name: 'Suite 6: Sentinel-2 L2A Satellite NDVI Processing & Quality Filters',
+      runner: runSatelliteProcessingTests,
+    },
   ];
 
   for (const suite of suites) {

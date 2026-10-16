@@ -35,6 +35,7 @@ import SmartFarmReport from '../components/SmartFarmReport';
 import { toast } from 'react-toastify';
 import { useRealisticData } from '../hooks/useRealisticData';
 import AIDecisionPanel from '../components/AIDecisionPanel';
+import EnvironmentalIntelligence from '../components/EnvironmentalIntelligence';
 import ProfitRiskIntelligence from '../components/ProfitRiskIntelligence';
 import SmartAlerts from '../components/SmartAlerts';
 import axios from 'axios';
@@ -423,6 +424,11 @@ const Dashboard: React.FC = () => {
             <Sparkles size={10} /> View Historical Comparison
           </div>
         </div>
+      </div>
+
+      {/* Macro-Environmental & Orbital Intelligence (Open-Meteo & Copernicus Sentinel-2) */}
+      <div className="animate-slide-up-fade" style={{ animationDelay: '220ms' }}>
+        <EnvironmentalIntelligence />
       </div>
 
       {/* Bottom Row */}

@@ -9,7 +9,8 @@
     "build": "tsc",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "ts-node src/tests/runAllTests.ts"
+    "test": "ts-node src/tests/runAllTests.ts",
+    "ingest:weather": "ts-node src/scripts/ingest-weather.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

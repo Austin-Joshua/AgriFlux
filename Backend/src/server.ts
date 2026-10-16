@@ -16,6 +16,10 @@ import consultationRoutes from './routes/consultation.routes';
 import integrationRoutes from './routes/integration.routes';
 import iotRoutes from './routes/iot.routes';
 import fieldIntelligenceRoutes from './routes/field-intelligence.routes';
+import environmentalDataRoutes from './routes/environmental-data.routes';
+import { WeatherIngestionService } from './services/weather-ingestion.service';
+import fs from 'fs';
+import path from 'path';
 
 import cluster from 'cluster';
 import os from 'os';
@@ -180,6 +184,7 @@ app.use('/api/consultations', consultationRoutes);
 app.use('/api/integration', integrationRoutes);
 app.use('/api/iot-data', iotRoutes);
 app.use('/api/field-intelligence', fieldIntelligenceRoutes);
+app.use('/api/environmental', environmentalDataRoutes);
 
 // 404
 app.use((_req: Request, res: Response) => {
@@ -225,5 +230,24 @@ if (cluster.isPrimary && env.NODE_ENV === 'production') {
   httpServer.listen(PORT, () => {
     console.log(`🚀 Worker ${process.pid} started. AgriFlux API: http://localhost:${PORT}`);
     console.log(`📡 WebSocket Gateway: ws://localhost:${PORT}`);
+
+    // Auto-seed historical weather observations if available
+    const weatherCsvCandidates = [
+      path.resolve(process.cwd(), '..', 'Data', 'open-meteo-10.79N79.10E59m.csv'),
+      path.resolve(process.cwd(), 'Data', 'open-meteo-10.79N79.10E59m.csv'),
+      path.resolve(__dirname, '..', '..', 'Data', 'open-meteo-10.79N79.10E59m.csv'),
+    ];
+    const foundCsv = weatherCsvCandidates.find((p) => fs.existsSync(p));
+    if (foundCsv) {
+      WeatherIngestionService.ingestOpenMeteoCSV(foundCsv)
+        .then((res) => {
+          console.log(
+            `⛅ [WEATHER SEED] Auto-ingested ${res.dailyRecordsImported} daily and ${res.hourlyRecordsImported} hourly observations.`
+          );
+        })
+        .catch((err) => {
+          console.warn(`⚠️ [WEATHER SEED] Ingestion notice: ${err.message}`);
+        });
+    }
   });
 }
