@@ -18,6 +18,7 @@ import iotRoutes from './routes/iot.routes';
 import fieldIntelligenceRoutes from './routes/field-intelligence.routes';
 import environmentalDataRoutes from './routes/environmental-data.routes';
 import { WeatherIngestionService } from './services/weather-ingestion.service';
+import { CropStatisticsService } from './services/crop-statistics.service';
 import fs from 'fs';
 import path from 'path';
 
@@ -247,6 +248,25 @@ if (cluster.isPrimary && env.NODE_ENV === 'production') {
         })
         .catch((err) => {
           console.warn(`⚠️ [WEATHER SEED] Ingestion notice: ${err.message}`);
+        });
+    }
+
+    // Auto-seed Directorate of Economics & Statistics (DES) APY data if available
+    const apyCandidates = [
+      path.resolve(process.cwd(), '..', 'Data', 'horizontal_crop_vertical_year_report.xls'),
+      path.resolve(process.cwd(), 'Data', 'horizontal_crop_vertical_year_report.xls'),
+      path.resolve(__dirname, '..', '..', 'Data', 'horizontal_crop_vertical_year_report.xls'),
+    ];
+    const foundApy = apyCandidates.find((p) => fs.existsSync(p));
+    if (foundApy) {
+      CropStatisticsService.ingestDESReport(foundApy)
+        .then((res) => {
+          console.log(
+            `🌾 [DES APY SEED] Auto-ingested ${res.totalRecordsImported} official crop statistics records.`
+          );
+        })
+        .catch((err) => {
+          console.warn(`⚠️ [DES APY SEED] Ingestion notice: ${err.message}`);
         });
     }
   });

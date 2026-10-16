@@ -15,27 +15,11 @@ export interface IFieldRecommendation extends Document {
     | 'SOIL_AERATION'
     | 'NUTRIENT_APPLICATION'
     | 'HEAT_PROTECTION'
-    | 'MONITOR_OPTIMAL';
+    | 'MONITOR_OPTIMAL'
+    | 'INSUFFICIENT_DATA';
   actionLabel: string;
   urgency: 'low' | 'medium' | 'high' | 'critical';
-  supportingObservations: {
-    soilMoisture: {
-      value: number;
-      unit: string;
-      source: string;
-      freshnessMinutes: number;
-      isStale: boolean;
-    };
-    soilTemp: { value: number; unit: string; source: string };
-    soilPh: { value: number; unit: string; source: string };
-    soilNitrogen: { value: number; unit: string };
-    soilPhosphorus: { value: number; unit: string };
-    soilPotassium: { value: number; unit: string };
-    ambientTemp: { value: number; unit: string };
-    humidity: { value: number; unit: string };
-    forecastRainMm: { value: number; unit: string };
-    forecastRainProbability: { value: number; unit: string };
-  };
+  supportingObservations: Record<string, any>;
   decisionRules: string[];
   explanation: string;
   assumptionsAndLimitations: string[];
@@ -81,6 +65,7 @@ const FieldRecommendationSchema: Schema = new Schema(
         'NUTRIENT_APPLICATION',
         'HEAT_PROTECTION',
         'MONITOR_OPTIMAL',
+        'INSUFFICIENT_DATA',
       ],
       required: true,
     },

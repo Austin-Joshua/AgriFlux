@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import { getIO } from '../socket';
 import IoTReading from '../../../Database/Models/IoTReading';
 import { isDBConnected } from '../config/db';
@@ -25,6 +26,26 @@ let latestIoTData = {
 
 // In-memory historical ring buffer (last 50 readings for fallback)
 const inMemoryHistory: (typeof latestIoTData)[] = [latestIoTData];
+
+// Actuator command state machine
+export interface ActuatorCommand {
+  commandId: string;
+  deviceId: string;
+  action: 'ACTIVATE_PUMP' | 'DEACTIVATE_PUMP';
+  targetPumpStatus: boolean;
+  issuedAt: string;
+  issuedBy: string;
+  status: 'requested' | 'accepted' | 'acknowledged' | 'failed' | 'timed_out';
+  acknowledgedAt?: string;
+  executionMetrics?: {
+    flowRateLpm?: number;
+    durationSeconds?: number;
+  };
+  failureReason?: string;
+}
+
+let activeActuatorCommand: ActuatorCommand | null = null;
+const commandHistory: ActuatorCommand[] = [];
 
 /**
  * POST /api/iot-data
@@ -60,7 +81,7 @@ export const postIoTData = async (req: Request, res: Response) => {
     const numTemp = Number(temperature);
     const numHumidity = Number(humidity);
 
-    // Range checks
+    // Physical range checks
     if (numMoisture < 0 || numMoisture > 100) {
       return res.status(400).json({
         success: false,
@@ -113,6 +134,7 @@ export const postIoTData = async (req: Request, res: Response) => {
     }
 
     // Persist to MongoDB if connected
+    let storageDurable = false;
     if (isDBConnected) {
       try {
         await IoTReading.create({
@@ -125,24 +147,29 @@ export const postIoTData = async (req: Request, res: Response) => {
           status: sensorStatus,
           rawTimestamp: new Date(timestamp),
         });
+        storageDurable = true;
       } catch (dbErr: any) {
         console.warn(`⚠️ [IoT SYNC] Could not persist reading to MongoDB: ${dbErr.message}`);
+        storageDurable = false;
       }
     }
 
     console.log(
-      `📡 [IoT SYNC] Synced: M:${latestIoTData.moisture}% T:${latestIoTData.temperature}°C H:${latestIoTData.humidity}% P:${latestIoTData.pumpStatus} [${targetSimulated ? 'SIMULATOR' : 'HARDWARE'}]`
+      `📡 [IoT SYNC] Synced: M:${latestIoTData.moisture}% T:${latestIoTData.temperature}°C H:${latestIoTData.humidity}% P:${latestIoTData.pumpStatus} [${targetSimulated ? 'SIMULATOR' : 'HARDWARE'}] [Durable: ${storageDurable}]`
     );
 
     // Broadcast real-time update to all connected Socket.IO clients
     const io = getIO();
     if (io) {
-      io.emit('iot-update', latestIoTData);
+      io.emit('iot-update', { ...latestIoTData, storageDurable });
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Telemetry synced and persisted successfully',
+      message: 'Telemetry processed successfully',
+      storageDurable,
+      storageMode: storageDurable ? 'mongodb_persisted' : 'in_memory_buffer',
+      isSimulated: targetSimulated,
       receivedAt: timestamp,
       data: latestIoTData,
     });
@@ -216,40 +243,183 @@ export const getIoTHistory = async (req: Request, res: Response) => {
 
 /**
  * POST /api/iot-data/control
- * Allows authenticated dashboard clients to toggle pump state remotely
+ * Allows authenticated dashboard clients to issue actuator commands.
+ * Creates an ActuatorCommand with status 'accepted'.
+ * DOES NOT falsely claim the pump is physically active until hardware acknowledges.
  */
 export const controlPump = async (req: Request, res: Response) => {
   try {
     const { pumpStatus } = req.body;
-    const targetPumpStatus = Boolean(pumpStatus);
-
-    latestIoTData = {
-      ...latestIoTData,
-      pumpStatus: targetPumpStatus,
-      timestamp: new Date().toISOString(),
-    };
-
-    console.log(
-      `📡 [IoT CONTROL] Command received: Pump is now ${targetPumpStatus ? 'ON' : 'OFF'}`
-    );
-
-    // Broadcast to ESP32 and frontends
-    const io = getIO();
-    if (io) {
-      io.emit('iot-update', latestIoTData);
-      io.emit('iot-control', { pumpStatus: targetPumpStatus });
+    if (pumpStatus === undefined || pumpStatus === null) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required boolean parameter: pumpStatus (true = ON, false = OFF)',
+      });
     }
 
-    return res.status(200).json({
+    const targetPumpStatus = Boolean(pumpStatus);
+    const commandId = 'cmd_' + crypto.randomUUID().substring(0, 10);
+    const issuedBy = (req as any).user?.email || (req as any).user?.id || 'authenticated_operator';
+    const issuedAt = new Date().toISOString();
+
+    const command: ActuatorCommand = {
+      commandId,
+      deviceId: 'esp32-node-01',
+      action: targetPumpStatus ? 'ACTIVATE_PUMP' : 'DEACTIVATE_PUMP',
+      targetPumpStatus,
+      issuedAt,
+      issuedBy,
+      status: 'accepted',
+    };
+
+    activeActuatorCommand = command;
+    commandHistory.unshift(command);
+    if (commandHistory.length > 50) commandHistory.pop();
+
+    console.log(
+      `📡 [IoT ACTUATOR] Command issued: ${command.action} (${commandId}) by ${issuedBy}. Pending hardware ACK.`
+    );
+
+    // Broadcast actuator command to ESP32 hardware and listening dashboard clients
+    const io = getIO();
+    if (io) {
+      io.emit('iot-control', {
+        commandId,
+        action: command.action,
+        targetPumpStatus,
+        issuedAt,
+      });
+    }
+
+    return res.status(202).json({
       success: true,
-      message: `Pump turned ${targetPumpStatus ? 'ON' : 'OFF'} successfully`,
-      pumpStatus: targetPumpStatus,
+      message: `Actuator command transmitted to field gateway (${command.action}). Physical state pending hardware acknowledgement.`,
+      commandId,
+      commandState: 'accepted',
+      actuatorState: 'pending_acknowledgement',
+      targetPumpStatus,
+      disclaimer:
+        'Safety Protocol: Actuator command has been queued. AgriFlux does NOT assume physical water flow until the ESP32 node confirms switch contact.',
     });
   } catch (error: any) {
     console.error('❌ [IoT CONTROL ERROR]', error.message);
     return res.status(500).json({
       success: false,
-      message: 'Error toggling pump',
+      message: 'Error issuing actuator control command',
+    });
+  }
+};
+
+/**
+ * POST /api/iot-data/actuator-ack
+ * Allows ESP32 or simulator to explicitly confirm physical relay activation.
+ */
+export const acknowledgeActuator = async (req: Request, res: Response) => {
+  try {
+    const { commandId, status, failureReason, flowRateLpm, durationSeconds } = req.body;
+
+    if (!commandId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required field: commandId',
+      });
+    }
+
+    if (!activeActuatorCommand || activeActuatorCommand.commandId !== commandId) {
+      const existing = commandHistory.find((c) => c.commandId === commandId);
+      if (!existing) {
+        return res.status(404).json({
+          success: false,
+          message: `Command ID ${commandId} not found or expired.`,
+        });
+      }
+    }
+
+    const ackTime = new Date().toISOString();
+    const finalStatus: ActuatorCommand['status'] = status === 'failed' ? 'failed' : 'acknowledged';
+
+    if (activeActuatorCommand && activeActuatorCommand.commandId === commandId) {
+      activeActuatorCommand.status = finalStatus;
+      activeActuatorCommand.acknowledgedAt = ackTime;
+      if (failureReason) activeActuatorCommand.failureReason = failureReason;
+      if (flowRateLpm !== undefined || durationSeconds !== undefined) {
+        activeActuatorCommand.executionMetrics = {
+          flowRateLpm: Number(flowRateLpm) || 0,
+          durationSeconds: Number(durationSeconds) || 0,
+        };
+      }
+
+      // Update confirmed telemetry pump state if confirmed
+      if (finalStatus === 'acknowledged') {
+        latestIoTData = {
+          ...latestIoTData,
+          pumpStatus: activeActuatorCommand.targetPumpStatus,
+          timestamp: ackTime,
+        };
+      }
+    }
+
+    console.log(
+      `🔌 [IoT ACTUATOR ACK] Command ${commandId} transitioned to ${finalStatus.toUpperCase()} at ${ackTime}`
+    );
+
+    // Broadcast confirmation to dashboard clients
+    const io = getIO();
+    if (io) {
+      io.emit('iot-actuator-ack', {
+        commandId,
+        status: finalStatus,
+        pumpStatus: latestIoTData.pumpStatus,
+        acknowledgedAt: ackTime,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Actuator confirmation received: ${finalStatus}`,
+      command: activeActuatorCommand,
+      currentPumpStatus: latestIoTData.pumpStatus,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to process actuator acknowledgement',
+    });
+  }
+};
+
+/**
+ * GET /api/iot-data/actuator-state
+ * Returns real-time actuator state machine diagnostic
+ */
+export const getActuatorState = async (_req: Request, res: Response) => {
+  try {
+    const now = Date.now();
+    // Auto-timeout check (if command pending > 15s without ack)
+    if (
+      activeActuatorCommand &&
+      activeActuatorCommand.status === 'accepted' &&
+      now - new Date(activeActuatorCommand.issuedAt).getTime() > 15000
+    ) {
+      activeActuatorCommand.status = 'timed_out';
+      activeActuatorCommand.failureReason =
+        'No acknowledgement received from ESP32 field gateway within 15s timeout window.';
+    }
+
+    return res.status(200).json({
+      success: true,
+      actuator: {
+        physicalPumpStatus: latestIoTData.pumpStatus,
+        isHardwareOnline: latestIoTData.isOnline,
+        lastSeenAt: latestIoTData.timestamp,
+        activeCommand: activeActuatorCommand,
+        recentCommandsCount: commandHistory.length,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching actuator state',
     });
   }
 };

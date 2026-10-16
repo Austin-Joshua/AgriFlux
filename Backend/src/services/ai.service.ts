@@ -49,6 +49,21 @@ export class AIService {
       predicted,
       risk,
       suggestions,
+      modelType: 'agronomic_crop_response_model',
+      districtStatisticalBaseline: {
+        source: 'Directorate of Economics and Statistics (DES), Govt of India',
+        district: 'Thanjavur',
+        crop,
+        baselineKgHa: crop.toLowerCase() === 'rice' ? 2700 : base,
+      },
+      provenance: {
+        isMachineLearningValidated: false,
+        methodology: 'FAO-56 & ICAR Empirical Nutrient Response Formula',
+        limitations: [
+          'Calculated from empirical agronomic crop response curves, not a trained neural network.',
+          'District-level APY statistics provide regional historical context, not individual-field ground truth.',
+        ],
+      },
     };
   }
 

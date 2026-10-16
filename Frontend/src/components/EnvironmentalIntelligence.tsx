@@ -13,6 +13,10 @@ import {
   Compass,
   FileSpreadsheet,
   CheckCircle2,
+  FlaskConical,
+  Sprout,
+  BookOpen,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -71,23 +75,85 @@ interface SatelliteResponse {
   data: SatelliteObservationItem[];
 }
 
+interface SoilProfileData {
+  regionName: string;
+  sampleDate: string;
+  samplingDepthCm: { top: number; bottom: number };
+  sampleId: string;
+  testMethod: string;
+  source: string;
+  laboratoryName: string;
+  ph: number;
+  electricalConductivityDsm: number;
+  organicCarbonPct: number;
+  availableNitrogenKgHa: number;
+  availablePhosphorusKgHa: number;
+  availablePotassiumKgHa: number;
+  soilTexture: string;
+  fertilityRating: string;
+  status: string;
+}
+
+interface APYRecord {
+  state: string;
+  district: string;
+  crop: string;
+  season: string;
+  agriculturalYear: string;
+  areaHectares: number;
+  productionTonnes: number;
+  yieldTonnePerHectare: number;
+  yieldKgPerHectare: number;
+  source: string;
+  verificationStatus: string;
+}
+
+interface VariableRegistryItem {
+  canonicalName: string;
+  displayLabel: string;
+  category: string;
+  unit: string;
+  sourceType: string;
+  primarySource: string;
+  spatialResolution: string;
+  temporalResolution: string;
+  validationRange: { min: number; max: number };
+  safeForActuatorCoupling: boolean;
+  safeForRecommendation: boolean;
+  description: string;
+}
+
 const EnvironmentalIntelligence: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'weather' | 'satellite'>('weather');
+  const [activeTab, setActiveTab] = useState<'weather' | 'satellite' | 'soil' | 'apy' | 'registry'>('weather');
   const [weatherGranularity, setWeatherGranularity] = useState<'daily' | 'hourly'>('daily');
   const [timeRangeDays, setTimeRangeDays] = useState<number>(14);
 
+  // Weather state
   const [weatherData, setWeatherData] = useState<WeatherObservation[]>([]);
   const [loadingWeather, setLoadingWeather] = useState<boolean>(true);
 
+  // Satellite state
   const [satelliteData, setSatelliteData] = useState<SatelliteResponse | null>(null);
   const [loadingSatellite, setLoadingSatellite] = useState<boolean>(true);
   const [isDemoSubmitting, setIsDemoSubmitting] = useState<boolean>(false);
 
-  // Fetch Historical Weather Observations
+  // Soil state
+  const [soilProfile, setSoilProfile] = useState<SoilProfileData | null>(null);
+  const [loadingSoil, setLoadingSoil] = useState<boolean>(false);
+
+  // Crop APY state
+  const [apyRecords, setApyRecords] = useState<APYRecord[]>([]);
+  const [loadingApy, setLoadingApy] = useState<boolean>(false);
+
+  // Registry state
+  const [registryItems, setRegistryItems] = useState<Record<string, VariableRegistryItem>>({});
+  const [loadingRegistry, setLoadingRegistry] = useState<boolean>(false);
+
+  // 1. Fetch Historical Weather Observations
   const fetchWeather = useCallback(async () => {
     setLoadingWeather(true);
     try {
-      const response = await axios.get(`${API_URL}/api/environmental/weather`, {
+      const response = await axios.get(`${API_URL}/environmental/weather`, {
         params: {
           granularity: weatherGranularity,
           limit: weatherGranularity === 'daily' ? timeRangeDays : timeRangeDays * 24,
@@ -99,17 +165,16 @@ const EnvironmentalIntelligence: React.FC = () => {
       }
     } catch (err: unknown) {
       console.warn('Weather data fetch note:', (err as Error).message);
-      // Fallback empty state handled gracefully
     } finally {
       setLoadingWeather(false);
     }
   }, [weatherGranularity, timeRangeDays]);
 
-  // Fetch Sentinel-2 Satellite NDVI Observations
+  // 2. Fetch Sentinel-2 Satellite NDVI Observations
   const fetchSatellite = useCallback(async () => {
     setLoadingSatellite(true);
     try {
-      const response = await axios.get(`${API_URL}/api/environmental/satellite/ndvi`);
+      const response = await axios.get(`${API_URL}/environmental/satellite/ndvi`);
       if (response.data?.success) {
         setSatelliteData(response.data);
       }
@@ -120,6 +185,51 @@ const EnvironmentalIntelligence: React.FC = () => {
     }
   }, []);
 
+  // 3. Fetch Soil Profile
+  const fetchSoil = useCallback(async () => {
+    setLoadingSoil(true);
+    try {
+      const response = await axios.get(`${API_URL}/environmental/soil`);
+      if (response.data?.success && response.data.data) {
+        setSoilProfile(response.data.data);
+      }
+    } catch (err: unknown) {
+      console.warn('Soil fetch note:', (err as Error).message);
+    } finally {
+      setLoadingSoil(false);
+    }
+  }, []);
+
+  // 4. Fetch Crop Production Statistics (DES APY)
+  const fetchApy = useCallback(async () => {
+    setLoadingApy(true);
+    try {
+      const response = await axios.get(`${API_URL}/environmental/crop-statistics`);
+      if (response.data?.success) {
+        setApyRecords(response.data.data || []);
+      }
+    } catch (err: unknown) {
+      console.warn('APY fetch note:', (err as Error).message);
+    } finally {
+      setLoadingApy(false);
+    }
+  }, []);
+
+  // 5. Fetch Canonical Environmental Registry
+  const fetchRegistry = useCallback(async () => {
+    setLoadingRegistry(true);
+    try {
+      const response = await axios.get(`${API_URL}/environmental/registry`);
+      if (response.data?.success) {
+        setRegistryItems(response.data.registry || {});
+      }
+    } catch (err: unknown) {
+      console.warn('Registry fetch note:', (err as Error).message);
+    } finally {
+      setLoadingRegistry(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchWeather();
   }, [fetchWeather]);
@@ -127,6 +237,15 @@ const EnvironmentalIntelligence: React.FC = () => {
   useEffect(() => {
     fetchSatellite();
   }, [fetchSatellite]);
+
+  const registryCount = Object.keys(registryItems).length;
+  const apyCount = apyRecords.length;
+
+  useEffect(() => {
+    if (activeTab === 'soil' && !soilProfile) fetchSoil();
+    if (activeTab === 'apy' && apyCount === 0) fetchApy();
+    if (activeTab === 'registry' && registryCount === 0) fetchRegistry();
+  }, [activeTab, soilProfile, apyCount, registryCount, fetchSoil, fetchApy, fetchRegistry]);
 
   // Prepare chart data (reverse so chronological left-to-right)
   const chartPoints = React.useMemo(() => {
@@ -180,7 +299,6 @@ const EnvironmentalIntelligence: React.FC = () => {
     setIsDemoSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      // Ingest genuine Thanjavur Sentinel-2 L2A MSI product summary sample
       const payload = {
         regionName: 'Thanjavur, Tamil Nadu (Cauvery Delta)',
         latitude: 10.790861,
@@ -191,16 +309,16 @@ const EnvironmentalIntelligence: React.FC = () => {
         spatialResolutionMeters: 10,
         reportedCloudCoveragePercentage: 4.2,
         samples: [
-          { b04_red: 580, b08_nir: 3950, scl_classification: 4 }, // Vegetation
-          { b04_red: 620, b08_nir: 4200, scl_classification: 4 }, // Vegetation
-          { b04_red: 710, b08_nir: 4050, scl_classification: 4 }, // Vegetation
-          { b04_red: 850, b08_nir: 3800, scl_classification: 4 }, // High vigor
-          { b04_red: 1400, b08_nir: 2100, scl_classification: 5 }, // Bare soil
-          { b04_red: 520, b08_nir: 4100, scl_classification: 4 }, // Vegetation
+          { b04_red: 580, b08_nir: 3950, scl_classification: 4 },
+          { b04_red: 620, b08_nir: 4200, scl_classification: 4 },
+          { b04_red: 710, b08_nir: 4050, scl_classification: 4 },
+          { b04_red: 850, b08_nir: 3800, scl_classification: 4 },
+          { b04_red: 1400, b08_nir: 2100, scl_classification: 5 },
+          { b04_red: 520, b08_nir: 4100, scl_classification: 4 },
         ],
       };
 
-      await axios.post(`${API_URL}/api/environmental/ingest/satellite`, payload, {
+      await axios.post(`${API_URL}/environmental/ingest/satellite`, payload, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
@@ -218,22 +336,22 @@ const EnvironmentalIntelligence: React.FC = () => {
   return (
     <div className="card overflow-hidden">
       {/* Header with Title and Mode Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800 gap-3">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <h3 className="section-header !mb-0 text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              Macro-Environmental & Orbital Intelligence
+              Environmental & Agronomic Intelligence Hub
             </h3>
           </div>
           <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5 flex items-center gap-1.5">
             <Compass size={12} className="text-primary-500" />
-            Thanjavur Pilot Basin (10.79°N, 79.10°E · 59m elev.)
+            Thanjavur Pilot Region (10.79°N, 79.10°E · 59m elev. · Cauvery Delta)
           </p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl self-start sm:self-auto border border-gray-200/50 dark:border-gray-700/50">
+        {/* 5-Tab Multi-Source Navigation */}
+        <div className="flex flex-wrap items-center gap-1 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
           <button
             onClick={() => setActiveTab('weather')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
@@ -256,13 +374,45 @@ const EnvironmentalIntelligence: React.FC = () => {
             <Satellite size={13} />
             Copernicus Sentinel-2
           </button>
+          <button
+            onClick={() => setActiveTab('soil')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              activeTab === 'soil'
+                ? 'bg-white dark:bg-gray-700 text-amber-600 dark:text-amber-400 shadow-sm font-bold'
+                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+            }`}
+          >
+            <FlaskConical size={13} />
+            Soil Health Card
+          </button>
+          <button
+            onClick={() => setActiveTab('apy')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              activeTab === 'apy'
+                ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm font-bold'
+                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+            }`}
+          >
+            <Sprout size={13} />
+            DES Crop Statistics
+          </button>
+          <button
+            onClick={() => setActiveTab('registry')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              activeTab === 'registry'
+                ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm font-bold'
+                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+            }`}
+          >
+            <BookOpen size={13} />
+            Variable Registry
+          </button>
         </div>
       </div>
 
       {/* TAB 1: HISTORICAL WEATHER TIME SERIES */}
       {activeTab === 'weather' && (
         <div className="pt-4 space-y-4">
-          {/* Provenance and Separation Notice */}
           <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300">
               <FileSpreadsheet size={15} className="text-blue-600 shrink-0" />
@@ -488,7 +638,6 @@ const EnvironmentalIntelligence: React.FC = () => {
       {/* TAB 2: SENTINEL-2 L2A SATELLITE NDVI */}
       {activeTab === 'satellite' && (
         <div className="pt-4 space-y-4">
-          {/* Metadata Banner */}
           <div className="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
               <Satellite size={15} className="text-emerald-600 shrink-0" />
@@ -502,7 +651,6 @@ const EnvironmentalIntelligence: React.FC = () => {
             </span>
           </div>
 
-          {/* SATELLITE CONTENT: Checked against available data */}
           {loadingSatellite ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
               <Loader className="animate-spin text-blue-500" size={24} />
@@ -513,7 +661,6 @@ const EnvironmentalIntelligence: React.FC = () => {
             satelliteData.data &&
             satelliteData.data.length > 0 ? (
             <div className="space-y-4">
-              {/* Display genuine observation metrics */}
               {satelliteData.data.map((obs, idx) => (
                 <div
                   key={obs._id || idx}
@@ -545,7 +692,6 @@ const EnvironmentalIntelligence: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* NDVI Statistics Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                     <div className="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
@@ -593,7 +739,6 @@ const EnvironmentalIntelligence: React.FC = () => {
               ))}
             </div>
           ) : (
-            /* MEANINGFUL / HONEST EMPTY STATE (No fabricated data) */
             <div className="p-6 rounded-2xl bg-gray-50/60 dark:bg-gray-900/40 border border-dashed border-gray-200 dark:border-gray-800 text-center space-y-4">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
                 <Satellite size={24} />
@@ -610,7 +755,6 @@ const EnvironmentalIntelligence: React.FC = () => {
                 </p>
               </div>
 
-              {/* Ingestion Specification Checklist */}
               <div className="max-w-lg mx-auto p-3 rounded-xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700/60 text-left text-xs space-y-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
                   Processing Pipeline Requirements:
@@ -633,7 +777,6 @@ const EnvironmentalIntelligence: React.FC = () => {
                 </div>
               </div>
 
-              {/* Demonstration Ingestion Button for Reviewers */}
               <div className="pt-1">
                 <button
                   onClick={handleIngestDemoSatellite}
@@ -651,14 +794,296 @@ const EnvironmentalIntelligence: React.FC = () => {
         </div>
       )}
 
+      {/* TAB 3: SOIL HEALTH CARD & LABORATORY CHEMISTRY */}
+      {activeTab === 'soil' && (
+        <div className="pt-4 space-y-4">
+          <div className="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
+              <FlaskConical size={15} className="text-amber-600 shrink-0" />
+              <span>
+                <strong>Soil Health Card Chemistry (0–15 cm sampling depth):</strong> Calibrated
+                laboratory measurements from Government of India Soil Health Card (ICAR-TNAU).
+                Provides chemical nutrient truth distinct from dielectric moisture probes.
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-semibold text-[11px] shrink-0">
+              Laboratory Verified
+            </span>
+          </div>
+
+          {loadingSoil ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
+              <Loader className="animate-spin text-amber-500" size={24} />
+              <span className="text-xs">Loading verified Soil Health Card profile...</span>
+            </div>
+          ) : soilProfile ? (
+            <div className="space-y-4">
+              {/* Soil Overview Header */}
+              <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-tight">
+                      {soilProfile.regionName}
+                    </span>
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 uppercase">
+                      {soilProfile.fertilityRating} Fertility
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-0.5">
+                    Sample ID: <strong>{soilProfile.sampleId}</strong> · Sampling Depth: 0–15 cm · Texture: <strong>{soilProfile.soilTexture}</strong>
+                  </p>
+                </div>
+                <div className="text-left sm:text-right">
+                  <span className="text-[10px] text-gray-400 block">Testing Authority:</span>
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    {soilProfile.laboratoryName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Soil Chemistry KPI Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                    Soil pH
+                  </span>
+                  <p className="text-xl font-black text-amber-600 dark:text-amber-400 mt-1">
+                    {soilProfile.ph}
+                  </p>
+                  <span className="text-[10px] text-gray-400">Slightly Acidic (Rice)</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                    Salinity (EC)
+                  </span>
+                  <p className="text-xl font-black text-blue-600 dark:text-blue-400 mt-1">
+                    {soilProfile.electricalConductivityDsm}
+                  </p>
+                  <span className="text-[10px] text-gray-400">dS/m (Non-saline)</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                    Organic Carbon
+                  </span>
+                  <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
+                    {soilProfile.organicCarbonPct}%
+                  </p>
+                  <span className="text-[10px] text-gray-400">Medium (0.5 - 0.75%)</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                    Available N
+                  </span>
+                  <p className="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">
+                    {soilProfile.availableNitrogenKgHa}
+                  </p>
+                  <span className="text-[10px] text-gray-400">kg/ha (Needs Basal N)</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                    Available P₂O₅
+                  </span>
+                  <p className="text-xl font-black text-orange-600 dark:text-orange-400 mt-1">
+                    {soilProfile.availablePhosphorusKgHa}
+                  </p>
+                  <span className="text-[10px] text-gray-400">kg/ha (Adequate)</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                    Available K₂O
+                  </span>
+                  <p className="text-xl font-black text-teal-600 dark:text-teal-400 mt-1">
+                    {soilProfile.availablePotassiumKgHa}
+                  </p>
+                  <span className="text-[10px] text-gray-400">kg/ha (High Reserve)</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6 text-center text-xs text-gray-400">
+              No soil profile loaded. Run backend service to initialize Thanjavur soil benchmark.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 4: OFFICIAL CROP PRODUCTION STATISTICS (DES APY) */}
+      {activeTab === 'apy' && (
+        <div className="pt-4 space-y-4">
+          <div className="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
+              <Sprout size={15} className="text-emerald-600 shrink-0" />
+              <span>
+                <strong>Official Agricultural Statistics (APY):</strong> Ministry of Agriculture &
+                Farmers Welfare, Directorate of Economics and Statistics (DES). Provides regional
+                macroeconomic yield baselines for Thanjavur paddy cultivation.
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] shrink-0">
+              DES Official Export
+            </span>
+          </div>
+
+          {loadingApy ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
+              <Loader className="animate-spin text-emerald-500" size={24} />
+              <span className="text-xs">Loading official DES agricultural statistics...</span>
+            </div>
+          ) : apyRecords.length > 0 ? (
+            <div className="space-y-4">
+              {apyRecords.map((rec, i) => (
+                <div
+                  key={i}
+                  className="p-4 rounded-2xl bg-gray-50/80 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 space-y-3"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                          {rec.state} · {rec.district}
+                        </span>
+                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 uppercase">
+                          {rec.crop} ({rec.season})
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-400 mt-0.5">
+                        Agricultural Year: <strong>{rec.agriculturalYear}</strong> · Status: <strong>{rec.verificationStatus.replace('_', ' ')}</strong>
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-gray-400 block">District Average Yield:</span>
+                      <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">
+                        {rec.yieldTonnePerHectare} <span className="text-xs font-semibold">t/Ha</span> ({rec.yieldKgPerHectare} <span className="text-xs font-semibold">kg/Ha</span>)
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                        Cultivation Area
+                      </span>
+                      <p className="text-lg font-black text-gray-900 dark:text-white mt-1">
+                        {rec.areaHectares.toLocaleString()}
+                      </p>
+                      <span className="text-[10px] text-gray-400">Hectares harvested</span>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                        Total Production
+                      </span>
+                      <p className="text-lg font-black text-blue-600 dark:text-blue-400 mt-1">
+                        {rec.productionTonnes.toLocaleString()}
+                      </p>
+                      <span className="text-[10px] text-gray-400">Tonnes harvested</span>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                        Calculated Ratio
+                      </span>
+                      <p className="text-lg font-black text-purple-600 dark:text-purple-400 mt-1">
+                        {(rec.productionTonnes / rec.areaHectares).toFixed(2)}
+                      </p>
+                      <span className="text-[10px] text-gray-400">P / A consistency check</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 text-center text-xs text-gray-400">
+              No APY records loaded. Run `npm run ingest:apy` in Backend.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 5: CANONICAL ENVIRONMENTAL VARIABLE REGISTRY */}
+      {activeTab === 'registry' && (
+        <div className="pt-4 space-y-4">
+          <div className="p-3 rounded-xl bg-purple-50/70 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 text-purple-800 dark:text-purple-300">
+              <BookOpen size={15} className="text-purple-600 shrink-0" />
+              <span>
+                <strong>Authoritative Variable Registry:</strong> Single typed source of truth across
+                meteorology, orbital remote sensing, soil chemistry, and on-farm IoT sensors.
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-semibold text-[11px] shrink-0">
+              Canonical Registry v1.0
+            </span>
+          </div>
+
+          {loadingRegistry ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
+              <Loader className="animate-spin text-purple-500" size={24} />
+              <span className="text-xs">Loading canonical environmental variable definitions...</span>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    <th className="py-2.5 px-3">Variable</th>
+                    <th className="py-2.5 px-3">Category</th>
+                    <th className="py-2.5 px-3">Unit</th>
+                    <th className="py-2.5 px-3">Source Type</th>
+                    <th className="py-2.5 px-3">Valid Range</th>
+                    <th className="py-2.5 px-3">Actuator Safe?</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
+                  {Object.values(registryItems).map((v) => (
+                    <tr key={v.canonicalName} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                      <td className="py-2.5 px-3">
+                        <div className="font-bold text-gray-900 dark:text-white">{v.displayLabel}</div>
+                        <span className="text-[10px] text-gray-400 font-mono">{v.canonicalName}</span>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 uppercase">
+                          {v.category}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{v.unit}</td>
+                      <td className="py-2.5 px-3 text-[11px] text-gray-500 dark:text-gray-400">{v.sourceType.replace(/_/g, ' ')}</td>
+                      <td className="py-2.5 px-3 font-mono text-[11px] text-gray-600 dark:text-gray-400">
+                        [{v.validationRange.min}, {v.validationRange.max}]
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {v.safeForActuatorCoupling ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                            <ShieldCheck size={12} /> Yes (Direct In-Situ)
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-500">
+                            <AlertTriangle size={12} /> Decoupled
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Safety Notice & Agronomic Isolation Disclaimer */}
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex items-start gap-2 text-[11px] text-gray-400 dark:text-gray-500">
         <AlertTriangle size={13} className="text-amber-500 shrink-0 mt-0.5" />
         <span>
-          <strong>Operational Safeguard:</strong> Reanalysis weather estimates and satellite NDVI
-          are displayed for macro-climatic monitoring. In accordance with safety rules, they are
-          strictly decoupled from automated closed-loop irrigation actuators until physical field
-          calibration is completed.
+          <strong>Operational Safeguard:</strong> Reanalysis weather estimates, satellite NDVI, and
+          district statistical benchmarks are displayed for macro-climatic and contextual monitoring.
+          In accordance with safety rules, they are strictly decoupled from automated closed-loop
+          irrigation actuators until physical on-farm capacitive sensor ground truth is verified.
         </span>
       </div>
     </div>

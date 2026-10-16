@@ -12,6 +12,10 @@ import { runFieldIntelligenceTests } from './field-intelligence.test';
 import { runAITests } from './ai.test';
 import { runWeatherIngestionTests } from './weather-ingestion.test';
 import { runSatelliteProcessingTests } from './satellite-processing.test';
+import { runSoilDataTests } from './soil-data.test';
+import { runCropStatisticsTests } from './crop-statistics.test';
+import { runActuatorStateMachineTests } from './actuator-state-machine.test';
+import { runFieldIntelligenceIntegrationTests } from './field-intelligence-integration.test';
 
 async function main() {
   console.log('================================================================');
@@ -40,6 +44,22 @@ async function main() {
     {
       name: 'Suite 6: Sentinel-2 L2A Satellite NDVI Processing & Quality Filters',
       runner: runSatelliteProcessingTests,
+    },
+    {
+      name: 'Suite 7: Soil Health Card & Laboratory Chemistry Ingestion',
+      runner: runSoilDataTests,
+    },
+    {
+      name: 'Suite 8: Directorate of Economics & Statistics (DES) APY Ingestion',
+      runner: runCropStatisticsTests,
+    },
+    {
+      name: 'Suite 9: IoT Actuator State Machine & Acknowledgement Protocol',
+      runner: runActuatorStateMachineTests,
+    },
+    {
+      name: 'Suite 10: Field Intelligence Multi-Source Environmental Integration',
+      runner: runFieldIntelligenceIntegrationTests,
     },
   ];
 

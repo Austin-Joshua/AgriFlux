@@ -1,24 +1,32 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import * as iotController from '../controllers/iot.controller';
-import { auth } from '../middleware/auth';
+import { auth, requireRole } from '../middleware/auth';
+import { env } from '../config/env';
 
 const router = Router();
 
 /**
  * IoT API Key middleware — for ESP32/hardware nodes.
- * Hardware devices send a static API key in the 'x-iot-api-key' header.
- * Frontend dashboard commands use JWT Bearer auth instead (see /control route).
+ * In production: fails closed if IOT_API_KEY is missing or key does not match.
+ * In development: permits configured dev key.
  */
 const iotDeviceAuth = (req: Request, res: Response, next: NextFunction) => {
   const apiKey = req.headers['x-iot-api-key'];
-  if (apiKey && apiKey === (process.env.IOT_API_KEY || 'agriflux-iot-key-dev')) {
+  const expectedKey =
+    process.env.IOT_API_KEY || (env.NODE_ENV === 'production' ? '' : 'agriflux-iot-key-dev');
+
+  if (apiKey && expectedKey && apiKey === expectedKey) {
     return next();
   }
+
   // Also allow JWT-authenticated dashboard users to push test data
   const bearer = req.headers['authorization'];
   if (bearer) return auth(req, res, next);
 
-  return res.status(401).json({ success: false, message: 'IoT API key required.' });
+  return res.status(401).json({
+    success: false,
+    message: 'Unauthorized: valid IoT device API key or authorization token required.',
+  });
 };
 
 /**
@@ -30,15 +38,26 @@ router.post('/', iotDeviceAuth, iotController.postIoTData);
 
 /**
  * POST /api/iot-data/control
- * Remote pump control from authenticated dashboard users.
- * Requires JWT Bearer token.
+ * Remote pump control from authenticated dashboard users (Farmer/Admin only).
+ * Requires JWT Bearer token and records command state machine.
  */
-router.post('/control', auth, iotController.controlPump);
+router.post('/control', auth, requireRole('farmer', 'admin'), iotController.controlPump);
+
+/**
+ * POST /api/iot-data/actuator-ack
+ * Physical acknowledgement from ESP32 hardware or simulator.
+ */
+router.post('/actuator-ack', iotDeviceAuth, iotController.acknowledgeActuator);
+
+/**
+ * GET /api/iot-data/actuator-state
+ * Current actuator state machine status
+ */
+router.get('/actuator-state', iotController.getActuatorState);
 
 /**
  * GET /api/iot-data
  * Latest sensor reading — public (used by embedded displays / mobile dashboard).
- * Authenticated on frontend via JWT already.
  */
 router.get('/', iotController.getIoTData);
 router.get('/history', iotController.getIoTHistory);
