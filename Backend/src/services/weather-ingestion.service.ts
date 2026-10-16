@@ -110,11 +110,19 @@ export class WeatherIngestionService {
           dailyBatch.length = 0;
         }
       } else {
-        // In-memory storage for demo fallback
+        // In-memory storage for demo fallback with ring buffer capping
         for (const doc of hourlyBatch) {
+          if (memoryHourlyWeather.size >= 720) {
+            const oldest = memoryHourlyWeather.keys().next().value;
+            if (oldest) memoryHourlyWeather.delete(oldest);
+          }
           memoryHourlyWeather.set(doc.dateStr, doc);
         }
         for (const doc of dailyBatch) {
+          if (memoryDailyWeather.size >= 365) {
+            const oldest = memoryDailyWeather.keys().next().value;
+            if (oldest) memoryDailyWeather.delete(oldest);
+          }
           memoryDailyWeather.set(doc.dateStr, doc);
         }
         hourlyBatch.length = 0;

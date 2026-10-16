@@ -56,7 +56,7 @@ export const connectDB = async () => {
   try {
     const conn = await mongoose.connect(env.MONGODB_URI, {
       serverSelectionTimeoutMS: 5000,
-      maxPoolSize: 100, // Handle 100 simultaneous connections
+      maxPoolSize: 15, // Lean connection pool tailored for container memory constraints (512MB limit)
       socketTimeoutMS: 45000, // 45s socket timeout
       connectTimeoutMS: 30000, // 30s connection timeout
     });

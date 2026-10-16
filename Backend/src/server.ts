@@ -211,13 +211,20 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 /**
- * Cluster Deployment:
+ * Container-Aware Deployment:
+ * In containerized environments (Render, Railway, Docker, K8s), os.cpus() reports the virtualized
+ * host machine core count (e.g. 8-16 cores) rather than container limits. Spawning N workers
+ * causes multiple Node processes to exceed the 512MB RAM tier, triggering OOM restarts.
+ * We run as a single lean process by default, or respect WEB_CONCURRENCY when explicitly configured.
  */
-if (cluster.isPrimary && env.NODE_ENV === 'production') {
-  const numCPUs = os.cpus().length;
-  console.log(`🚀 Primary process ${process.pid} is running. Spawning ${numCPUs} workers...`);
+const WEB_CONCURRENCY = parseInt(process.env.WEB_CONCURRENCY || '1', 10);
 
-  for (let i = 0; i < numCPUs; i++) {
+if (cluster.isPrimary && env.NODE_ENV === 'production' && WEB_CONCURRENCY > 1) {
+  console.log(
+    `🚀 Primary process ${process.pid} is running. Spawning ${WEB_CONCURRENCY} workers...`
+  );
+
+  for (let i = 0; i < WEB_CONCURRENCY; i++) {
     cluster.fork();
   }
 
@@ -229,10 +236,12 @@ if (cluster.isPrimary && env.NODE_ENV === 'production') {
   });
 } else {
   httpServer.listen(PORT, () => {
-    console.log(`🚀 Worker ${process.pid} started. AgriFlux API: http://localhost:${PORT}`);
+    console.log(
+      `🚀 AgriFlux API Server started (PID ${process.pid}). URL: http://localhost:${PORT}`
+    );
     console.log(`📡 WebSocket Gateway: ws://localhost:${PORT}`);
 
-    // Auto-seed historical weather observations if available
+    // Auto-seed historical weather observations if available (capped to protect heap in 512MB RAM containers)
     const weatherCsvCandidates = [
       path.resolve(process.cwd(), '..', 'Data', 'open-meteo-10.79N79.10E59m.csv'),
       path.resolve(process.cwd(), 'Data', 'open-meteo-10.79N79.10E59m.csv'),
@@ -240,7 +249,10 @@ if (cluster.isPrimary && env.NODE_ENV === 'production') {
     ];
     const foundCsv = weatherCsvCandidates.find((p) => fs.existsSync(p));
     if (foundCsv) {
-      WeatherIngestionService.ingestOpenMeteoCSV(foundCsv)
+      WeatherIngestionService.ingestOpenMeteoCSV(foundCsv, {
+        maxHourlyRows: 720, // 30 days of hourly observations
+        maxDailyRows: 365, // 1 year of daily summaries
+      })
         .then((res) => {
           console.log(
             `⛅ [WEATHER SEED] Auto-ingested ${res.dailyRecordsImported} daily and ${res.hourlyRecordsImported} hourly observations.`
