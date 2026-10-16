@@ -1,5 +1,6 @@
 import fs from 'fs';
 import readline from 'readline';
+import mongoose from 'mongoose';
 import CropProductionStatistic, {
   ICropProductionStatistic,
 } from '../../../Database/Models/CropProductionStatistic';
@@ -113,7 +114,8 @@ export class CropStatisticsService {
     }
 
     // Persist to MongoDB if connected
-    if (isDBConnected && records.length > 0) {
+    const isConnected = isDBConnected || mongoose.connection.readyState === 1;
+    if (isConnected && records.length > 0) {
       const ops = records.map((rec) => ({
         updateOne: {
           filter: {
@@ -150,7 +152,8 @@ export class CropStatisticsService {
     const targetDistrict = filter.district || 'Thanjavur';
     const targetCrop = filter.crop || 'Rice';
 
-    if (isDBConnected) {
+    const isConnected = isDBConnected || mongoose.connection.readyState === 1;
+    if (isConnected) {
       const query: Record<string, any> = {
         district: new RegExp(`^${targetDistrict}$`, 'i'),
         crop: new RegExp(`^${targetCrop}$`, 'i'),
@@ -203,6 +206,10 @@ export class CropStatisticsService {
         district: latest.district,
         crop: latest.crop,
         agriculturalYear: latest.agriculturalYear,
+        isHistoricalArchive: true,
+        historicalScope: `Archived Agricultural Year ${latest.agriculturalYear} (DES Official Record)`,
+        disclaimer:
+          'Archived district-level macro statistic from historical DES reporting. Not a modern seasonal yield benchmark or individual farm productivity target.',
         yieldKgPerHectare: latest.yieldKgPerHectare,
         yieldTonnePerHectare: latest.yieldTonnePerHectare,
         areaHectares: latest.areaHectares,
@@ -217,6 +224,11 @@ export class CropStatisticsService {
       district: 'Thanjavur',
       crop: 'Rice',
       agriculturalYear: '1997 - 1998',
+      isHistoricalArchive: true,
+      historicalScope:
+        'Archived Agricultural Year 1997–1998 (Whole Year). Not a modern seasonal yield target.',
+      disclaimer:
+        'Archived district-level macro statistic from Agricultural Year 1997–1998. Not a modern seasonal yield benchmark or an individual farm yield target.',
       yieldKgPerHectare: 2700,
       yieldTonnePerHectare: 2.7,
       areaHectares: 181496.0,

@@ -16,7 +16,8 @@ export interface ISoilObservation extends Document {
     | 'soil_health_card'
     | 'laboratory_wet_chemistry'
     | 'soilgrids_gridded_estimate'
-    | 'in_situ_sensor_estimate';
+    | 'in_situ_sensor_estimate'
+    | 'regional_survey_benchmark';
   source: string;
   laboratoryName?: string;
   ph: number;
@@ -33,8 +34,13 @@ export interface ISoilObservation extends Document {
     ironPpm?: number;
   };
   fertilityRating: 'low' | 'medium' | 'high' | 'optimal';
-  dataType: 'soil_health_card_observation' | 'laboratory_soil_test' | 'gridded_soil_estimate';
-  status: 'verified' | 'provisional' | 'estimated';
+  dataType:
+    | 'soil_health_card_observation'
+    | 'laboratory_soil_test'
+    | 'gridded_soil_estimate'
+    | 'illustrative_regional_benchmark';
+  status: 'verified' | 'provisional' | 'estimated' | 'benchmark';
+  notes?: string;
   importedAt: Date;
 }
 
@@ -134,13 +140,17 @@ const SoilObservationSchema: Schema = new Schema<ISoilObservation>(
         'soil_health_card_observation',
         'laboratory_soil_test',
         'gridded_soil_estimate',
+        'illustrative_regional_benchmark',
       ],
       default: 'soil_health_card_observation',
     },
     status: {
       type: String,
-      enum: ['verified', 'provisional', 'estimated'],
+      enum: ['verified', 'provisional', 'estimated', 'benchmark'],
       default: 'verified',
+    },
+    notes: {
+      type: String,
     },
     importedAt: {
       type: Date,

@@ -325,14 +325,28 @@ export const acknowledgeActuator = async (req: Request, res: Response) => {
       });
     }
 
-    if (!activeActuatorCommand || activeActuatorCommand.commandId !== commandId) {
-      const existing = commandHistory.find((c) => c.commandId === commandId);
-      if (!existing) {
-        return res.status(404).json({
-          success: false,
-          message: `Command ID ${commandId} not found or expired.`,
-        });
-      }
+    const targetCommand =
+      activeActuatorCommand && activeActuatorCommand.commandId === commandId
+        ? activeActuatorCommand
+        : commandHistory.find((c) => c.commandId === commandId);
+
+    if (!targetCommand) {
+      return res.status(404).json({
+        success: false,
+        message: `Command ID ${commandId} not found or expired.`,
+      });
+    }
+
+    if (
+      targetCommand.status === 'acknowledged' ||
+      targetCommand.status === 'failed' ||
+      targetCommand.status === 'timed_out'
+    ) {
+      return res.status(409).json({
+        success: false,
+        message: `Command ${commandId} was already processed with status: ${targetCommand.status}. Duplicate acknowledgements rejected.`,
+        command: targetCommand,
+      });
     }
 
     const ackTime = new Date().toISOString();

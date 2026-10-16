@@ -94,10 +94,10 @@ export async function runSoilDataTests(): Promise<
     assert.ok(
       profile.data.source.includes('Soil Health Card') || profile.data.source.includes('TNAU')
     );
-    assert.strictEqual(profile.data.status, 'verified');
+    assert.ok(profile.data.status === 'verified' || profile.data.status === 'benchmark');
 
     results.push({
-      name: 'Soil Data: Delivers verified Thanjavur Cauvery Delta soil profile',
+      name: 'Soil Data: Delivers verified or benchmark Thanjavur Cauvery Delta soil profile',
       passed: true,
     });
   } catch (err: any) {

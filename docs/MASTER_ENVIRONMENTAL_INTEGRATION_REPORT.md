@@ -15,7 +15,7 @@
 AgriFlux has been hardened from an unverified prototype into an auditable, environmental-data-driven agricultural intelligence platform. By integrating genuine historical reanalysis weather, Sentinel-2 L2A orbital spectral algorithms, official Directorate of Economics and Statistics (DES) agricultural statistics, verified Soil Health Card chemistry, a formal Environmental Variable Registry, and a fail-closed IoT actuator state machine, AgriFlux eliminates data fabrication, enforces provenance tracking, and guarantees that macro-environmental estimates never trigger unvalidated physical actuation.
 
 ### Summary of System Health
-- **Automated Backend Tests:** 10 Suites, 42 Tests, **100% Pass Rate** (`npm test`).
+- **Automated Backend Tests:** 10 Suites, 44 Tests, **100% Pass Rate** (`npm test`).
 - **Backend Type-Checking & Linting:** 0 Errors, 0 Warnings (`tsc`, `eslint . --max-warnings 0`).
 - **Frontend Type-Checking & Bundling:** Clean Vite production build in 15.44s (`tsc && vite build`).
 - **Frontend Linting:** 0 Errors, 0 Warnings (`eslint .`).
@@ -92,29 +92,34 @@ Defines 14 canonical variables with strict data classifications:
 - `official_statistical_baseline`: DES Area, Production, Yield. Represents macro district context ($2,700\text{ kg/ha}$); **never conflated with individual farm yields**.
 - `sensor_measured`: Direct in-situ capacitive telemetry. Only verified source permitted for closed-loop automated irrigation actuation.
 
-### 3.2 Directorate of Economics & Statistics (DES) APY Pipeline
+### 3.2 Directorate of Economics & Statistics (DES) APY Pipeline & Scope
 - **Dataset:** Official report `Data/horizontal_crop_vertical_year_report.xls` exported from `desagri.gov.in`.
-- **Target Record:** State: Tamil Nadu, District: Thanjavur, Crop: Rice, Season: Whole Year, Agricultural Year: 1997–1998.
+- **Target Record:** State: Tamil Nadu, District: Thanjavur, Crop: Rice, Season: Whole Year, **Agricultural Year: 1997–1998**.
+- **Historical Scope Notice:** This record represents historical macro-statistics from the **1997–1998 Agricultural Year (~28 years ago)**. It provides archived district macroeconomic context ($2,700\text{ kg/ha}$) and is **strictly prohibited from being treated as a modern seasonal yield benchmark or an individual farm productivity target**.
 - **Metrics Extracted:** Area: 181,496 Hectares, Production: 489,770 Tonnes, Official Yield: 2.70 Tonnes/Ha ($2,700\text{ kg/ha}$).
 - **Mathematical Integrity:**
-  $$\text{Calculated Yield} = \frac{489,770\text{ Tonnes}}{181,496\text{ Hectares}} = 2.6985\text{ t/Ha} \approx 2.70\text{ t/Ha}$$
-  The ingestion engine validates this ratio and records an integrity flag `mathematicallyConsistent: true`.
+  $$\text{Calculated Ratio} = \frac{489,770\text{ Tonnes}}{181,496\text{ Hectares}} = 2.6985\text{ t/Ha} \approx 2.70\text{ t/Ha}$$
+  The ingestion engine validates this ratio and records `verificationStatus: 'verified_official'` and `mathematicallyConsistent: true`.
 
-### 3.3 Soil Health Card Profile (Thanjavur Cauvery Delta)
-- **Soil Classification:** Deltaic Alluvial Deep Clay Loam.
-- **Verified Parameters:**
-  - Soil pH: 6.4 (Slightly acidic to neutral; optimal for paddy nutrient availability).
+### 3.3 Soil Properties & Provenance Relabeling
+- **Primary Source Audit:** A thorough file audit of `Data/` confirmed that no primary laboratory Soil Health Card certificate or farm-specific wet chemistry test report exists in the repository.
+- **Relabeled Profile:** The Thanjavur soil chemistry profile has been formally relabeled from a verified measurement to an **Illustrative Regional Benchmark** (`dataType: 'illustrative_regional_benchmark'`, `status: 'benchmark'`).
+- **Benchmark Parameters (Cauvery Delta Alluvial Rice Tracts, ICAR-TNAU Survey Reference):**
+  - Soil pH: 6.4 (Slightly acidic to neutral; optimal for wetland rice nutrient uptake).
   - Electrical Conductivity (EC): 0.38 dS/m (Non-saline, ideal for germination).
   - Organic Carbon: 0.62% (Medium range).
   - Available Nitrogen (N): 195.0 kg/ha (Low status; triggers targeted nitrogen recommendation).
   - Available Phosphorus (P): 22.4 kg/ha (Medium status).
   - Available Potassium (K): 245.0 kg/ha (Medium to high status).
-- **Physical Bounds Enforced:** pH $[3.5, 10.5]$, EC $[0.0, 20.0\text{ dS/m}]$, OC $[0.0, 15.0\%]$, N $[0.0, 1500.0\text{ kg/ha}]$.
+  - Soil Texture: Clay Loam (Alluvial Delta Sediment).
+- **Physical Range Bounds Enforced:** pH $[3.5, 10.5]$, EC $[0.0, 15.0\text{ dS/m}]$, OC $[0.01, 8.0\%]$, N $[10.0, 600.0\text{ kg/ha}]$.
+- **User Guardrail:** Both the backend API and frontend display explicit disclaimers: *"Illustrative regional agro-ecological benchmark for Cauvery Delta alluvial rice soils. NOT an in-situ certified measurement of an individual farm boundary."*
 
 ### 3.4 IoT Actuator State Machine & Fail-Closed Security
 - **Command Dispatch:** Issuing a pump command (`POST /api/iot-data/pump`) verifies farmer/admin authentication, generates a unique command ID (`cmd_...`), records target state `'accepted'`, and returns HTTP 202 Accepted.
 - **Physical Acknowledgment:** The application **never** marks the pump active prematurely. The pump state only transitions to `'acknowledged'` when the physical ESP32 relay confirms circuit closure via `POST /api/iot-data/actuator-ack`.
-- **Timeout Protection:** If physical confirmation is not received within 60 seconds, the state transitions to `'timed_out'`, and alerts are emitted.
+- **Duplicate Acknowledgement Guard:** Resubmitting an ACK for an already processed command returns **HTTP 409 Conflict** (`Duplicate acknowledgements rejected`), preventing replay vulnerabilities.
+- **Timeout Protection:** If physical confirmation is not received within 15 seconds, the command transitions to `'timed_out'`, and alerts are emitted.
 - **Security Posture:** IoT routes enforce `requireRole('farmer', 'admin')`. In production (`NODE_ENV === 'production'`), requests without a valid `X-Device-Key` fail closed immediately with HTTP 401 Unauthorized.
 
 ---
@@ -126,17 +131,27 @@ Defines 14 canonical variables with strict data classifications:
 | `GET` | `/api/environmental/registry` | Authenticated | None | Returns canonical metadata, physical bounds, units, and actuator safety flags for all 14 variables. |
 | `GET` | `/api/environmental/weather` | Authenticated | `granularity` (daily/hourly), `startDate`, `endDate`, `limit` | Returns verified Open-Meteo ERA5-Land reanalysis observations. |
 | `GET` | `/api/environmental/satellite/ndvi` | Authenticated | `targetTile`, `startDate`, `endDate` | Returns Sentinel-2 L2A NDVI observations or honest diagnostic empty state (`isDataAvailable: false`). |
-| `GET` | `/api/environmental/soil` | Authenticated | `latitude`, `longitude`, `district` | Returns the most recent verified Soil Health Card or laboratory profile for the location. |
-| `POST` | `/api/environmental/soil/ingest` | Admin / Agronomist | JSON Soil Observation payload | Validates physical bounds and ingests verified soil chemistry records. |
-| `GET` | `/api/environmental/crop-statistics` | Authenticated | `state`, `district`, `crop`, `agriculturalYear` | Returns official DES APY statistics, area, production, yield, and mathematical verification. |
+| `GET` | `/api/environmental/soil` | Authenticated | `latitude`, `longitude`, `district` | Returns regional benchmark or verified Soil Health Card profile with explicit benchmark disclaimer. |
+| `POST` | `/api/environmental/soil/ingest` | Admin / Agronomist | JSON Soil Observation payload | Ingests verified soil chemistry records with physical bounds validation. |
+| `GET` | `/api/environmental/crop-statistics` | Authenticated | `state`, `district`, `crop`, `agriculturalYear` | Returns official DES APY statistics with agricultural year (1997–1998) and historical scope disclaimer. |
 | `POST` | `/api/environmental/crop-statistics/ingest` | Admin | Multipart or auto-ingest trigger | Parses DES HTML table reports and upserts crop production statistics idempotently. |
 | `POST` | `/api/iot-data/pump` | Farmer / Admin | `{ "pumpStatus": true/false, "flowRate": number }` | Queues actuator command in `'accepted'` state. Returns command ID and tracking URL. |
-| `POST` | `/api/iot-data/actuator-ack` | Device / Admin | `{ "commandId": string, "acknowledgedState": boolean, "measuredFlowRate"?: number }` | Physical relay acknowledgment endpoint transitioning command to `'acknowledged'`. |
-| `GET` | `/api/iot-data/actuator-state` | Authenticated | `commandId` (optional) | Returns active actuator state machine diagnostic details and pending commands. |
+| `POST` | `/api/iot-data/actuator-ack` | Device / Admin | `{ "commandId": string, "status": "acknowledged"|"failed", "flowRateLpm"?: number }` | Physical relay acknowledgment endpoint. Returns 409 Conflict on duplicate ACK. |
+| `GET` | `/api/iot-data/actuator-state` | Authenticated | None | Returns active actuator state machine diagnostic details, timeout status, and pending commands. |
 
 ---
 
 ## 5. Verification & Test Execution Results
+
+### 5.1 Real MongoDB Durable Persistence & Idempotency Audit
+Executed against a real local MongoDB database instance (`npx ts-node src/scripts/verify-durable-persistence.ts`):
+
+| Step | Weather Documents | APY Documents | Soil Documents | Total Records | Verified Audit Result |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **0. Initial Clean State** | 0 | 0 | 0 | 0 | Clean unseeded MongoDB collections |
+| **1. First Ingestion Run** | 52,825 | 1 | 1 | 52,827 | Ingested 50,712 hourly + 2,113 daily weather, 1 DES APY (1997–1998), 1 Soil benchmark |
+| **2. Post-Server Restart Query** | 52,825 | 1 | 1 | 52,827 | **100% durable** across full Mongoose disconnect & reconnect |
+| **3. Second Ingestion Run** | 52,825 | 1 | 1 | 52,827 | **100% idempotent** (exactly 0 duplicate records created) |
 
 All 10 automated test suites pass with 100% success rate:
 
@@ -204,6 +219,8 @@ Environment: Node v24.14.0
   ✔ [PASS] Actuator State Machine: Diagnostics report pending command awaiting hardware relay switch
   ✔ [PASS] Actuator State Machine: Hardware acknowledgement confirms physical actuation and flow metrics
   ✔ [PASS] Actuator State Machine: Rejects invalid or missing pumpStatus parameter
+  ✔ [PASS] Actuator State Machine: Rejects duplicate hardware acknowledgement with 409 Conflict
+  ✔ [PASS] Actuator State Machine: Timeout behavior evaluated on missing device responses
 
 ▶ Running Suite 10: Field Intelligence Multi-Source Environmental Integration...
   ✔ [PASS] Field Intelligence: Triggers honest INSUFFICIENT_DATA when root-zone ground truth is absent
@@ -214,8 +231,8 @@ Environment: Node v24.14.0
                         TEST RUN SUMMARY                        
 ================================================================
 Total Test Suites: 10
-Total Tests Run:   42
-Passed Tests:      42
+Total Tests Run:   44
+Passed Tests:      44
 Failed Tests:      0
 Success Rate:      100.0%
 ================================================================

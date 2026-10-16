@@ -17,6 +17,7 @@ import {
   Sprout,
   BookOpen,
   ShieldCheck,
+  AlertCircle,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -797,27 +798,35 @@ const EnvironmentalIntelligence: React.FC = () => {
       {/* TAB 3: SOIL HEALTH CARD & LABORATORY CHEMISTRY */}
       {activeTab === 'soil' && (
         <div className="pt-4 space-y-4">
-          <div className="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+          <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
-              <FlaskConical size={15} className="text-amber-600 shrink-0" />
+              <FlaskConical size={16} className="text-amber-600 shrink-0" />
               <span>
-                <strong>Soil Health Card Chemistry (0–15 cm sampling depth):</strong> Calibrated
-                laboratory measurements from Government of India Soil Health Card (ICAR-TNAU).
-                Provides chemical nutrient truth distinct from dielectric moisture probes.
+                <strong>Regional Soil Benchmark (0–15 cm depth):</strong> Agro-ecological profile based
+                on published ICAR-TNAU Cauvery Delta regional soil surveys.
+                <strong> Illustrative benchmark only — NOT an in-situ certified measurement of an individual farm boundary.</strong>
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-semibold text-[11px] shrink-0">
-              Laboratory Verified
+            <span className="px-2.5 py-0.5 rounded-md bg-amber-200/80 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold text-[10px] tracking-wide uppercase shrink-0">
+              {soilProfile?.status === 'benchmark' ? 'Illustrative Benchmark' : 'Laboratory Verified'}
             </span>
           </div>
 
           {loadingSoil ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
               <Loader className="animate-spin text-amber-500" size={24} />
-              <span className="text-xs">Loading verified Soil Health Card profile...</span>
+              <span className="text-xs">Loading soil profile...</span>
             </div>
           ) : soilProfile ? (
             <div className="space-y-4">
+              {/* Benchmark Disclaimer Alert */}
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
+                <p className="leading-relaxed">
+                  <strong>Provenance Note:</strong> This profile reflects published ICAR-TNAU regional classification data for Thanjavur alluvial delta soils (pH 6.4, low available N). For operational field recommendations, an actual certified farm Soil Health Card must be uploaded.
+                </p>
+              </div>
+
               {/* Soil Overview Header */}
               <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
@@ -827,6 +836,9 @@ const EnvironmentalIntelligence: React.FC = () => {
                     </span>
                     <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 uppercase">
                       {soilProfile.fertilityRating} Fertility
+                    </span>
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 uppercase">
+                      Regional Benchmark
                     </span>
                   </div>
                   <p className="text-[11px] text-gray-400 mt-0.5">
@@ -915,18 +927,25 @@ const EnvironmentalIntelligence: React.FC = () => {
       {/* TAB 4: OFFICIAL CROP PRODUCTION STATISTICS (DES APY) */}
       {activeTab === 'apy' && (
         <div className="pt-4 space-y-4">
-          <div className="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+          <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
-              <Sprout size={15} className="text-emerald-600 shrink-0" />
+              <Sprout size={16} className="text-emerald-600 shrink-0" />
               <span>
-                <strong>Official Agricultural Statistics (APY):</strong> Ministry of Agriculture &
-                Farmers Welfare, Directorate of Economics and Statistics (DES). Provides regional
-                macroeconomic yield baselines for Thanjavur paddy cultivation.
+                <strong>Archived Directorate of Economics & Statistics (DES) Statistics:</strong> Ministry of Agriculture &
+                Farmers Welfare, Govt of India.
+                <strong> Historical record from Agricultural Year 1997–1998 (Whole Year). Macro district statistic only — NOT a current seasonal yield target or individual farm productivity label.</strong>
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] shrink-0">
-              DES Official Export
+            <span className="px-2.5 py-0.5 rounded-md bg-emerald-200/80 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-bold text-[10px] tracking-wide uppercase shrink-0">
+              Archived DES Record (1997–1998)
             </span>
+          </div>
+
+          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300 flex items-start gap-2">
+            <AlertCircle size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              <strong>Historical Scope Notice:</strong> This official report reflects Agricultural Year 1997–1998 district-wide production for Thanjavur Rice (181,496 Ha, 489,770 Tonnes, 2.70 t/Ha). It provides macroeconomic historical context and must not be conflated with modern seasonal field targets.
+            </p>
           </div>
 
           {loadingApy ? (

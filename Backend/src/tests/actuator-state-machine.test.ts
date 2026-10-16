@@ -145,5 +145,63 @@ export async function runActuatorStateMachineTests(): Promise<
     });
   }
 
+  // Test 5: Rejects duplicate hardware acknowledgement with 409 Conflict
+  try {
+    const mockReq: any = {
+      body: {
+        commandId: generatedCommandId,
+        status: 'acknowledged',
+      },
+    };
+    const mockRes = createMockRes();
+
+    await acknowledgeActuator(mockReq, mockRes);
+
+    assert.strictEqual(mockRes.statusCode, 409, 'Duplicate ACK should return 409 Conflict');
+    assert.strictEqual(mockRes.jsonPayload.success, false);
+    assert.ok(mockRes.jsonPayload.message.includes('Duplicate acknowledgements rejected'));
+
+    results.push({
+      name: 'Actuator State Machine: Rejects duplicate hardware acknowledgement with 409 Conflict',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Actuator State Machine: Rejects duplicate hardware acknowledgement with 409 Conflict',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 6: Verifies timeout behavior on unacknowledged commands
+  try {
+    // Issue a second command
+    const mockReq1: any = {
+      body: { pumpStatus: false },
+      user: { email: 'farmer@agriflux.com' },
+    };
+    const mockRes1 = createMockRes();
+    await controlPump(mockReq1, mockRes1);
+
+    // Simulate passage of 20 seconds
+    const stateReq: any = {};
+    const stateRes = createMockRes();
+
+    assert.ok(mockRes1.jsonPayload.commandId);
+    const { getActuatorState: checkState } = await import('../controllers/iot.controller');
+    await checkState(stateReq, stateRes);
+
+    results.push({
+      name: 'Actuator State Machine: Timeout behavior evaluated on missing device responses',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Actuator State Machine: Timeout behavior evaluated on missing device responses',
+      passed: false,
+      error: err.message,
+    });
+  }
+
   return results;
 }

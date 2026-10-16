@@ -1,5 +1,6 @@
 import fs from 'fs';
 import readline from 'readline';
+import mongoose from 'mongoose';
 import HistoricalWeather, { IHistoricalWeather } from '../../../Database/Models/HistoricalWeather';
 import { isDBConnected } from '../config/db';
 
@@ -73,7 +74,8 @@ export class WeatherIngestionService {
     const BATCH_SIZE = 500;
 
     const flushBatches = async () => {
-      if (isDBConnected) {
+      const isConnected = isDBConnected || mongoose.connection.readyState === 1;
+      if (isConnected) {
         if (hourlyBatch.length > 0) {
           const ops: any[] = hourlyBatch.map((doc) => ({
             updateOne: {
@@ -330,7 +332,8 @@ export class WeatherIngestionService {
       if (params.endDate) filter.dateStr.$lte = params.endDate;
     }
 
-    if (isDBConnected) {
+    const isConnected = isDBConnected || mongoose.connection.readyState === 1;
+    if (isConnected) {
       const records = await HistoricalWeather.find(filter)
         .sort({ dateStr: -1 })
         .limit(limit)
@@ -367,4 +370,9 @@ export class WeatherIngestionService {
       data: sliced,
     };
   }
+
+  /**
+   * Alias for ingestOpenMeteoCSV for backward compatibility
+   */
+  static ingestFromCSV = WeatherIngestionService.ingestOpenMeteoCSV;
 }
