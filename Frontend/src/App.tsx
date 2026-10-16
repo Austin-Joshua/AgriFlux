@@ -119,8 +119,24 @@ const App: React.FC = () => {
                   <Route path="/soil-advisor" element={<SoilAdvisor />} />
                   <Route path="/book-consultation" element={<BookConsultation />} />
                   <Route path="/land-intelligence" element={<LandIntelligence />} />
-                  <Route path="/agronomist" element={<AgronomistDashboard />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
+
+                  {/* Role-Restricted Portals */}
+                  <Route
+                    path="/agronomist"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <AgronomistDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute allowedRoles={['admin']}>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
                 </Route>
 
                 {/* Redirects */}

@@ -22,6 +22,8 @@ import {
   Tractor,
   PhoneCall,
   Wind,
+  Shield,
+  Microscope,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo-icon.png';
@@ -159,6 +161,43 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
 
         {/* Nav Links */}
         <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto overflow-x-hidden">
+          {/* Role-Specific Portal Links */}
+          {user?.role === 'admin' && (
+            <NavLink
+              to="/admin"
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer group mb-2 border ${
+                  isActive
+                    ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 shadow-sm'
+                    : 'text-red-600/80 dark:text-red-400/80 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200/40 dark:border-red-900/40'
+                } ${collapsed ? 'justify-center' : ''}`
+              }
+              title={collapsed ? 'Admin Console' : undefined}
+            >
+              <Shield size={18} className="text-red-600 dark:text-red-400 flex-shrink-0" />
+              {!collapsed && <span>🛡️ Admin Console</span>}
+            </NavLink>
+          )}
+
+          {(user?.role === 'agronomist' || user?.role === 'admin') && (
+            <NavLink
+              to="/agronomist"
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer group mb-2 border ${
+                  isActive
+                    ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30 shadow-sm'
+                    : 'text-blue-600/80 dark:text-blue-400/80 hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200/40 dark:border-blue-900/40'
+                } ${collapsed ? 'justify-center' : ''}`
+              }
+              title={collapsed ? 'Agronomist Portal' : undefined}
+            >
+              <Microscope size={18} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              {!collapsed && <span>🔬 Agronomist Portal</span>}
+            </NavLink>
+          )}
+
           {navItems.map((item) => (
             <NavItem key={item.to} {...item} />
           ))}

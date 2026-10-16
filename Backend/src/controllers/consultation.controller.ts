@@ -130,9 +130,14 @@ export const getAllConsultations = async (_req: Request, res: Response) => {
       return res.json({ success: true, data: tempConsultations });
     }
 
-    const consultations = await Consultation.find({})
-      .populate('userId', 'name farmName location')
-      .sort({ createdAt: -1 });
+    let consultations;
+    try {
+      consultations = await Consultation.find({})
+        .populate('userId', 'name farmName location')
+        .sort({ createdAt: -1 });
+    } catch {
+      consultations = await Consultation.find({}).sort({ createdAt: -1 });
+    }
     res.json({ success: true, data: consultations });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

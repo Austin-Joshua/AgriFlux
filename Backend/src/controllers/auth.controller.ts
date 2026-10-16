@@ -39,9 +39,13 @@ export const register = async (req: Request, res: Response) => {
       email,
     });
 
-    const token = jwt.sign({ id: newUser._id, phone: newUser.phone }, JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role, phone: newUser.phone, email: newUser.email },
+      JWT_SECRET,
+      {
+        expiresIn: '7d',
+      }
+    );
 
     res.status(201).json({
       token,
@@ -97,7 +101,9 @@ export const login = async (req: Request, res: Response) => {
       };
       const demo = demoUsers[identifier];
       if (demo && demo.password === password) {
-        const token = jwt.sign({ id: demo.id }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: demo.id, role: demo.role, email: identifier }, JWT_SECRET, {
+          expiresIn: '7d',
+        });
         return res.json({
           token,
           user: {
@@ -124,7 +130,11 @@ export const login = async (req: Request, res: Response) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign(
+      { id: user._id, role: user.role, phone: user.phone, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     res.json({
       token,
@@ -208,7 +218,9 @@ export const socialLogin = async (req: Request, res: Response) => {
       await user.save();
     }
 
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user._id, role: user.role, email: user.email }, JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
     res.status(isNewUser ? 201 : 200).json({
       token,
@@ -256,11 +268,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
       });
     }
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    console.log(`[PASSWORD RESET] Token for ${email}: ${resetToken}`);
-    console.log(
-      `[PASSWORD RESET] Link: http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`
-    );
+    // In production or demo, avoid logging raw tokens to prevent credential exposure in logs
+    console.log(`[PASSWORD RESET] Password reset requested for: ${email}`);
 
     return res.json({ success: true, message: 'Password reset link has been sent to your email.' });
   } catch (error: any) {

@@ -10,10 +10,11 @@ import { useAuth } from '../context/AuthContext';
  */
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  allowedRoles?: ('farmer' | 'agronomist' | 'admin')[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -29,9 +30,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     // Redirect to login but save the current location
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Check role authorization
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    const target = user.role === 'admin' ? '/admin' : user.role === 'agronomist' ? '/agronomist' : '/dashboard';
+    return <Navigate to={target} replace />;
   }
 
   return <>{children}</>;

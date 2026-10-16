@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IConsultation extends Document {
-    userId: mongoose.Types.ObjectId;
+    userId: any;
     expertId: string;
     expertName: string;
     specialization: string;
@@ -14,7 +14,7 @@ export interface IConsultation extends Document {
 }
 
 const ConsultationSchema: Schema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: Schema.Types.Mixed, required: true },
     expertId: { type: String, required: true },
     expertName: { type: String, required: true },
     specialization: { type: String, required: true },
