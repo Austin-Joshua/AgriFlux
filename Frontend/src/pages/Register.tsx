@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/logo-icon.png';
-import { GoogleIcon, MicrosoftIcon, AppleIcon } from '../components/SocialIcons';
+import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
 const Register: React.FC = () => {
@@ -63,7 +63,7 @@ const Register: React.FC = () => {
     }
   }, [isLoading, requiresOnboarding, navigate]);
 
-  const handleSocialSignup = async (provider: 'google' | 'microsoft' | 'apple') => {
+  const handleSocialSignup = async (provider: 'google') => {
     setSocialLoading(provider);
     setError('');
     try {
@@ -74,55 +74,6 @@ const Register: React.FC = () => {
       toast.error(`${provider} sign-up failed.`);
     } finally {
       setSocialLoading(null);
-    }
-  };
-
-  const openMockProviderPopup = (provider: 'microsoft' | 'apple') => {
-    setSocialLoading(provider);
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    const popup = window.open(
-      'about:blank',
-      `${provider}-signup`,
-      `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
-    );
-
-    if (popup) {
-      popup.document.write(`
-                <html>
-                    <head>
-                        <title>Sign up with ${provider.charAt(0).toUpperCase() + provider.slice(1)}</title>
-                        <style>
-                            body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; }
-                            .loader { border: 4px solid #f3f3f3; border-top: 4px solid #16a34a; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; }
-                            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="loader"></div>
-                        <p>Connecting to ${provider}...</p>
-                        <script>
-                            setTimeout(() => {
-                                window.close();
-                            }, 1500);
-                        </script>
-                    </body>
-                </html>
-            `);
-
-      const interval = setInterval(() => {
-        if (popup.closed) {
-          clearInterval(interval);
-          handleSocialSignup(provider);
-        }
-      }, 500);
-    } else {
-      setSocialLoading(null);
-      setError('Popup blocked. Please allow popups.');
-      toast.warning('Popup blocked. Please allow popups.');
     }
   };
 
@@ -300,37 +251,21 @@ const Register: React.FC = () => {
           </span>
           <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { id: 'google', icon: <GoogleIcon />, action: () => handleSocialSignup('google') },
-            {
-              id: 'microsoft',
-              icon: <MicrosoftIcon />,
-              action: () => openMockProviderPopup('microsoft'),
-            },
-            {
-              id: 'apple',
-              icon: <AppleIcon className={isDark ? 'text-white' : 'text-black'} />,
-              action: () => openMockProviderPopup('apple'),
-            },
-          ].map((provider) => (
-            <button
-              key={provider.id}
-              type="button"
-              onClick={provider.action}
-              disabled={!!socialLoading || isLoading}
-              className="flex items-center justify-center h-10 border border-gray-100 dark:border-white/5 rounded-xl bg-white/50 dark:bg-gray-900/40 hover:bg-white dark:hover:bg-gray-900 transition-all group"
-            >
-              <div className="scale-90 group-hover:scale-100 transition-transform">
-                {socialLoading === provider.id ? (
-                  <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  provider.icon
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={() => handleSocialSignup('google')}
+          disabled={!!socialLoading || isLoading}
+          className="w-full flex items-center justify-center gap-2.5 h-11 border border-gray-200/80 dark:border-gray-700/60 rounded-xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-sm hover:shadow-md transition-all duration-200 hover-lift active-press group"
+        >
+          {socialLoading === 'google' ? (
+            <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <div className="scale-100 group-hover:scale-110 transition-transform duration-200">
+              <GoogleIcon />
+            </div>
+          )}
+          <span>Join with Google</span>
+        </button>
       </div>
 
       <p className="mt-5 text-center text-xs font-medium text-gray-500 dark:text-gray-400">

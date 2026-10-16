@@ -59,12 +59,12 @@ export class FieldIntelligenceService {
     }
 
     const now = Date.now();
-    let sensorMoisture: number | null = null;
+    let sensorMoisture: number;
     let sensorTemp: number | null = null;
     let sensorHumidity: number | null = null;
-    let sensorSource = 'iot_simulator';
-    let sensorSourceType = 'iot_capacitive_probe';
-    let sensorQualityStatus = 'simulated';
+    let sensorSource: string;
+    let sensorSourceType: string;
+    let sensorQualityStatus: string;
     let freshnessMinutes = 0;
     let isStale = false;
 
