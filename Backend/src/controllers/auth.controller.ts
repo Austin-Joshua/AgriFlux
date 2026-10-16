@@ -8,6 +8,45 @@ import { env } from '../config/env';
 
 const JWT_SECRET = env.JWT_SECRET;
 
+// In-memory user store for complete resilience when MongoDB is offline / not yet configured
+const inMemoryUsers: Map<string, any> = new Map([
+  [
+    'farmer@agriflux.com',
+    {
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Demo Farmer',
+      role: 'farmer',
+      password: 'password123',
+      farmName: 'Green Valley Farm',
+      location: 'Karnataka, India',
+      email: 'farmer@agriflux.com',
+      phone: '0000000001',
+    },
+  ],
+  [
+    'agronomist@agriflux.com',
+    {
+      id: '22222222-2222-4222-9222-222222222222',
+      name: 'Demo Agronomist',
+      role: 'agronomist',
+      password: 'agro123',
+      email: 'agronomist@agriflux.com',
+      phone: '0000000002',
+    },
+  ],
+  [
+    'admin@agriflux.com',
+    {
+      id: '33333333-3333-4333-a333-333333333333',
+      name: 'Demo Admin',
+      role: 'admin',
+      password: 'admin123',
+      email: 'admin@agriflux.com',
+      phone: '0000000003',
+    },
+  ],
+]);
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { phone, password, name, farmName, location, role, email } = req.body;
@@ -19,9 +58,45 @@ export const register = async (req: Request, res: Response) => {
     }
 
     if (!isDBConnected) {
-      return res
-        .status(503)
-        .json({ message: 'Database connecting, please try again in a moment.' });
+      const primaryKey = email || phone;
+      if (inMemoryUsers.has(primaryKey)) {
+        return res.status(400).json({
+          message: 'An account with this email or phone number already exists.',
+        });
+      }
+      const newId = crypto.randomUUID();
+      const mockUser = {
+        id: newId,
+        _id: newId,
+        phone: phone || '',
+        password,
+        name,
+        farmName: farmName || '',
+        location: location || '',
+        role: role || 'farmer',
+        email: email || '',
+      };
+      inMemoryUsers.set(primaryKey, mockUser);
+      if (email && phone) {
+        inMemoryUsers.set(phone, mockUser);
+      }
+      const token = jwt.sign(
+        { id: mockUser.id, role: mockUser.role, phone: mockUser.phone, email: mockUser.email },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+      return res.status(201).json({
+        token,
+        user: {
+          id: mockUser.id,
+          phone: mockUser.phone,
+          name: mockUser.name,
+          farmName: mockUser.farmName,
+          location: mockUser.location,
+          role: mockUser.role,
+          email: mockUser.email,
+        },
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -77,49 +152,36 @@ export const login = async (req: Request, res: Response) => {
 
     // ── Demo mode fallback (MongoDB unreachable) ──────────────────────────
     if (!isDBConnected) {
-      const demoUsers: Record<string, any> = {
-        'farmer@agriflux.com': {
-          id: '11111111-1111-4111-8111-111111111111',
-          name: 'Demo Farmer',
-          role: 'farmer',
-          password: 'password123',
-          farmName: 'Green Valley Farm',
-          location: 'Karnataka, India',
-        },
-        'agronomist@agriflux.com': {
-          id: '22222222-2222-4222-9222-222222222222',
-          name: 'Demo Agronomist',
-          role: 'agronomist',
-          password: 'agro123',
-        },
-        'admin@agriflux.com': {
-          id: '33333333-3333-4333-a333-333333333333',
-          name: 'Demo Admin',
-          role: 'admin',
-          password: 'admin123',
-        },
-      };
-      const demo = demoUsers[identifier];
-      if (demo && demo.password === password) {
-        const token = jwt.sign({ id: demo.id, role: demo.role, email: identifier }, JWT_SECRET, {
-          expiresIn: '7d',
-        });
+      const demo = inMemoryUsers.get(identifier);
+      if (
+        demo &&
+        (demo.password === password ||
+          (await bcrypt.compare(password, demo.password).catch(() => false)))
+      ) {
+        const token = jwt.sign(
+          { id: demo.id, role: demo.role, email: demo.email || identifier },
+          JWT_SECRET,
+          {
+            expiresIn: '7d',
+          }
+        );
         return res.json({
           token,
           user: {
             id: demo.id,
             name: demo.name,
             role: demo.role,
-            email: identifier,
-            phone: '',
+            email: demo.email || identifier,
+            phone: demo.phone || '',
             farmName: demo.farmName || '',
             location: demo.location || '',
           },
         });
       }
-      return res
-        .status(503)
-        .json({ message: 'Database connecting, please try again in a moment.' });
+      if (demo) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+      return res.status(400).json({ message: 'User not found' });
     }
 
     const user = await User.findOne({
