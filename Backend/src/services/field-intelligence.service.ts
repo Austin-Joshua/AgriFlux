@@ -59,12 +59,12 @@ export class FieldIntelligenceService {
     }
 
     const now = Date.now();
-    let sensorMoisture: number;
-    let sensorTemp: number | null = null;
-    let sensorHumidity: number | null = null;
-    let sensorSource: string;
-    let sensorSourceType: string;
-    let sensorQualityStatus: string;
+    let sensorMoisture: number | null | undefined;
+    let sensorTemp: number | null | undefined;
+    let sensorHumidity: number | null | undefined;
+    let sensorSource: string | undefined;
+    let sensorSourceType: string | undefined;
+    let sensorQualityStatus: string | undefined;
     let freshnessMinutes = 0;
     let isStale = false;
 
@@ -219,7 +219,7 @@ export class FieldIntelligenceService {
 
     // --- 3. DATA-QUALITY GATE: INSUFFICIENT DATA SAFETY CHECK ---
     // If neither in-situ sensor telemetry nor manual override is supplied:
-    if (sensorMoisture === null) {
+    if (sensorMoisture == null) {
       const recommendationId = 'rec_' + crypto.randomUUID().substring(0, 12);
       const insufficientResult = {
         recommendationId,

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/auth.controller';
+import { auth, requireRole } from '../middleware/auth';
 
 const router = Router();
 
@@ -26,5 +27,9 @@ router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);
 router.post('/social-login', socialLimiter, authController.socialLogin);
 router.post('/forgot-password', authLimiter, authController.forgotPassword);
+router.post('/logout', authController.logout);
+
+// Administrative role elevation: strictly requires valid admin token
+router.patch('/users/:userId/role', auth, requireRole('admin'), authController.updateUserRole);
 
 export default router;

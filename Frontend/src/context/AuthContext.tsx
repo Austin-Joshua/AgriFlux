@@ -250,6 +250,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── Logout ────────────────────────────────────────────────────────────────
   const logout = async () => {
+    try {
+      await axios.post('/api/auth/logout').catch(() => {});
+    } catch {
+      /* ignore */
+    }
     // Sign out from Firebase as well to clear the Google session
     try {
       await signOut(auth);

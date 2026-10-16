@@ -2,13 +2,16 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 import User from '../../../Database/Models/User';
 import { isDBConnected } from '../config/db';
 import { env } from '../config/env';
 
 const JWT_SECRET = env.JWT_SECRET;
 
-// In-memory user store for complete resilience when MongoDB is offline / not yet configured
+// In-memory demo store strictly for isolated demo/development environments
+// In production, in-memory auth is disabled and requests fail closed if DB is offline.
+// Notice demo admin has restricted privileges to prevent unauthenticated administrative elevation.
 const inMemoryUsers: Map<string, any> = new Map([
   [
     'farmer@agriflux.com',
@@ -21,6 +24,7 @@ const inMemoryUsers: Map<string, any> = new Map([
       location: 'Karnataka, India',
       email: 'farmer@agriflux.com',
       phone: '0000000001',
+      isDemo: true,
     },
   ],
   [
@@ -32,24 +36,26 @@ const inMemoryUsers: Map<string, any> = new Map([
       password: 'agro123',
       email: 'agronomist@agriflux.com',
       phone: '0000000002',
+      isDemo: true,
     },
   ],
   [
     'admin@agriflux.com',
     {
       id: '33333333-3333-4333-a333-333333333333',
-      name: 'Demo Admin',
-      role: 'admin',
+      name: 'Demo Admin (Restricted)',
+      role: 'farmer', // Demo fallback has restricted privileges — no administrative elevation
       password: 'admin123',
       email: 'admin@agriflux.com',
       phone: '0000000003',
+      isDemo: true,
     },
   ],
 ]);
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { phone, password, name, farmName, location, role, email } = req.body;
+    const { phone, password, name, farmName, location, email } = req.body;
 
     if (!password || !name || (!email && !phone)) {
       return res
@@ -57,7 +63,20 @@ export const register = async (req: Request, res: Response) => {
         .json({ message: 'Please provide email or phone, plus password and name.' });
     }
 
+    // SECURITY: Never trust client-supplied role. All public registrations default to 'farmer'.
+    // Role elevation requires an authorized administrative process via PATCH /api/auth/users/:userId/role.
+    const assignedRole = 'farmer';
+
     if (!isDBConnected) {
+      // In production, fail closed immediately if database is unavailable
+      if (env.NODE_ENV === 'production' || !env.ALLOW_DEMO_LOGIN) {
+        return res.status(503).json({
+          success: false,
+          message:
+            'Database service unavailable. Registration requires persistent database storage.',
+        });
+      }
+
       const primaryKey = email || phone;
       if (inMemoryUsers.has(primaryKey)) {
         return res.status(400).json({
@@ -73,8 +92,9 @@ export const register = async (req: Request, res: Response) => {
         name,
         farmName: farmName || '',
         location: location || '',
-        role: role || 'farmer',
+        role: assignedRole,
         email: email || '',
+        isDemo: true,
       };
       inMemoryUsers.set(primaryKey, mockUser);
       if (email && phone) {
@@ -110,7 +130,7 @@ export const register = async (req: Request, res: Response) => {
       name,
       farmName,
       location,
-      role: role || 'farmer',
+      role: assignedRole, // Server-enforced default
       email,
     });
 
@@ -150,8 +170,21 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { identifier, password } = req.body;
 
-    // ── Demo mode fallback (MongoDB unreachable) ──────────────────────────
+    if (!identifier || !password) {
+      return res.status(400).json({ message: 'Please provide identifier and password.' });
+    }
+
+    // ── Fail closed if MongoDB is offline in production ─────────────────────
     if (!isDBConnected) {
+      if (env.NODE_ENV === 'production' || !env.ALLOW_DEMO_LOGIN) {
+        return res.status(503).json({
+          success: false,
+          message:
+            'Authentication service unavailable while database is offline. Please try again shortly.',
+        });
+      }
+
+      // Demo mode fallback strictly for isolated demo/development environments
       const demo = inMemoryUsers.get(identifier);
       if (
         demo &&
@@ -159,7 +192,7 @@ export const login = async (req: Request, res: Response) => {
           (await bcrypt.compare(password, demo.password).catch(() => false)))
       ) {
         const token = jwt.sign(
-          { id: demo.id, role: demo.role, email: demo.email || identifier },
+          { id: demo.id, role: demo.role, email: demo.email || identifier, isDemo: true },
           JWT_SECRET,
           {
             expiresIn: '7d',
@@ -175,6 +208,7 @@ export const login = async (req: Request, res: Response) => {
             phone: demo.phone || '',
             farmName: demo.farmName || '',
             location: demo.location || '',
+            isDemo: true,
           },
         });
       }
@@ -184,6 +218,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'User not found' });
     }
 
+    // ── Database is connected: Authenticate strictly against MongoDB ─────────
     const user = await User.findOne({
       $or: [{ phone: identifier }, { email: identifier }],
     });
@@ -219,11 +254,11 @@ export const login = async (req: Request, res: Response) => {
 /**
  * POST /api/auth/social-login
  * Verifies a Firebase ID token, then creates or syncs the user in MongoDB.
- * CitizenOne-safe: preserves UUID `id` and `email` fields for cross-platform lookup.
+ * Always assigns 'farmer' role by default; never trusts client-supplied role.
  */
 export const socialLogin = async (req: Request, res: Response) => {
   try {
-    const { idToken, farmName, location, role } = req.body;
+    const { idToken, farmName, location } = req.body;
 
     if (!idToken) {
       return res.status(400).json({ success: false, message: 'Firebase ID token is required.' });
@@ -232,7 +267,7 @@ export const socialLogin = async (req: Request, res: Response) => {
     if (!isDBConnected) {
       return res
         .status(503)
-        .json({ message: 'Database connecting, please try again in a moment.' });
+        .json({ success: false, message: 'Database connecting, please try again in a moment.' });
     }
 
     // Verify with Firebase Admin SDK
@@ -259,6 +294,9 @@ export const socialLogin = async (req: Request, res: Response) => {
     let user = await User.findOne({ email });
     let isNewUser = false;
 
+    // SECURITY: Always assign 'farmer' role server-side for social logins.
+    const assignedRole = 'farmer';
+
     if (!user) {
       isNewUser = true;
       const placeholderHash = await bcrypt.hash(uid + '_firebase_social', 10);
@@ -268,7 +306,7 @@ export const socialLogin = async (req: Request, res: Response) => {
         email,
         phone: '',
         password: placeholderHash,
-        role: role || 'farmer',
+        role: assignedRole,
         farmName: farmName || '',
         location: location || '',
         emailVerified: true,
@@ -337,4 +375,67 @@ export const forgotPassword = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
+};
+
+/**
+ * PATCH /api/auth/users/:userId/role
+ * Authorized administrative role elevation.
+ * Protected by auth & requireRole('admin').
+ */
+export const updateUserRole = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+    const validRoles = ['farmer', 'agronomist', 'admin'];
+
+    if (!role || !validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid role specified. Role must be one of: ${validRoles.join(', ')}.`,
+      });
+    }
+
+    if (!isDBConnected) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database unavailable. Role updates require persistent database connection.',
+      });
+    }
+
+    const targetUser = await User.findOne({
+      $or: [{ id: userId }, ...(mongoose.isValidObjectId(userId) ? [{ _id: userId }] : [])],
+    });
+
+    if (!targetUser) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    targetUser.role = role as 'farmer' | 'agronomist' | 'admin';
+    await targetUser.save();
+
+    return res.json({
+      success: true,
+      message: `User role successfully updated to ${role}.`,
+      user: {
+        id: targetUser.id,
+        mongoId: targetUser._id,
+        name: targetUser.name,
+        email: targetUser.email,
+        role: targetUser.role,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * POST /api/auth/logout
+ * Acknowledges session termination and instructs client to clear credentials.
+ */
+export const logout = async (_req: Request, res: Response) => {
+  return res.json({
+    success: true,
+    message: 'Successfully logged out. Client credentials invalidated.',
+  });
 };

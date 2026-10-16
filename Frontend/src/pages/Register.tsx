@@ -5,7 +5,6 @@ import { Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle } from 'lucide-reac
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/logo-icon.png';
 import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
@@ -13,7 +12,6 @@ import SEO from '../components/SEO';
 const Register: React.FC = () => {
   const { t } = useTranslation();
   const { register, loginWithProvider, isLoading, requiresOnboarding } = useAuth();
-  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({

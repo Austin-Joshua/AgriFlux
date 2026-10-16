@@ -25,8 +25,6 @@ import {
   Sprout,
   BarChart3,
   Landmark,
-  Shield,
-  Microscope,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';

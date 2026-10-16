@@ -4,21 +4,19 @@ import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Phone, Lock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/logo-icon.png';
 import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
-  const { isDark } = useTheme();
   const { login, loginWithProvider, isLoading, requiresOnboarding, isAuthenticated, user } =
     useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
+  const [identifier, setIdentifier] = useState('farmer@agriflux.com');
+  const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
@@ -88,14 +86,6 @@ const Login: React.FC = () => {
       route: '/admin',
     },
   };
-
-  // Pre-fill credentials on mount for instantaneous testing with zero friction
-  useEffect(() => {
-    if (!identifier && !password) {
-      setIdentifier(DEMO_CREDENTIALS.farmer.identifier);
-      setPassword(DEMO_CREDENTIALS.farmer.password);
-    }
-  }, []);
 
   const switchMode = (mode: 'farmer' | 'agronomist' | 'admin') => {
     setLoginMode(mode);

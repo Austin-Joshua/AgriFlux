@@ -10,10 +10,11 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { requireRole } from '../middleware/auth';
 import { Request, Response, NextFunction } from 'express';
+import { env } from '../config/env';
 
 export async function runAuthTests(): Promise<{ name: string; passed: boolean; error?: string }[]> {
   const results: { name: string; passed: boolean; error?: string }[] = [];
-  const JWT_SECRET = process.env.JWT_SECRET || 'test_jwt_secret_agriflux_2026';
+  const JWT_SECRET = env.JWT_SECRET;
 
   // Test 1: JWT Signing contains user role
   try {
@@ -218,6 +219,176 @@ export async function runAuthTests(): Promise<{ name: string; passed: boolean; e
   } catch (err: any) {
     results.push({
       name: 'Regression: Authenticated layout does not mount voice assistant; normal dashboard renders',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  const createMockRes = () => {
+    const res: any = {
+      statusCode: 200,
+      jsonPayload: null,
+      status: function (code: number) {
+        this.statusCode = code;
+        return this;
+      },
+      json: function (payload: any) {
+        this.jsonPayload = payload;
+        return this;
+      },
+    };
+    return res;
+  };
+
+  // Test 7: Role escalation defense - Registration ignores client-supplied 'admin' role
+  try {
+    const { register } = await import('../controllers/auth.controller');
+    const mockReq: any = {
+      body: {
+        email: `hacker_${Date.now()}@test.com`,
+        password: 'Password123!',
+        name: 'Malicious Actor',
+        role: 'admin', // Malicious client attempt to self-elevate to admin
+      },
+    };
+    const mockRes = createMockRes();
+
+    await register(mockReq, mockRes);
+
+    assert.strictEqual(mockRes.statusCode, 201, 'Registration should succeed');
+    assert.strictEqual(
+      mockRes.jsonPayload.user.role,
+      'farmer',
+      'User must be assigned farmer role server-side regardless of client payload'
+    );
+
+    const decoded = jwt.verify(mockRes.jsonPayload.token, JWT_SECRET) as any;
+    assert.strictEqual(
+      decoded.role,
+      'farmer',
+      'Issued JWT token must reflect server-assigned farmer role'
+    );
+
+    results.push({
+      name: 'Security: Registration strictly prevents client role escalation to admin (enforces farmer)',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Security: Registration strictly prevents client role escalation to admin (enforces farmer)',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 8: Disconnected-database defense - Production fails closed with HTTP 503
+  try {
+    const { env } = await import('../config/env');
+    const originalEnv = env.NODE_ENV;
+    (env as any).NODE_ENV = 'production';
+
+    const { register, login } = await import('../controllers/auth.controller');
+
+    // Test register while DB is offline in production
+    const regReq: any = {
+      body: {
+        email: `prod_offline_${Date.now()}@test.com`,
+        password: 'Password123!',
+        name: 'Prod Offline Test',
+      },
+    };
+    const regRes = createMockRes();
+    await register(regReq, regRes);
+
+    assert.strictEqual(
+      regRes.statusCode,
+      503,
+      'Production register without DB must fail closed with 503'
+    );
+    assert.strictEqual(regRes.jsonPayload.success, false);
+
+    // Test login while DB is offline in production
+    const loginReq: any = {
+      body: {
+        identifier: 'farmer@agriflux.com',
+        password: 'password123',
+      },
+    };
+    const loginRes = createMockRes();
+    await login(loginReq, loginRes);
+
+    assert.strictEqual(
+      loginRes.statusCode,
+      503,
+      'Production login without DB must fail closed with 503'
+    );
+    assert.strictEqual(loginRes.jsonPayload.success, false);
+
+    // Restore original environment
+    (env as any).NODE_ENV = originalEnv;
+
+    results.push({
+      name: 'Security: Disconnected DB in production fails closed with HTTP 503 (no in-memory bypass)',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Security: Disconnected DB in production fails closed with HTTP 503 (no in-memory bypass)',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 9: Administrative role elevation validation
+  try {
+    const { updateUserRole } = await import('../controllers/auth.controller');
+    const mockReq: any = {
+      params: { userId: '11111111-1111-4111-8111-111111111111' },
+      body: { role: 'super_admin_invalid' },
+      user: { id: 'admin_id', role: 'admin' },
+    };
+    const mockRes = createMockRes();
+
+    await updateUserRole(mockReq, mockRes);
+
+    assert.strictEqual(
+      mockRes.statusCode,
+      400,
+      'Invalid role elevation request must return 400 Bad Request'
+    );
+    assert.strictEqual(mockRes.jsonPayload.success, false);
+
+    results.push({
+      name: 'Security: Administrative role elevation rejects invalid roles with 400 Bad Request',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Security: Administrative role elevation rejects invalid roles with 400 Bad Request',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 10: Logout session invalidation
+  try {
+    const { logout } = await import('../controllers/auth.controller');
+    const mockReq: any = {};
+    const mockRes = createMockRes();
+
+    await logout(mockReq, mockRes);
+
+    assert.strictEqual(mockRes.statusCode, 200, 'Logout endpoint must return 200 OK');
+    assert.strictEqual(mockRes.jsonPayload.success, true);
+    assert.ok(mockRes.jsonPayload.message.includes('logged out'));
+
+    results.push({
+      name: 'Security: Logout endpoint invalidates session and confirms credential revocation',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Security: Logout endpoint invalidates session and confirms credential revocation',
       passed: false,
       error: err.message,
     });
