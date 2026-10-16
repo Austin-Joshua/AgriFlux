@@ -1,12 +1,20 @@
 import mongoose from 'mongoose';
 import path from 'path';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import HistoricalWeather from '../../../Database/Models/HistoricalWeather';
 import CropProductionStatistic from '../../../Database/Models/CropProductionStatistic';
 import SoilObservation from '../../../Database/Models/SoilObservation';
 import { WeatherIngestionService } from '../services/weather-ingestion.service';
 import { CropStatisticsService } from '../services/crop-statistics.service';
 import { SoilDataService } from '../services/soil-data.service';
+
+// Lazy dynamic loader for MongoMemoryServer to prevent compilation failures when devDependencies are omitted
+let MongoMemoryServer: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
+} catch {
+  // Not available in production builds without devDependencies
+}
 
 interface PersistenceAuditResult {
   step: string;
@@ -21,6 +29,12 @@ export async function runDurablePersistenceAudit() {
   console.log('   AGRIFLUX DURABLE PERSISTENCE & IDEMPOTENCY AUDIT EXECUTION   ');
   console.log('================================================================');
   console.log(`Execution Timestamp: ${new Date().toISOString()}`);
+
+  if (!MongoMemoryServer) {
+    throw new Error(
+      'mongodb-memory-server is not installed. Please install devDependencies to run this audit script.'
+    );
+  }
 
   const results: PersistenceAuditResult[] = [];
   const mongod = await MongoMemoryServer.create();
