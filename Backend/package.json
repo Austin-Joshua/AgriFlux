@@ -8,7 +8,8 @@
     "dev": "nodemon src/server.ts",
     "build": "tsc",
     "lint": "eslint . --max-warnings 0",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "ts-node src/tests/runAllTests.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
