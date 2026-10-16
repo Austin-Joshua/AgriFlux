@@ -4,6 +4,8 @@
  * requireRole middleware enforcement, and token validation.
  */
 import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { requireRole } from '../middleware/auth';
@@ -155,6 +157,67 @@ export async function runAuthTests(): Promise<{ name: string; passed: boolean; e
   } catch (err: any) {
     results.push({
       name: 'requireRole rejects unauthenticated request (401 Unauthorized)',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 6: Post-Login Regression: Authenticated Layout does not mount voice assistant and dashboard renders normally
+  try {
+    const layoutPath = path.resolve(__dirname, '../../../Frontend/src/components/Layout.tsx');
+    assert.ok(fs.existsSync(layoutPath), 'Frontend Layout.tsx must exist');
+    const layoutContent = fs.readFileSync(layoutPath, 'utf8');
+
+    assert.strictEqual(
+      layoutContent.includes('<AIAssistantChat'),
+      false,
+      'Layout must NOT mount AIAssistantChat component'
+    );
+    assert.strictEqual(
+      layoutContent.includes("import AIAssistantChat from './AIAssistantChat'"),
+      false,
+      'Layout must NOT import AIAssistantChat'
+    );
+    assert.ok(
+      layoutContent.includes('id="main-content"'),
+      'Layout must render main content element for dashboard'
+    );
+    assert.ok(
+      layoutContent.includes('{children}'),
+      'Layout must render children for dashboard routes'
+    );
+
+    // Verify AIAssistantChat source has no speech synthesis autoplay or speech recognition
+    const assistantPath = path.resolve(
+      __dirname,
+      '../../../Frontend/src/components/AIAssistantChat.tsx'
+    );
+    if (fs.existsSync(assistantPath)) {
+      const assistantContent = fs.readFileSync(assistantPath, 'utf8');
+      assert.strictEqual(
+        assistantContent.includes('speechSynthesis.speak'),
+        false,
+        'Assistant must not contain speech synthesis speak calls'
+      );
+      assert.strictEqual(
+        assistantContent.includes('window.SpeechRecognition'),
+        false,
+        'Assistant must not contain window.SpeechRecognition startup'
+      );
+      assert.strictEqual(
+        assistantContent.includes('window.webkitSpeechRecognition'),
+        false,
+        'Assistant must not contain webkitSpeechRecognition startup'
+      );
+    }
+
+    results.push({
+      name: 'Regression: Authenticated layout does not mount voice assistant; normal dashboard renders',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Regression: Authenticated layout does not mount voice assistant; normal dashboard renders',
       passed: false,
       error: err.message,
     });
