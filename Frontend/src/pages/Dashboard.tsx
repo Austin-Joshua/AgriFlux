@@ -224,9 +224,9 @@ const Dashboard: React.FC = () => {
         <AIDecisionPanel />
       </div>
 
-      {/* Stat Cards Grid — Standardized to 3-column focus on wider screens if appropriate, but keeping 4 for dashboard symmetry in stat row might be okay; however user said 3. Let's try 3 for main blocks. */}
+      {/* Stat Cards Grid — Symmetrical 4-Column Layout */}
       <div
-        className="grid grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-up-fade"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up-fade"
         style={{ animationDelay: '150ms' }}
       >
         <StatCard
@@ -258,6 +258,16 @@ const Dashboard: React.FC = () => {
           bgColor="bg-blue-100 dark:bg-blue-900/30"
           accentColor="#3b82f6"
           route="/irrigation"
+        />
+        <StatCard
+          title="Climate Resilience"
+          value="94%"
+          change="Low Risk"
+          icon={<ShieldCheck size={22} className="text-emerald-600" />}
+          color="text-emerald-600 dark:text-emerald-400"
+          bgColor="bg-emerald-100 dark:bg-emerald-900/30"
+          accentColor="#10b981"
+          route="/climate"
         />
       </div>
 

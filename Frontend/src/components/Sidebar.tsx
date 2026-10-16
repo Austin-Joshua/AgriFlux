@@ -26,6 +26,7 @@ import {
   Microscope,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 import logo from '../assets/logo-icon.png';
 
 interface SidebarProps {
@@ -65,6 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
 
   const handleLogout = () => {
     logout();
+    toast.info('Signed out successfully.');
     navigate('/login');
   };
 

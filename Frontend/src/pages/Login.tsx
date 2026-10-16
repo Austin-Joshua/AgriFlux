@@ -65,9 +65,59 @@ const Login: React.FC = () => {
     }
   }, [location, login, loginMode, navigate]);
 
+  const DEMO_CREDENTIALS = {
+    farmer: {
+      identifier: 'farmer@agriflux.com',
+      password: 'password123',
+      label: '🌾 Farmer Workspace',
+      desc: 'Smart Farm Dashboard, IoT Telemetry, Yield & Closed-Loop Engine',
+      route: '/dashboard',
+    },
+    agronomist: {
+      identifier: 'agronomist@agriflux.com',
+      password: 'agro123',
+      label: '🔬 Agronomist Portal',
+      desc: 'Expert Consultation Queue, Soil Health Labs & Advisory Dispatch',
+      route: '/agronomist',
+    },
+    admin: {
+      identifier: 'admin@agriflux.com',
+      password: 'admin123',
+      label: '🛡️ Admin Console',
+      desc: 'System Security, User Roles, Audit Logs & Global Telemetry',
+      route: '/admin',
+    },
+  };
+
+  // Pre-fill credentials on mount for instantaneous testing with zero friction
+  useEffect(() => {
+    if (!identifier && !password) {
+      setIdentifier(DEMO_CREDENTIALS.farmer.identifier);
+      setPassword(DEMO_CREDENTIALS.farmer.password);
+    }
+  }, []);
+
   const switchMode = (mode: 'farmer' | 'agronomist' | 'admin') => {
     setLoginMode(mode);
+    setIdentifier(DEMO_CREDENTIALS[mode].identifier);
+    setPassword(DEMO_CREDENTIALS[mode].password);
     setError('');
+  };
+
+  const handleQuickDemoLogin = async () => {
+    setError('');
+    try {
+      const creds = DEMO_CREDENTIALS[loginMode];
+      const loggedInUser = await login(creds.identifier, creds.password);
+      const role = loggedInUser?.role || loginMode;
+      toast.success(`Welcome to AgriFlux as ${loggedInUser?.name || creds.label}!`);
+      if (role === 'admin') navigate('/admin');
+      else if (role === 'agronomist') navigate('/agronomist');
+      else navigate('/dashboard');
+    } catch {
+      setError('Instant demo authentication failed. Please try again.');
+      toast.error('Demo authentication error.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -185,7 +235,7 @@ const Login: React.FC = () => {
       </div>
 
       {/* Login Mode Tabs (Matching Website Style) */}
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-700/50 rounded-2xl p-1 mb-6 border border-gray-200 dark:border-white/5">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-700/50 rounded-2xl p-1 mb-3 border border-gray-200 dark:border-white/5">
         {(['farmer', 'agronomist', 'admin'] as const).map((mode) => (
           <button
             key={mode}
@@ -196,9 +246,19 @@ const Login: React.FC = () => {
                 : 'text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
             }`}
           >
-            {mode}
+            {mode === 'farmer' ? '🌾 Farmer' : mode === 'agronomist' ? '🔬 Agronomist' : '🛡️ Admin'}
           </button>
         ))}
+      </div>
+
+      {/* Role Scope Description */}
+      <div className="mb-5 px-3.5 py-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-xs">
+        <p className="font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+          <span>{DEMO_CREDENTIALS[loginMode].label}</span>
+        </p>
+        <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-0.5 leading-snug">
+          {DEMO_CREDENTIALS[loginMode].desc}
+        </p>
       </div>
 
       {error && (
@@ -282,6 +342,15 @@ const Login: React.FC = () => {
           ) : (
             t('auth.login')
           )}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleQuickDemoLogin}
+          disabled={isLoading}
+          className="w-full py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-lg shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 border border-emerald-400/30 hover-lift mt-2"
+        >
+          <span>⚡ Instant Demo Access ({DEMO_CREDENTIALS[loginMode].label.split(' ')[1]})</span>
         </button>
       </form>
 

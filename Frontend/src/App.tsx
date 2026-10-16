@@ -104,19 +104,31 @@ const App: React.FC = () => {
                   <Route path="/marketplace" element={<Marketplace />} />
                   <Route path="/equipment-rental" element={<EquipmentRental />} />
                   <Route path="/yield" element={<YieldPrediction />} />
+                  <Route path="/yield-prediction" element={<YieldPrediction />} />
                   <Route path="/irrigation" element={<IrrigationIntelligence />} />
+                  <Route path="/irrigation-intelligence" element={<IrrigationIntelligence />} />
                   <Route path="/soil" element={<SoilAdvisor />} />
+                  <Route path="/soil-advisor" element={<SoilAdvisor />} />
+                  <Route path="/soil-intelligence" element={<SoilAdvisor />} />
                   <Route path="/crop-health" element={<CropHealthMonitoring />} />
+                  <Route path="/crop-health-monitoring" element={<CropHealthMonitoring />} />
                   <Route path="/climate" element={<ClimateRisk />} />
+                  <Route path="/climate-risk" element={<ClimateRisk />} />
                   <Route path="/simulator" element={<ClimateSimulator />} />
+                  <Route path="/climate-simulator" element={<ClimateSimulator />} />
                   <Route path="/crop-switching" element={<CropSwitchingAdvisor />} />
+                  <Route path="/crop-resilience" element={<CropSwitchingAdvisor />} />
                   <Route path="/sustainability" element={<SustainabilityScore />} />
+                  <Route path="/sustainability-score" element={<SustainabilityScore />} />
+                  <Route path="/sustainability-index" element={<SustainabilityScore />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/subsidies" element={<GovernmentSubsidies />} />
+                  <Route path="/government-subsidies" element={<GovernmentSubsidies />} />
                   <Route path="/market" element={<MarketAnalysis />} />
+                  <Route path="/market-analysis" element={<MarketAnalysis />} />
                   <Route path="/investors" element={<InvestorsHub />} />
-                  <Route path="/soil-advisor" element={<SoilAdvisor />} />
+                  <Route path="/investors-hub" element={<InvestorsHub />} />
                   <Route path="/book-consultation" element={<BookConsultation />} />
                   <Route path="/land-intelligence" element={<LandIntelligence />} />
 

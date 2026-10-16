@@ -18,9 +18,19 @@ import {
   CheckCircle,
   LogOut,
   ChevronRight,
+  Map,
+  Store,
+  Tractor,
+  Wind,
+  Sprout,
+  BarChart3,
+  Landmark,
+  Shield,
+  Microscope,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -84,21 +94,85 @@ const SEARCH_DATA = [
     label: 'Yield Prediction',
     icon: TrendingUp,
     route: '/yield',
-    desc: 'AI crop yield forecasting',
+    desc: 'AI crop yield forecasting & optimization',
   },
   {
     label: 'Irrigation Intelligence',
     icon: Droplets,
     route: '/irrigation',
-    desc: 'Smart water scheduling',
+    desc: 'Closed-loop smart water scheduling',
   },
-  { label: 'Soil Health Advisor', icon: Leaf, route: '/soil', desc: 'Soil analysis & nutrients' },
-  { label: 'Climate Risk', icon: AlertTriangle, route: '/climate', desc: 'Weather risk alerts' },
+  {
+    label: 'Soil Health Advisor',
+    icon: Leaf,
+    route: '/soil',
+    desc: 'Soil diagnostic, NPK chemistry & plant scanner',
+  },
+  {
+    label: 'Crop Health Monitoring',
+    icon: Sprout,
+    route: '/crop-health',
+    desc: 'Orbital Sentinel-2 NDVI & canopy vigor',
+  },
+  {
+    label: 'Climate Risk Analysis',
+    icon: AlertTriangle,
+    route: '/climate',
+    desc: 'Extreme weather hazard forecasting',
+  },
+  {
+    label: 'Climate Simulator',
+    icon: Wind,
+    route: '/simulator',
+    desc: 'Micro-climate stress testing & scenarios',
+  },
+  {
+    label: 'Crop Resilience Advisor',
+    icon: Sprout,
+    route: '/crop-switching',
+    desc: 'Optimal crop switching & economic analysis',
+  },
   {
     label: 'Sustainability Score',
     icon: CheckCircle,
     route: '/sustainability',
-    desc: 'Farm eco score',
+    desc: 'Environmental ESG metrics & carbon index',
+  },
+  {
+    label: 'Land Intelligence',
+    icon: Map,
+    route: '/land-intelligence',
+    desc: 'Satellite land boundary & topology',
+  },
+  {
+    label: 'Marketplace',
+    icon: Store,
+    route: '/marketplace',
+    desc: 'Direct farm produce & agricultural inputs',
+  },
+  {
+    label: 'Equipment Rental',
+    icon: Tractor,
+    route: '/equipment-rental',
+    desc: 'Machinery sharing, tractors & drones',
+  },
+  {
+    label: 'Government Subsidies',
+    icon: Landmark,
+    route: '/subsidies',
+    desc: 'PM-KISAN, crop insurance & subsidy schemes',
+  },
+  {
+    label: 'Market Price Intelligence',
+    icon: BarChart3,
+    route: '/market',
+    desc: 'APMC mandis, live price trends & forecasts',
+  },
+  {
+    label: 'Settings & Preferences',
+    icon: Settings,
+    route: '/settings',
+    desc: 'Personalization, notifications & display',
   },
 ];
 
@@ -468,6 +542,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
               <button
                 onClick={() => {
                   logout();
+                  toast.info('Signed out successfully.');
                   navigate('/login');
                 }}
                 className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-50/40 dark:hover:bg-red-900/10 text-red-500 hover:text-red-600 transition-all duration-150 group border-t border-gray-100/50 dark:border-gray-700/50"

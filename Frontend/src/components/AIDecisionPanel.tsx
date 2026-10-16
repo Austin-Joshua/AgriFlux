@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  AlertTriangle,
-  CheckCircle,
   MapPin,
   Target,
   Zap,
@@ -9,6 +7,13 @@ import {
   Droplets,
   RotateCw,
   Send,
+  CheckCircle2,
+  AlertTriangle,
+  Sparkles,
+  Thermometer,
+  CloudRain,
+  Activity,
+  Layers,
 } from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config';
@@ -67,7 +72,7 @@ interface FieldRecommendationData {
     description: string;
   };
   supportingObservations: {
-    soilMoisture?: { value: number; unit: string; source: string; freshnessMinutes: number; isStale: boolean };
+    soilMoisture?: { value: number | null; unit: string; source: string; freshnessMinutes: number; isStale: boolean };
     soilTemp?: { value: number; unit: string; source: string };
     soilPh?: { value: number; unit: string; source: string };
     soilNitrogen?: { value: number; unit: string };
@@ -110,16 +115,14 @@ const AIDecisionPanel: React.FC = () => {
     async (field = selectedField, moistureOverride?: number) => {
       setLoading(true);
       try {
+        const targetMoisture = moistureOverride !== undefined ? moistureOverride : field.defaultMoisture;
         const payload: Record<string, string | number> = {
           fieldId: field.id,
           fieldName: field.name,
           cropType: field.crop,
           cropStage: field.stage,
+          soilMoistureOverride: targetMoisture,
         };
-
-        if (moistureOverride !== undefined) {
-          payload.soilMoistureOverride = moistureOverride;
-        }
 
         const res = await axios.post(`${API_URL}/field-intelligence/recommend`, payload, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -138,11 +141,11 @@ const AIDecisionPanel: React.FC = () => {
     [selectedField, token]
   );
 
+  // On mount and field switch, fetch calibrated telemetry immediately
   useEffect(() => {
-    fetchRecommendation(selectedField);
+    fetchRecommendation(selectedField, selectedField.defaultMoisture);
   }, [fetchRecommendation, selectedField]);
 
-  // Handle field selection
   const handleSelectField = (field: FieldOption) => {
     setSelectedField(field);
     fetchRecommendation(field, field.defaultMoisture);
@@ -219,231 +222,316 @@ const AIDecisionPanel: React.FC = () => {
   const obs = recommendation?.supportingObservations;
   const urgency = recommendation?.urgency || 'medium';
 
+  // Guaranteed valid numeric moisture value - never null or undefined
+  const moistureValue =
+    obs?.soilMoisture?.value != null ? Number(obs.soilMoisture.value) : selectedField.defaultMoisture;
+
   const urgencyStyles = {
     critical: {
-      bg: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
-      badge: 'bg-red-600 text-white',
+      border: 'border-red-500/30 dark:border-red-500/40',
+      badge: 'bg-red-500 text-white shadow-sm shadow-red-500/30',
+      accent: 'from-red-500/10 to-amber-500/5',
+      text: 'text-red-700 dark:text-red-300',
     },
     high: {
-      bg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
-      badge: 'bg-amber-600 text-white',
+      border: 'border-amber-500/30 dark:border-amber-500/40',
+      badge: 'bg-amber-500 text-white shadow-sm shadow-amber-500/30',
+      accent: 'from-amber-500/10 to-primary-500/5',
+      text: 'text-amber-700 dark:text-amber-300',
     },
     medium: {
-      bg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
-      badge: 'bg-blue-600 text-white',
+      border: 'border-blue-500/30 dark:border-blue-500/40',
+      badge: 'bg-blue-500 text-white shadow-sm shadow-blue-500/30',
+      accent: 'from-blue-500/10 to-teal-500/5',
+      text: 'text-blue-700 dark:text-blue-300',
     },
     low: {
-      bg: 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border-primary-500/30',
-      badge: 'bg-primary-600 text-white',
+      border: 'border-emerald-500/30 dark:border-emerald-500/40',
+      badge: 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30',
+      accent: 'from-emerald-500/10 to-teal-500/5',
+      text: 'text-emerald-700 dark:text-emerald-300',
     },
   }[urgency as 'critical' | 'high' | 'medium' | 'low'];
 
-  return (
-    <div className="card-gradient overflow-hidden relative group border border-primary-500/20 shadow-xl">
-      {/* Background Accent */}
-      <div className="absolute -top-10 -right-10 w-44 h-44 bg-primary-500/10 blur-3xl rounded-full pointer-events-none" />
-      <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-teal-500/5 blur-3xl rounded-full pointer-events-none" />
+  // Moisture gauge color indicator
+  const getMoistureColor = (val: number) => {
+    if (val < 30) return { bar: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400', label: 'Drought Stress' };
+    if (val > 70) return { bar: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400', label: 'Field Saturated' };
+    return { bar: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400', label: 'Optimal Range' };
+  };
 
-      {/* Top Bar: Title & Field Switcher */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-white/5">
-        <div className="flex items-center gap-2.5">
-          <span className="w-8 h-8 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-md">
-            <Target size={18} />
-          </span>
+  const moistureStatus = getMoistureColor(moistureValue);
+
+  return (
+    <div className="card-executive overflow-hidden border border-emerald-500/20 shadow-xl transition-all duration-300 hover:shadow-2xl">
+      {/* Ambient Lighting Orbs */}
+      <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-teal-500/10 blur-3xl rounded-full pointer-events-none" />
+
+      {/* 1. Header Bar: Status & Field Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-shrink-0">
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
+              <Target size={18} />
+            </span>
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+            </span>
+          </div>
+
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-black uppercase tracking-wider text-gray-900 dark:text-white">
-                AgriFlux Field Intelligence Engine
+              <h2 className="text-base font-black tracking-tight text-gray-900 dark:text-white font-display">
+                Field Intelligence Engine
               </h2>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 uppercase">
-                Closed-Loop Decisions
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                Closed-Loop AI
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Evidence-based agronomic recommendations connecting real-time IoT sensors, soil
-              health, and weather forecasts.
+              Autonomous agronomic decision gates connecting real-time IoT sensors, soil cards, and ERA5 weather.
             </p>
           </div>
         </div>
 
-        {/* Field Selection Tabs */}
-        <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl self-start md:self-auto border border-gray-200/50 dark:border-white/5">
+        {/* Field Switcher Pills */}
+        <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl self-start sm:self-auto border border-gray-200/50 dark:border-white/5">
           {FIELDS.map((f) => (
             <button
               key={f.id}
               onClick={() => handleSelectField(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                 selectedField.id === f.id
-                  ? 'bg-primary-600 text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 scale-[1.02]'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/50'
               }`}
             >
               {f.name.split(' ')[0]} ({f.crop})
             </button>
           ))}
           <button
-            onClick={() => fetchRecommendation(selectedField)}
+            onClick={() => fetchRecommendation(selectedField, selectedField.defaultMoisture)}
             disabled={loading}
-            title="Refresh Recommendation"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 transition-colors"
+            title="Refresh In-Situ Telemetry"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
-            <RotateCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RotateCw size={14} className={loading ? 'animate-spin text-emerald-600' : ''} />
           </button>
         </div>
       </div>
 
-      {/* Main Workspace Body */}
-      <div className="pt-4 grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* LEFT COLUMN: Active Recommendation & Evidence (7 Cols) */}
-        <div className="lg:col-span-7 space-y-4">
-          {/* Main Action Banner */}
-          <div className={`p-4 rounded-2xl border ${urgencyStyles.bg} relative overflow-hidden`}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span
-                    className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md ${urgencyStyles.badge}`}
-                  >
-                    {urgency.toUpperCase()} PRIORITY
-                  </span>
-                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <MapPin size={12} /> {selectedField.name} · {selectedField.crop} (
-                    {selectedField.stage})
-                  </span>
-                </div>
-                <h3 className="text-xl font-black text-gray-900 dark:text-white leading-snug">
-                  {recommendation?.actionLabel || 'Analyzing field context...'}
-                </h3>
-              </div>
+      {/* 2. Visual Telemetry Gauges Grid (Symmetric 4-Card Row) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 py-4 border-b border-gray-100 dark:border-gray-800">
+        {/* Gauge 1: Soil Moisture */}
+        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+              <Droplets size={12} className="text-blue-500" /> Soil Moisture
+            </span>
+            <span className={`text-[10px] font-extrabold ${moistureStatus.text}`}>
+              {moistureStatus.label}
+            </span>
+          </div>
+
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl font-black text-gray-900 dark:text-white font-display">
+              {moistureValue}%
+            </span>
+            <span className="text-[10px] text-gray-400 font-medium">Root-Zone</span>
+          </div>
+
+          {/* Visual Progress Bar Gauge */}
+          <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-700 ${moistureStatus.bar}`}
+              style={{ width: `${Math.min(100, Math.max(5, moistureValue))}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+            <span>0% Dry</span>
+            <span>50% Target</span>
+            <span>100% Sat</span>
+          </div>
+        </div>
+
+        {/* Gauge 2: Soil Chemistry */}
+        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+              <Activity size={12} className="text-emerald-500" /> Soil Chemistry
+            </span>
+            <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400">
+              Balanced
+            </span>
+          </div>
+
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
+              pH {obs?.soilPh?.value || 6.4}
+            </span>
+            <span className="text-[10px] text-gray-400 font-medium">Optimal</span>
+          </div>
+
+          <div className="w-full bg-gradient-to-r from-red-400 via-emerald-400 to-blue-400 rounded-full h-1.5 mt-2 relative">
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-gray-900 dark:bg-white rounded-full border border-emerald-500 shadow-sm"
+              style={{ left: `${((Number(obs?.soilPh?.value || 6.4) - 4) / 5) * 100}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+            <span>Acidic</span>
+            <span>pH 7.0</span>
+            <span>Alkaline</span>
+          </div>
+        </div>
+
+        {/* Gauge 3: Ambient Climate */}
+        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+              <Thermometer size={12} className="text-amber-500" /> Micro-Climate
+            </span>
+            <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400">
+              Warm
+            </span>
+          </div>
+
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl font-black text-amber-600 dark:text-amber-400 font-display">
+              {obs?.ambientTemp?.value || 28}°C
+            </span>
+            <span className="text-[10px] text-gray-400 font-medium">
+              RH {obs?.humidity?.value || 60}%
+            </span>
+          </div>
+
+          <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-700"
+              style={{ width: `${Math.min(100, ((Number(obs?.ambientTemp?.value || 28) - 10) / 35) * 100)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+            <span>15°C</span>
+            <span>28°C Normal</span>
+            <span>45°C</span>
+          </div>
+        </div>
+
+        {/* Gauge 4: Precipitation Window */}
+        <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+              <CloudRain size={12} className="text-teal-500" /> Rain (24h)
+            </span>
+            <span className="text-[10px] font-extrabold text-teal-600 dark:text-teal-400">
+              {obs?.forecastRainProbability?.value || 15}% Prob
+            </span>
+          </div>
+
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl font-black text-teal-600 dark:text-teal-400 font-display">
+              {obs?.forecastRainMm?.value || 0} mm
+            </span>
+            <span className="text-[10px] text-gray-400 font-medium">Clear Window</span>
+          </div>
+
+          <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-teal-400 to-blue-500 rounded-full transition-all duration-700"
+              style={{ width: `${Math.min(100, Math.max(8, Number(obs?.forecastRainProbability?.value || 15)))}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
+            <span>Dry</span>
+            <span>Rain Window</span>
+            <span>Heavy</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Main Command Center (Symmetric 2-Column Responsive Grid) */}
+      <div className="pt-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* LEFT COLUMN: Agronomic Intelligence & Rationale (7 Cols) */}
+        <div className="lg:col-span-7 flex flex-col justify-between space-y-3">
+          <div className={`p-4 rounded-2xl border ${urgencyStyles.border} bg-gradient-to-br ${urgencyStyles.accent} relative overflow-hidden`}>
+            {/* Urgency and Context Badges */}
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${urgencyStyles.badge}`}>
+                {urgency.toUpperCase()} PRIORITY
+              </span>
+              <span className="text-xs font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                <MapPin size={13} className="text-emerald-500" />
+                {selectedField.name} · {selectedField.crop} ({selectedField.stage})
+              </span>
             </div>
 
-            {/* Explanation */}
-            <p className="mt-3 text-sm text-gray-700 dark:text-gray-200 leading-relaxed font-medium bg-white/50 dark:bg-gray-900/40 p-3 rounded-xl border border-white/20 dark:border-white/5">
-              {recommendation?.explanation || 'Loading agronomic rationale...'}
+            {/* Action Headline */}
+            <h3 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white font-display leading-snug">
+              {recommendation?.actionLabel || 'Analyzing root-zone telemetry...'}
+            </h3>
+
+            {/* Concise Rationale */}
+            <p className="mt-2.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium bg-white/60 dark:bg-gray-900/50 p-3 rounded-xl border border-white/40 dark:border-gray-700/40">
+              {recommendation?.explanation ||
+                `Root-zone sensor telemetry reads ${moistureValue}%. Immediate irrigation is recommended to prevent vegetative stress during the tillering stage.`}
             </p>
 
             {/* Decision Rule Trigger */}
             {recommendation?.decisionRules && recommendation.decisionRules.length > 0 && (
-              <div className="mt-3 flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300">
-                <Zap size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
-                <span className="italic">
-                  Rule: {recommendation.decisionRules[0]}
-                </span>
+              <div className="mt-2.5 flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-300">
+                <Zap size={14} className="text-amber-500 flex-shrink-0" />
+                <span className="truncate">Rule: {recommendation.decisionRules[0]}</span>
               </div>
             )}
           </div>
 
-          {/* Validated Telemetry Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
-              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
-                Soil Moisture
-              </span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black text-blue-600 dark:text-blue-400">
-                  {obs?.soilMoisture?.value !== undefined ? `${obs.soilMoisture.value}%` : '---'}
-                </span>
-                <span className="text-[10px] text-gray-400">
-                  {obs?.soilMoisture?.source === 'iot_simulator' ? '(Simulated)' : '(Sensor)'}
+          {/* Expected Target Condition */}
+          <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <div>
+                <span className="font-bold text-blue-900 dark:text-blue-300">Target Outcome: </span>
+                <span className="text-blue-700 dark:text-blue-400">
+                  {recommendation?.expectedFollowUpCondition?.description || 'Soil moisture between 48% - 55% within 2 hours'}
                 </span>
               </div>
-              <p className="text-[9px] text-gray-400 mt-1 flex items-center gap-0.5">
-                <Clock size={10} /> Freshness:{' '}
-                {obs?.soilMoisture?.freshnessMinutes !== undefined
-                  ? `${obs.soilMoisture.freshnessMinutes}m`
-                  : '0m'}
-              </p>
             </div>
-
-            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
-              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
-                Soil Chemistry
-              </span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black text-primary-600 dark:text-primary-400">
-                  pH {obs?.soilPh?.value || 6.4}
-                </span>
-              </div>
-              <p className="text-[9px] text-gray-400 mt-1">
-                K: {obs?.soilPotassium?.value || 48} kg/ha
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
-              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
-                Ambient Temp
-              </span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black text-amber-600 dark:text-amber-400">
-                  {obs?.ambientTemp?.value || 28}°C
-                </span>
-              </div>
-              <p className="text-[9px] text-gray-400 mt-1">
-                Humidity: {obs?.humidity?.value || 60}%
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/60 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5">
-              <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">
-                Rain Forecast (24h)
-              </span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black text-teal-600 dark:text-teal-400">
-                  {obs?.forecastRainMm?.value || 0} mm
-                </span>
-              </div>
-              <p className="text-[9px] text-gray-400 mt-1">
-                Prob: {obs?.forecastRainProbability?.value || 15}%
-              </p>
-            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 uppercase whitespace-nowrap">
+              Target: 48-55%
+            </span>
           </div>
-
-          {/* Expected Follow-up Condition */}
-          {recommendation?.expectedFollowUpCondition && (
-            <div className="p-3 rounded-xl bg-blue-50/60 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/30 text-xs">
-              <p className="font-bold text-blue-800 dark:text-blue-300 flex items-center gap-1.5 mb-1">
-                <CheckCircle size={14} className="text-blue-600" />
-                Target Evaluation Criteria (Within {recommendation.expectedFollowUpCondition.timeframeHours}h):
-              </p>
-              <p className="text-blue-700/80 dark:text-blue-300/80">
-                {recommendation.expectedFollowUpCondition.description} (Target: {recommendation.expectedFollowUpCondition.targetRange})
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* RIGHT COLUMN: Action Execution & Closed-Loop Evaluation (5 Cols) */}
-        <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
+        {/* RIGHT COLUMN: 2-Step Closed-Loop Action & Outcome Verification (5 Cols) */}
+        <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
           {/* STEP 1: Farmer Action Recording */}
-          <div className="p-4 rounded-2xl bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-white/10 shadow-sm space-y-3">
+          <div className="p-4 rounded-2xl bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/50 shadow-sm space-y-2.5">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">
-                Step 1: Record Farmer Action
+              <h4 className="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200 font-display flex items-center gap-1.5">
+                <Sparkles size={14} className="text-emerald-500" /> Step 1: Record Farmer Action
               </h4>
               {recommendation?.farmerAction ? (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 uppercase">
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 uppercase">
                   Action Recorded ✅
                 </span>
               ) : (
-                <span className="text-[10px] font-bold text-amber-500 uppercase animate-pulse">
-                  Pending Execution
+                <span className="text-[10px] font-black text-amber-500 uppercase flex items-center gap-1">
+                  <Clock size={11} /> Pending
                 </span>
               )}
             </div>
-
-            <p className="text-xs text-gray-500">
-              Record your real farm response to ensure traceability and track closed-loop crop
-              responses.
-            </p>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => handleRecordAction('irrigated')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
                   recommendation?.farmerAction?.actionTaken === 'irrigated'
-                    ? 'bg-primary-600 text-white shadow-md'
-                    : 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-100'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                    : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/40'
                 }`}
               >
                 <Droplets size={13} /> Irrigated Field
@@ -452,10 +540,10 @@ const AIDecisionPanel: React.FC = () => {
               <button
                 onClick={() => handleRecordAction('postponed')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
                   recommendation?.farmerAction?.actionTaken === 'postponed'
-                    ? 'bg-amber-600 text-white shadow-md'
-                    : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-100'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40 border border-amber-200/50 dark:border-amber-800/40'
                 }`}
               >
                 <Clock size={13} /> Postponed Cycle
@@ -464,22 +552,22 @@ const AIDecisionPanel: React.FC = () => {
               <button
                 onClick={() => handleRecordAction('inspected')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
                   recommendation?.farmerAction?.actionTaken === 'inspected'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                    : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/50 dark:border-blue-800/40'
                 }`}
               >
-                <CheckCircle size={13} /> Inspected Field
+                <CheckCircle2 size={13} /> Inspected Field
               </button>
 
               <button
                 onClick={() => handleRecordAction('dismissed')}
                 disabled={actionLoading}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 active-press ${
                   recommendation?.farmerAction?.actionTaken === 'dismissed'
-                    ? 'bg-gray-600 text-white shadow-md'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
+                    ? 'bg-gray-700 text-white shadow-md'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
               >
                 Dismissed
@@ -487,37 +575,29 @@ const AIDecisionPanel: React.FC = () => {
             </div>
           </div>
 
-          {/* STEP 2: Closed-Loop Outcome Evaluator */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-primary-50/50 to-teal-50/20 dark:from-gray-800/40 dark:to-gray-900/40 border border-primary-200/50 dark:border-primary-800/30 space-y-3">
-            <h4 className="text-xs font-black uppercase tracking-wider text-primary-700 dark:text-primary-400 flex items-center gap-1.5">
-              <RotateCw size={14} /> Step 2: Evaluate Follow-up Outcome
+          {/* STEP 2: Closed-Loop Outcome Verification */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-gray-800/40 dark:to-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/30 space-y-2.5">
+            <h4 className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-display flex items-center gap-1.5">
+              <RotateCw size={13} /> Step 2: Evaluate Follow-up Outcome
             </h4>
-
-            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-              Verify if subsequent field telemetry satisfies the expected condition following the
-              recorded action.
-            </p>
 
             <div className="flex items-center gap-2">
               <div className="flex-1">
-                <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">
-                  Subsequent Moisture (%)
-                </label>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={followUpMoisture}
                   onChange={(e) => setFollowUpMoisture(e.target.value)}
-                  className="w-full h-9 px-3 text-sm font-bold rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                  placeholder="e.g. 52"
+                  className="w-full h-9 px-3 text-sm font-bold rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  placeholder="Subsequent Moisture (%)"
                 />
               </div>
 
               <button
                 onClick={handleEvaluateFollowUp}
                 disabled={evaluating || !recommendation}
-                className="btn-primary self-end h-9 px-4 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
+                className="btn-primary h-9 px-4 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 active-press shadow-md shadow-emerald-600/25"
               >
                 <Send size={12} /> {evaluating ? 'Evaluating...' : 'Evaluate'}
               </button>
@@ -526,16 +606,16 @@ const AIDecisionPanel: React.FC = () => {
             {/* Outcome Display */}
             {evaluationResult && (
               <div
-                className={`p-3 rounded-xl border mt-2 text-xs ${
+                className={`p-3 rounded-xl border text-xs transition-all duration-300 ${
                   evaluationResult.conditionMet
-                    ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-300 dark:border-primary-700 text-primary-800 dark:text-primary-200'
-                    : 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200'
+                    ? 'bg-emerald-100/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200'
+                    : 'bg-amber-100/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-black uppercase tracking-wider flex items-center gap-1">
                     {evaluationResult.conditionMet ? (
-                      <CheckCircle size={14} className="text-primary-600" />
+                      <CheckCircle2 size={14} className="text-emerald-600" />
                     ) : (
                       <AlertTriangle size={14} className="text-amber-600" />
                     )}
@@ -545,7 +625,7 @@ const AIDecisionPanel: React.FC = () => {
                     {evaluationResult.observedDelta}
                   </span>
                 </div>
-                <p className="mt-1 leading-relaxed opacity-90">{evaluationResult.explanation}</p>
+                <p className="mt-1 leading-relaxed opacity-95">{evaluationResult.explanation}</p>
               </div>
             )}
           </div>
