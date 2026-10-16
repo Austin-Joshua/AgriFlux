@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+build
+**/build
+out
+.cache
+.vite
+
+# Version control and CI
+.git
+.github
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and Editor
+.vscode
+.idea
+*.tsbuildinfo
+.eslintcache
+.prettiercache
+
+# Logs and test coverage
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage
+.nyc_output
+
+# Operating system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
