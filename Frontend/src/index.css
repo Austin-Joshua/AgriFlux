@@ -918,4 +918,21 @@ body {
     scroll-behavior: auto !important;
   }
 }
+/* ================================
+   MOBILE & TABLET NATIVE DOCK & TOUCH FEEL
+================================ */
+@media (max-width: 1023px) {
+  /* Ensure interactive touch targets feel native */
+  button,
+  a,
+  input,
+  select {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 
+  /* Safe padding for bottom navigation bar on mobile/tablet */
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+  }
+}
