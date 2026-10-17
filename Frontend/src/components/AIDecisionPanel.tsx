@@ -218,8 +218,30 @@ const AIDecisionPanel: React.FC = () => {
     }
   };
 
+  const getFallbackAction = (f: FieldOption) => {
+    if (f.defaultMoisture < 30) return 'Immediate Irrigation Required — Root Zone Deficit';
+    if (f.defaultMoisture > 70) return 'Postpone Irrigation Cycle — Soil Near Saturation';
+    return 'Maintain Monitoring Schedule — Root Zone Moisture Optimal';
+  };
+
+  const getFallbackUrgency = (f: FieldOption): 'critical' | 'high' | 'medium' | 'low' => {
+    if (f.defaultMoisture < 30) return 'high';
+    if (f.defaultMoisture > 70) return 'medium';
+    return 'low';
+  };
+
+  const getFallbackExplanation = (f: FieldOption) => {
+    if (f.defaultMoisture < 30) {
+      return `Root-zone sensor telemetry reads ${f.defaultMoisture}%, severely below the managed depletion threshold for ${f.crop}. Immediate hydration is recommended to prevent yield stunting.`;
+    }
+    if (f.defaultMoisture > 70) {
+      return `Root-zone sensor telemetry reads ${f.defaultMoisture}%. High moisture combined with scheduled rain indicates irrigation should be suspended to avoid root hypoxia.`;
+    }
+    return `Root-zone sensor telemetry reads ${f.defaultMoisture}%. Soil hydration and micro-climate parameters are within the calibrated agronomic target window for ${f.crop}.`;
+  };
+
   const obs = recommendation?.supportingObservations;
-  const urgency = recommendation?.urgency || 'medium';
+  const urgency = recommendation?.urgency || getFallbackUrgency(selectedField);
 
   // Guaranteed valid numeric moisture value - never null or undefined
   const moistureValue =
@@ -472,13 +494,12 @@ const AIDecisionPanel: React.FC = () => {
 
             {/* Action Headline */}
             <h3 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white font-display leading-snug">
-              {recommendation?.actionLabel || 'Analyzing root-zone telemetry...'}
+              {recommendation?.actionLabel || getFallbackAction(selectedField)}
             </h3>
 
             {/* Crisp Rationale (Clean, open typography without boxed clutter) */}
             <p className="mt-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-              {recommendation?.explanation ||
-                `Root-zone sensor telemetry reads ${moistureValue}%. Immediate irrigation is recommended to prevent vegetative stress during the tillering stage.`}
+              {recommendation?.explanation || getFallbackExplanation(selectedField)}
             </p>
 
             {/* Decision Rule Trigger */}
