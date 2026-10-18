@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, UserRole } from '../context/AuthContext';
 import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
+import logo from '../assets/logo-icon.png';
 
 const DEMO_ACCOUNTS = {
   farmer: {
@@ -142,6 +143,26 @@ const Login: React.FC = () => {
   return (
     <div className="w-full h-full flex flex-col justify-center">
       <SEO title={t('auth.login', 'Sign In')} />
+
+      {/* Mobile Branding Logo */}
+      <Link
+        to="/"
+        id="login-mobile-logo-link"
+        className="lg:hidden inline-flex items-center gap-2.5 mb-5 group cursor-pointer w-fit"
+        title={t('common.backToHome', 'Back to Home')}
+      >
+        <div className="w-9 h-9 rounded-xl overflow-hidden shadow-sm shadow-primary-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
+          <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
+        </div>
+        <div className="flex flex-col text-left">
+          <span className="text-base font-black text-gray-900 dark:text-white leading-none tracking-tight">
+            Agri<span className="text-primary-600 dark:text-primary-400">Flux</span>
+          </span>
+          <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-0.5">
+            {t('common.intelligencePlatform', 'Intelligence Platform')}
+          </span>
+        </div>
+      </Link>
 
       {/* Header */}
       <div className="mb-6">

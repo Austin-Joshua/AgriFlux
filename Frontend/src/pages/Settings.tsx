@@ -152,7 +152,7 @@ const Settings: React.FC = () => {
       console.warn('Logout fallback:', err);
     }
     toast.info(t('auth.signedOutSuccess', 'Signed out of AgriFlux account.'));
-    navigate('/login', { replace: true });
+    navigate('/login', { replace: true, state: null });
   };
 
   const [profile, setProfile] = useState({

@@ -337,7 +337,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
       console.warn('Logout fallback:', err);
     }
     toast.info(t('auth.signedOutSuccess', 'Signed out successfully.'));
-    navigate('/login', { replace: true });
+    navigate('/login', { replace: true, state: null });
   };
 
   const w = 'lg:w-64';

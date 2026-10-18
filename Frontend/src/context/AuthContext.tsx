@@ -379,6 +379,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setRequiresOnboarding(false);
     localStorage.removeItem('agriflux-token');
     localStorage.removeItem('agriflux-user');
+    sessionStorage.removeItem('agriflux-token');
+    sessionStorage.removeItem('agriflux-user');
     delete axios.defaults.headers.common['Authorization'];
 
     // 2. Perform remote session revocation in the background without blocking client transition

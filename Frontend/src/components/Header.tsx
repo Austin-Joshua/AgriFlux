@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Menu,
@@ -252,6 +252,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   const userRole = user?.role || 'farmer';
+  const workspaceRoute =
+    userRole === 'admin'
+      ? '/admin'
+      : userRole === 'agronomist'
+        ? '/agronomist'
+        : '/dashboard';
   const roleAllowedData = SEARCH_DATA.filter((s) => !s.roles || s.roles.includes(userRole));
   const filteredSearch = searchQuery.trim()
     ? roleAllowedData.filter(
@@ -714,43 +720,33 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
               {/* Navigation Options */}
               <div className="p-1.5 space-y-0.5">
-                <button
+                <Link
                   id="header-workspace-link"
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                  to={workspaceRoute}
+                  onClick={() => {
                     setAccountOpen(false);
-                    navigate(
-                      user?.role === 'agronomist'
-                        ? '/agronomist'
-                        : user?.role === 'admin'
-                          ? '/admin'
-                          : '/dashboard'
-                    );
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
                 >
                   <LayoutDashboard size={16} className="text-emerald-600 dark:text-emerald-400" />
                   <span>{t('header.workspaceDashboard', 'Workspace Dashboard')}</span>
                   <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
-                </button>
+                </Link>
 
-                <button
+                <Link
                   id="header-settings-link"
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                  to="/settings"
+                  onClick={() => {
                     setAccountOpen(false);
-                    navigate('/settings');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
                 >
                   <Settings size={16} className="text-gray-500 dark:text-gray-400" />
                   <span>{t('header.accountPreferences', 'Account & Preferences')}</span>
                   <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
-                </button>
+                </Link>
               </div>
 
               {/* Explicit Logout Action */}
@@ -768,7 +764,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                       console.warn('Logout fallback:', err);
                     }
                     toast.info(t('auth.signedOutSuccess', 'Signed out successfully.'));
-                    navigate('/login', { replace: true });
+                    navigate('/login', { replace: true, state: null });
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold transition-colors group cursor-pointer"
                 >
@@ -777,7 +773,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   </div>
                   <div className="text-left flex-1">
                     <p className="leading-tight">{t('common.signOut', 'Sign Out')}</p>
-                    <p className="text-[10px] text-gray-400 font-normal">{t('header.endSession', 'Terminate session')}</p>
+                    <p className="text-[10px] text-gray-400 font-normal">{t('header.endSession', 'End active session')}</p>
                   </div>
                 </button>
               </div>

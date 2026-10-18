@@ -115,7 +115,12 @@ const AuthLayout: React.FC = () => {
 
             <div className="relative w-full h-full p-8 lg:p-12 flex flex-col justify-between text-white z-10">
               <div className="space-y-6">
-                <div className="flex items-center gap-3.5">
+                <Link
+                  to="/"
+                  id="auth-brand-logo-link"
+                  className="flex items-center gap-3.5 group cursor-pointer w-fit"
+                  title={t('common.backToHome', 'Back to Home')}
+                >
                   <motion.div
                     whileHover={{ scale: 1.05, rotate: 3 }}
                     className="w-12 h-12 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0"
@@ -123,14 +128,14 @@ const AuthLayout: React.FC = () => {
                     <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
                   </motion.div>
                   <div className="flex flex-col text-left">
-                    <span className="text-xl font-black text-white leading-none tracking-tight">
+                    <span className="text-xl font-black text-white leading-none tracking-tight group-hover:text-primary-200 transition-colors">
                       {t('common.agriflux', 'AgriFlux')}
                     </span>
                     <span className="text-[10px] font-black text-gold-400 uppercase tracking-widest mt-1">
                       {t('common.intelligencePlatform', 'Intelligence Platform')}
                     </span>
                   </div>
-                </div>
+                </Link>
 
                 <div className="space-y-3">
                   <motion.div
