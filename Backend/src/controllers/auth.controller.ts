@@ -150,17 +150,23 @@ export const sendOtp = async (req: Request, res: Response) => {
     });
 
     console.log(`📱 [AGRIFLUX SECURE OTP] Generated OTP: ${otp} for phone: +91 ${cleanPhone}`);
-    await dispatchSmsGateway(cleanPhone, otp);
+    const smsDelivered = await dispatchSmsGateway(cleanPhone, otp);
 
-    // In dev & demo environments, return OTP in response for instant credible verification
     const isDev = env.NODE_ENV !== 'production';
+    const message = smsDelivered
+      ? `OTP sent successfully via carrier SMS to +91 ${cleanPhone}. Valid for 5 minutes.`
+      : isDev
+        ? `OTP generated in development/demo mode for +91 ${cleanPhone} (SMS carrier gateway not configured). Valid for 5 minutes.`
+        : `OTP generated for +91 ${cleanPhone}. Valid for 5 minutes.`;
+
     return res.json({
       success: true,
-      message: `OTP sent successfully to +91 ${cleanPhone}. Valid for 5 minutes.`,
+      message,
+      deliveryMode: smsDelivered ? 'carrier_sms' : 'simulated_dev',
       ...(isDev
         ? {
             otp,
-            devHint: `Verification Code: ${otp} (Master fallback: 123456)`,
+            devHint: `Development OTP: ${otp} (Master fallback: 123456)`,
           }
         : {}),
     });

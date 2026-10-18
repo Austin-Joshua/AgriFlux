@@ -2,8 +2,41 @@ import { Request, Response } from 'express';
 import { FieldIntelligenceService } from '../services/field-intelligence.service';
 
 /**
+ * GET /api/field-intelligence/context
+ * Phase 2: Retrieves unified field context and data-quality status
+ */
+export const getFieldContext = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id || 'demo-farmer';
+    const fieldId = (req.query.fieldId as string) || undefined;
+    const cropType = (req.query.cropType as string) || undefined;
+    const cropStage = (req.query.cropStage as string) || undefined;
+    const moistureOverride =
+      req.query.moistureOverride !== undefined ? Number(req.query.moistureOverride) : undefined;
+
+    const context = await FieldIntelligenceService.getFieldContext(userId, {
+      fieldId,
+      cropType,
+      cropStage,
+      soilMoistureOverride: moistureOverride,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: context,
+    });
+  } catch (error: any) {
+    console.error('❌ [FIELD INTELLIGENCE CONTEXT ERROR]', error.message);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching unified field context',
+    });
+  }
+};
+
+/**
  * POST /api/field-intelligence/recommend
- * Generates an evidence-based recommendation for a field
+ * Phase 3: Generates an evidence-based recommendation for a field
  */
 export const getRecommendation = async (req: Request, res: Response) => {
   try {
@@ -27,11 +60,13 @@ export const getRecommendation = async (req: Request, res: Response) => {
 
 /**
  * POST /api/field-intelligence/action
- * Records the farmer's response to an actionable recommendation
+ * Phase 4: Records the farmer's response to an actionable recommendation
  */
 export const recordAction = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?.id || 'demo-farmer';
+    const user = (req as any).user || {};
+    const userId = user.id || 'demo-farmer';
+    const actorName = user.name || (user.role === 'farmer' ? 'Farmer' : 'Farm Operator');
     const { recommendationId, actionTaken, notes } = req.body;
 
     if (!recommendationId || !actionTaken) {
@@ -41,10 +76,19 @@ export const recordAction = async (req: Request, res: Response) => {
       });
     }
 
-    if (!['irrigated', 'postponed', 'inspected', 'dismissed'].includes(actionTaken)) {
+    const validActions = [
+      'irrigated',
+      'postponed',
+      'inspected',
+      'dismissed',
+      'accepted',
+      'rejected',
+      'requested_review',
+    ];
+    if (!validActions.includes(actionTaken)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid actionTaken. Must be: irrigated, postponed, inspected, or dismissed.',
+        message: `Invalid actionTaken. Must be one of: ${validActions.join(', ')}.`,
       });
     }
 
@@ -52,7 +96,9 @@ export const recordAction = async (req: Request, res: Response) => {
       userId,
       recommendationId,
       actionTaken,
-      notes
+      notes,
+      user.id,
+      actorName
     );
 
     return res.status(200).json({
@@ -70,7 +116,7 @@ export const recordAction = async (req: Request, res: Response) => {
 
 /**
  * POST /api/field-intelligence/evaluate
- * Evaluates the follow-up sensor reading against the expected agronomic condition
+ * Phase 5: Evaluates the follow-up sensor reading against the expected agronomic condition
  */
 export const evaluateFollowUp = async (req: Request, res: Response) => {
   try {
@@ -99,6 +145,106 @@ export const evaluateFollowUp = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message || 'Error evaluating follow-up outcome',
+    });
+  }
+};
+
+/**
+ * GET /api/field-intelligence/timeline/:fieldId?
+ * Phase 4: Retrieves chronological audit timeline of recommendations, actions, and outcomes
+ */
+export const getFieldTimeline = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id || 'demo-farmer';
+    const fieldIdParam = req.params.fieldId;
+    const fieldIdQuery = req.query.fieldId;
+    const fieldId =
+      typeof fieldIdParam === 'string'
+        ? fieldIdParam
+        : typeof fieldIdQuery === 'string'
+          ? fieldIdQuery
+          : undefined;
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 25));
+
+    const timeline = await FieldIntelligenceService.getFieldTimeline(userId, fieldId, limit);
+
+    return res.status(200).json({
+      success: true,
+      data: timeline,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching field timeline',
+    });
+  }
+};
+
+/**
+ * POST /api/field-intelligence/review
+ * Phase 7: Agronomist review workflow
+ */
+export const recordAgronomistReview = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user || {};
+    const reviewerId = user.id || 'agronomist-01';
+    const reviewerName = user.name || 'Specialist Agronomist';
+    const { recommendationId, status, notes } = req.body;
+
+    if (!recommendationId || !status) {
+      return res.status(400).json({
+        success: false,
+        message: 'recommendationId and status are required.',
+      });
+    }
+
+    const validStatuses = ['endorsed', 'revision_requested', 'inspection_required'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid review status. Must be one of: ${validStatuses.join(', ')}.`,
+      });
+    }
+
+    const updated = await FieldIntelligenceService.recordAgronomistReview(
+      user.id,
+      reviewerId,
+      reviewerName,
+      recommendationId,
+      status,
+      notes
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `Agronomist review '${status}' recorded successfully.`,
+      data: updated,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Error recording agronomist review',
+    });
+  }
+};
+
+/**
+ * GET /api/field-intelligence/reviews
+ * Phase 7: Retrieves pending reviews for agronomists
+ */
+export const getPendingReviews = async (req: Request, res: Response) => {
+  try {
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 20));
+    const reviews = await FieldIntelligenceService.getPendingReviews(limit);
+
+    return res.status(200).json({
+      success: true,
+      data: reviews,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching pending reviews',
     });
   }
 };

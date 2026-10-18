@@ -14,10 +14,55 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { Calendar, AlertTriangle, Send, Loader } from 'lucide-react';
+import {
+  Calendar,
+  AlertTriangle,
+  Send,
+  Loader,
+  ShieldCheck,
+  CheckCircle2,
+  RotateCw,
+  UserCheck,
+  Zap,
+  Target,
+} from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { toast } from 'react-toastify';
+
+interface FieldReviewItem {
+  _id?: string;
+  recommendationId: string;
+  fieldId: string;
+  fieldName: string;
+  cropType: string;
+  cropStage: string;
+  action: string;
+  actionLabel: string;
+  urgency: 'critical' | 'high' | 'medium' | 'low';
+  explanation: string;
+  ruleVersion?: string;
+  decisionRules?: string[];
+  supportingObservations?: {
+    soilMoisture?: { value: number; unit: string; provenance?: string };
+    soilPh?: { value: number; unit: string };
+    ambientTemp?: { value: number; unit: string };
+    forecastRainMm?: { value: number; unit: string };
+  };
+  farmerAction?: {
+    actionTaken: string;
+    notes?: string;
+    recordedAt?: string;
+    actorName?: string;
+  };
+  agronomistReview?: {
+    status: 'endorsed' | 'revision_requested' | 'inspection_required';
+    notes: string;
+    reviewerName: string;
+    reviewedAt: string;
+  };
+  createdAt: string;
+}
 
 interface Consultation {
   _id: string;
@@ -47,19 +92,23 @@ const AgronomistDashboard: React.FC = () => {
   const initialTab =
     tabParam === 'consultations' || tabParam === 'fieldVisits'
       ? 'fieldVisits'
-      : tabParam === 'soilReports'
-        ? 'soilReports'
-        : tabParam === 'advisory'
-          ? 'advisory'
-          : 'overview';
+      : tabParam === 'fieldDecisions'
+        ? 'fieldDecisions'
+        : tabParam === 'soilReports'
+          ? 'soilReports'
+          : tabParam === 'advisory'
+            ? 'advisory'
+            : 'overview';
 
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'soilReports' | 'fieldVisits' | 'advisory'
+    'overview' | 'soilReports' | 'fieldVisits' | 'fieldDecisions' | 'advisory'
   >(initialTab);
 
   useEffect(() => {
     if (tabParam === 'consultations' || tabParam === 'fieldVisits') {
       setActiveTab('fieldVisits');
+    } else if (tabParam === 'fieldDecisions') {
+      setActiveTab('fieldDecisions');
     } else if (tabParam === 'soilReports') {
       setActiveTab('soilReports');
     } else if (tabParam === 'advisory') {
@@ -69,10 +118,18 @@ const AgronomistDashboard: React.FC = () => {
     }
   }, [tabParam]);
 
-  const handleTabSelect = (tab: 'overview' | 'soilReports' | 'fieldVisits' | 'advisory') => {
+  const handleTabSelect = (
+    tab: 'overview' | 'soilReports' | 'fieldVisits' | 'fieldDecisions' | 'advisory'
+  ) => {
     setActiveTab(tab);
     setSearchParams(
-      tab === 'overview' ? {} : tab === 'fieldVisits' ? { tab: 'consultations' } : { tab }
+      tab === 'overview'
+        ? {}
+        : tab === 'fieldVisits'
+          ? { tab: 'consultations' }
+          : tab === 'fieldDecisions'
+            ? { tab: 'fieldDecisions' }
+            : { tab }
     );
   };
   const [advisoryText, setAdvisoryText] = useState('');
@@ -81,6 +138,57 @@ const AgronomistDashboard: React.FC = () => {
   );
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [loadingConsultations, setLoadingConsultations] = useState(false);
+
+  // Field Decision Reviews State
+  const [reviews, setReviews] = useState<FieldReviewItem[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
+  const [submittingReview, setSubmittingReview] = useState<string | null>(null);
+
+  const fetchReviews = useCallback(async () => {
+    setLoadingReviews(true);
+    try {
+      const res = await axios.get(`${API_URL}/field-intelligence/reviews`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        setReviews(res.data.data);
+      }
+    } catch (err) {
+      console.warn('Could not fetch agronomist reviews:', err);
+    } finally {
+      setLoadingReviews(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (activeTab === 'fieldDecisions') {
+      fetchReviews();
+    }
+  }, [activeTab, fetchReviews]);
+
+  const handleReviewDecision = async (
+    recommendationId: string,
+    status: 'endorsed' | 'revision_requested' | 'inspection_required'
+  ) => {
+    setSubmittingReview(recommendationId);
+    try {
+      const notes = reviewNotes[recommendationId] || `Agronomist status: ${status}`;
+      const res = await axios.post(
+        `${API_URL}/field-intelligence/review`,
+        { recommendationId, status, notes },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      if (res.data?.success) {
+        toast.success(`Decision successfully marked as '${status}'!`);
+        fetchReviews();
+      }
+    } catch {
+      toast.error('Failed to submit review.');
+    } finally {
+      setSubmittingReview(null);
+    }
+  };
 
   const fetchConsultations = useCallback(async () => {
     setLoadingConsultations(true);
@@ -302,7 +410,9 @@ const AgronomistDashboard: React.FC = () => {
           aria-label="Agronomist Views"
           className="flex gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl p-1.5 w-max border border-gray-200/50 dark:border-gray-700/50"
         >
-          {(['overview', 'fieldVisits', 'soilReports', 'advisory'] as const).map((tab) => (
+          {(
+            ['overview', 'fieldVisits', 'fieldDecisions', 'soilReports', 'advisory'] as const
+          ).map((tab) => (
             <button
               key={tab}
               role="tab"
@@ -318,9 +428,11 @@ const AgronomistDashboard: React.FC = () => {
                 ? `📊 ${t('common.overview', 'Overview')}`
                 : tab === 'fieldVisits'
                   ? `📅 Consultations (${consultations.filter((c) => c.status === 'pending').length || 0})`
-                  : tab === 'soilReports'
-                    ? `🧪 ${t('agronomist.soilReports', 'Soil Diagnostics')}`
-                    : `📡 ${t('agronomist.advisoryTab', 'Regional Advisory')}`}
+                  : tab === 'fieldDecisions'
+                    ? `🎯 Decision Reviews (${reviews.filter((r) => !r.agronomistReview).length || 0})`
+                    : tab === 'soilReports'
+                      ? `🧪 ${t('agronomist.soilReports', 'Soil Diagnostics')}`
+                      : `📡 ${t('agronomist.advisoryTab', 'Regional Advisory')}`}
             </button>
           ))}
         </div>
@@ -670,6 +782,175 @@ const AgronomistDashboard: React.FC = () => {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'fieldDecisions' && (
+        <div className="space-y-4">
+          <div className="card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-gray-900 dark:text-white font-display flex items-center gap-2">
+                <Target size={20} className="text-emerald-500" /> Agronomic Decision Reviews
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Phase 7 specialist workflow: evaluate deterministic FAO-56 decision rules, review
+                farmer actions, endorse recommendations or mandate field inspection.
+              </p>
+            </div>
+            <button
+              onClick={fetchReviews}
+              disabled={loadingReviews}
+              className="btn-outline flex items-center gap-1.5 text-xs py-2 px-3 self-end sm:self-auto"
+            >
+              <RotateCw size={14} className={loadingReviews ? 'animate-spin' : ''} /> Refresh Queue
+            </button>
+          </div>
+
+          {loadingReviews ? (
+            <div className="card text-center py-12">
+              <Loader size={24} className="animate-spin text-primary-600 mx-auto mb-2" />
+              <p className="text-xs text-gray-500">Loading pending field reviews...</p>
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="card text-center py-12">
+              <ShieldCheck size={32} className="text-emerald-500 mx-auto mb-2 opacity-80" />
+              <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                No Pending Field Decision Reviews
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                All farmer recommendations are endorsed or operating within normal agronomic
+                thresholds.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {reviews.map((rec) => {
+                const isUnderReview = submittingReview === rec.recommendationId;
+                const noteValue = reviewNotes[rec.recommendationId] || '';
+
+                return (
+                  <div
+                    key={rec.recommendationId}
+                    className="card p-4 sm:p-5 border border-gray-200/80 dark:border-gray-700/60 space-y-3"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-black text-sm text-gray-900 dark:text-white">
+                          {rec.fieldName} · {rec.cropType} ({rec.cropStage})
+                        </span>
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                          {rec.ruleVersion || 'v2.1-QUANTEX-FAO56'}
+                        </span>
+                        <span
+                          className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                            rec.urgency === 'critical' || rec.urgency === 'high'
+                              ? 'bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300'
+                              : 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                          }`}
+                        >
+                          {rec.urgency} priority
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {new Date(rec.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h4 className="font-extrabold text-sm text-gray-900 dark:text-white">
+                        {rec.actionLabel || rec.action}
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                        {rec.explanation}
+                      </p>
+                      {rec.decisionRules && rec.decisionRules.length > 0 && (
+                        <p className="text-[11px] font-semibold text-gray-500 mt-1 flex items-center gap-1">
+                          <Zap size={12} className="text-amber-500" />
+                          Rule trigger: {rec.decisionRules[0]}
+                        </p>
+                      )}
+                    </div>
+
+                    {rec.farmerAction && (
+                      <div className="p-2.5 rounded-lg bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-800/40 text-xs">
+                        <span className="font-bold text-blue-900 dark:text-blue-300">
+                          Farmer Response:{' '}
+                        </span>
+                        <span className="font-extrabold uppercase text-blue-700 dark:text-blue-400">
+                          {rec.farmerAction.actionTaken}
+                        </span>
+                        {rec.farmerAction.notes && (
+                          <span className="text-gray-600 dark:text-gray-400 ml-2">
+                            ({rec.farmerAction.notes})
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {rec.agronomistReview ? (
+                      <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs">
+                        <div className="flex items-center justify-between font-bold text-emerald-800 dark:text-emerald-300 mb-1">
+                          <span className="flex items-center gap-1.5">
+                            <ShieldCheck size={14} /> Endorsed by{' '}
+                            {rec.agronomistReview.reviewerName}
+                          </span>
+                          <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200">
+                            {rec.agronomistReview.status}
+                          </span>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300">
+                          {rec.agronomistReview.notes}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                        <input
+                          type="text"
+                          value={noteValue}
+                          onChange={(e) =>
+                            setReviewNotes((prev) => ({
+                              ...prev,
+                              [rec.recommendationId]: e.target.value,
+                            }))
+                          }
+                          placeholder="Agronomist directive or field validation notes..."
+                          className="w-full text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        />
+
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => handleReviewDecision(rec.recommendationId, 'endorsed')}
+                            disabled={isUnderReview}
+                            className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5"
+                          >
+                            <CheckCircle2 size={13} /> Endorse Decision
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleReviewDecision(rec.recommendationId, 'revision_requested')
+                            }
+                            disabled={isUnderReview}
+                            className="btn-outline py-1.5 px-3 text-xs flex items-center gap-1.5 text-amber-600 border-amber-300 hover:bg-amber-50"
+                          >
+                            <AlertTriangle size={13} /> Request Revision
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleReviewDecision(rec.recommendationId, 'inspection_required')
+                            }
+                            disabled={isUnderReview}
+                            className="btn-outline py-1.5 px-3 text-xs flex items-center gap-1.5 text-blue-600 border-blue-300 hover:bg-blue-50"
+                          >
+                            <UserCheck size={13} /> Field Inspection Required
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

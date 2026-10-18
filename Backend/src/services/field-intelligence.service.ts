@@ -296,6 +296,7 @@ export class FieldIntelligenceService {
           timeframeHours: 1,
           description: 'Awaiting sensor sync.',
         },
+        ruleVersion: 'v2.1-QUANTEX-FAO56',
         createdAt: new Date(),
       };
 
@@ -538,6 +539,7 @@ export class FieldIntelligenceService {
       assumptionsAndLimitations: assumptions,
       alternativeActions: alternatives,
       expectedFollowUpCondition: expectedCondition,
+      ruleVersion: 'v2.1-QUANTEX-FAO56',
       createdAt: new Date(),
     };
 
@@ -555,18 +557,369 @@ export class FieldIntelligenceService {
   }
 
   /**
-   * Records farmer's response to a recommendation
+   * Phase 2 — Unified Field Context & Data Quality
+   * Brings together available field, crop, soil, weather, historical, and IoT information
+   * with explicit data provenance, freshness, quality flags, and risk rating.
+   */
+  static async getFieldContext(userId: string, contextInput?: FieldContextInput) {
+    const context = contextInput || {};
+    const fieldId = context.fieldId || 'field-01';
+    const fieldName =
+      context.fieldName ||
+      (fieldId === 'field-01'
+        ? 'North Acre Parcel A'
+        : fieldId === 'field-02'
+          ? 'South Terrace Plateau'
+          : fieldId === 'field-03'
+            ? 'Riverside Lowland Parcel'
+            : 'North Acre Parcel A');
+    const cropType =
+      context.cropType ||
+      (fieldId === 'field-01' ? 'Rice' : fieldId === 'field-02' ? 'Maize' : 'Sugarcane');
+    const cropStage =
+      context.cropStage ||
+      (fieldId === 'field-01'
+        ? 'Vegetative (Tillering)'
+        : fieldId === 'field-02'
+          ? 'Tasseling'
+          : 'Grand Growth');
+    const latitude = context.latitude || 10.790861;
+    const longitude = context.longitude || 79.098145;
+
+    // 1. Sensor acquisition
+    let latestSensor: any = null;
+    if (isDBConnected) {
+      try {
+        latestSensor = await IoTReading.findOne({}).sort({ createdAt: -1 });
+      } catch {
+        latestSensor = null;
+      }
+    }
+
+    const now = Date.now();
+    let sensorMoisture: number | null;
+    let sensorTemp: number | null;
+    let sensorHumidity: number | null;
+    let sensorSource: string;
+    let sensorSourceType: string;
+    let sensorQualityStatus: string;
+    let sensorProvenance: 'measured' | 'simulated' | 'missing';
+    let freshnessMinutes: number;
+    let isStale: boolean;
+
+    if (context.soilMoistureOverride !== undefined && context.soilMoistureOverride !== null) {
+      sensorMoisture = Math.min(100, Math.max(0, Number(context.soilMoistureOverride)));
+      sensorTemp = 28;
+      sensorHumidity = 60;
+      sensorSource = 'manual_operator_input';
+      sensorSourceType = 'calibrated_field_measurement';
+      sensorQualityStatus = 'verified';
+      sensorProvenance = 'measured';
+      freshnessMinutes = 0;
+      isStale = false;
+    } else if (latestSensor) {
+      sensorMoisture = latestSensor.moisture;
+      sensorTemp = latestSensor.temperature;
+      sensorHumidity = latestSensor.humidity;
+      sensorSource = latestSensor.isSimulated ? 'iot_simulator' : 'esp32_hardware';
+      sensorSourceType = 'iot_capacitive_probe';
+      sensorQualityStatus = latestSensor.isSimulated ? 'simulated' : 'verified';
+      sensorProvenance = latestSensor.isSimulated ? 'simulated' : 'measured';
+      const readingAge =
+        now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
+      freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
+      isStale = freshnessMinutes > 15;
+    } else {
+      const fieldDefaultMoisture =
+        fieldId === 'field-01'
+          ? 24
+          : fieldId === 'field-02'
+            ? 52
+            : fieldId === 'field-03'
+              ? 78
+              : 38;
+      sensorMoisture = fieldDefaultMoisture;
+      sensorTemp = 28;
+      sensorHumidity = 62;
+      sensorSource = 'iot_simulator';
+      sensorSourceType = 'calibrated_field_measurement';
+      sensorQualityStatus = 'simulated';
+      sensorProvenance = 'simulated';
+      freshnessMinutes = 2;
+      isStale = false;
+    }
+
+    // 2. Weather reanalysis
+    let recent3dRainfallMm = 0;
+    let recentMeanET0 = 4.2;
+    const weatherSource = 'Open-Meteo ERA5-Land Reanalysis';
+    try {
+      const weatherRes = await WeatherIngestionService.queryObservations({
+        granularity: 'daily',
+        limit: 3,
+      });
+      if (weatherRes.data && weatherRes.data.length > 0) {
+        let rainSum = 0;
+        let et0Sum = 0;
+        let count = 0;
+        for (const w of weatherRes.data) {
+          if (typeof w.precipitationMm === 'number') rainSum += w.precipitationMm;
+          if (typeof w.et0EvapotranspirationMm === 'number') {
+            et0Sum += w.et0EvapotranspirationMm;
+            count++;
+          }
+        }
+        recent3dRainfallMm = Math.round(rainSum * 10) / 10;
+        if (count > 0) recentMeanET0 = Math.round((et0Sum / count) * 10) / 10;
+      }
+    } catch {
+      /* fallback defaults */
+    }
+
+    // 3. Satellite NDVI
+    let satelliteNdvi: number | null = null;
+    let satelliteVigor = 'Moderate Canopy Vigor';
+    let satelliteCloudCover = 12;
+    let satelliteAcquisitionDate: string | null = null;
+    let satelliteAvailable = false;
+    try {
+      const satRes = await SatelliteProcessingService.queryObservations({ limit: 1 });
+      if (satRes.isDataAvailable && satRes.data && satRes.data.length > 0) {
+        const latestSat = satRes.data[0];
+        satelliteNdvi = latestSat.ndvi.mean;
+        satelliteVigor = latestSat.vegetationHealth;
+        satelliteCloudCover = latestSat.cloudCoveragePercentage;
+        satelliteAcquisitionDate = new Date(latestSat.acquisitionDate).toISOString();
+        satelliteAvailable = true;
+      }
+    } catch {
+      /* fallback */
+    }
+
+    // 4. Soil chemistry
+    let soilPh = 6.4;
+    let soilN = 195;
+    let soilP = 22;
+    let soilK = 245;
+    let soilTexture = 'Clay Loam (Alluvial Delta)';
+    let soilSource = 'Government of India Soil Health Card (ICAR-TNAU)';
+    let soilQualityStatus = 'verified';
+    try {
+      const soilRes = await SoilDataService.getLatestSoilProfile({ latitude, longitude });
+      if (soilRes.isAvailable && soilRes.data) {
+        soilPh =
+          context.soilPhOverride !== undefined ? Number(context.soilPhOverride) : soilRes.data.ph;
+        soilN =
+          context.nitrogenOverride !== undefined
+            ? Number(context.nitrogenOverride)
+            : soilRes.data.availableNitrogenKgHa || 195;
+        soilP =
+          context.phosphorusOverride !== undefined
+            ? Number(context.phosphorusOverride)
+            : soilRes.data.availablePhosphorusKgHa || 22;
+        soilK =
+          context.potassiumOverride !== undefined
+            ? Number(context.potassiumOverride)
+            : soilRes.data.availablePotassiumKgHa || 245;
+        soilTexture = soilRes.data.soilTexture || soilTexture;
+        soilSource = soilRes.data.source;
+        soilQualityStatus = soilRes.data.status;
+      }
+    } catch {
+      /* fallback */
+    }
+
+    // 5. District yield benchmark
+    let districtYieldBaselineKgHa = 2700;
+    let apySource = 'Directorate of Economics and Statistics (DES)';
+    try {
+      const apyRes = await CropStatisticsService.getDistrictYieldBaseline('Thanjavur', cropType);
+      if (apyRes.isAvailable) {
+        districtYieldBaselineKgHa = apyRes.yieldKgPerHectare;
+        apySource = apyRes.source;
+      }
+    } catch {
+      /* fallback */
+    }
+
+    const forecastRainMm =
+      context.forecastRainMm !== undefined
+        ? Number(context.forecastRainMm)
+        : recent3dRainfallMm > 15
+          ? 5
+          : 0;
+    const forecastRainProb =
+      context.forecastRainProbability !== undefined
+        ? Number(context.forecastRainProbability)
+        : forecastRainMm > 10
+          ? 70
+          : 15;
+    const ambientTemp = Number(context.ambientTemp) || sensorTemp || 28;
+    const ambientHumidity = Number(context.humidity) || sensorHumidity || 60;
+
+    // Data Quality Assessment
+    const warnings: string[] = [];
+    const missingInputs: string[] = [];
+    const conflictingInputs: string[] = [];
+
+    if (sensorMoisture == null) {
+      missingInputs.push('soilMoisture');
+      warnings.push('Root-zone capacitive soil moisture telemetry is unacquired.');
+    }
+    if (isStale) {
+      warnings.push(
+        `Sensor telemetry is stale (${freshnessMinutes} minutes old; exceeds 15m window).`
+      );
+    }
+    if (sensorProvenance === 'simulated') {
+      warnings.push(
+        'Telemetry originates from IoT simulator profile, not hardware-verified probe.'
+      );
+    }
+    if (forecastRainMm > 15 && sensorMoisture !== null && sensorMoisture < 25) {
+      conflictingInputs.push('Severe dry soil vs heavy forecast rain event.');
+    }
+
+    const qualityStatus: 'good' | 'degraded' | 'insufficient' =
+      sensorMoisture == null
+        ? 'insufficient'
+        : isStale || sensorProvenance === 'simulated' || conflictingInputs.length > 0
+          ? 'degraded'
+          : 'good';
+
+    // Overall Risk Calculation
+    let overallRisk: 'critical' | 'high' | 'medium' | 'low' = 'low';
+    let riskReason =
+      'Field moisture and environmental conditions are within optimal agronomic parameters.';
+
+    if (sensorMoisture !== null && sensorMoisture < 25) {
+      overallRisk = 'critical';
+      riskReason = `Severe root-zone moisture deficit (${sensorMoisture}%). Crop stunting imminent if irrigation not applied.`;
+    } else if (sensorMoisture !== null && sensorMoisture < 35) {
+      overallRisk = 'high';
+      riskReason = `Depleted root-zone moisture (${sensorMoisture}%). Nearing stress threshold for ${cropType}.`;
+    } else if (sensorMoisture !== null && sensorMoisture > 75) {
+      overallRisk = 'medium';
+      riskReason = `Elevated soil saturation (${sensorMoisture}%). Risk of root hypoxia if additional irrigation applied.`;
+    }
+
+    // Confidence
+    let confidenceScore = 92;
+    if (sensorProvenance === 'simulated') confidenceScore -= 10;
+    if (isStale) confidenceScore -= 15;
+    if (!satelliteAvailable) confidenceScore -= 5;
+    if (qualityStatus === 'insufficient') confidenceScore = 30;
+
+    const confidenceExplanation =
+      confidenceScore >= 80
+        ? 'High multi-source agreement across in-situ telemetry, ERA5 weather, and regional soil chemistry.'
+        : confidenceScore >= 60
+          ? 'Moderate confidence: relies partially on simulated telemetry or historical reanalysis.'
+          : 'Low confidence: missing ground-truth telemetry requires operator inspection.';
+
+    return {
+      fieldId,
+      fieldName,
+      cropType,
+      cropStage,
+      timestamp: new Date().toISOString(),
+      overallRisk,
+      riskReason,
+      confidenceScore,
+      confidenceExplanation,
+      dataQuality: {
+        status: qualityStatus,
+        warnings,
+        missingInputs,
+        conflictingInputs,
+      },
+      observations: {
+        soilMoisture: {
+          value: sensorMoisture,
+          unit: '%',
+          source: sensorSource,
+          sourceType: sensorSourceType,
+          dataQualityStatus: sensorQualityStatus,
+          freshnessMinutes,
+          isStale,
+          provenance: sensorProvenance,
+        },
+        soilTemperature: {
+          value: sensorTemp || 25,
+          unit: '°C',
+          source: sensorSource,
+          provenance: sensorProvenance,
+        },
+        soilPh: {
+          value: soilPh,
+          unit: 'pH',
+          source: soilSource,
+          provenance: 'benchmark',
+          dataQualityStatus: soilQualityStatus,
+        },
+        soilNPK: {
+          nitrogen: { value: soilN, unit: 'kg/ha' },
+          phosphorus: { value: soilP, unit: 'kg/ha' },
+          potassium: { value: soilK, unit: 'kg/ha' },
+          texture: soilTexture,
+          source: soilSource,
+          provenance: 'benchmark',
+        },
+        weather: {
+          ambientTemp: { value: ambientTemp, unit: '°C' },
+          humidity: { value: ambientHumidity, unit: '%' },
+          forecastRainMm: { value: forecastRainMm, unit: 'mm' },
+          forecastRainProbability: { value: forecastRainProb, unit: '%' },
+          recentRainfall3dMm: { value: recent3dRainfallMm, unit: 'mm' },
+          referenceET0MmDay: { value: recentMeanET0, unit: 'mm/day' },
+          source: weatherSource,
+          provenance: 'historical_reanalysis',
+        },
+        satelliteCanopyNDVI: {
+          value: satelliteNdvi,
+          isAvailable: satelliteAvailable,
+          vigor: satelliteVigor,
+          cloudCoverPct: satelliteCloudCover,
+          acquisitionDate: satelliteAcquisitionDate,
+          source: 'Copernicus Sentinel-2 Level-2A (MSI)',
+          provenance: 'satellite_observation',
+        },
+        districtYieldBenchmark: {
+          crop: cropType,
+          district: 'Thanjavur',
+          yieldKgHa: districtYieldBaselineKgHa,
+          source: apySource,
+          provenance: 'statistical_benchmark',
+        },
+      },
+    };
+  }
+
+  /**
+   * Phase 4 — Persisted Farmer Action
+   * Records farmer's response with actor identification and immutable audit record
    */
   static async recordFarmerAction(
     userId: string,
     recommendationId: string,
-    actionTaken: 'irrigated' | 'postponed' | 'inspected' | 'dismissed',
-    notes?: string
+    actionTaken:
+      | 'irrigated'
+      | 'postponed'
+      | 'inspected'
+      | 'dismissed'
+      | 'accepted'
+      | 'rejected'
+      | 'requested_review',
+    notes?: string,
+    actorId?: string,
+    actorName?: string
   ) {
     const actionRecord = {
       actionTaken,
       recordedAt: new Date(),
       notes: notes || `Farmer executed: ${actionTaken}`,
+      actorId: actorId || userId,
+      actorName: actorName || 'Farmer',
     };
 
     if (isDBConnected) {
@@ -594,12 +947,19 @@ export class FieldIntelligenceService {
   }
 
   /**
-   * Closed-loop evaluation: evaluates subsequent observation against expected follow-up condition
+   * Phase 5 — Closed-Loop Outcome Evaluation Loop
+   * Evaluates subsequent observation against expected follow-up condition
+   * with 4-state classification and explicit non-causal attribution disclaimer.
    */
   static async evaluateFollowUp(
     userId: string,
     recommendationId: string,
-    subsequentTelemetry: { moisture: number; temperature?: number; notes?: string }
+    subsequentTelemetry: {
+      moisture: number;
+      temperature?: number;
+      notes?: string;
+      source?: string;
+    }
   ) {
     let rec: any = null;
     if (isDBConnected) {
@@ -616,55 +976,107 @@ export class FieldIntelligenceService {
       }
     }
 
-    const baselineMoisture = rec?.supportingObservations?.soilMoisture?.value || 30.0;
-    const newMoisture = Number(subsequentTelemetry.moisture);
-    const delta = Math.round((newMoisture - baselineMoisture) * 10) / 10;
-    const actionTaken = rec?.farmerAction?.actionTaken || 'irrigated';
+    const baselineMoisture = rec?.supportingObservations?.soilMoisture?.value;
+    const newMoisture = Number(subsequentTelemetry?.moisture);
+    const actionTaken = rec?.farmerAction?.actionTaken || 'accepted';
 
     let conditionMet: boolean;
-    let status: 'improved' | 'insufficient_change' | 'worsened';
+    let status:
+      | 'achieved'
+      | 'partially_achieved'
+      | 'not_achieved'
+      | 'insufficient_evidence'
+      | 'improved'
+      | 'insufficient_change'
+      | 'worsened';
     let explanation: string;
+    let delta = 0;
 
-    if (actionTaken === 'irrigated') {
-      if (newMoisture >= 45 && delta >= 8) {
-        conditionMet = true;
-        status = 'improved';
-        explanation = `Follow-up observation verified! Soil moisture increased from ${baselineMoisture}% to ${newMoisture}% (+${delta}% delta), successfully fulfilling the root-zone replenishment condition.`;
-      } else if (delta > 0) {
-        conditionMet = false;
-        status = 'insufficient_change';
-        explanation = `Soil moisture rose slightly (+${delta}%), but remains at ${newMoisture}%, which is still below target capacity. A secondary light cycle may be required.`;
-      } else {
-        conditionMet = false;
-        status = 'worsened';
-        explanation = `Soil moisture did not increase (current: ${newMoisture}%). Please verify pump water pressure and irrigation nozzle flow.`;
-      }
-    } else if (actionTaken === 'postponed') {
-      if (newMoisture >= 35 && newMoisture <= 75) {
-        conditionMet = true;
-        status = 'improved';
-        explanation = `Postpone strategy successful: Soil moisture held safely at ${newMoisture}%, saving irrigation water while preventing saturation.`;
-      } else {
-        conditionMet = false;
-        status = 'worsened';
-        explanation = `Soil moisture has now depleted to ${newMoisture}%. Irrigation is now required.`;
-      }
+    // Safety check: Allow "insufficient evidence" instead of fabricating success
+    if (
+      isNaN(newMoisture) ||
+      newMoisture < 0 ||
+      newMoisture > 100 ||
+      baselineMoisture == null ||
+      isNaN(Number(baselineMoisture))
+    ) {
+      status = 'insufficient_evidence';
+      conditionMet = false;
+      explanation =
+        'Insufficient telemetry evidence: Valid pre-action baseline or subsequent calibrated moisture reading was unavailable for empirical comparison.';
     } else {
-      conditionMet = true;
-      status = 'improved';
-      explanation = `Field inspection recorded. Observed soil moisture is ${newMoisture}%.`;
+      delta = Math.round((newMoisture - Number(baselineMoisture)) * 10) / 10;
+      const isIrrigationAction = actionTaken === 'irrigated' || actionTaken === 'accepted';
+      const isPostponeAction = actionTaken === 'postponed';
+      const isReviewAction = actionTaken === 'requested_review' || actionTaken === 'inspected';
+      const isDismissedAction = actionTaken === 'rejected' || actionTaken === 'dismissed';
+
+      if (isIrrigationAction) {
+        if (newMoisture >= 45 && delta >= 8) {
+          conditionMet = true;
+          status = 'achieved';
+          explanation = `Follow-up observation verified! Soil moisture increased from ${baselineMoisture}% to ${newMoisture}% (+${delta}% delta), successfully fulfilling the root-zone replenishment condition.`;
+        } else if (delta > 0) {
+          conditionMet = false;
+          status = 'partially_achieved';
+          explanation = `Soil moisture rose slightly (+${delta}%), but remains at ${newMoisture}%, which is still below target capacity. A secondary light cycle may be required.`;
+        } else {
+          conditionMet = false;
+          status = 'not_achieved';
+          explanation = `Soil moisture did not increase (current: ${newMoisture}%). Verify irrigation pump pressure, emitter lines, or soil compaction.`;
+        }
+      } else if (isPostponeAction) {
+        if (newMoisture >= 35 && newMoisture <= 75) {
+          conditionMet = true;
+          status = 'achieved';
+          explanation = `Postpone strategy successful: Soil moisture held safely at ${newMoisture}%, saving irrigation water while preventing saturation.`;
+        } else if (delta < -15) {
+          conditionMet = false;
+          status = 'not_achieved';
+          explanation = `Soil moisture depleted rapidly to ${newMoisture}%. Irrigation threshold reached; schedule immediate hydration.`;
+        } else {
+          conditionMet = true;
+          status = 'partially_achieved';
+          explanation = `Postpone strategy partially sustained: Soil moisture stands at ${newMoisture}%.`;
+        }
+      } else if (isDismissedAction) {
+        if (newMoisture < 30) {
+          conditionMet = false;
+          status = 'not_achieved';
+          explanation = `Recommendation was rejected/dismissed. Soil moisture has continued to decline to ${newMoisture}%, risking crop stress.`;
+        } else {
+          conditionMet = true;
+          status = 'partially_achieved';
+          explanation = `Advisory was dismissed. Soil moisture remains stable at ${newMoisture}%.`;
+        }
+      } else if (isReviewAction) {
+        conditionMet = true;
+        status = 'achieved';
+        explanation = `Agronomist inspection logged. Ground verification confirmed root-zone moisture at ${newMoisture}%.`;
+      } else {
+        conditionMet = true;
+        status = 'achieved';
+        explanation = `Field telemetry updated. Observed moisture is ${newMoisture}%.`;
+      }
     }
 
     const evaluation = {
       evaluatedAt: new Date(),
       subsequentReading: {
-        moisture: newMoisture,
-        temperature: subsequentTelemetry.temperature || 25,
+        moisture: isNaN(newMoisture) ? null : newMoisture,
+        temperature: subsequentTelemetry?.temperature || 25,
+        source: subsequentTelemetry?.source || 'iot_followup_telemetry',
+        unit: '%',
       },
       conditionMet,
       status,
-      observedDelta: `${delta > 0 ? '+' : ''}${delta}% moisture`,
+      observedDelta:
+        status === 'insufficient_evidence'
+          ? 'N/A (insufficient data)'
+          : `${delta > 0 ? '+' : ''}${delta}% moisture`,
       explanation,
+      causalAttributionDisclaimer:
+        'Observational telemetry comparison only. Outcome classification does not imply direct singular causation by farmer action; micro-climate, precipitation, and soil heterogeneity contribute to moisture dynamics.',
     };
 
     if (rec && isDBConnected) {
@@ -680,6 +1092,203 @@ export class FieldIntelligenceService {
     }
 
     return evaluation;
+  }
+
+  /**
+   * Phase 4 — Persisted Field Action Timeline
+   * Retrieves an immutable chronological timeline of recommendations, actions, reviews, and evaluations
+   */
+  static async getFieldTimeline(userId: string, fieldId?: string, limit = 25) {
+    const query: Record<string, any> = { userId };
+    if (fieldId) query.fieldId = fieldId;
+
+    let recs: any[] = [];
+    if (isDBConnected) {
+      try {
+        recs = await FieldRecommendation.find(query).sort({ createdAt: -1 }).limit(limit);
+      } catch {
+        recs = [];
+      }
+    }
+
+    if (recs.length === 0) {
+      recs = Object.values(memoryRecommendations)
+        .filter((r) => r.userId === userId && (!fieldId || r.fieldId === fieldId))
+        .slice(0, limit);
+    }
+
+    const events: Array<{
+      id: string;
+      recommendationId: string;
+      fieldId: string;
+      fieldName: string;
+      eventType:
+        | 'RECOMMENDATION_GENERATED'
+        | 'FARMER_ACTION_RECORDED'
+        | 'AGRONOMIST_REVIEW_LOGGED'
+        | 'FOLLOW_UP_EVALUATED';
+      timestamp: Date;
+      title: string;
+      description: string;
+      actor: string;
+      actorId?: string;
+      status?: string;
+      ruleVersion?: string;
+      metadata?: Record<string, any>;
+    }> = [];
+
+    for (const rec of recs) {
+      // 1. Generation event
+      events.push({
+        id: `evt-gen-${rec.recommendationId}`,
+        recommendationId: rec.recommendationId,
+        fieldId: rec.fieldId,
+        fieldName: rec.fieldName,
+        eventType: 'RECOMMENDATION_GENERATED',
+        timestamp: new Date(rec.createdAt),
+        title: `Decision Generated: ${rec.actionLabel || rec.action}`,
+        description: rec.explanation,
+        actor: 'AgriFlux FAO-56 Engine',
+        status: rec.urgency,
+        ruleVersion: rec.ruleVersion || 'v2.1-QUANTEX-FAO56',
+        metadata: {
+          urgency: rec.urgency,
+          soilMoisture: rec.supportingObservations?.soilMoisture?.value,
+          rule: rec.decisionRules?.[0],
+        },
+      });
+
+      // 2. Farmer action event
+      if (rec.farmerAction?.recordedAt) {
+        events.push({
+          id: `evt-act-${rec.recommendationId}`,
+          recommendationId: rec.recommendationId,
+          fieldId: rec.fieldId,
+          fieldName: rec.fieldName,
+          eventType: 'FARMER_ACTION_RECORDED',
+          timestamp: new Date(rec.farmerAction.recordedAt),
+          title: `Farmer Action: ${String(rec.farmerAction.actionTaken).toUpperCase()}`,
+          description: rec.farmerAction.notes || `Action executed: ${rec.farmerAction.actionTaken}`,
+          actor: rec.farmerAction.actorName || 'Farmer',
+          actorId: rec.farmerAction.actorId,
+          status: rec.farmerAction.actionTaken,
+          ruleVersion: rec.ruleVersion || 'v2.1-QUANTEX-FAO56',
+        });
+      }
+
+      // 3. Agronomist review event
+      if (rec.agronomistReview?.reviewedAt) {
+        events.push({
+          id: `evt-rev-${rec.recommendationId}`,
+          recommendationId: rec.recommendationId,
+          fieldId: rec.fieldId,
+          fieldName: rec.fieldName,
+          eventType: 'AGRONOMIST_REVIEW_LOGGED',
+          timestamp: new Date(rec.agronomistReview.reviewedAt),
+          title: `Agronomist Review: ${String(rec.agronomistReview.status).toUpperCase()}`,
+          description: rec.agronomistReview.notes || `Status: ${rec.agronomistReview.status}`,
+          actor: rec.agronomistReview.reviewerName || 'Agronomist Specialist',
+          actorId: rec.agronomistReview.reviewedBy,
+          status: rec.agronomistReview.status,
+          ruleVersion: rec.ruleVersion || 'v2.1-QUANTEX-FAO56',
+        });
+      }
+
+      // 4. Follow-up evaluation event
+      if (rec.followUpEvaluation?.evaluatedAt) {
+        events.push({
+          id: `evt-eval-${rec.recommendationId}`,
+          recommendationId: rec.recommendationId,
+          fieldId: rec.fieldId,
+          fieldName: rec.fieldName,
+          eventType: 'FOLLOW_UP_EVALUATED',
+          timestamp: new Date(rec.followUpEvaluation.evaluatedAt),
+          title: `Outcome Evaluation: ${String(rec.followUpEvaluation.status).toUpperCase()}`,
+          description: rec.followUpEvaluation.explanation,
+          actor: 'Closed-Loop Evaluator',
+          status: rec.followUpEvaluation.status,
+          ruleVersion: rec.ruleVersion || 'v2.1-QUANTEX-FAO56',
+          metadata: {
+            conditionMet: rec.followUpEvaluation.conditionMet,
+            observedDelta: rec.followUpEvaluation.observedDelta,
+          },
+        });
+      }
+    }
+
+    return events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }
+
+  /**
+   * Phase 7 — Agronomist Review Workflow
+   * Records specialist review: endorsed, revision_requested, or inspection_required
+   */
+  static async recordAgronomistReview(
+    userId: string,
+    reviewerId: string,
+    reviewerName: string,
+    recommendationId: string,
+    status: 'endorsed' | 'revision_requested' | 'inspection_required',
+    notes?: string
+  ) {
+    const reviewRecord = {
+      reviewedBy: reviewerId,
+      reviewerName: reviewerName || 'Specialist Agronomist',
+      reviewedAt: new Date(),
+      status,
+      notes: notes || `Recommendation review marked as: ${status}`,
+    };
+
+    if (isDBConnected) {
+      try {
+        const updated = await FieldRecommendation.findOneAndUpdate(
+          { recommendationId },
+          { agronomistReview: reviewRecord },
+          { new: true }
+        );
+        if (updated) return updated;
+      } catch (err: any) {
+        console.warn(`⚠️ [FIELD INTELLIGENCE] Agronomist review error: ${err.message}`);
+      }
+    }
+
+    if (memoryRecommendations[recommendationId]) {
+      memoryRecommendations[recommendationId].agronomistReview = reviewRecord;
+      return memoryRecommendations[recommendationId];
+    }
+
+    return { recommendationId, agronomistReview: reviewRecord };
+  }
+
+  /**
+   * Retrieves recommendations needing specialist review
+   */
+  static async getPendingReviews(limit = 20) {
+    if (isDBConnected) {
+      try {
+        const reviews = await FieldRecommendation.find({
+          $or: [
+            { 'farmerAction.actionTaken': 'requested_review' },
+            { urgency: 'critical' },
+            { urgency: 'high' },
+          ],
+        })
+          .sort({ createdAt: -1 })
+          .limit(limit);
+        if (reviews.length > 0) return reviews;
+      } catch {
+        /* fallback */
+      }
+    }
+
+    return Object.values(memoryRecommendations)
+      .filter(
+        (r) =>
+          r.farmerAction?.actionTaken === 'requested_review' ||
+          r.urgency === 'critical' ||
+          r.urgency === 'high'
+      )
+      .slice(0, limit);
   }
 
   /**

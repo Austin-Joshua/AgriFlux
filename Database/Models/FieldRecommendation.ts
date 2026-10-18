@@ -31,18 +31,43 @@ export interface IFieldRecommendation extends Document {
     description: string;
   };
   farmerAction?: {
-    actionTaken: 'irrigated' | 'postponed' | 'inspected' | 'dismissed';
+    actionTaken:
+      | 'irrigated'
+      | 'postponed'
+      | 'inspected'
+      | 'dismissed'
+      | 'accepted'
+      | 'rejected'
+      | 'requested_review';
     recordedAt: Date;
     notes?: string;
+    actorId?: string;
+    actorName?: string;
   };
   followUpEvaluation?: {
     evaluatedAt: Date;
     subsequentReading: Record<string, any>;
     conditionMet: boolean;
-    status: 'improved' | 'insufficient_change' | 'worsened' | 'pending';
+    status:
+      | 'achieved'
+      | 'partially_achieved'
+      | 'not_achieved'
+      | 'insufficient_evidence'
+      | 'improved'
+      | 'insufficient_change'
+      | 'worsened'
+      | 'pending';
     observedDelta: string;
     explanation: string;
   };
+  agronomistReview?: {
+    reviewedBy: string;
+    reviewerName: string;
+    reviewedAt: Date;
+    status: 'endorsed' | 'revision_requested' | 'inspection_required';
+    notes: string;
+  };
+  ruleVersion?: string;
   createdAt: Date;
 }
 
@@ -55,6 +80,7 @@ const FieldRecommendationSchema: Schema = new Schema(
     fieldName: { type: String, required: true },
     cropType: { type: String, required: true },
     cropStage: { type: String, default: 'Vegetative' },
+    ruleVersion: { type: String, default: 'v2.1-QUANTEX-FAO56' },
     action: {
       type: String,
       enum: [
@@ -90,10 +116,20 @@ const FieldRecommendationSchema: Schema = new Schema(
     farmerAction: {
       actionTaken: {
         type: String,
-        enum: ['irrigated', 'postponed', 'inspected', 'dismissed'],
+        enum: [
+          'irrigated',
+          'postponed',
+          'inspected',
+          'dismissed',
+          'accepted',
+          'rejected',
+          'requested_review',
+        ],
       },
       recordedAt: { type: Date },
       notes: { type: String },
+      actorId: { type: String },
+      actorName: { type: String },
     },
     followUpEvaluation: {
       evaluatedAt: { type: Date },
@@ -101,16 +137,36 @@ const FieldRecommendationSchema: Schema = new Schema(
       conditionMet: { type: Boolean },
       status: {
         type: String,
-        enum: ['improved', 'insufficient_change', 'worsened', 'pending'],
+        enum: [
+          'achieved',
+          'partially_achieved',
+          'not_achieved',
+          'insufficient_evidence',
+          'improved',
+          'insufficient_change',
+          'worsened',
+          'pending',
+        ],
       },
       observedDelta: { type: String },
       explanation: { type: String },
+    },
+    agronomistReview: {
+      reviewedBy: { type: String },
+      reviewerName: { type: String },
+      reviewedAt: { type: Date },
+      status: {
+        type: String,
+        enum: ['endorsed', 'revision_requested', 'inspection_required'],
+      },
+      notes: { type: String },
     },
   },
   { timestamps: true }
 );
 
 FieldRecommendationSchema.index({ userId: 1, fieldId: 1, createdAt: -1 });
+FieldRecommendationSchema.index({ fieldId: 1, createdAt: -1 });
 FieldRecommendationSchema.index({ recommendationId: 1 });
 
 export default mongoose.model<IFieldRecommendation>(

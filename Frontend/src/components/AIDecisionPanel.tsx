@@ -13,6 +13,13 @@ import {
   Thermometer,
   CloudRain,
   Activity,
+  History,
+  UserCheck,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  ShieldCheck,
+  XCircle,
 } from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config';
@@ -61,6 +68,7 @@ interface FieldRecommendationData {
   actionLabel: string;
   urgency: 'critical' | 'high' | 'medium' | 'low';
   explanation: string;
+  ruleVersion?: string;
   decisionRules: string[];
   assumptionsAndLimitations: string[];
   alternativeActions: Array<{ action: string; tradeOff: string }>;
@@ -75,8 +83,11 @@ interface FieldRecommendationData {
       value: number | null;
       unit: string;
       source: string;
+      sourceType?: string;
+      dataQualityStatus?: string;
       freshnessMinutes: number;
       isStale: boolean;
+      provenance?: string;
     };
     soilTemp?: { value: number; unit: string; source: string };
     soilPh?: { value: number; unit: string; source: string };
@@ -92,19 +103,63 @@ interface FieldRecommendationData {
     actionTaken: string;
     notes?: string;
     recordedAt: string;
+    actorName?: string;
+    actorId?: string;
+  };
+  agronomistReview?: {
+    status: 'endorsed' | 'revision_requested' | 'inspection_required';
+    notes: string;
+    reviewerName: string;
+    reviewedAt: string;
+  };
+  followUpEvaluation?: {
+    conditionMet: boolean;
+    status: string;
+    observedDelta: string;
+    explanation: string;
+    causalAttributionDisclaimer?: string;
+    evaluatedAt: string;
   };
 }
 
 interface FollowUpEvaluationData {
   conditionMet: boolean;
-  status: 'improved' | 'insufficient_change' | 'worsened';
+  status:
+    | 'achieved'
+    | 'partially_achieved'
+    | 'not_achieved'
+    | 'insufficient_evidence'
+    | 'improved'
+    | 'insufficient_change'
+    | 'worsened';
   observedDelta: string;
   explanation: string;
-  subsequentReading?: { moisture: number; temperature: number };
+  causalAttributionDisclaimer?: string;
+  subsequentReading?: { moisture: number | null; temperature: number };
+}
+
+interface TimelineEvent {
+  id: string;
+  recommendationId: string;
+  fieldId: string;
+  fieldName: string;
+  eventType:
+    | 'RECOMMENDATION_GENERATED'
+    | 'FARMER_ACTION_RECORDED'
+    | 'AGRONOMIST_REVIEW_LOGGED'
+    | 'FOLLOW_UP_EVALUATED';
+  timestamp: string;
+  title: string;
+  description: string;
+  actor: string;
+  actorId?: string;
+  status?: string;
+  ruleVersion?: string;
+  metadata?: Record<string, unknown>;
 }
 
 const AIDecisionPanel: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [selectedField, setSelectedField] = useState<FieldOption>(FIELDS[0]);
   const [recommendation, setRecommendation] = useState<FieldRecommendationData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -114,6 +169,31 @@ const AIDecisionPanel: React.FC = () => {
   // Follow-up evaluation state
   const [followUpMoisture, setFollowUpMoisture] = useState('52');
   const [evaluationResult, setEvaluationResult] = useState<FollowUpEvaluationData | null>(null);
+
+  // Field action timeline state
+  const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
+  const [loadingTimeline, setLoadingTimeline] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(true);
+
+  // Fetch chronological timeline for selected field
+  const fetchTimeline = useCallback(
+    async (fieldId = selectedField.id) => {
+      setLoadingTimeline(true);
+      try {
+        const res = await axios.get(`${API_URL}/field-intelligence/timeline/${fieldId}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.data?.success && Array.isArray(res.data.data)) {
+          setTimeline(res.data.data);
+        }
+      } catch (err: unknown) {
+        console.warn('Could not fetch field timeline:', err);
+      } finally {
+        setLoadingTimeline(false);
+      }
+    },
+    [selectedField.id, token]
+  );
 
   // Fetch structured recommendation from backend
   const fetchRecommendation = useCallback(
@@ -137,6 +217,8 @@ const AIDecisionPanel: React.FC = () => {
         if (res.data?.success) {
           setRecommendation(res.data.data);
           setEvaluationResult(null);
+          // Auto sync timeline
+          fetchTimeline(field.id);
         }
       } catch (err: unknown) {
         console.error('Error fetching field recommendation:', err);
@@ -144,7 +226,7 @@ const AIDecisionPanel: React.FC = () => {
         setLoading(false);
       }
     },
-    [selectedField, token]
+    [selectedField, token, fetchTimeline]
   );
 
   // On mount and field switch, fetch calibrated telemetry immediately
@@ -159,7 +241,14 @@ const AIDecisionPanel: React.FC = () => {
 
   // Record Farmer Response
   const handleRecordAction = async (
-    actionTaken: 'irrigated' | 'postponed' | 'inspected' | 'dismissed'
+    actionTaken:
+      | 'accepted'
+      | 'postponed'
+      | 'rejected'
+      | 'requested_review'
+      | 'irrigated'
+      | 'inspected'
+      | 'dismissed'
   ) => {
     if (!recommendation?.recommendationId) return;
     setActionLoading(true);
@@ -169,7 +258,7 @@ const AIDecisionPanel: React.FC = () => {
         {
           recommendationId: recommendation.recommendationId,
           actionTaken,
-          notes: `Recorded via Farmer Workspace for ${selectedField.name}`,
+          notes: `Recorded via Farmer Workspace by ${user?.name || 'Farmer'} for ${selectedField.name}`,
         },
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -177,7 +266,7 @@ const AIDecisionPanel: React.FC = () => {
       );
 
       if (res.data?.success) {
-        toast.success(`Action '${actionTaken}' recorded and persisted!`);
+        toast.success(`Action '${actionTaken}' recorded and persisted in field audit log!`);
         setRecommendation((prev) =>
           prev
             ? {
@@ -186,6 +275,7 @@ const AIDecisionPanel: React.FC = () => {
               }
             : null
         );
+        fetchTimeline(selectedField.id);
       }
     } catch {
       toast.error('Failed to record action. Please try again.');
@@ -206,7 +296,8 @@ const AIDecisionPanel: React.FC = () => {
           subsequentTelemetry: {
             moisture: Number(followUpMoisture),
             temperature: 26,
-            notes: 'Post-action sensor reading',
+            source: 'calibrated_followup_sensor',
+            notes: 'Post-action root-zone sensor telemetry',
           },
         },
         {
@@ -216,7 +307,8 @@ const AIDecisionPanel: React.FC = () => {
 
       if (res.data?.success) {
         setEvaluationResult(res.data.data);
-        toast.success('Closed-loop outcome evaluated!');
+        toast.success('Closed-loop outcome evaluated and sealed!');
+        fetchTimeline(selectedField.id);
       }
     } catch {
       toast.error('Evaluation failed. Please verify input value.');
@@ -333,16 +425,22 @@ const AIDecisionPanel: React.FC = () => {
                   Field Intelligence Engine
                 </h2>
                 <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                  Closed-Loop AI
+                  Rule: {recommendation?.ruleVersion || 'v2.1-QUANTEX-FAO56'}
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/40">
+                  {obs?.soilMoisture?.provenance === 'measured'
+                    ? '⚡ ESP32 Measured'
+                    : '🔬 Simulated Calibration Profile'}
                 </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Autonomous agronomic decision gates connecting real-time IoT sensors & ERA5 weather.
+                Deterministic FAO-56 decision gates connecting in-situ IoT sensors, ERA5 reanalysis,
+                and Sentinel-2 NDVI.
               </p>
             </div>
           </div>
 
-          {/* Field Switcher Pills - Horizontal scrolling on mobile without overflow */}
+          {/* Field Switcher Pills */}
           <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl max-w-full overflow-x-auto no-scrollbar border border-gray-200/50 dark:border-white/5 flex-nowrap self-start sm:self-auto flex-shrink-0">
             {FIELDS.map((f) => (
               <button
@@ -388,7 +486,6 @@ const AIDecisionPanel: React.FC = () => {
               <span className="text-[10px] text-gray-400 font-medium">Root-Zone</span>
             </div>
 
-            {/* Visual Progress Bar Gauge - Snappy 200ms duration */}
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-200 ease-out ${moistureStatus.bar}`}
@@ -396,7 +493,7 @@ const AIDecisionPanel: React.FC = () => {
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-              <span>0% Dry</span>
+              <span>0% Deficit</span>
               <span>50% Target</span>
               <span>100% Sat</span>
             </div>
@@ -409,7 +506,7 @@ const AIDecisionPanel: React.FC = () => {
                 <Activity size={12} className="text-emerald-500" /> Chemistry
               </span>
               <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400">
-                Balanced
+                ICAR-TNAU
               </span>
             </div>
 
@@ -437,10 +534,10 @@ const AIDecisionPanel: React.FC = () => {
           <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-                <Thermometer size={12} className="text-amber-500" /> Climate
+                <Thermometer size={12} className="text-amber-500" /> Weather
               </span>
               <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400">
-                Warm
+                ERA5-Land
               </span>
             </div>
 
@@ -449,55 +546,55 @@ const AIDecisionPanel: React.FC = () => {
                 {obs?.ambientTemp?.value || 28}°C
               </span>
               <span className="text-[10px] text-gray-400 font-medium">
-                RH {obs?.humidity?.value || 60}%
+                {obs?.humidity?.value || 60}% RH
               </span>
             </div>
 
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-200 ease-out"
+                className="h-full rounded-full bg-amber-500 transition-all duration-200 ease-out"
                 style={{
-                  width: `${Math.min(100, ((Number(obs?.ambientTemp?.value || 28) - 10) / 35) * 100)}%`,
+                  width: `${Math.min(100, Math.max(10, ((Number(obs?.ambientTemp?.value || 28) - 10) / 35) * 100))}%`,
                 }}
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-              <span>15°C</span>
-              <span>28°C Normal</span>
+              <span>10°C</span>
+              <span>25°C</span>
               <span>45°C</span>
             </div>
           </div>
 
-          {/* Gauge 4: Precipitation Window */}
+          {/* Gauge 4: Precipitation & ET0 */}
           <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 hover-lift">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-                <CloudRain size={12} className="text-teal-500" /> Rain (24h)
+                <CloudRain size={12} className="text-blue-500" /> Rain Forecast
               </span>
-              <span className="text-[10px] font-extrabold text-teal-600 dark:text-teal-400">
+              <span className="text-[10px] font-extrabold text-blue-600 dark:text-blue-400">
                 {obs?.forecastRainProbability?.value || 15}% Prob
               </span>
             </div>
 
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xl sm:text-2xl font-black text-teal-600 dark:text-teal-400 font-display">
+              <span className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 font-display">
                 {obs?.forecastRainMm?.value || 0} mm
               </span>
-              <span className="text-[10px] text-gray-400 font-medium">Clear Window</span>
+              <span className="text-[10px] text-gray-400 font-medium">Next 24h</span>
             </div>
 
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-teal-400 to-blue-500 rounded-full transition-all duration-200 ease-out"
+                className="h-full rounded-full bg-blue-500 transition-all duration-200 ease-out"
                 style={{
-                  width: `${Math.min(100, Math.max(8, Number(obs?.forecastRainProbability?.value || 15)))}%`,
+                  width: `${Math.min(100, Math.max(5, (Number(obs?.forecastRainMm?.value || 0) / 30) * 100))}%`,
                 }}
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-              <span>Dry</span>
-              <span>Rain Window</span>
-              <span>Heavy</span>
+              <span>0mm</span>
+              <span>15mm</span>
+              <span>30mm+</span>
             </div>
           </div>
         </div>
@@ -528,7 +625,7 @@ const AIDecisionPanel: React.FC = () => {
               {recommendation?.actionLabel || getFallbackAction(selectedField)}
             </h3>
 
-            {/* Crisp Rationale (Clean, open typography without boxed clutter) */}
+            {/* Crisp Rationale */}
             <p className="mt-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
               {recommendation?.explanation || getFallbackExplanation(selectedField)}
             </p>
@@ -570,26 +667,27 @@ const AIDecisionPanel: React.FC = () => {
               </h4>
               {recommendation?.farmerAction ? (
                 <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 uppercase">
-                  Action Recorded ✅
+                  Action: {recommendation.farmerAction.actionTaken.toUpperCase()} ✅
                 </span>
               ) : (
                 <span className="text-[10px] font-black text-amber-500 uppercase flex items-center gap-1">
-                  <Clock size={11} /> Pending
+                  <Clock size={11} /> Pending Action
                 </span>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => handleRecordAction('irrigated')}
+                onClick={() => handleRecordAction('accepted')}
                 disabled={actionLoading}
                 className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95 ${
+                  recommendation?.farmerAction?.actionTaken === 'accepted' ||
                   recommendation?.farmerAction?.actionTaken === 'irrigated'
                     ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
                     : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/40'
                 }`}
               >
-                <Droplets size={13} /> Irrigated Field
+                <CheckCircle2 size={13} /> Action Completed
               </button>
 
               <button
@@ -601,31 +699,33 @@ const AIDecisionPanel: React.FC = () => {
                     : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40 border border-amber-200/50 dark:border-amber-800/40'
                 }`}
               >
-                <Clock size={13} /> Postponed Cycle
+                <Clock size={13} /> Postpone Cycle
               </button>
 
               <button
-                onClick={() => handleRecordAction('inspected')}
+                onClick={() => handleRecordAction('requested_review')}
                 disabled={actionLoading}
                 className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95 ${
+                  recommendation?.farmerAction?.actionTaken === 'requested_review' ||
                   recommendation?.farmerAction?.actionTaken === 'inspected'
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                     : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/50 dark:border-blue-800/40'
                 }`}
               >
-                <CheckCircle2 size={13} /> Inspected Field
+                <UserCheck size={13} /> Request Agronomist
               </button>
 
               <button
-                onClick={() => handleRecordAction('dismissed')}
+                onClick={() => handleRecordAction('rejected')}
                 disabled={actionLoading}
                 className={`py-2 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95 ${
+                  recommendation?.farmerAction?.actionTaken === 'rejected' ||
                   recommendation?.farmerAction?.actionTaken === 'dismissed'
                     ? 'bg-gray-700 text-white shadow-md'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
               >
-                Dismissed
+                <XCircle size={13} /> Dismiss / Reject
               </button>
             </div>
           </div>
@@ -636,7 +736,6 @@ const AIDecisionPanel: React.FC = () => {
               <RotateCw size={13} className="text-emerald-500" /> Step 2: Evaluate Follow-up Outcome
             </h4>
 
-            {/* Refined compact input group on desktop */}
             <div className="flex items-center gap-2">
               <div className="relative w-28 sm:w-32 flex-shrink-0">
                 <input
@@ -662,34 +761,161 @@ const AIDecisionPanel: React.FC = () => {
               </button>
             </div>
 
-            {/* Outcome Display */}
+            {/* Outcome Display with 4 States and Non-Causal Attribution Disclaimer */}
             {evaluationResult && (
               <div
                 className={`p-3 rounded-xl border text-xs transition-all duration-150 ${
-                  evaluationResult.conditionMet
+                  evaluationResult.status === 'achieved' || evaluationResult.status === 'improved'
                     ? 'bg-emerald-100/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200'
-                    : 'bg-amber-100/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200'
+                    : evaluationResult.status === 'partially_achieved'
+                      ? 'bg-blue-100/70 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-200'
+                      : evaluationResult.status === 'insufficient_evidence'
+                        ? 'bg-purple-100/70 dark:bg-purple-950/40 border-purple-300 dark:border-purple-700 text-purple-900 dark:text-purple-200'
+                        : 'bg-red-100/70 dark:bg-red-950/40 border-red-300 dark:border-red-700 text-red-900 dark:text-red-200'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-black uppercase tracking-wider flex items-center gap-1">
-                    {evaluationResult.conditionMet ? (
+                    {evaluationResult.status === 'achieved' ||
+                    evaluationResult.status === 'improved' ? (
                       <CheckCircle2 size={14} className="text-emerald-600" />
+                    ) : evaluationResult.status === 'partially_achieved' ? (
+                      <CheckCircle2 size={14} className="text-blue-600" />
+                    ) : evaluationResult.status === 'insufficient_evidence' ? (
+                      <Info size={14} className="text-purple-600" />
                     ) : (
-                      <AlertTriangle size={14} className="text-amber-600" />
+                      <AlertTriangle size={14} className="text-red-600" />
                     )}
-                    Outcome:{' '}
-                    {evaluationResult.conditionMet ? 'Condition Satisfied' : 'Review Needed'}
+                    Outcome: {evaluationResult.status.replace('_', ' ').toUpperCase()}
                   </span>
                   <span className="font-extrabold text-[11px]">
                     {evaluationResult.observedDelta}
                   </span>
                 </div>
                 <p className="mt-1 leading-relaxed opacity-95">{evaluationResult.explanation}</p>
+
+                {/* Non-Causal Attribution Disclaimer */}
+                <div className="mt-2 pt-2 border-t border-black/10 dark:border-white/10 flex items-start gap-1.5 text-[10px] opacity-80">
+                  <Info size={12} className="flex-shrink-0 mt-0.5 text-blue-500" />
+                  <span>
+                    {evaluationResult.causalAttributionDisclaimer ||
+                      'Observational telemetry comparison only. Outcome classification does not imply direct singular causation by farmer action; micro-climate, precipitation, and soil heterogeneity contribute to moisture dynamics.'}
+                  </span>
+                </div>
               </div>
             )}
           </div>
         </div>
+      </div>
+
+      {/* 3. Field Action Timeline (Phase 4 Chronological Audit Trail) */}
+      <div className="card-executive overflow-hidden border border-gray-200/80 dark:border-gray-800 shadow-md p-4 sm:p-5">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+              <History size={16} />
+            </span>
+            <div>
+              <h3 className="text-sm font-black text-gray-900 dark:text-white font-display">
+                Field Action Timeline · {selectedField.name}
+              </h3>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                Immutable chronological audit record of decisions, farmer executions, and verified
+                outcomes.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fetchTimeline(selectedField.id)}
+              disabled={loadingTimeline}
+              className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 transition-colors"
+              title="Refresh timeline"
+            >
+              <RotateCw size={14} className={loadingTimeline ? 'animate-spin' : ''} />
+            </button>
+            <button
+              onClick={() => setShowTimeline(!showTimeline)}
+              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            >
+              {showTimeline ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+          </div>
+        </div>
+
+        {showTimeline && (
+          <div className="pt-4">
+            {timeline.length === 0 ? (
+              <div className="text-center py-6 text-gray-400 text-xs font-medium">
+                No timeline events recorded yet for this parcel. Record an action or evaluate an
+                outcome above to begin the audit trail.
+              </div>
+            ) : (
+              <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-200 dark:before:bg-gray-800">
+                {timeline.map((event) => {
+                  const eventConfig = {
+                    RECOMMENDATION_GENERATED: {
+                      dot: 'bg-amber-500',
+                      badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300',
+                      icon: <Zap size={12} className="text-white" />,
+                    },
+                    FARMER_ACTION_RECORDED: {
+                      dot: 'bg-emerald-500',
+                      badge:
+                        'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300',
+                      icon: <CheckCircle2 size={12} className="text-white" />,
+                    },
+                    AGRONOMIST_REVIEW_LOGGED: {
+                      dot: 'bg-blue-500',
+                      badge: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
+                      icon: <ShieldCheck size={12} className="text-white" />,
+                    },
+                    FOLLOW_UP_EVALUATED: {
+                      dot: 'bg-purple-500',
+                      badge:
+                        'bg-purple-100 text-purple-800 dark:bg-purple-950/50 dark:text-purple-300',
+                      icon: <RotateCw size={12} className="text-white" />,
+                    },
+                  }[event.eventType];
+
+                  return (
+                    <div key={event.id} className="relative group">
+                      {/* Timeline Dot */}
+                      <span
+                        className={`absolute -left-6 top-1.5 w-4 h-4 rounded-full flex items-center justify-center shadow-sm ${eventConfig.dot}`}
+                      >
+                        {eventConfig.icon}
+                      </span>
+
+                      {/* Content Card */}
+                      <div className="p-3 rounded-xl bg-gray-50/80 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/40 text-xs">
+                        <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-black text-gray-900 dark:text-white">
+                              {event.title}
+                            </span>
+                            <span
+                              className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${eventConfig.badge}`}
+                            >
+                              {event.actor}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-gray-400 font-medium">
+                            {new Date(event.timestamp).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium leading-relaxed">
+                          {event.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -41,8 +41,12 @@ export class BlockchainService {
   private static instance: BlockchainService;
   private chain: Block[] = [];
   private difficulty: number = 2; // Difficulty: 2 leading zeros for fast proof-of-work
-  private validatorNode: string = 'AgriFlux-PoA-Consensus-Node-Primary';
-  private validatorKey: string = env.JWT_SECRET || 'agriflux-sovereign-master-secret';
+  private validatorNode: string = 'AgriFlux-PoA-Audit-Node-Demonstration';
+  private validatorKey: string =
+    env.JWT_SECRET ||
+    (env.NODE_ENV === 'production'
+      ? crypto.randomBytes(32).toString('hex')
+      : 'agriflux-dev-audit-ephemeral-key');
 
   private constructor() {
     this.createGenesisBlock();
@@ -123,10 +127,12 @@ export class BlockchainService {
   private createGenesisBlock(): void {
     const timestamp = '2025-01-01T00:00:00.000Z';
     const data = {
-      message: 'AgriFlux Sovereign Agricultural Ledger Initialized',
-      network: 'AgriFlux-Private-PoA-Mesh',
-      version: '2.0.0-SHA256-MERKLE-ED25519',
-      antiTheftProtocol: 'ACTIVE',
+      message: 'AgriFlux In-Memory Cryptographic Audit Ledger Initialized (Demo/Prototype)',
+      network: 'AgriFlux-Local-PoA-Demonstration',
+      version: '2.0.0-SHA256-MERKLE-AUDIT',
+      antiTheftProtocol: 'ACTIVE_DEMO',
+      disclaimer:
+        'In-memory demonstration ledger; requires distributed multi-node persistence for sovereign legal immutability.',
     };
     const merkleRoot = this.calculateMerkleRoot(data);
     const hash = this.calculateHash(0, '0'.repeat(64), timestamp, merkleRoot, 0, 'GENESIS');
@@ -141,7 +147,7 @@ export class BlockchainService {
       previousHash: '0'.repeat(64),
       hash,
       nonce: 0,
-      validator: 'AgriFlux-Genesis-Authority',
+      validator: 'AgriFlux-Demonstration-Authority',
       signature,
     };
 
@@ -315,7 +321,7 @@ export class BlockchainService {
       status: validation.isValid ? 'VERIFIED_TAMPER_PROOF' : 'COMPROMISED',
       issuedAt: new Date().toISOString(),
       legalNotice:
-        'This certificate verifies that the recorded farm telemetry, advisory, or actuator event is permanently sealed in the AgriFlux sovereign tamper-proof blockchain ledger.',
+        'This demonstration certificate verifies that the recorded farm telemetry, advisory, or actuator event is cryptographically hashed and chained in the AgriFlux local in-memory audit ledger. Note: In-memory demo ledger; requires distributed multi-node persistence for sovereign legal immutability.',
     };
   }
 
@@ -339,8 +345,8 @@ export class BlockchainService {
       lastBlockHash: this.getLatestBlock().hash,
       isValid: validation.isValid,
       difficulty: this.difficulty,
-      consensus: 'Proof of Authority (PoA) with SHA-256 Merkle Ledger',
-      antiTheftState: '100% IMMUTABLE & VERIFIED',
+      consensus: 'Proof of Authority (PoA) demonstration with SHA-256 Merkle Ledger',
+      antiTheftState: 'VERIFIED_IN_MEMORY_AUDIT_TRAIL (Prototype)',
       genesisTimestamp: this.chain[0].timestamp,
       merkleTreeStatus: 'VERIFIED_MERKLE_ROOTS_ALL_BLOCKS',
     };
