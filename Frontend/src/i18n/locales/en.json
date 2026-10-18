@@ -23,7 +23,7 @@
     "adminSystem": "Cloud Infrastructure",
     "adminActuators": "Hardware & Actuators",
     "adminActivity": "Audit Logs",
-    "agronomistPortal": "Agronomist Portal",
+    "agronomistPortal": "Diagnostic Command",
     "consultationsQueue": "Consultations & Triage",
     "farmerPreview": "Farmer Mode View",
     "agriflux": "AgriFlux AI",

@@ -379,8 +379,8 @@ const App: React.FC = () => {
             </BrowserRouter>
           </ErrorBoundary>
           <ToastContainer
-            position="bottom-right"
-            autoClose={4000}
+            position="top-right"
+            autoClose={3500}
             hideProgressBar={false}
             newestOnTop
             closeOnClick
@@ -388,7 +388,8 @@ const App: React.FC = () => {
             pauseOnFocusLoss
             draggable
             pauseOnHover
-            theme="colored"
+            theme="light"
+            limit={3}
           />
         </AuthProvider>
       </ThemeProvider>

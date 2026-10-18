@@ -29,10 +29,64 @@ import {
   ShieldCheck,
   RefreshCw,
   CheckCircle2,
+  Users,
+  Cpu,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
+  ArrowRight,
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { API_URL } from '../config';
+
+const StatCard: React.FC<{
+  title: string;
+  value: string;
+  change: string;
+  positive?: boolean;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+  onClick?: () => void;
+  accentColor: string;
+}> = ({ title, value, change, positive = true, icon, color, bgColor, onClick, accentColor }) => {
+  return (
+    <div
+      className="card-clickable group border-b-2 border-transparent hover:border-primary-500"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick && onClick()}
+    >
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-glow-green"
+        style={{ background: `linear-gradient(135deg, ${accentColor}10 0%, transparent 60%)` }}
+      />
+      <div className="flex items-start justify-between mb-2">
+        <div
+          className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
+        >
+          {icon}
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <span
+            className={`flex items-center gap-1 text-sm font-semibold ${positive ? 'text-primary-600 dark:text-primary-400' : 'text-red-500'}`}
+          >
+            {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+            {change}
+          </span>
+          <span className="text-[10px] text-gray-400 group-hover:text-primary-500 flex items-center gap-0.5 transition-colors duration-200">
+            View details{' '}
+            <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+          </span>
+        </div>
+      </div>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{title}</p>
+      <p className={`text-2xl font-bold ${color} font-display`}>{value}</p>
+    </div>
+  );
+};
 
 const VALID_TABS: AdminTab[] = [
   'overview',
@@ -480,6 +534,9 @@ interface BlockchainLedgerSummary {
     (u) => userFilter === 'All' || u.role === userFilter || u.status === userFilter
   );
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+
   return (
     <div className="space-y-5">
       {/* Header Banner */}
@@ -487,14 +544,18 @@ interface BlockchainLedgerSummary {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="page-header text-gray-900 dark:text-white">
-              🛡️ {t('admin.title', 'Administrative Command')}
+              {greeting},{' '}
+              <span className="text-gradient font-black">
+                {user?.name?.split(' ')[0] || 'Administrator'}
+              </span>{' '}
+              👋
             </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-xs font-black border border-red-200/50">
               DIRECT CONTROL
             </span>
           </div>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            Logged in as <strong>{user?.name}</strong> · Complete Governance & Hardware Interlock
+            Complete platform governance, immutable cryptographic ledger, and hardware interlock
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -518,47 +579,55 @@ interface BlockchainLedgerSummary {
         </div>
       </div>
 
-      {/* KPI Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          {
-            label: 'Total Registered',
-            value: '271',
-            sub: '+34 this month',
-            icon: '👥',
-            color: 'text-primary-600 dark:text-primary-400',
-          },
-          {
-            label: 'Active Hardware Nodes',
-            value: '18 / 18',
-            sub: 'LoRa Mesh Sync 100%',
-            icon: '📡',
-            color: 'text-blue-600 dark:text-blue-400',
-          },
-          {
-            label: 'Pending Consultations',
-            value: '3',
-            sub: 'Farmer queries',
-            icon: '📋',
-            color: 'text-amber-600 dark:text-amber-400',
-          },
-          {
-            label: 'System Health',
-            value: 'Nominal',
-            sub: 'Zero critical faults',
-            icon: '⚡',
-            color: 'text-emerald-600 dark:text-emerald-400',
-          },
-        ].map((s) => (
-          <div key={s.label} className="card text-center p-3 sm:p-4">
-            <div className="text-xl mb-1">{s.icon}</div>
-            <p className={`text-xl sm:text-2xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mt-0.5">
-              {s.label}
-            </p>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500">{s.sub}</p>
-          </div>
-        ))}
+      {/* KPI Stat Cards — Symmetrical 4-Column Layout using Farmer Card Design */}
+      <div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up-fade"
+        style={{ animationDelay: '100ms' }}
+      >
+        <StatCard
+          title="Total Registered"
+          value="271 Users"
+          change="+34 this month"
+          positive={true}
+          icon={<Users size={22} className="text-primary-600" />}
+          color="text-primary-600 dark:text-primary-400"
+          bgColor="bg-primary-100 dark:bg-primary-900/30"
+          accentColor="#22c55e"
+          onClick={() => setActiveTab('users')}
+        />
+        <StatCard
+          title="Hardware Nodes"
+          value="18 / 18 Online"
+          change="LoRa Mesh 100%"
+          positive={true}
+          icon={<Cpu size={22} className="text-blue-600" />}
+          color="text-blue-600 dark:text-blue-400"
+          bgColor="bg-blue-100 dark:bg-blue-900/30"
+          accentColor="#3b82f6"
+          onClick={() => setActiveTab('system')}
+        />
+        <StatCard
+          title="Farmer Inquiries"
+          value="3 Pending"
+          change="Triage Queue"
+          positive={true}
+          icon={<Calendar size={22} className="text-amber-600" />}
+          color="text-amber-600 dark:text-amber-400"
+          bgColor="bg-amber-100 dark:bg-amber-900/30"
+          accentColor="#f59e0b"
+          onClick={() => setActiveTab('activity')}
+        />
+        <StatCard
+          title="System Health"
+          value="Nominal"
+          change="Zero Faults"
+          positive={true}
+          icon={<ShieldCheck size={22} className="text-emerald-600" />}
+          color="text-emerald-600 dark:text-emerald-400"
+          bgColor="bg-emerald-100 dark:bg-emerald-900/30"
+          accentColor="#10b981"
+          onClick={() => setActiveTab('blockchain')}
+        />
       </div>
 
       {/* Tab Navigation Pill Bar */}

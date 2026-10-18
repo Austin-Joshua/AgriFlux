@@ -25,10 +25,63 @@ import {
   UserCheck,
   Zap,
   Target,
+  ArrowUpRight,
+  ArrowDownRight,
+  ArrowRight,
+  Sprout,
+  Leaf,
 } from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { toast } from 'react-toastify';
+
+const StatCard: React.FC<{
+  title: string;
+  value: string;
+  change: string;
+  positive?: boolean;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+  onClick?: () => void;
+  accentColor: string;
+}> = ({ title, value, change, positive = true, icon, color, bgColor, onClick, accentColor }) => {
+  return (
+    <div
+      className="card-clickable group border-b-2 border-transparent hover:border-primary-500"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick && onClick()}
+    >
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-glow-green"
+        style={{ background: `linear-gradient(135deg, ${accentColor}10 0%, transparent 60%)` }}
+      />
+      <div className="flex items-start justify-between mb-2">
+        <div
+          className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
+        >
+          {icon}
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <span
+            className={`flex items-center gap-1 text-sm font-semibold ${positive ? 'text-primary-600 dark:text-primary-400' : 'text-red-500'}`}
+          >
+            {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+            {change}
+          </span>
+          <span className="text-[10px] text-gray-400 group-hover:text-primary-500 flex items-center gap-0.5 transition-colors duration-200">
+            View details{' '}
+            <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+          </span>
+        </div>
+      </div>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{title}</p>
+      <p className={`text-2xl font-bold ${color} font-display`}>{value}</p>
+    </div>
+  );
+};
 
 interface FieldReviewItem {
   _id?: string;
@@ -355,59 +408,92 @@ const AgronomistDashboard: React.FC = () => {
       { to: t('agronomist.allFarmers'), msg: advisoryText, time: new Date().toLocaleTimeString() },
       ...prev,
     ]);
+    toast.success('Advisory broadcasted to monitored farmers!');
     setAdvisoryText('');
   };
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+
   return (
     <div className="space-y-5">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      {/* Welcome Header — Clean & Symmetrical (Farmer Base Reference) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="page-header">🔬 {t('agronomist.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            {t('common.welcome')}, <strong>{user?.name}</strong> · {user?.expertise}
+          <h1 className="page-header">
+            {greeting},{' '}
+            <span className="text-gradient font-black">
+              {user?.name?.split(' ')[0] || user?.name || 'Specialist'}
+            </span>{' '}
+            👋
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+            Crop diagnostics, consultation triage, and field decision reviews
           </p>
         </div>
-        <div className="flex gap-2">
-          <span className="px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold border border-blue-200 dark:border-blue-700/50">
-            🔬 {t('agronomist.mode')}
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-200 dark:border-primary-700/50">
+            <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
+            Active Duty · {user?.expertise || 'Field Agronomy'}
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          {
-            label: t('agronomist.farmsMonitored'),
-            value: '42',
-            icon: '🌾',
-            color: 'text-primary-600',
-          },
-          {
-            label: t('agronomist.fieldVisitsMonth'),
-            value: '13',
-            icon: '🚗',
-            color: 'text-blue-600',
-          },
-          { label: t('agronomist.activeCases'), value: '24', icon: '⚠️', color: 'text-amber-600' },
-          {
-            label: t('agronomist.advisoriesSent'),
-            value: '156',
-            icon: '📨',
-            color: 'text-purple-600',
-          },
-        ].map((s) => (
-          <div key={s.label} className="card text-center">
-            <div className="text-2xl mb-1">{s.icon}</div>
-            <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{s.label}</p>
-          </div>
-        ))}
+      {/* Stat Cards Grid — Symmetrical 4-Column Layout using Farmer Card Design */}
+      <div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up-fade"
+        style={{ animationDelay: '100ms' }}
+      >
+        <StatCard
+          title={t('agronomist.farmsMonitored', 'Farms Monitored')}
+          value="42 Parcels"
+          change="+4 this month"
+          positive={true}
+          icon={<Sprout size={22} className="text-primary-600" />}
+          color="text-primary-600 dark:text-primary-400"
+          bgColor="bg-primary-100 dark:bg-primary-900/30"
+          accentColor="#22c55e"
+          onClick={() => handleTabSelect('overview')}
+        />
+        <StatCard
+          title={t('nav.consultationsQueue', 'Farmer Consultations')}
+          value={`${consultations.filter((c) => c.status === 'pending').length || 0} Pending`}
+          change="Triage Active"
+          positive={true}
+          icon={<Calendar size={22} className="text-blue-600" />}
+          color="text-blue-600 dark:text-blue-400"
+          bgColor="bg-blue-100 dark:bg-blue-900/30"
+          accentColor="#3b82f6"
+          onClick={() => handleTabSelect('fieldVisits')}
+        />
+        <StatCard
+          title={t('nav.fieldDecisions', 'Decision Reviews')}
+          value={`${reviews.filter((r) => !r.agronomistReview).length || 0} Awaiting`}
+          change="FAO-56 Gates"
+          positive={true}
+          icon={<Target size={22} className="text-purple-600" />}
+          color="text-purple-600 dark:text-purple-400"
+          bgColor="bg-purple-100 dark:bg-purple-900/30"
+          accentColor="#8b5cf6"
+          onClick={() => handleTabSelect('fieldDecisions')}
+        />
+        <StatCard
+          title={t('agronomist.soilReports', 'Soil Diagnostics')}
+          value="88/100 Optimal"
+          change="Lab Calibrated"
+          positive={true}
+          icon={<Leaf size={22} className="text-earth-600" />}
+          color="text-earth-600 dark:text-earth-400"
+          bgColor="bg-earth-100 dark:bg-earth-900/30"
+          accentColor="#b8823d"
+          onClick={() => handleTabSelect('soilReports')}
+        />
       </div>
 
       <div className="overflow-x-auto max-w-full scrollbar-none pb-1">
         <div
           role="tablist"
-          aria-label="Agronomist Views"
+          aria-label="Management Views"
           className="flex gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl p-1.5 w-max border border-gray-200/50 dark:border-gray-700/50"
         >
           {(
@@ -913,7 +999,7 @@ const AgronomistDashboard: React.FC = () => {
                               [rec.recommendationId]: e.target.value,
                             }))
                           }
-                          placeholder="Agronomist directive or field validation notes..."
+                          placeholder="Diagnostic directive or field validation notes..."
                           className="w-full text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary-500"
                         />
 

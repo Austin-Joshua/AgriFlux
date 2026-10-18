@@ -100,9 +100,9 @@ const farmerNavItems: NavItemData[] = [
 const agronomistNavItems: NavItemData[] = [
   {
     to: '/agronomist',
-    icon: Microscope,
-    labelKey: 'nav.agronomistPortal',
-    fallback: 'Command Center',
+    icon: LayoutDashboard,
+    labelKey: 'nav.dashboard',
+    fallback: 'Dashboard',
   },
   {
     to: '/agronomist?tab=fieldDecisions',
@@ -187,7 +187,7 @@ const adminDirectPortals: NavItemData[] = [
     to: '/agronomist',
     icon: Microscope,
     labelKey: 'nav.agronomistPortal',
-    fallback: 'Agronomist Portal',
+    fallback: 'Diagnostic Portal',
     badge: 'PORTAL',
     badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   },
