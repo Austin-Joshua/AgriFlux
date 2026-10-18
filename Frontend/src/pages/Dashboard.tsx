@@ -215,49 +215,10 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* High-Individuality AI Farm Diagnostic Card */}
-      <div
-        onClick={() => setReportOpen(true)}
-        className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/5 dark:from-emerald-950/40 dark:via-dark-900 dark:to-teal-950/20 border border-emerald-500/30 hover:border-emerald-500/60 shadow-sm hover:shadow-md transition-all cursor-pointer group select-none animate-slide-up-fade"
-        role="button"
-        tabIndex={0}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-500/30 group-hover:scale-105 transition-transform">
-              <Sparkles size={20} className="text-yellow-200 animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                  Live AI Crop Diagnostic
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
-                  {data.confidenceScore}% Confidence
-                </span>
-              </div>
-              <p className="text-sm sm:text-base font-black text-slate-900 dark:text-white mt-0.5">
-                {data.crop} ({data.variety}) · Harvest Target: {yieldForecast}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 self-end sm:self-center text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
-            <span>View Detailed AI Report</span>
-            <ChevronRight size={14} />
-          </div>
-        </div>
-      </div>
-
-      {/* AI DECISION ENGINE PANEL — Hackathon Core Feature */}
-      <div className="animate-slide-up-fade" style={{ animationDelay: '100ms' }}>
-        <AIDecisionPanel />
-      </div>
-
       {/* Stat Cards Grid — Symmetrical 4-Column Layout */}
       <div
         className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up-fade"
-        style={{ animationDelay: '150ms' }}
+        style={{ animationDelay: '100ms' }}
       >
         <StatCard
           title={t('dashboard.soilHealth')}
@@ -304,7 +265,7 @@ const Dashboard: React.FC = () => {
       {/* Charts Row */}
       <div
         className="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-slide-up-fade"
-        style={{ animationDelay: '200ms' }}
+        style={{ animationDelay: '150ms' }}
       >
         {/* Yield Chart */}
         <div className="lg:col-span-2 card">
@@ -420,7 +381,7 @@ const Dashboard: React.FC = () => {
                 )}
               </ResponsiveContainer>
             </div>
-            <div className="mt-2 text-[10px] text-gray-400 text-center opacity-0 group-hover/chart:opacity-100 transition-opacity font-bold uppercase tracking-widest">
+            <div className="mt-2 text-[10px] text-gray-400 text-center opacity-0 group/chart:opacity-100 transition-opacity font-bold uppercase tracking-widest">
               Click for Deep Analysis Insights
             </div>
           </div>
@@ -464,6 +425,46 @@ const Dashboard: React.FC = () => {
             <Sparkles size={10} /> View Historical Comparison
           </div>
         </div>
+      </div>
+
+      {/* High-Individuality AI Farm Diagnostic Card */}
+      <div
+        onClick={() => setReportOpen(true)}
+        className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/5 dark:from-emerald-950/40 dark:via-dark-900 dark:to-teal-950/20 border border-emerald-500/30 hover:border-emerald-500/60 shadow-sm hover:shadow-md transition-all cursor-pointer group select-none animate-slide-up-fade"
+        style={{ animationDelay: '200ms' }}
+        role="button"
+        tabIndex={0}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-500/30 group-hover:scale-105 transition-transform">
+              <Sparkles size={20} className="text-yellow-200 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                  Live AI Crop Diagnostic
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
+                  {data.confidenceScore}% Confidence
+                </span>
+              </div>
+              <p className="text-sm sm:text-base font-black text-slate-900 dark:text-white mt-0.5">
+                {data.crop} ({data.variety}) · Harvest Target: {yieldForecast}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 self-end sm:self-center text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
+            <span>View Detailed AI Report</span>
+            <ChevronRight size={14} />
+          </div>
+        </div>
+      </div>
+
+      {/* AI DECISION ENGINE PANEL — Hackathon Core Feature */}
+      <div className="animate-slide-up-fade" style={{ animationDelay: '250ms' }}>
+        <AIDecisionPanel />
       </div>
 
       {/* Macro-Environmental & Reference Benchmarks (Collapsible for Clean Symmetrical UX) */}
