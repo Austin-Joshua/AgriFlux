@@ -55,7 +55,7 @@ const StatCard: React.FC<{
 
   return (
     <div
-      className="card-clickable group border-b-2 border-transparent hover:border-primary-500"
+      className="card-clickable group border-b-2 border-transparent hover:border-primary-500 p-3 sm:p-4 md:p-5"
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -65,27 +65,31 @@ const StatCard: React.FC<{
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-glow-green"
         style={{ background: `linear-gradient(135deg, ${accentColor}10 0%, transparent 60%)` }}
       />
-      <div className="flex items-start justify-between mb-2">
+      <div className="flex items-start justify-between gap-1 mb-2">
         <div
-          className={`w-12 h-12 ${bgColor} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
+          className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 ${bgColor} rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]`}
         >
           {icon}
         </div>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-0.5 min-w-0">
           <span
-            className={`flex items-center gap-1 text-sm font-semibold ${positive ? 'text-primary-600 dark:text-primary-400' : 'text-red-500'}`}
+            className={`flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right ${positive ? 'text-primary-600 dark:text-primary-400' : 'text-red-500'}`}
           >
-            {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-            {change}
+            {positive ? (
+              <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+            ) : (
+              <ArrowDownRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+            )}
+            <span className="truncate">{change}</span>
           </span>
-          <span className="text-[10px] text-gray-400 group-hover:text-primary-500 flex items-center gap-0.5 transition-colors duration-200">
+          <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-primary-500 items-center gap-0.5 transition-colors duration-200">
             {t('common.viewDetails', 'View details')}{' '}
             <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
       </div>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{title}</p>
-      <p className={`text-2xl font-bold ${color} font-display`}>{value}</p>
+      <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">{title}</p>
+      <p className={`text-lg sm:text-xl md:text-2xl font-bold ${color} font-display truncate`}>{value}</p>
     </div>
   );
 };
@@ -552,7 +556,7 @@ interface BlockchainLedgerHealth {
 
       {/* KPI Stat Cards — Symmetrical 4-Column Layout using Farmer Card Design */}
       <div
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up-fade"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
         style={{ animationDelay: '100ms' }}
       >
         <StatCard

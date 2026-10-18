@@ -26,6 +26,7 @@ import {
   Landmark,
   LayoutDashboard,
   Sparkles,
+  ArrowLeft,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -233,11 +234,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [langOpen, setLangOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [reportOpen, setReportOpen] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
@@ -269,6 +272,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchOpen(false);
+      if (mobileSearchRef.current && !mobileSearchRef.current.contains(e.target as Node)) {
+        setMobileSearchOpen(false);
+      }
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
       if (accountRef.current && !accountRef.current.contains(e.target as Node))
         setAccountOpen(false);
@@ -279,44 +285,119 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 glass-header px-2 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-3 w-full max-w-full overflow-x-clip select-none">
-      {/* Left Section: Mobile Menu + Mobile Logo + Desktop Logo (No desktop hamburger) */}
-      <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-        {/* Mobile Hamburger Menu Button - ONLY visible on mobile (<lg) */}
-        <button
-          id="mobile-menu-toggle"
-          onClick={onMenuClick}
-          className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 lg:hidden transition-all duration-150 flex-shrink-0"
-          aria-label={t('header.openMenu', 'Open mobile menu')}
-        >
-          <Menu size={20} />
-        </button>
-
-        {/* Mobile Brand / Logo: Placed right after the hamburger icon and before the search bar */}
-        <div
-          onClick={() => {
-            if (userRole === 'admin') navigate('/admin');
-            else if (userRole === 'agronomist') navigate('/agronomist');
-            else navigate('/dashboard');
-          }}
-          className="flex lg:hidden items-center gap-1.5 cursor-pointer flex-shrink-0 group"
-          role="button"
-          tabIndex={0}
-        >
-          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm shadow-primary-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
-            <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
+    <header className="sticky top-0 z-30 glass-header px-2 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-1 sm:gap-2 md:gap-3 w-full max-w-full overflow-x-clip select-none">
+      {mobileSearchOpen ? (
+        /* Full-width Mobile Search Bar Overlay */
+        <div ref={mobileSearchRef} className="flex md:hidden items-center gap-1.5 w-full animate-fade-in relative py-0.5">
+          <button
+            onClick={() => {
+              setMobileSearchOpen(false);
+              setSearchOpen(false);
+              setSearchQuery('');
+            }}
+            className="p-1.5 rounded-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex-shrink-0"
+            aria-label={t('common.back', 'Back')}
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-100/90 dark:bg-gray-800/90 glass-input ring-2 ring-primary-400/50">
+            <Search size={14} className="text-gray-400 flex-shrink-0" />
+            <input
+              type="text"
+              autoFocus
+              placeholder={t('header.searchPlaceholder', 'Search fields, advisories, tools...')}
+              value={searchQuery}
+              onFocus={() => setSearchOpen(true)}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent text-xs text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none flex-1 min-w-0 w-full"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                <X size={13} />
+              </button>
+            )}
           </div>
-          <span className="text-sm font-black text-gray-900 dark:text-white tracking-tight leading-none">
-            Agri<span className="text-gradient">Flux</span>
-          </span>
+          {/* Mobile Search Results Dropdown */}
+          {searchOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
+              <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                {searchQuery ? `Results for "${searchQuery}"` : 'Quick Navigate'}
+              </p>
+              {filteredSearch.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-gray-500">{t('common.noResults', 'No results found.')}</p>
+              ) : (
+                filteredSearch.map((item) => (
+                  <button
+                    key={item.route}
+                    onClick={() => {
+                      navigate(item.route);
+                      setSearchOpen(false);
+                      setMobileSearchOpen(false);
+                      setSearchQuery('');
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-primary-50/60 dark:hover:bg-primary-900/20 transition-all duration-150 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                      <item.icon size={15} className="text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {item.label}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{item.desc}</p>
+                    </div>
+                    <ChevronRight
+                      size={14}
+                      className="ml-auto text-gray-300 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all duration-150"
+                    />
+                  </button>
+                ))
+              )}
+            </div>
+          )}
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Left Section: Mobile Menu + Mobile Logo + Desktop Logo (No desktop hamburger) */}
+          <div className="flex items-center gap-1 sm:gap-2.5 flex-shrink-0">
+            {/* Mobile Hamburger Menu Button - ONLY visible on mobile (<lg) */}
+            <button
+              id="mobile-menu-toggle"
+              onClick={onMenuClick}
+              className="p-1 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 lg:hidden transition-all duration-150 flex-shrink-0"
+              aria-label={t('header.openMenu', 'Open mobile menu')}
+            >
+              <Menu size={19} />
+            </button>
 
-      {/* Center Section: Responsive Search Bar */}
-      <div
-        ref={searchRef}
-        className="relative flex-1 min-w-[100px] sm:max-w-xs md:max-w-md lg:max-w-lg mx-1.5 sm:mx-2"
-      >
+            {/* Mobile Brand / Logo */}
+            <div
+              onClick={() => {
+                if (userRole === 'admin') navigate('/admin');
+                else if (userRole === 'agronomist') navigate('/agronomist');
+                else navigate('/dashboard');
+              }}
+              className="flex lg:hidden items-center gap-1 cursor-pointer flex-shrink-0 group"
+              role="button"
+              tabIndex={0}
+            >
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg overflow-hidden shadow-sm shadow-primary-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
+                <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
+              </div>
+              <span className="text-xs sm:text-sm font-black text-gray-900 dark:text-white tracking-tight leading-none">
+                Agri<span className="text-gradient">Flux</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Center Section: Responsive Search Bar (Desktop & Tablet only) */}
+          <div
+            ref={searchRef}
+            className="hidden md:block relative flex-1 max-w-xs md:max-w-md lg:max-w-lg mx-2"
+          >
         <div
           className={`flex items-center gap-2 px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-200 ${
             searchOpen
@@ -383,7 +464,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       </div>
 
       {/* Right Section: All Action Buttons Fully Visible with Balanced Spacing */}
-      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+        {/* Mobile Search Toggle Button — Mobile only */}
+        <button
+          id="mobile-search-toggle"
+          onClick={() => {
+            setMobileSearchOpen(true);
+            setSearchOpen(true);
+          }}
+          className="flex md:hidden p-1.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 active:scale-95 flex-shrink-0"
+          aria-label={t('common.search', 'Search')}
+        >
+          <Search size={17} />
+        </button>
+
         {/* AI Report Button — Desktop only (hidden on mobile & tablet since bottom dock handles it) */}
         <button
           id="header-ai-report-btn"
@@ -404,13 +498,15 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               setAccountOpen(false);
               setLangOpen(false);
             }}
-            className="relative p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
+            className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
             aria-label={t('notifications.title', 'Notifications')}
           >
-            <Bell size={17} />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" />
-            )}
+            <div className="relative flex items-center justify-center">
+              <Bell size={17} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full border border-white dark:border-gray-800 shadow-sm" />
+              )}
+            </div>
           </button>
 
           {notifOpen && (
@@ -516,8 +612,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           )}
         </div>
 
-        {/* Language Selector — Desktop & Tablet only (removed on mobile for cleaner spacing) */}
-        <div ref={langRef} className="hidden md:block relative flex-shrink-0">
+        {/* Language Selector — Visible on all screen sizes (compact flag on mobile) */}
+        <div ref={langRef} className="relative flex-shrink-0">
           <button
             id="language-selector"
             onClick={() => {
@@ -525,7 +621,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               setNotifOpen(false);
               setAccountOpen(false);
             }}
-            className="flex items-center gap-1 px-1.5 sm:px-2 py-1.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 text-xs flex-shrink-0"
+            className="flex items-center gap-1 p-1.5 sm:px-2 py-1.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 text-xs flex-shrink-0"
             aria-label={t('header.selectLanguage', 'Language selector')}
           >
             <span className="text-sm leading-none">{currentLang.flag}</span>
@@ -581,11 +677,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               setNotifOpen(false);
               setLangOpen(false);
             }}
-            className="p-0.5 rounded-full text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95 transition-all duration-150 group focus:outline-none"
+            className="p-0.5 rounded-full text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95 transition-all duration-150 group focus:outline-none flex-shrink-0"
             aria-label={t('header.accountSettings', 'User profile and account settings')}
             title={user?.name || 'User Profile'}
           >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-xs shadow-sm ring-2 ring-emerald-500/30 group-hover:ring-emerald-500 group-hover:shadow-emerald-500/25 transition-all">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-xs shadow-sm ring-2 ring-emerald-500/30 group-hover:ring-emerald-500 group-hover:shadow-emerald-500/25 transition-all flex-shrink-0">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
           </button>
@@ -676,6 +772,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           )}
         </div>
       </div>
+        </>
+      )}
 
       {/* Global Smart Farm Report Modal */}
       <SmartFarmReport isOpen={reportOpen} onClose={() => setReportOpen(false)} />
