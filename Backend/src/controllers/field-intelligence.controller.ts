@@ -107,7 +107,8 @@ export const recordAction = async (req: Request, res: Response) => {
       data: updated,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    const status = error.statusCode || 500;
+    return res.status(status).json({
       success: false,
       message: error.message || 'Error recording farmer action',
     });
@@ -142,7 +143,8 @@ export const evaluateFollowUp = async (req: Request, res: Response) => {
       data: evaluation,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    const status = error.statusCode || 500;
+    return res.status(status).json({
       success: false,
       message: error.message || 'Error evaluating follow-up outcome',
     });
@@ -221,7 +223,8 @@ export const recordAgronomistReview = async (req: Request, res: Response) => {
       data: updated,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    const status = error.statusCode || 500;
+    return res.status(status).json({
       success: false,
       message: error.message || 'Error recording agronomist review',
     });

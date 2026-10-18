@@ -375,10 +375,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
             }}
             className="flex items-center gap-2.5 cursor-pointer"
           >
-            <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-sm shadow-primary-500/20 flex-shrink-0">
-              <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
-                <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
-              </div>
+            <div className="w-8 h-8 rounded-xl overflow-hidden shadow-sm shadow-primary-500/20 flex-shrink-0">
+              <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
             </div>
             <div className="flex flex-col text-left">
               <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">

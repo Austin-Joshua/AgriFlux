@@ -291,10 +291,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           role="button"
           tabIndex={0}
         >
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 p-0.5 shadow-sm shadow-primary-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
-            <div className="w-full h-full rounded-[6px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
-              <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
-            </div>
+          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm shadow-primary-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
+            <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
           </div>
           <span className="text-sm font-black text-gray-900 dark:text-white tracking-tight leading-none">
             Agri<span className="text-gradient">Flux</span>
@@ -312,10 +310,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           role="button"
           tabIndex={0}
         >
-          <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-sm shadow-primary-500/25 group-hover:scale-105 transition-transform flex-shrink-0">
-            <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
-              <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
-            </div>
+          <div className="w-9 h-9 rounded-xl overflow-hidden shadow-sm shadow-primary-500/25 group-hover:scale-105 transition-transform flex-shrink-0">
+            <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-col text-left">
             <span className="text-base font-black text-gray-900 dark:text-white leading-none tracking-tight">

@@ -58,11 +58,9 @@ const AuthLayout: React.FC = () => {
                 <div className="flex items-center gap-3.5">
                   <motion.div
                     whileHover={{ scale: 1.05, rotate: 3 }}
-                    className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-white/30 via-white/15 to-gold-400/40 shadow-2xl flex-shrink-0"
+                    className="w-12 h-12 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0"
                   >
-                    <div className="w-12 h-12 bg-white/15 dark:bg-black/30 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/25">
-                      <img src={logo} alt="AgriFlux Logo" className="w-8 h-8 object-contain" />
-                    </div>
+                    <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
                   </motion.div>
                   <div className="flex flex-col text-left">
                     <span className="text-xl font-black text-white leading-none tracking-tight">
