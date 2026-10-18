@@ -323,10 +323,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    toast.info('Signed out successfully.');
-    navigate('/');
+  const handleLogout = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (window.innerWidth < 1024) {
+      onClose();
+    }
+    try {
+      logout();
+    } catch (err) {
+      console.warn('Logout fallback:', err);
+    }
+    toast.info(t('auth.signedOutSuccess', 'Signed out successfully.'));
+    navigate('/login', { replace: true });
   };
 
   const w = 'lg:w-64';

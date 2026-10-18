@@ -54,12 +54,16 @@ const Login: React.FC = () => {
         typeof fromPath === 'string' &&
         fromPath.startsWith('/') &&
         !fromPath.startsWith('//') &&
-        fromPath !== '/login'
+        fromPath !== '/login' &&
+        fromPath !== '/'
       ) {
-        if (fromPath.startsWith('/admin') && userRole !== 'admin') {
-          return '/dashboard';
+        if (userRole === 'admin') {
+          return fromPath.startsWith('/admin') ? fromPath : '/admin';
         }
-        if (fromPath.startsWith('/agronomist') && userRole !== 'agronomist') {
+        if (userRole === 'agronomist') {
+          return fromPath.startsWith('/agronomist') ? fromPath : '/agronomist';
+        }
+        if (fromPath.startsWith('/admin') || fromPath.startsWith('/agronomist')) {
           return '/dashboard';
         }
         return fromPath;
@@ -161,6 +165,7 @@ const Login: React.FC = () => {
           return (
             <button
               key={role}
+              id={`login-role-${role}`}
               role="tab"
               aria-selected={isSelected}
               type="button"

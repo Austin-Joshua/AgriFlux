@@ -716,7 +716,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <div className="p-1.5 space-y-0.5">
                 <button
                   id="header-workspace-link"
-                  onClick={() => {
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setAccountOpen(false);
                     navigate(
                       user?.role === 'agronomist'
                         ? '/agronomist'
@@ -724,7 +728,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                           ? '/admin'
                           : '/dashboard'
                     );
-                    setAccountOpen(false);
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
                 >
@@ -735,9 +738,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
                 <button
                   id="header-settings-link"
-                  onClick={() => {
-                    navigate('/settings');
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setAccountOpen(false);
+                    navigate('/settings');
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
                 >
@@ -751,11 +757,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <div className="p-1.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-dark-900/40">
                 <button
                   id="header-logout-btn"
-                  onClick={() => {
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setAccountOpen(false);
-                    logout();
-                    toast.info('Signed out successfully.');
-                    navigate('/login');
+                    try {
+                      logout();
+                    } catch (err) {
+                      console.warn('Logout fallback:', err);
+                    }
+                    toast.info(t('auth.signedOutSuccess', 'Signed out successfully.'));
+                    navigate('/login', { replace: true });
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold transition-colors group cursor-pointer"
                 >

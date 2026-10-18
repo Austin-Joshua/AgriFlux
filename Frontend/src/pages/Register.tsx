@@ -10,8 +10,16 @@ import SEO from '../components/SEO';
 
 const Register: React.FC = () => {
   const { t } = useTranslation();
-  const { register, loginWithProvider, sendOtp, verifyOtp, isLoading, requiresOnboarding } =
-    useAuth();
+  const {
+    register,
+    loginWithProvider,
+    sendOtp,
+    verifyOtp,
+    isLoading,
+    requiresOnboarding,
+    isAuthenticated,
+    user,
+  } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -49,8 +57,16 @@ const Register: React.FC = () => {
   useEffect(() => {
     if (!isLoading && requiresOnboarding) {
       navigate('/onboarding');
+    } else if (!isLoading && isAuthenticated && user) {
+      const target =
+        user.role === 'admin'
+          ? '/admin'
+          : user.role === 'agronomist'
+            ? '/agronomist'
+            : '/dashboard';
+      navigate(target, { replace: true });
     }
-  }, [isLoading, requiresOnboarding, navigate]);
+  }, [isLoading, requiresOnboarding, isAuthenticated, user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -141,10 +141,18 @@ const Settings: React.FC = () => {
   const [saved, setSaved] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    toast.info('Signed out of AgriFlux account.');
-    navigate('/login');
+  const handleLogout = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    try {
+      logout();
+    } catch (err) {
+      console.warn('Logout fallback:', err);
+    }
+    toast.info(t('auth.signedOutSuccess', 'Signed out of AgriFlux account.'));
+    navigate('/login', { replace: true });
   };
 
   const [profile, setProfile] = useState({

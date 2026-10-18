@@ -382,8 +382,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     delete axios.defaults.headers.common['Authorization'];
 
     // 2. Perform remote session revocation in the background without blocking client transition
-    axios.post(`${API_URL}/auth/logout`).catch(() => {});
-    signOut(auth).catch(() => {});
+    try {
+      axios.post(`${API_URL}/auth/logout`).catch(() => {});
+    } catch {
+      // safe fallback
+    }
+    try {
+      if (auth && typeof signOut === 'function') {
+        signOut(auth).catch(() => {});
+      }
+    } catch {
+      // safe fallback
+    }
   };
 
   return (

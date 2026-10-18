@@ -30,6 +30,18 @@ const Onboarding: React.FC = () => {
     }
   };
 
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      logout();
+    } catch (err) {
+      console.warn('Logout fallback:', err);
+    }
+    toast.info(t('auth.signedOutSuccess', 'Signed out successfully.'));
+    navigate('/login', { replace: true });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
       <SEO title={t('onboarding.completeSetup', 'Complete Setup')} />
@@ -118,8 +130,10 @@ const Onboarding: React.FC = () => {
         {/* Footer */}
         <div className="mt-8 flex justify-center">
           <button
-            onClick={logout}
-            className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-red-500 transition-colors uppercase tracking-widest"
+            type="button"
+            id="onboarding-logout-btn"
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-red-500 transition-colors uppercase tracking-widest cursor-pointer"
           >
             <LogOut size={14} />
             {t('onboarding.cancel', 'Cancel & Sign Out')}
