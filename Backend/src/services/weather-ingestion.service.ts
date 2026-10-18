@@ -380,6 +380,39 @@ export class WeatherIngestionService {
   }
 
   /**
+   * Directly stores or buffers a normalized historical weather observation record
+   */
+  static async ingestRecord(record: any): Promise<void> {
+    const isConnected = isDBConnected || mongoose.connection.readyState === 1;
+    const dateStr = record.dateStr || (record.date ? new Date(record.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+    const normalized = {
+      locationName: record.locationName || 'Thanjavur, Tamil Nadu',
+      coordinates: record.coordinates || { latitude: record.latitude || 10.79, longitude: record.longitude || 79.13 },
+      granularity: record.granularity || 'daily',
+      dateStr,
+      timestamp: record.timestamp || new Date(record.date || Date.now()),
+      temperature_2m_mean: record.temperature_2m_mean,
+      precipitation_sum: record.precipitation_sum ?? record.precipitationMm,
+      et0_fao_evapotranspiration: record.et0_fao_evapotranspiration ?? record.et0EvapotranspirationMm,
+      source: record.source || 'open-meteo-reanalysis',
+      dataType: record.dataType || 'historical_reanalysis_estimate',
+      importedAt: new Date(),
+    };
+
+    if (isConnected) {
+      await HistoricalWeather.findOneAndUpdate(
+        { dateStr: normalized.dateStr, granularity: normalized.granularity },
+        { $set: normalized },
+        { upsert: true, new: true }
+      );
+    } else {
+      const store = normalized.granularity === 'hourly' ? memoryHourlyWeather : memoryDailyWeather;
+      const key = `${normalized.granularity}_${normalized.dateStr}`;
+      store.set(key, normalized);
+    }
+  }
+
+  /**
    * Alias for ingestOpenMeteoCSV for backward compatibility
    */
   static ingestFromCSV = WeatherIngestionService.ingestOpenMeteoCSV;

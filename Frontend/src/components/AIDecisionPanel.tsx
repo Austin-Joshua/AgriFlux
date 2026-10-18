@@ -361,11 +361,11 @@ const AIDecisionPanel: React.FC = () => {
   const obs = recommendation?.supportingObservations;
   const urgency = recommendation?.urgency || getFallbackUrgency(selectedField);
 
-  // Guaranteed valid numeric moisture value - never null or undefined
+  // Calibrated numeric moisture value - null when physical telemetry is unavailable
   const moistureValue =
     obs?.soilMoisture?.value != null
       ? Number(obs.soilMoisture.value)
-      : selectedField.defaultMoisture;
+      : null;
 
   const urgencyStyles = {
     critical: {
@@ -395,7 +395,13 @@ const AIDecisionPanel: React.FC = () => {
   }[urgency as 'critical' | 'high' | 'medium' | 'low'];
 
   // Moisture gauge color indicator
-  const getMoistureColor = (val: number) => {
+  const getMoistureColor = (val: number | null) => {
+    if (val === null)
+      return {
+        bar: 'bg-gray-400',
+        text: 'text-gray-500 dark:text-gray-400',
+        label: t('decisionEngine.noTelemetry', 'No Telemetry'),
+      };
     if (val < 30)
       return {
         bar: 'bg-amber-500',
@@ -447,8 +453,12 @@ const AIDecisionPanel: React.FC = () => {
                   {t('decisionEngine.rule', 'Rule')}: {recommendation?.ruleVersion || 'v2.1-QUANTEX-FAO56'}
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/40">
-                  {obs?.soilMoisture?.provenance === 'measured'
+                  {obs?.soilMoisture?.value == null
+                    ? `⚠️ ${t('decisionEngine.telemetryMissing', 'Telemetry Offline')}`
+                    : obs?.soilMoisture?.provenance === 'measured'
                     ? `⚡ ${t('decisionEngine.measuredEsp32', 'ESP32 Measured')}`
+                    : obs?.soilMoisture?.provenance === 'operator_override'
+                    ? `🎛️ ${t('decisionEngine.operatorOverride', 'Calibrated Input')}`
                     : `🔬 ${t('decisionEngine.simulatedProfile', 'Simulated Calibration Profile')}`}
                 </span>
               </div>
@@ -499,12 +509,16 @@ const AIDecisionPanel: React.FC = () => {
 
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-display">
-                {moistureValue}%
+                {moistureValue != null ? `${moistureValue}%` : 'N/A'}
               </span>
               <span className="text-[10px] text-gray-400 font-medium">{t('decisionEngine.rootZone', 'Root-Zone')}</span>
             </div>
             <div className="mt-1 flex items-center gap-1">
-              {obs?.soilMoisture?.source === 'esp32_hardware' ? (
+              {obs?.soilMoisture?.value == null ? (
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-700">
+                  {t('decisionEngine.telemetryOffline', 'Telemetry Offline')}
+                </span>
+              ) : obs?.soilMoisture?.source === 'esp32_hardware' ? (
                 <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
                   {t('decisionEngine.esp32Measured', 'ESP32 Measured')}
                 </span>
@@ -522,7 +536,7 @@ const AIDecisionPanel: React.FC = () => {
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-200 ease-out ${moistureStatus.bar}`}
-                style={{ width: `${Math.min(100, Math.max(5, moistureValue))}%` }}
+                style={{ width: `${moistureValue != null ? Math.min(100, Math.max(5, moistureValue)) : 0}%` }}
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">

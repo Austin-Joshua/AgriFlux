@@ -17,6 +17,7 @@ import { runCropStatisticsTests } from './crop-statistics.test';
 import { runActuatorStateMachineTests } from './actuator-state-machine.test';
 import { runFieldIntelligenceIntegrationTests } from './field-intelligence-integration.test';
 import { runBlockchainTests } from './blockchain.test';
+import { runDecisionEngineRemediationTests } from './decision-engine-remediation.test';
 
 async function main() {
   console.log('================================================================');
@@ -65,6 +66,10 @@ async function main() {
     {
       name: 'Suite 11: Cryptographic Audit Ledger & Chain Integrity Verification',
       runner: runBlockchainTests,
+    },
+    {
+      name: 'Suite 12: Decision Engine Defect Remediation & Verification Suite',
+      runner: runDecisionEngineRemediationTests,
     },
   ];
 

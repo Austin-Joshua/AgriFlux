@@ -57,10 +57,16 @@ const SoilAdvisor: React.FC = () => {
     title: string;
     content: React.ReactNode;
   } | null>(null);
-  const [reportStats, setReportStats] = useState({
+  const [reportStats, setReportStats] = useState<{
+    ph: number;
+    nitrogen: number | null;
+    potassium: number | null;
+    salinity: number;
+    moisture: number;
+  }>({
     ph: 6.8,
-    nitrogen: 42,
-    potassium: 55,
+    nitrogen: null,
+    potassium: null,
     salinity: 1.2,
     moisture: 65,
   });
@@ -340,11 +346,8 @@ const SoilAdvisor: React.FC = () => {
 
     setReportStats({
       ph: parseFloat(input.ph) || 6.8,
-      nitrogen: Math.min(
-        100,
-        Math.max(15, Math.round((parseFloat(input.germination) || 85) * 0.55))
-      ),
-      potassium: Math.min(100, Math.max(20, Math.round((parseFloat(input.moisture) || 60) * 0.85))),
+      nitrogen: null, // Telemetry form does not include laboratory soil N; avoid fabricating from germination
+      potassium: null, // Telemetry form does not include laboratory soil K; avoid fabricating from moisture
       salinity: parseFloat(input.salinity) || 1.2,
       moisture: parseFloat(input.moisture) || 65,
     });
@@ -435,25 +438,39 @@ const SoilAdvisor: React.FC = () => {
                     },
                     {
                       label: 'Nitrogen (N)',
-                      value: `${reportStats.nitrogen}%`,
+                      value: reportStats.nitrogen !== null ? `${reportStats.nitrogen}%` : 'Not Measured',
                       status:
-                        reportStats.nitrogen < 30
-                          ? 'Deficient'
-                          : reportStats.nitrogen > 75
-                            ? 'Abundant'
-                            : 'Optimal',
-                      color: reportStats.nitrogen < 30 ? 'text-red-500' : 'text-green-500',
+                        reportStats.nitrogen === null
+                          ? 'Lab Test Required'
+                          : reportStats.nitrogen < 30
+                            ? 'Deficient'
+                            : reportStats.nitrogen > 75
+                              ? 'Abundant'
+                              : 'Optimal',
+                      color:
+                        reportStats.nitrogen === null
+                          ? 'text-amber-500'
+                          : reportStats.nitrogen < 30
+                            ? 'text-red-500'
+                            : 'text-green-500',
                     },
                     {
                       label: 'Potassium (K)',
-                      value: `${reportStats.potassium}%`,
+                      value: reportStats.potassium !== null ? `${reportStats.potassium}%` : 'Not Measured',
                       status:
-                        reportStats.potassium < 35
-                          ? 'Deficient'
-                          : reportStats.potassium > 80
-                            ? 'High'
-                            : 'Optimal',
-                      color: reportStats.potassium < 35 ? 'text-red-500' : 'text-green-500',
+                        reportStats.potassium === null
+                          ? 'Lab Test Required'
+                          : reportStats.potassium < 35
+                            ? 'Deficient'
+                            : reportStats.potassium > 80
+                              ? 'High'
+                              : 'Optimal',
+                      color:
+                        reportStats.potassium === null
+                          ? 'text-amber-500'
+                          : reportStats.potassium < 35
+                            ? 'text-red-500'
+                            : 'text-green-500',
                     },
                   ].map((stat) => (
                     <div

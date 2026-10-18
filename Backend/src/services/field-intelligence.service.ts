@@ -29,6 +29,8 @@ export interface FieldContextInput {
   longitude?: number;
   forceRefresh?: boolean;
   reuseActive?: boolean;
+  allowSimulation?: boolean;
+  isSimulated?: boolean;
 }
 
 // In-memory cache for demo mode
@@ -96,27 +98,64 @@ export class FieldIntelligenceService {
     let sensorSource: string | undefined;
     let sensorSourceType: string | undefined;
     let sensorQualityStatus: string | undefined;
+    let sensorProvenance: 'measured' | 'simulated' | 'missing' = 'measured';
     let freshnessMinutes = 0;
     let isStale = false;
 
-    if (context.soilMoistureOverride !== undefined && context.soilMoistureOverride !== null) {
-      sensorMoisture = Math.min(100, Math.max(0, Number(context.soilMoistureOverride)));
-      sensorSource = 'manual_operator_input';
-      sensorSourceType = 'calibrated_field_measurement';
-      sensorQualityStatus = 'verified';
+    if (context.soilMoistureOverride !== undefined) {
+      if (context.soilMoistureOverride === null) {
+        sensorMoisture = null;
+        sensorSource = 'missing_telemetry';
+        sensorSourceType = 'iot_capacitive_probe';
+        sensorQualityStatus = 'missing';
+        sensorProvenance = 'missing';
+        freshnessMinutes = -1;
+        isStale = true;
+      } else {
+        const rawMoist = Number(context.soilMoistureOverride);
+        if (isNaN(rawMoist) || !isFinite(rawMoist) || rawMoist < 0 || rawMoist > 100) {
+          const err: any = new Error(
+            `Invalid soil moisture override: "${context.soilMoistureOverride}". Must be a valid numeric percentage in physical range [0, 100].`
+          );
+          err.statusCode = 400;
+          throw err;
+        }
+        sensorMoisture = Math.round(rawMoist * 10) / 10;
+        sensorSource = 'manual_operator_input';
+        sensorSourceType = 'calibrated_field_measurement';
+        sensorQualityStatus = 'verified';
+        sensorProvenance = 'measured';
+      }
     } else if (latestSensor) {
-      sensorMoisture = latestSensor.moisture;
-      sensorTemp = latestSensor.temperature;
-      sensorHumidity = latestSensor.humidity;
-      sensorSource = latestSensor.isSimulated ? 'iot_simulator' : 'esp32_hardware';
-      sensorSourceType = 'iot_capacitive_probe';
-      sensorQualityStatus = latestSensor.isSimulated ? 'simulated' : 'verified';
-      const readingAge =
-        now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
-      freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
-      isStale = freshnessMinutes > 15;
-    } else {
-      // Calibrated telemetry baseline for demo field profiles
+      if (
+        latestSensor.moisture !== undefined &&
+        latestSensor.moisture !== null &&
+        !isNaN(Number(latestSensor.moisture)) &&
+        Number(latestSensor.moisture) >= 0 &&
+        Number(latestSensor.moisture) <= 100
+      ) {
+        sensorMoisture = Number(latestSensor.moisture);
+        sensorTemp = latestSensor.temperature;
+        sensorHumidity = latestSensor.humidity;
+        sensorSource = latestSensor.isSimulated ? 'iot_simulator' : 'esp32_hardware';
+        sensorSourceType = 'iot_capacitive_probe';
+        sensorQualityStatus = latestSensor.isSimulated ? 'simulated' : 'verified';
+        sensorProvenance = latestSensor.isSimulated ? 'simulated' : 'measured';
+        const readingAge =
+          now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
+        freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
+        isStale = freshnessMinutes > 15;
+      } else {
+        sensorMoisture = null;
+        sensorSource = 'missing_telemetry';
+        sensorSourceType = 'iot_capacitive_probe';
+        sensorQualityStatus = 'missing';
+        sensorProvenance = 'missing';
+        freshnessMinutes = -1;
+        isStale = true;
+      }
+    } else if (context.allowSimulation || context.isSimulated) {
+      // Explicit simulation mode permitted only when requested
       const fieldDefaultMoisture =
         fieldId === 'field-01'
           ? 24 // North Acre Rice: Triggers targeted irrigation advisory
@@ -129,10 +168,20 @@ export class FieldIntelligenceService {
       sensorTemp = 28;
       sensorHumidity = 62;
       sensorSource = 'iot_simulator';
-      sensorSourceType = 'calibrated_field_measurement';
+      sensorSourceType = 'simulated_calibration_profile';
       sensorQualityStatus = 'simulated';
+      sensorProvenance = 'simulated';
       freshnessMinutes = 2;
       isStale = false;
+    } else {
+      // Normal production path: No physical reading and no simulation flag -> trigger INSUFFICIENT_DATA gate
+      sensorMoisture = null;
+      sensorSource = 'missing_telemetry';
+      sensorSourceType = 'iot_capacitive_probe';
+      sensorQualityStatus = 'missing';
+      sensorProvenance = 'missing';
+      freshnessMinutes = -1;
+      isStale = true;
     }
 
     // --- 2. MULTI-SOURCE ENVIRONMENTAL DATA INGESTION ---
@@ -150,9 +199,26 @@ export class FieldIntelligenceService {
         let et0Sum = 0;
         let count = 0;
         for (const w of weatherRes.data) {
-          if (typeof w.precipitationMm === 'number') rainSum += w.precipitationMm;
-          if (typeof w.et0EvapotranspirationMm === 'number') {
-            et0Sum += w.et0EvapotranspirationMm;
+          // Normalize schema: precipitation_sum (daily model) or precipitationMm (legacy)
+          const precipVal =
+            w.precipitation_sum !== undefined
+              ? Number(w.precipitation_sum)
+              : w.precipitationMm !== undefined
+                ? Number(w.precipitationMm)
+                : NaN;
+          if (!isNaN(precipVal) && precipVal >= 0) {
+            rainSum += precipVal;
+          }
+
+          // Normalize schema: et0_fao_evapotranspiration (model) or et0EvapotranspirationMm (legacy)
+          const et0Val =
+            w.et0_fao_evapotranspiration !== undefined
+              ? Number(w.et0_fao_evapotranspiration)
+              : w.et0EvapotranspirationMm !== undefined
+                ? Number(w.et0EvapotranspirationMm)
+                : NaN;
+          if (!isNaN(et0Val) && et0Val >= 0) {
+            et0Sum += et0Val;
             count++;
           }
         }
@@ -272,6 +338,7 @@ export class FieldIntelligenceService {
             dataQualityStatus: 'missing',
             freshnessMinutes: -1,
             isStale: true,
+            provenance: sensorProvenance,
           },
           ambientTemp: { value: ambientTemp, unit: '°C', source: 'reanalysis_model_estimate' },
           humidity: { value: ambientHumidity, unit: '%', source: 'reanalysis_model_estimate' },
@@ -334,8 +401,20 @@ export class FieldIntelligenceService {
       if (isDBConnected) {
         try {
           await FieldRecommendation.create(insufficientResult);
-        } catch {
-          /* ignore */
+        } catch (err: any) {
+          const dbErr: any = new Error(
+            'Service Unavailable: Failed to persist field recommendation to durable storage. Please retry.'
+          );
+          dbErr.statusCode = 503;
+          throw dbErr;
+        }
+      } else {
+        if (env.NODE_ENV === 'production') {
+          const dbErr: any = new Error(
+            'Service Unavailable: Database connection required to persist field recommendations in production. Please retry.'
+          );
+          dbErr.statusCode = 503;
+          throw dbErr;
         }
       }
       memoryRecommendations[recommendationId] = insufficientResult;
@@ -379,7 +458,11 @@ export class FieldIntelligenceService {
       decisionRules.push(
         `Triggered by high soil moisture (${sensorMoisture}%), recent 3-day precipitation (${recent3dRainfallMm}mm), or forecast rain (${forecastRainMm}mm at ${forecastRainProb}%).`
       );
-      explanation = `Soil moisture is currently at ${sensorMoisture}%, which exceeds field capacity. Recent cumulative rainfall in Thanjavur is ${recent3dRainfallMm}mm. Applying additional water now risks root hypoxia, nutrient leaching, and increased sheath blight vulnerability.`;
+      if (sensorMoisture >= 75) {
+        explanation = `Soil moisture is currently at ${sensorMoisture}%, which exceeds root-zone field capacity. Recent cumulative rainfall in Thanjavur is ${recent3dRainfallMm}mm. Applying additional water now risks root hypoxia, nutrient leaching, and increased sheath blight vulnerability.`;
+      } else {
+        explanation = `Soil moisture is at ${sensorMoisture}%. Significant precipitation is imminent (${forecastRainMm}mm forecast at ${forecastRainProb}%, with ${recent3dRainfallMm}mm recent rainfall). Irrigation is postponed to avoid surface waterlogging and fertilizer runoff.`;
+      }
       alternatives.push({
         action: 'Inspect field drainage bunds',
         tradeOff: 'Prevents waterlogging if downpour exceeds forecast intensity.',
@@ -391,13 +474,13 @@ export class FieldIntelligenceService {
         description: 'Moisture expected to naturally draw down via evapotranspiration.',
       };
     }
-    // Rule 2: Critical root zone depletion
+    // Rule 2A: Critical root zone depletion with low forecast rain (< 5mm)
     else if (sensorMoisture < 28 && forecastRainMm < 5) {
       action = 'IRRIGATE_IMMEDIATE';
       actionLabel = 'Immediate Irrigation Required — Root Zone Deficit';
-      urgency = sensorMoisture < 20 ? 'critical' : 'high';
+      urgency = sensorMoisture <= 20 ? 'critical' : 'high';
       decisionRules.push(
-        `Triggered by soil moisture (${sensorMoisture}%) falling below FAO-56 Management Allowed Depletion (MAD 50% / threshold 28%) with high reference ET₀ (${recentMeanET0} mm/day).`
+        `Triggered by soil moisture (${sensorMoisture}%) falling below FAO-56 Management Allowed Depletion (MAD 50% / threshold 28%) with high reference ET₀ (${recentMeanET0} mm/day) and negligible forecast rain (${forecastRainMm}mm).`
       );
       explanation = `Soil moisture has depleted to ${sensorMoisture}%, severely below the managed depletion threshold for ${cropType}. Atmospheric evapotranspiration demand (ET₀) is ${recentMeanET0} mm/day. Without timely hydration, crop transpiration stress will cause stomatal closure and vegetative yield stunting.`;
       alternatives.push({
@@ -411,7 +494,47 @@ export class FieldIntelligenceService {
         description: 'Moisture must rise above 48% within 4 hours post-irrigation.',
       };
     }
-    // Rule 3: Moderate depletion
+    // Rule 2B: Critical root zone depletion with light-to-moderate rain (5 <= rain < 15mm)
+    else if (sensorMoisture < 28 && forecastRainMm >= 5 && forecastRainMm < 15) {
+      action = 'IRRIGATE_LIGHT';
+      actionLabel = 'Schedule Light Irrigation Cycle (10-15mm) — Deficit with Rain Offset';
+      urgency = 'high';
+      decisionRules.push(
+        `Triggered by severe soil moisture depletion (${sensorMoisture}% < 28%) buffered by light forecast rain (${forecastRainMm}mm).`
+      );
+      explanation = `Soil moisture is critically depleted at ${sensorMoisture}%. While light-to-moderate rain (${forecastRainMm}mm) is forecast, it is insufficient on its own to replenish the root zone. A light 10–15mm cycle provides necessary hydration while leaving buffer capacity for incoming precipitation.`;
+      alternatives.push({
+        action: 'Hold irrigation for 12 hours to observe rainfall onset',
+        tradeOff: 'Avoids supplemental pumping if downpour exceeds forecast, but prolongs daytime moisture stress.',
+      });
+      expectedCondition = {
+        parameter: 'Soil Moisture',
+        targetRange: '45% – 60%',
+        timeframeHours: 8,
+        description: 'Moisture expected to recover to 45–60% with combined irrigation and rain.',
+      };
+    }
+    // Rule 2C: Critical root zone depletion with substantial forecast rain (15 <= rain < 20mm)
+    else if (sensorMoisture < 28 && forecastRainMm >= 15 && forecastRainMm < 20) {
+      action = 'POSTPONE_IRRIGATION';
+      actionLabel = 'Temporary Postpone — Inbound Rain Cushion with Drought Watch';
+      urgency = 'medium';
+      decisionRules.push(
+        `Triggered by low soil moisture (${sensorMoisture}%) offset by substantial forecast rain (${forecastRainMm}mm at ${forecastRainProb}%).`
+      );
+      explanation = `Soil moisture is depleted (${sensorMoisture}%), but substantial precipitation (${forecastRainMm}mm) is anticipated. Postponing irrigation conserves resources. Actively monitor root-zone moisture; if rain fails to arrive within 12 hours, execute immediate irrigation.`;
+      alternatives.push({
+        action: 'Apply micro-drip pulse',
+        tradeOff: 'Provides immediate relief to top 5cm root zone with minimal water volume.',
+      });
+      expectedCondition = {
+        parameter: 'Soil Moisture',
+        targetRange: '45% – 60%',
+        timeframeHours: 12,
+        description: 'Awaiting rainfall arrival to restore root zone.',
+      };
+    }
+    // Rule 3A: Moderate depletion with low rain (< 10mm)
     else if (sensorMoisture < 42 && forecastRainMm < 10) {
       action = 'IRRIGATE_LIGHT';
       actionLabel = 'Schedule Light Irrigation Cycle (15mm)';
@@ -429,6 +552,26 @@ export class FieldIntelligenceService {
         targetRange: '50% – 60%',
         timeframeHours: 6,
         description: 'Moisture expected to recover to 50–60% range.',
+      };
+    }
+    // Rule 3B: Moderate depletion with sufficient rain (>= 10mm)
+    else if (sensorMoisture < 42 && forecastRainMm >= 10) {
+      action = 'POSTPONE_IRRIGATION';
+      actionLabel = 'Postpone Irrigation — Anticipated Rain Replenishment';
+      urgency = 'low';
+      decisionRules.push(
+        `Triggered by moderate soil moisture (${sensorMoisture}%) with sufficient forecast rain (${forecastRainMm}mm) to replenish root zone.`
+      );
+      explanation = `Moisture levels are moderate at ${sensorMoisture}%. Forecast precipitation of ${forecastRainMm}mm is sufficient to replenish root-zone capacity naturally without supplemental irrigation.`;
+      alternatives.push({
+        action: 'Check field bunds and drainage outlets',
+        tradeOff: 'Ensures even water retention across parcel.',
+      });
+      expectedCondition = {
+        parameter: 'Soil Moisture',
+        targetRange: '50% – 65%',
+        timeframeHours: 18,
+        description: 'Rainfall expected to recharge root zone.',
       };
     }
     // Rule 4: Nitrogen replenishment during tillering
@@ -528,6 +671,7 @@ export class FieldIntelligenceService {
           dataQualityStatus: sensorQualityStatus,
           freshnessMinutes,
           isStale,
+          provenance: sensorProvenance,
         },
         soilTemp: {
           value: sensorTemp || 25.0,
@@ -544,6 +688,15 @@ export class FieldIntelligenceService {
         soilNitrogen: { value: soilN, unit: 'kg/ha', source: soilSource },
         soilPhosphorus: { value: soilP, unit: 'kg/ha', source: soilSource },
         soilPotassium: { value: soilK, unit: 'kg/ha', source: soilSource },
+        soilHealthCard: {
+          ph: soilPh,
+          availableN: soilN,
+          availableP: soilP,
+          availableK: soilK,
+          texture: soilTexture,
+          source: soilSource,
+          dataQualityStatus: soilQualityStatus,
+        },
         ambientTemp: { value: ambientTemp, unit: '°C', source: weatherSource },
         humidity: { value: ambientHumidity, unit: '%', source: weatherSource },
         forecastRainMm: { value: forecastRainMm, unit: 'mm', source: weatherSource },
@@ -580,13 +733,11 @@ export class FieldIntelligenceService {
         await FieldRecommendation.create(result);
       } catch (err: any) {
         console.warn(`⚠️ [FIELD INTELLIGENCE] DB save error: ${err.message}`);
-        if (env.NODE_ENV === 'production') {
-          const dbErr: any = new Error(
-            'Service Unavailable: Failed to persist field recommendation to durable storage. Please retry.'
-          );
-          dbErr.statusCode = 503;
-          throw dbErr;
-        }
+        const dbErr: any = new Error(
+          'Service Unavailable: Failed to persist field recommendation to durable storage. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
       }
     } else {
       if (env.NODE_ENV === 'production') {
@@ -596,8 +747,9 @@ export class FieldIntelligenceService {
         dbErr.statusCode = 503;
         throw dbErr;
       }
-      memoryRecommendations[recommendationId] = result;
     }
+
+    memoryRecommendations[recommendationId] = result;
 
     return result;
   }
@@ -643,9 +795,9 @@ export class FieldIntelligenceService {
     }
 
     const now = Date.now();
-    let sensorMoisture: number | null;
-    let sensorTemp: number | null;
-    let sensorHumidity: number | null;
+    let sensorMoisture: number | null = null;
+    let sensorTemp: number | null = null;
+    let sensorHumidity: number | null = null;
     let sensorSource: string;
     let sensorSourceType: string;
     let sensorQualityStatus: string;
@@ -653,16 +805,34 @@ export class FieldIntelligenceService {
     let freshnessMinutes: number;
     let isStale: boolean;
 
-    if (context.soilMoistureOverride !== undefined && context.soilMoistureOverride !== null) {
-      sensorMoisture = Math.min(100, Math.max(0, Number(context.soilMoistureOverride)));
-      sensorTemp = 28;
-      sensorHumidity = 60;
-      sensorSource = 'manual_operator_input';
-      sensorSourceType = 'calibrated_field_measurement';
-      sensorQualityStatus = 'verified';
-      sensorProvenance = 'measured';
-      freshnessMinutes = 0;
-      isStale = false;
+    if (context.soilMoistureOverride !== undefined) {
+      if (context.soilMoistureOverride === null) {
+        sensorMoisture = null;
+        sensorSource = 'missing_telemetry';
+        sensorSourceType = 'iot_capacitive_probe';
+        sensorQualityStatus = 'missing';
+        sensorProvenance = 'missing';
+        freshnessMinutes = -1;
+        isStale = true;
+      } else {
+        const rawMoist = Number(context.soilMoistureOverride);
+        if (isNaN(rawMoist) || !isFinite(rawMoist) || rawMoist < 0 || rawMoist > 100) {
+          const err: any = new Error(
+            `Invalid soil moisture override: "${context.soilMoistureOverride}". Must be a valid numeric percentage in physical range [0, 100].`
+          );
+          err.statusCode = 400;
+          throw err;
+        }
+        sensorMoisture = Math.round(rawMoist * 10) / 10;
+        sensorTemp = 28;
+        sensorHumidity = 60;
+        sensorSource = 'manual_operator_input';
+        sensorSourceType = 'calibrated_field_measurement';
+        sensorQualityStatus = 'verified';
+        sensorProvenance = 'measured';
+        freshnessMinutes = 0;
+        isStale = false;
+      }
     } else if (latestSensor) {
       sensorMoisture = latestSensor.moisture;
       sensorTemp = latestSensor.temperature;
@@ -675,7 +845,7 @@ export class FieldIntelligenceService {
         now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
       freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
       isStale = freshnessMinutes > 15;
-    } else {
+    } else if (context.allowSimulation || context.isSimulated) {
       const fieldDefaultMoisture =
         fieldId === 'field-01'
           ? 24
@@ -688,11 +858,19 @@ export class FieldIntelligenceService {
       sensorTemp = 28;
       sensorHumidity = 62;
       sensorSource = 'iot_simulator';
-      sensorSourceType = 'calibrated_field_measurement';
+      sensorSourceType = 'simulated_calibration_profile';
       sensorQualityStatus = 'simulated';
       sensorProvenance = 'simulated';
       freshnessMinutes = 2;
       isStale = false;
+    } else {
+      sensorMoisture = null;
+      sensorSource = 'missing_telemetry';
+      sensorSourceType = 'iot_capacitive_probe';
+      sensorQualityStatus = 'missing';
+      sensorProvenance = 'missing';
+      freshnessMinutes = -1;
+      isStale = true;
     }
 
     // 2. Weather reanalysis
@@ -709,9 +887,24 @@ export class FieldIntelligenceService {
         let et0Sum = 0;
         let count = 0;
         for (const w of weatherRes.data) {
-          if (typeof w.precipitationMm === 'number') rainSum += w.precipitationMm;
-          if (typeof w.et0EvapotranspirationMm === 'number') {
-            et0Sum += w.et0EvapotranspirationMm;
+          const precipVal =
+            w.precipitation_sum !== undefined
+              ? Number(w.precipitation_sum)
+              : w.precipitationMm !== undefined
+                ? Number(w.precipitationMm)
+                : NaN;
+          if (!isNaN(precipVal) && precipVal >= 0) {
+            rainSum += precipVal;
+          }
+
+          const et0Val =
+            w.et0_fao_evapotranspiration !== undefined
+              ? Number(w.et0_fao_evapotranspiration)
+              : w.et0EvapotranspirationMm !== undefined
+                ? Number(w.et0EvapotranspirationMm)
+                : NaN;
+          if (!isNaN(et0Val) && et0Val >= 0) {
+            et0Sum += et0Val;
             count++;
           }
         }
@@ -1011,13 +1204,11 @@ export class FieldIntelligenceService {
       } catch (err: any) {
         if (err.statusCode) throw err;
         console.warn(`⚠️ [FIELD INTELLIGENCE] Action record error: ${err.message}`);
-        if (env.NODE_ENV === 'production') {
-          const dbErr: any = new Error(
-            'Service Unavailable: Failed to persist farmer action to durable storage. Please retry.'
-          );
-          dbErr.statusCode = 503;
-          throw dbErr;
-        }
+        const dbErr: any = new Error(
+          'Service Unavailable: Failed to persist farmer action to durable storage. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
       }
     } else {
       if (env.NODE_ENV === 'production') {
@@ -1165,10 +1356,14 @@ export class FieldIntelligenceService {
       const isDismissedAction = actionTaken === 'rejected' || actionTaken === 'dismissed';
 
       if (isIrrigationAction) {
-        if (newMoisture >= 45 && delta >= 8) {
+        if (newMoisture > 75) {
+          conditionMet = false;
+          status = 'worsened';
+          explanation = `Excessive soil moisture observed (${newMoisture}%). Exceeds root-zone field capacity and aeration threshold (75%), presenting acute waterlogging and hypoxia risk. Irrigation should be suspended immediately.`;
+        } else if (newMoisture >= 45 && newMoisture <= 75 && delta >= 8) {
           conditionMet = true;
           status = 'achieved';
-          explanation = `Follow-up observation verified! Soil moisture increased from ${baselineMoisture}% to ${newMoisture}% (+${delta}% delta), successfully fulfilling the root-zone replenishment condition.`;
+          explanation = `Follow-up observation verified! Soil moisture increased from ${baselineMoisture}% to ${newMoisture}% (+${delta}% delta), successfully fulfilling the root-zone replenishment condition within the safe agronomic range (45-75%).`;
         } else if (delta > 0) {
           conditionMet = false;
           status = 'partially_achieved';
@@ -1179,11 +1374,15 @@ export class FieldIntelligenceService {
           explanation = `Soil moisture did not increase (current: ${newMoisture}%). Verify irrigation pump pressure, emitter lines, or soil compaction.`;
         }
       } else if (isPostponeAction) {
-        if (newMoisture >= 35 && newMoisture <= 75) {
+        if (newMoisture > 75) {
+          conditionMet = false;
+          status = 'worsened';
+          explanation = `Postpone strategy resulted in soil saturation (${newMoisture}%), indicating heavy unabsorbed rainfall or waterlogging. Check drainage ditches and tile drains.`;
+        } else if (newMoisture >= 35 && newMoisture <= 75) {
           conditionMet = true;
           status = 'achieved';
           explanation = `Postpone strategy successful: Soil moisture held safely at ${newMoisture}%, saving irrigation water while preventing saturation.`;
-        } else if (delta < -15) {
+        } else if (delta < -15 || newMoisture < 28) {
           conditionMet = false;
           status = 'not_achieved';
           explanation = `Soil moisture depleted rapidly to ${newMoisture}%. Irrigation threshold reached; schedule immediate hydration.`;
@@ -1237,13 +1436,11 @@ export class FieldIntelligenceService {
         rec.followUpEvaluation = evaluation;
         await rec.save();
       } catch (err: any) {
-        if (env.NODE_ENV === 'production') {
-          const dbErr: any = new Error(
-            'Service Unavailable: Failed to persist follow-up evaluation in durable storage. Please retry.'
-          );
-          dbErr.statusCode = 503;
-          throw dbErr;
-        }
+        const dbErr: any = new Error(
+          'Service Unavailable: Failed to persist follow-up evaluation in durable storage. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
       }
     } else if (env.NODE_ENV === 'production') {
       const dbErr: any = new Error(
@@ -1433,19 +1630,6 @@ export class FieldIntelligenceService {
           { new: true }
         );
 
-        try {
-          BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
-            recommendationId,
-            status,
-            reviewerId,
-            reviewerName,
-            notes: reviewRecord.notes,
-            reviewedAt: reviewRecord.reviewedAt.toISOString(),
-          });
-        } catch {
-          /* audit safe */
-        }
-
         if (updated) {
           try {
             await BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
@@ -1463,13 +1647,11 @@ export class FieldIntelligenceService {
         }
       } catch (err: any) {
         console.warn(`⚠️ [FIELD INTELLIGENCE] Agronomist review error: ${err.message}`);
-        if (env.NODE_ENV === 'production') {
-          const dbErr: any = new Error(
-            'Service Unavailable: Failed to persist specialist review to durable storage. Please retry.'
-          );
-          dbErr.statusCode = 503;
-          throw dbErr;
-        }
+        const dbErr: any = new Error(
+          'Service Unavailable: Failed to persist specialist review to durable storage. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
       }
     } else {
       if (env.NODE_ENV === 'production') {
@@ -1562,7 +1744,7 @@ export class FieldIntelligenceService {
     }
 
     const memoryList = Object.values(memoryRecommendations)
-      .filter((r) => r.userId === userId || r.farmId === farmId)
+      .filter((r) => r.userId === userId && (!farmId || r.farmId === farmId))
       .slice(0, limit);
 
     return memoryList;
