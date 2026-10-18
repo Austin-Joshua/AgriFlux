@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Activity } from 'lucide-react';
+import {
+  Activity,
+  Leaf,
+  CheckCircle2,
+  AlertTriangle,
+  Layers,
+  ArrowUpRight,
+  ArrowRight,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ReportModal from '../components/ReportModal';
 
@@ -221,8 +229,8 @@ const CropHealthMonitoring: React.FC = () => {
         content={reportModal.content}
         type={reportModal.type}
       />
-      {/* Header — Standardized */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+      {/* Header with Clean Structured Capsules */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
         <div>
           <h1 className="page-header flex items-center gap-3">
             <Activity className="text-primary-600 dark:text-primary-400" />
@@ -231,62 +239,133 @@ const CropHealthMonitoring: React.FC = () => {
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
             {t('cropHealthMonitor.subtitle', 'Precision NDVI & EVI vegetation analytics via satellite vision')}
           </p>
-        </div>
-        <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-          <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
-            {t('cropHealthMonitor.satelliteAiVision', '🛰️ Satellite AI Vision')}
-          </span>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40">
-            {t('cropHealthMonitor.sentinelCalibration', 'Copernicus Sentinel-2 L2A Calibration Profile')}
-          </span>
+          <div className="flex flex-wrap items-center gap-2 mt-2.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/50 shadow-sm whitespace-nowrap">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              {t('cropHealthMonitor.satelliteAiVision', 'Satellite AI Vision')}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/50 shadow-sm whitespace-nowrap">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              {t('cropHealthMonitor.sentinelCalibration', 'Copernicus Sentinel-2 L2A')}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Summary Cards — Standardized to 3-column */}
-      <div className="standard-grid">
-        {[
-          {
-            key: 'avgNdviScore',
-            label: t('cropHealthMonitor.avgNdviScore', 'Avg NDVI Score'),
-            value: avgNDVI,
-            color: 'text-primary-600',
-            bg: 'glass-gold border-gold-200',
-            icon: '🌿',
-          },
-          {
-            key: 'fieldHealth',
-            label: t('cropHealthMonitor.fieldHealth', 'Field Health'),
-            value: `${healthyCount}/${NDVI_ZONES.length} ${t('cropHealthMonitor.healthy', 'Healthy')}`,
-            color: 'text-primary-600',
-            bg: 'bg-primary-50 dark:bg-primary-900/20',
-            icon: '✅',
-          },
-          {
-            key: 'totalFarmArea',
-            label: t('cropHealthMonitor.totalFarmArea', 'Total Farm Area'),
-            value: '9.0 ha',
-            color: 'text-blue-600',
-            bg: 'bg-blue-50 dark:bg-blue-900/20',
-            icon: '🗺️',
-          },
-        ].map((s) => (
-          <div
-            key={s.key}
-            onClick={() => openReport(s.key === 'fieldHealth' ? 'Healthy Zones' : s.label)}
-            className={`card !p-6 transition-all hover:scale-[1.02] hover:shadow-2xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
-          >
-            <div className="flex justify-between items-start">
-              <span className="text-3xl group-hover:rotate-12 transition-transform">{s.icon}</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary-500 transition-colors">
-                {t('cropHealthMonitor.analyticalReport', 'Analytical Report')}
+      {/* Crop Health KPI Stat Cards — Symmetrical 4-Column Layout like Dashboard */}
+      <div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
+        style={{ animationDelay: '100ms' }}
+      >
+        <div
+          onClick={() => openReport('Avg NDVI Score')}
+          className="card-clickable group border-b-2 border-transparent hover:border-primary-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <Leaf className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className="flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right text-emerald-600 dark:text-emerald-400">
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                <span className="truncate">{t('cropHealthMonitor.optimalRange', 'Optimal')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-primary-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
               </span>
             </div>
-            <p className={`text-3xl font-black mt-4 ${s.color}`}>{s.value}</p>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
-              {s.label}
-            </p>
           </div>
-        ))}
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('cropHealthMonitor.avgNdviScore', 'Avg NDVI Score')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-display truncate">
+            {avgNDVI}
+          </p>
+        </div>
+
+        <div
+          onClick={() => openReport('Healthy Zones')}
+          className="card-clickable group border-b-2 border-transparent hover:border-primary-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <CheckCircle2 className="text-primary-600 dark:text-primary-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className="flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right text-primary-600 dark:text-primary-400">
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                <span className="truncate">{Math.round((healthyCount / NDVI_ZONES.length) * 100)}% {t('cropHealthMonitor.healthy', 'Healthy')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-primary-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('cropHealthMonitor.fieldHealth', 'Field Health')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white font-display truncate">
+            {healthyCount}/{NDVI_ZONES.length} {t('cropHealthMonitor.zones', 'Zones')}
+          </p>
+        </div>
+
+        <div
+          onClick={() => openReport('Stress Zones')}
+          className="card-clickable group border-b-2 border-transparent hover:border-amber-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <AlertTriangle className="text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className="flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right text-amber-600 dark:text-amber-400">
+                <span className="truncate">{t('cropHealthMonitor.zoneCAlert', 'Zone C Alert')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-amber-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('cropHealthMonitor.stressAlert', 'Stress Alert')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-amber-600 dark:text-amber-400 font-display truncate">
+            {NDVI_ZONES.filter((z) => z.status === 'Stressed').length} {t('cropHealthMonitor.zoneStressed', 'Zone Stressed')}
+          </p>
+        </div>
+
+        <div
+          onClick={() => openReport('Total Farm Area')}
+          className="card-clickable group border-b-2 border-transparent hover:border-blue-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <Layers className="text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className="flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right text-blue-600 dark:text-blue-400">
+                <span className="truncate">22.2 {t('cropHealthMonitor.acres', 'Acres')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-blue-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('cropHealthMonitor.monitoredArea', 'Monitored Area')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400 font-display truncate">
+            9.0 ha
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

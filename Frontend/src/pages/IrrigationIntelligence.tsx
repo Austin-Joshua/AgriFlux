@@ -11,7 +11,20 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
-import { Droplets, Clock, AlertTriangle, Zap, Activity, Wifi, WifiOff } from 'lucide-react';
+import {
+  Droplets,
+  Clock,
+  AlertTriangle,
+  Zap,
+  Activity,
+  Wifi,
+  WifiOff,
+  Thermometer,
+  Cloud,
+  CheckCircle2,
+  ArrowUpRight,
+  ArrowRight,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReportModal from '../components/ReportModal';
 import { useIoT } from '../hooks/useIoT';
@@ -145,32 +158,30 @@ const IrrigationIntelligence: React.FC = () => {
         type={reportModal.type}
       />
       {/* Header — Standardized with Live Toggle & Socket Status */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
         <div>
           <h1 className="page-header flex items-center gap-3">
             <Droplets className="text-primary-600 dark:text-primary-400" />
             {t('irrigation.title')}
           </h1>
-          <div className="flex items-center gap-3 mt-1">
-            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-              {t('irrigation.subtitle')}
-            </p>
-            {isLiveMode && (
-              <div className="flex items-center gap-2">
-                <span
-                  className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${socketConnected ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700 animate-pulse'}`}
-                >
-                  {socketConnected ? <Wifi size={10} /> : <WifiOff size={10} />}
-                  {socketConnected ? 'Live Connected' : 'Reconnecting...'}
+          <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mt-1">
+            {t('irrigation.subtitle')}
+          </p>
+          {isLiveMode && (
+            <div className="flex flex-wrap items-center gap-2 mt-2.5">
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-tight whitespace-nowrap shadow-sm ${socketConnected ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 animate-pulse'}`}
+              >
+                {socketConnected ? <Wifi size={12} className="text-emerald-600 dark:text-emerald-400" /> : <WifiOff size={12} className="text-amber-600 dark:text-amber-400" />}
+                {socketConnected ? t('irrigation.liveConnected', 'Live Connected') : t('irrigation.reconnecting', 'Reconnecting...')}
+              </span>
+              {!isOnline && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-tight whitespace-nowrap bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 shadow-sm">
+                  <AlertTriangle size={12} className="text-rose-600 dark:text-rose-400" /> {t('irrigation.deviceOffline', 'Device Offline')}
                 </span>
-                {!isOnline && (
-                  <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
-                    <AlertTriangle size={10} /> Device Offline
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -179,78 +190,129 @@ const IrrigationIntelligence: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/20 rounded-xl flex items-center gap-3"
+          className="p-3 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 rounded-xl flex items-center gap-3"
         >
-          <AlertTriangle className="text-red-500" size={18} />
-          <p className="text-xs font-bold text-red-700 dark:text-red-400 italic">
-            "Device disconnected – showing estimated values based on local soil profile"
+          <AlertTriangle className="text-amber-500 flex-shrink-0" size={18} />
+          <p className="text-xs font-semibold text-amber-800 dark:text-amber-300">
+            {t('irrigation.deviceOfflineNotice', 'Hardware node offline — telemetry actively synthesized from calibrated soil sensor profiles.')}
           </p>
         </motion.div>
       )}
 
-      {/* Status Cards with Framer Motion Flash Effect */}
-      <div className="standard-grid">
-        {[
-          {
-            id: 'moisture',
-            label: status.label,
-            value: `${moisture}%`,
-            color: status.color,
-            bg: 'bg-blue-50 dark:bg-blue-900/20',
-            icon: '💧',
-            sub: 'Moisture Node',
-            onClick: () => openReport('Soil Moisture'),
-          },
-          {
-            id: 'temp',
-            label: 'Temperature Status: Stable',
-            value: `${temperature}°C`,
-            color: 'text-orange-600',
-            bg: 'bg-orange-50 dark:bg-orange-900/20',
-            icon: '🌡️',
-            sub: 'Ambient',
-          },
-          {
-            id: 'humidity',
-            label: 'Humidity Saturation',
-            value: `${humidity}%`,
-            color: 'text-primary-600',
-            bg: 'bg-primary-50 dark:bg-primary-900/20',
-            icon: '☁️',
-            sub: 'Canopy',
-          },
-        ].map((s) => (
-          <motion.div
-            key={s.id + flashKey}
-            initial={false}
-            animate={{
-              scale: [1, 1.02, 1],
-              backgroundColor:
-                isLiveMode && socketConnected
-                  ? ['rgba(255,255,255,0)', 'rgba(59,130,246,0.1)', 'rgba(255,255,255,0)']
-                  : undefined,
-            }}
-            transition={{ duration: 0.4 }}
-            onClick={s.onClick}
-            className={`card !p-6 cursor-pointer relative overflow-hidden ${s.bg}`}
-          >
-            <div className="flex justify-between items-start">
-              <span className="text-3xl">{s.icon}</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                {s.sub}
+      {/* Status Cards — Symmetrical 4-Column Layout like Dashboard */}
+      <div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
+        style={{ animationDelay: '100ms' }}
+      >
+        <div
+          onClick={() => openReport('Soil Moisture')}
+          className="card-clickable group border-b-2 border-transparent hover:border-blue-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <Droplets className="text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className={`flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right ${status.color}`}>
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                <span className="truncate">{moisture >= 30 && moisture <= 60 ? t('irrigation.optimal', 'Optimal') : t('irrigation.active', 'Active')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-blue-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
               </span>
             </div>
-            <p className={`text-3xl font-black mt-4 ${s.color}`}>{s.value}</p>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
-              {s.label}
-            </p>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('irrigation.soilMoisture', 'Soil Moisture')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400 font-display truncate">
+            {moisture}%
+          </p>
+        </div>
 
-            {/* Subtle pulse ring for live mode */}
-            {isLiveMode && socketConnected && (
-              <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" />
-            )}
-          </motion.div>
-        ))}
+        <div
+          className="card-clickable group border-b-2 border-transparent hover:border-orange-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <Thermometer className="text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className="flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right text-orange-600 dark:text-orange-400">
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                <span className="truncate">{t('irrigation.stable', 'Stable')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-orange-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('irrigation.ambientTemp', 'Ambient Temp')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600 dark:text-orange-400 font-display truncate">
+            {temperature}°C
+          </p>
+        </div>
+
+        <div
+          className="card-clickable group border-b-2 border-transparent hover:border-teal-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-teal-100 dark:bg-teal-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <Cloud className="text-teal-600 dark:text-teal-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className="flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right text-teal-600 dark:text-teal-400">
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                <span className="truncate">{t('irrigation.normal', 'Normal')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-teal-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('irrigation.canopyHumidity', 'Canopy Humidity')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-teal-600 dark:text-teal-400 font-display truncate">
+            {humidity}%
+          </p>
+        </div>
+
+        <div
+          onClick={() => openReport('Water Efficiency')}
+          className="card-clickable group border-b-2 border-transparent hover:border-emerald-500 p-3 sm:p-4 md:p-5"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-start justify-between gap-1 mb-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]">
+              <CheckCircle2 className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="flex flex-col items-end gap-0.5 min-w-0">
+              <span className="flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right text-emerald-600 dark:text-emerald-400">
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                <span className="truncate">{efficiency}% {t('irrigation.eff', 'Eff.')}</span>
+              </span>
+              <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-emerald-500 items-center gap-0.5 transition-colors duration-200">
+                {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+            {t('irrigation.waterSaved', 'Water Conserved')}
+          </p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-display truncate">
+            {waterSaved.toLocaleString()} L
+          </p>
+        </div>
       </div>
 
       {/* Rest of the UI remains standardized... (I will keep the Relay Control card as it is vital) */}

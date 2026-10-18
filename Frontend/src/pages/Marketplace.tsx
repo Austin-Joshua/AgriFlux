@@ -7,6 +7,11 @@ import {
   Star,
   TrendingUp,
   ShoppingCart,
+  ShoppingBag,
+  Users,
+  Award,
+  ArrowUpRight,
+  ArrowRight,
   Info,
   X,
   CheckCircle2,
@@ -500,35 +505,75 @@ const Marketplace: React.FC = () => {
         </button>
       </div>
 
-      {/* Analytics Summary */}
+      {/* Analytics Summary — Symmetrical 4-Column Layout like Dashboard */}
       <div
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-slide-up-fade"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
         style={{ animationDelay: '100ms' }}
       >
         {[
           {
-            label: t('marketplace.activeListings'),
+            label: t('marketplace.activeListings', 'Active Listings'),
             value: `${rndInt(1220, 1280).toLocaleString()}`,
-            trend: `+${rndInt(12, 18)}% this week`,
-            color: 'border-l-blue-500',
+            trend: `+${rndInt(12, 18)}% ${t('common.thisWeek', 'this week')}`,
+            color: 'text-blue-600 dark:text-blue-400',
+            bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+            icon: ShoppingBag,
+            positive: true,
           },
           {
-            label: t('marketplace.successfulTrades'),
+            label: t('marketplace.successfulTrades', 'Successful Trades (30d)'),
             value: `₹${rndInt(38, 48) / 10}Cr`,
-            trend: `+${rndInt(6, 12)}% this week`,
-            color: 'border-l-green-500',
+            trend: `+${rndInt(6, 12)}% ${t('common.thisWeek', 'this week')}`,
+            color: 'text-emerald-600 dark:text-emerald-400',
+            bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
+            icon: TrendingUp,
+            positive: true,
           },
           {
-            label: t('marketplace.verifiedBuyers'),
+            label: t('marketplace.verifiedBuyers', 'Verified Buyers'),
             value: `${rndInt(340, 365)}+`,
-            trend: 'Across 12 states',
-            color: 'border-l-purple-500',
+            trend: `12 ${t('marketplace.states', 'States')}`,
+            color: 'text-purple-600 dark:text-purple-400',
+            bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+            icon: Users,
+            positive: true,
           },
-        ].map(({ label, value, trend, color }) => (
-          <div key={label} className={`card p-5 border-l-4 ${color}`}>
-            <h3 className="text-gray-500 dark:text-gray-400 text-sm font-medium">{label}</h3>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
-            <span className="text-xs text-green-500 font-medium">{trend}</span>
+          {
+            label: t('marketplace.fairPricePremium', 'Fair Price Index'),
+            value: '+14.2%',
+            trend: t('marketplace.vsMandi', 'Above Mandi'),
+            color: 'text-amber-600 dark:text-amber-400',
+            bgColor: 'bg-amber-100 dark:bg-amber-900/30',
+            icon: Award,
+            positive: true,
+          },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="card-clickable group border-b-2 border-transparent hover:border-primary-500 p-3 sm:p-4 md:p-5"
+          >
+            <div className="flex items-start justify-between gap-1 mb-2">
+              <div
+                className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 ${item.bgColor} rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 md:[&>svg]:w-[22px] md:[&>svg]:h-[22px]`}
+              >
+                <item.icon className={item.color} />
+              </div>
+              <div className="flex flex-col items-end gap-0.5 min-w-0">
+                <span className={`flex items-center justify-end gap-0.5 text-[11px] sm:text-xs md:text-sm font-bold tracking-tight text-right ${item.color}`}>
+                  <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                  <span className="truncate">{item.trend}</span>
+                </span>
+                <span className="hidden sm:flex text-[9px] md:text-[10px] text-gray-400 group-hover:text-primary-500 items-center gap-0.5 transition-colors duration-200">
+                  {t('common.viewDetails', 'View details')} <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
+                </span>
+              </div>
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 truncate">
+              {item.label}
+            </p>
+            <p className={`text-lg sm:text-xl md:text-2xl font-bold ${item.color} font-display truncate`}>
+              {item.value}
+            </p>
           </div>
         ))}
       </div>
