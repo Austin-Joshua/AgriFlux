@@ -572,7 +572,7 @@ interface BlockchainLedgerSummary {
             [
               { key: 'overview', label: '📊 Overview' },
               { key: 'users', label: '👥 User Governance' },
-              { key: 'blockchain', label: '🔗 Blockchain Ledger' },
+              { key: 'blockchain', label: '🛡️ Cryptographic Ledger' },
               { key: 'actuators', label: '🕹️ Hardware & Actuators' },
               { key: 'system', label: '⚙️ Cloud Health' },
               { key: 'activity', label: '📋 Audit Trail' },
@@ -659,7 +659,7 @@ interface BlockchainLedgerSummary {
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={22} className="text-emerald-400" />
                   <h3 className="text-lg font-black text-white font-display">
-                    Cryptographic Blockchain Ledger & Anti-Theft Protection
+                    Cryptographic Audit Ledger & Tamper Guard
                   </h3>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30">
                     SHA-256 MERKLE CHAIN
@@ -668,9 +668,10 @@ interface BlockchainLedgerSummary {
                 <p className="text-xs text-gray-300 mt-1 max-w-2xl leading-relaxed">
                   In-Process Proof-of-Authority (PoA) Cryptographic Audit Ledger: Every sensor
                   telemetry batch, mobile OTP credential, agronomist prescription, and hardware
-                  actuator command is cryptographically sealed into an immutable SHA-256 Merkle
-                  chain. If any runtime telemetry or prescription record is altered or tampered with,
-                  the downstream block hashes and signatures break immediately.
+                  actuator command is cryptographically sealed into a sequential SHA-256 Merkle
+                  chain running on the sovereign node. Mathematical hash-linking guarantees that any
+                  in-memory or persistent tampering invalidates downstream block hashes and HMAC
+                  signatures immediately.
                 </p>
               </div>
 

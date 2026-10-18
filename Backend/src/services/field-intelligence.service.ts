@@ -8,6 +8,7 @@ import { WeatherIngestionService } from './weather-ingestion.service';
 import { SatelliteProcessingService } from './satellite-processing.service';
 import { SoilDataService } from './soil-data.service';
 import { CropStatisticsService } from './crop-statistics.service';
+import { BlockchainService } from './blockchain.service';
 
 export interface FieldContextInput {
   fieldId?: string;
@@ -25,6 +26,8 @@ export interface FieldContextInput {
   humidity?: number;
   latitude?: number;
   longitude?: number;
+  forceRefresh?: boolean;
+  reuseActive?: boolean;
 }
 
 // In-memory cache for demo mode
@@ -59,6 +62,33 @@ export class FieldIntelligenceService {
     }
 
     const now = Date.now();
+
+    // --- 0. REUSE ACTIVE RECOMMENDATION IF REQUESTED ---
+    if (context.reuseActive && !context.forceRefresh) {
+      if (isDBConnected) {
+        try {
+          const activeRec = await FieldRecommendation.findOne({
+            userId,
+            fieldId,
+            createdAt: { $gte: new Date(now - 30 * 60 * 1000) },
+          }).sort({ createdAt: -1 });
+          if (activeRec) return activeRec;
+        } catch {
+          /* fallback to memory */
+        }
+      }
+
+      const activeMem = Object.values(memoryRecommendations)
+        .filter(
+          (r) =>
+            r.userId === userId &&
+            r.fieldId === fieldId &&
+            now - new Date(r.createdAt).getTime() < 30 * 60 * 1000
+        )
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+      if (activeMem) return activeMem;
+    }
+
     let sensorMoisture: number | null | undefined;
     let sensorTemp: number | null | undefined;
     let sensorHumidity: number | null | undefined;
@@ -947,6 +977,19 @@ export class FieldIntelligenceService {
 
           existing.farmerAction = actionRecord;
           await existing.save();
+
+          try {
+            BlockchainService.getInstance().addBlock('ACTUATOR_OVERRIDE', {
+              recommendationId,
+              farmerAction: actionTaken,
+              actorId: actorId || userId,
+              actorName: actorName || 'Farmer',
+              recordedAt: actionRecord.recordedAt.toISOString(),
+            });
+          } catch {
+            /* audit safe */
+          }
+
           return existing;
         }
       } catch (err: any) {
@@ -976,6 +1019,19 @@ export class FieldIntelligenceService {
       }
 
       memRec.farmerAction = actionRecord;
+
+      try {
+        BlockchainService.getInstance().addBlock('ACTUATOR_OVERRIDE', {
+          recommendationId,
+          farmerAction: actionTaken,
+          actorId: actorId || userId,
+          actorName: actorName || 'Farmer',
+          recordedAt: actionRecord.recordedAt.toISOString(),
+        });
+      } catch {
+        /* audit safe */
+      }
+
       return memRec;
     }
 
@@ -1149,6 +1205,18 @@ export class FieldIntelligenceService {
       memoryRecommendations[recommendationId].followUpEvaluation = evaluation;
     }
 
+    try {
+      BlockchainService.getInstance().addBlock('TELEMETRY_LOG', {
+        recommendationId,
+        evaluationStatus: evaluation.status,
+        conditionMet: evaluation.conditionMet,
+        observedDelta: evaluation.observedDelta,
+        evaluatedAt: evaluation.evaluatedAt.toISOString(),
+      });
+    } catch {
+      /* audit safe */
+    }
+
     return evaluation;
   }
 
@@ -1156,8 +1224,16 @@ export class FieldIntelligenceService {
    * Phase 4 — Persisted Field Action Timeline
    * Retrieves an immutable chronological timeline of recommendations, actions, reviews, and evaluations
    */
-  static async getFieldTimeline(userId: string, fieldId?: string, limit = 25) {
-    const query: Record<string, any> = { userId };
+  static async getFieldTimeline(
+    userId: string,
+    fieldId?: string,
+    limit = 25,
+    isSpecialist = false
+  ) {
+    const query: Record<string, any> = {};
+    if (!isSpecialist) {
+      query.userId = userId;
+    }
     if (fieldId) query.fieldId = fieldId;
 
     let recs: any[] = [];
@@ -1171,7 +1247,7 @@ export class FieldIntelligenceService {
 
     if (recs.length === 0) {
       recs = Object.values(memoryRecommendations)
-        .filter((r) => r.userId === userId && (!fieldId || r.fieldId === fieldId))
+        .filter((r) => (isSpecialist || r.userId === userId) && (!fieldId || r.fieldId === fieldId))
         .slice(0, limit);
     }
 
@@ -1304,6 +1380,20 @@ export class FieldIntelligenceService {
           { agronomistReview: reviewRecord },
           { new: true }
         );
+
+        try {
+          BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
+            recommendationId,
+            status,
+            reviewerId,
+            reviewerName,
+            notes: reviewRecord.notes,
+            reviewedAt: reviewRecord.reviewedAt.toISOString(),
+          });
+        } catch {
+          /* audit safe */
+        }
+
         if (updated) return updated;
       } catch (err: any) {
         console.warn(`⚠️ [FIELD INTELLIGENCE] Agronomist review error: ${err.message}`);
@@ -1312,6 +1402,20 @@ export class FieldIntelligenceService {
 
     if (memoryRecommendations[recommendationId]) {
       memoryRecommendations[recommendationId].agronomistReview = reviewRecord;
+
+      try {
+        BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
+          recommendationId,
+          status,
+          reviewerId,
+          reviewerName,
+          notes: reviewRecord.notes,
+          reviewedAt: reviewRecord.reviewedAt.toISOString(),
+        });
+      } catch {
+        /* audit safe */
+      }
+
       return memoryRecommendations[recommendationId];
     }
 

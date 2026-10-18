@@ -125,6 +125,7 @@ interface FieldRecommendationData {
     notes: string;
     reviewerName: string;
     reviewedAt: string;
+    revisedPrescription?: string;
   };
   followUpEvaluation?: {
     conditionMet: boolean;
@@ -211,17 +212,19 @@ const AIDecisionPanel: React.FC = () => {
 
   // Fetch structured recommendation from backend
   const fetchRecommendation = useCallback(
-    async (field = selectedField, moistureOverride?: number) => {
+    async (field = selectedField, moistureOverride?: number, forceRefresh = false) => {
       setLoading(true);
       try {
         const targetMoisture =
           moistureOverride !== undefined ? moistureOverride : field.defaultMoisture;
-        const payload: Record<string, string | number> = {
+        const payload: Record<string, string | number | boolean> = {
           fieldId: field.id,
           fieldName: field.name,
           cropType: field.crop,
           cropStage: field.stage,
           soilMoistureOverride: targetMoisture,
+          forceRefresh,
+          reuseActive: !forceRefresh,
         };
 
         const res = await axios.post(`${API_URL}/field-intelligence/recommend`, payload, {
@@ -245,12 +248,12 @@ const AIDecisionPanel: React.FC = () => {
 
   // On mount and field switch, fetch calibrated telemetry immediately
   useEffect(() => {
-    fetchRecommendation(selectedField, selectedField.defaultMoisture);
+    fetchRecommendation(selectedField, selectedField.defaultMoisture, false);
   }, [fetchRecommendation, selectedField]);
 
   const handleSelectField = (field: FieldOption) => {
     setSelectedField(field);
-    fetchRecommendation(field, field.defaultMoisture);
+    fetchRecommendation(field, field.defaultMoisture, false);
   };
 
   // Record Farmer Response
@@ -470,7 +473,7 @@ const AIDecisionPanel: React.FC = () => {
               </button>
             ))}
             <button
-              onClick={() => fetchRecommendation(selectedField, selectedField.defaultMoisture)}
+              onClick={() => fetchRecommendation(selectedField, selectedField.defaultMoisture, true)}
               disabled={loading}
               title="Refresh In-Situ Telemetry"
               className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex-shrink-0 active:scale-95"
@@ -799,6 +802,44 @@ const AIDecisionPanel: React.FC = () => {
                 <XCircle size={13} /> Dismiss / Reject
               </button>
             </div>
+
+            {/* Specialist Consultation & Agronomist Review State */}
+            {recommendation?.agronomistReview ? (
+              <div className="p-2.5 rounded-xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-800/50 text-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-purple-900 dark:text-purple-200 flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-purple-600 dark:text-purple-400" />
+                    Specialist Review:{' '}
+                    {recommendation.agronomistReview.status.replace('_', ' ').toUpperCase()}
+                  </span>
+                  <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono">
+                    {new Date(recommendation.agronomistReview.reviewedAt).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </div>
+                <p className="text-gray-700 dark:text-gray-300 text-[11px] leading-relaxed">
+                  <span className="font-semibold text-purple-800 dark:text-purple-300">
+                    {recommendation.agronomistReview.reviewerName}:
+                  </span>{' '}
+                  {recommendation.agronomistReview.notes}
+                </p>
+                {recommendation.agronomistReview.revisedPrescription && (
+                  <p className="text-emerald-700 dark:text-emerald-300 font-bold text-[11px] bg-white/60 dark:bg-gray-900/60 p-1.5 rounded-lg border border-purple-100 dark:border-purple-900/40">
+                    Prescription: {recommendation.agronomistReview.revisedPrescription}
+                  </p>
+                )}
+              </div>
+            ) : recommendation?.farmerAction?.actionTaken === 'requested_review' ||
+              recommendation?.farmerAction?.actionTaken === 'inspected' ? (
+              <div className="p-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-800/50 text-xs flex items-center gap-2">
+                <Clock size={14} className="text-blue-500 animate-spin flex-shrink-0" />
+                <span className="text-blue-800 dark:text-blue-200 text-[11px]">
+                  Specialist review dispatched. Regional agronomist notified in consultation queue.
+                </span>
+              </div>
+            ) : null}
           </div>
 
           {/* STEP 2: Closed-Loop Outcome Verification */}

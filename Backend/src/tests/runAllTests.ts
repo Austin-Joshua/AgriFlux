@@ -16,6 +16,7 @@ import { runSoilDataTests } from './soil-data.test';
 import { runCropStatisticsTests } from './crop-statistics.test';
 import { runActuatorStateMachineTests } from './actuator-state-machine.test';
 import { runFieldIntelligenceIntegrationTests } from './field-intelligence-integration.test';
+import { runBlockchainTests } from './blockchain.test';
 
 async function main() {
   console.log('================================================================');
@@ -60,6 +61,10 @@ async function main() {
     {
       name: 'Suite 10: Field Intelligence Multi-Source Environmental Integration',
       runner: runFieldIntelligenceIntegrationTests,
+    },
+    {
+      name: 'Suite 11: Cryptographic Audit Ledger & Chain Integrity Verification',
+      runner: runBlockchainTests,
     },
   ];
 

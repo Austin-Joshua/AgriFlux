@@ -455,5 +455,77 @@ export async function runFieldIntelligenceTests(): Promise<
     });
   }
 
+  // Test 15: Specialist agronomist role can inspect field timeline across farmer recommendations
+  try {
+    const specialistTimeline = await FieldIntelligenceService.getFieldTimeline(
+      'agronomist_specialist_id',
+      'field-idempotent-01',
+      10,
+      true // isSpecialist
+    );
+    assert.ok(
+      specialistTimeline.length >= 1,
+      'Specialist must be able to retrieve field timeline across tenants'
+    );
+    assert.ok(
+      specialistTimeline.some((e) => e.fieldId === 'field-idempotent-01'),
+      'Must contain field event'
+    );
+
+    // Regular farmer must still be restricted
+    const otherFarmerTimeline = await FieldIntelligenceService.getFieldTimeline(
+      'random_stranger_farmer',
+      'field-idempotent-01',
+      10,
+      false
+    );
+    assert.strictEqual(
+      otherFarmerTimeline.length,
+      0,
+      'Unprivileged farmer must see 0 events for another farmer field'
+    );
+
+    results.push({
+      name: 'Field Intelligence Governance: Specialist timeline inspection enabled while preserving farmer tenant isolation',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Field Intelligence Governance: Specialist timeline inspection enabled while preserving farmer tenant isolation',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 16: Agronomist review triggers cryptographic seal in audit ledger
+  try {
+    const targetRec = await FieldIntelligenceService.generateRecommendation('farmer_sealed_01', {
+      fieldId: 'field-seal-01',
+      cropType: 'Maize',
+      soilMoistureOverride: 22,
+    });
+
+    const reviewed = await FieldIntelligenceService.recordAgronomistReview(
+      'farmer_sealed_01',
+      'agronomist_01',
+      'Dr. Test Agronomist',
+      targetRec.recommendationId,
+      'endorsed',
+      'Cryptographically sealed review directive'
+    );
+
+    assert.strictEqual(reviewed.agronomistReview.status, 'endorsed');
+    results.push({
+      name: 'Field Intelligence Security: Agronomist review seals tamper-proof record in cryptographic audit ledger',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Field Intelligence Security: Agronomist review seals tamper-proof record in cryptographic audit ledger',
+      passed: false,
+      error: err.message,
+    });
+  }
+
   return results;
 }

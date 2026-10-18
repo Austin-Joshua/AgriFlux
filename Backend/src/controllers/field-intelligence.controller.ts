@@ -157,7 +157,9 @@ export const evaluateFollowUp = async (req: Request, res: Response) => {
  */
 export const getFieldTimeline = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?.id || 'demo-farmer';
+    const user = (req as any).user;
+    const userId = user?.id || 'demo-farmer';
+    const isSpecialist = user?.role === 'agronomist' || user?.role === 'admin';
     const fieldIdParam = req.params.fieldId;
     const fieldIdQuery = req.query.fieldId;
     const fieldId =
@@ -168,7 +170,12 @@ export const getFieldTimeline = async (req: Request, res: Response) => {
           : undefined;
     const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 25));
 
-    const timeline = await FieldIntelligenceService.getFieldTimeline(userId, fieldId, limit);
+    const timeline = await FieldIntelligenceService.getFieldTimeline(
+      userId,
+      fieldId,
+      limit,
+      isSpecialist
+    );
 
     return res.status(200).json({
       success: true,

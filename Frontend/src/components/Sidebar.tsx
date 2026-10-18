@@ -30,6 +30,7 @@ import {
   Activity,
   ShieldCheck,
   Calendar,
+  Target,
   LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -104,6 +105,14 @@ const agronomistNavItems: NavItemData[] = [
     fallback: 'Command Center',
   },
   {
+    to: '/agronomist?tab=fieldDecisions',
+    icon: Target,
+    labelKey: 'nav.fieldDecisions',
+    fallback: 'Field Decisions Review',
+    badge: 'Decision Gates',
+    badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  },
+  {
     to: '/agronomist?tab=consultations',
     icon: Calendar,
     labelKey: 'nav.consultationsQueue',
@@ -149,8 +158,8 @@ const adminNavItems: NavItemData[] = [
     to: '/admin?tab=blockchain',
     icon: ShieldCheck,
     labelKey: 'nav.adminBlockchain',
-    fallback: 'Blockchain Ledger',
-    badge: 'SHA-256',
+    fallback: 'Cryptographic Audit Ledger',
+    badge: 'SHA-256 Merkle',
     badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
   },
   {

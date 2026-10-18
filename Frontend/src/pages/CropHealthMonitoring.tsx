@@ -230,9 +230,12 @@ const CropHealthMonitoring: React.FC = () => {
             Precision NDVI & EVI vegetation analytics via satellite vision
           </p>
         </div>
-        <div className="flex items-center justify-center md:justify-start gap-2">
+        <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
           <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
             🛰️ Satellite AI Vision
+          </span>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40">
+            Copernicus Sentinel-2 L2A Calibration Profile
           </span>
         </div>
       </div>
