@@ -204,7 +204,8 @@ export async function runBlockchainTests(): Promise<
   const setupMocks = () => {
     (BlockchainBlock as any).find = (_query: any = {}) => ({
       sort: (_sortCriteria: any) => ({
-        lean: async () => JSON.parse(JSON.stringify(mockPersistentBlocks.sort((a, b) => a.index - b.index))),
+        lean: async () =>
+          JSON.parse(JSON.stringify(mockPersistentBlocks.sort((a, b) => a.index - b.index))),
       }),
     });
 
@@ -252,7 +253,11 @@ export async function runBlockchainTests(): Promise<
       'Initial persistent initialization must seed 5 blocks into persistent storage'
     );
     assert.strictEqual(mockPersistentBlocks[0].index, 0, 'First persistent block must be index 0');
-    assert.strictEqual(mockPersistentBlocks[0].blockType, 'GENESIS', 'First persistent block must be GENESIS');
+    assert.strictEqual(
+      mockPersistentBlocks[0].blockType,
+      'GENESIS',
+      'First persistent block must be GENESIS'
+    );
     assert.strictEqual(
       mockPersistentBlocks[4].blockType,
       'ACTUATOR_OVERRIDE',
@@ -289,7 +294,11 @@ export async function runBlockchainTests(): Promise<
 
     // Simulate complete process crash / server restart
     blockchain.resetForTesting([]);
-    assert.strictEqual(blockchain.getChain().length, 0, 'In-memory chain must be empty before rehydration');
+    assert.strictEqual(
+      blockchain.getChain().length,
+      0,
+      'In-memory chain must be empty before rehydration'
+    );
 
     // Rehydrate from persistent storage
     await blockchain.initialize({ forceRehydrate: true });
@@ -347,7 +356,11 @@ export async function runBlockchainTests(): Promise<
   // Test 9: Full integrity verification passes after process reload
   try {
     const validation = blockchain.isChainValid();
-    assert.strictEqual(validation.isValid, true, 'Rehydrated chain must pass cryptographic verification');
+    assert.strictEqual(
+      validation.isValid,
+      true,
+      'Rehydrated chain must pass cryptographic verification'
+    );
     assert.strictEqual(blockchain.getHealthStatus().status, 'healthy');
 
     results.push({
@@ -376,8 +389,16 @@ export async function runBlockchainTests(): Promise<
       'Corrupted persistent storage must mark ledger status as degraded'
     );
     const tamperValidation = blockchain.isChainValid();
-    assert.strictEqual(tamperValidation.isValid, false, 'Tampered persistent data must fail validation');
-    assert.strictEqual(tamperValidation.brokenBlockIndex, 2, 'Broken block index must be accurately flagged as 2');
+    assert.strictEqual(
+      tamperValidation.isValid,
+      false,
+      'Tampered persistent data must fail validation'
+    );
+    assert.strictEqual(
+      tamperValidation.brokenBlockIndex,
+      2,
+      'Broken block index must be accurately flagged as 2'
+    );
     assert.ok(
       tamperValidation.reason?.includes('Merkle root mismatch'),
       'Reason must cite Merkle root mismatch'
@@ -385,7 +406,9 @@ export async function runBlockchainTests(): Promise<
 
     // Restore clean state for subsequent tests
     mockPersistentBlocks[2].data.metrics.moisture = '42.5%';
-    mockPersistentBlocks[2].merkleRoot = blockchain.calculateMerkleRoot(mockPersistentBlocks[2].data);
+    mockPersistentBlocks[2].merkleRoot = blockchain.calculateMerkleRoot(
+      mockPersistentBlocks[2].data
+    );
 
     results.push({
       name: 'Persistence Regression: Corrupted persisted database payloads are detected on reload',
@@ -414,7 +437,11 @@ export async function runBlockchainTests(): Promise<
     );
     const brokenValidation = blockchain.isChainValid();
     assert.strictEqual(brokenValidation.isValid, false, 'Broken link must fail validation');
-    assert.strictEqual(brokenValidation.brokenBlockIndex, 3, 'Must identify Block 3 as broken link');
+    assert.strictEqual(
+      brokenValidation.brokenBlockIndex,
+      3,
+      'Must identify Block 3 as broken link'
+    );
 
     // Restore clean hash pointer
     mockPersistentBlocks[3].previousHash = origPrevHash;
@@ -494,7 +521,11 @@ export async function runBlockchainTests(): Promise<
       5,
       'Concurrent initialization must strictly seed exactly 5 blocks without duplicates'
     );
-    assert.strictEqual(blockchain.getChain().length, 5, 'In-memory chain must hold exactly 5 blocks');
+    assert.strictEqual(
+      blockchain.getChain().length,
+      5,
+      'In-memory chain must hold exactly 5 blocks'
+    );
 
     results.push({
       name: 'Concurrency Regression: Concurrent service startup does not duplicate genesis or seed blocks',
@@ -667,7 +698,10 @@ export async function runBlockchainTests(): Promise<
     // Teardown test doubles and restore pristine environment
     (env as any).NODE_ENV = 'development';
     restoreMocks();
-    Object.defineProperty(mongoose.connection, 'readyState', { value: origReadyState, configurable: true });
+    Object.defineProperty(mongoose.connection, 'readyState', {
+      value: origReadyState,
+      configurable: true,
+    });
     blockchain.resetForTesting();
   }
 

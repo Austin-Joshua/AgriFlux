@@ -194,7 +194,8 @@ async function runAuditMatrix() {
       actualExplanation: res.explanation.substring(0, 80) + '...',
       expectedBehavior: 'POSTPONE_IRRIGATION / high urgency',
       status: pass ? 'PASS' : 'FAIL',
-      reasoning: 'Moisture > 82% triggers POSTPONE_IRRIGATION with high urgency due to hypoxia risk.',
+      reasoning:
+        'Moisture > 82% triggers POSTPONE_IRRIGATION with high urgency due to hypoxia risk.',
     });
   } catch (err: any) {
     results.push({
@@ -411,7 +412,8 @@ async function runAuditMatrix() {
       actualExplanation: res.explanation.substring(0, 100) + '...',
       expectedBehavior: 'POSTPONE_IRRIGATION (Rule 1 takes precedence over Rule 2)',
       status: pass ? 'PASS' : 'FAIL',
-      reasoning: 'Rain protection correctly takes precedence over irrigation to prevent flood runoff.',
+      reasoning:
+        'Rain protection correctly takes precedence over irrigation to prevent flood runoff.',
     });
   } catch (err: any) {
     results.push({
@@ -593,9 +595,13 @@ async function runAuditMatrix() {
       soilMoistureOverride: 20,
       forceRefresh: true,
     });
-    const evalRes = await FieldIntelligenceService.evaluateFollowUp('audit-user-1', rec.recommendationId, {
-      moisture: NaN,
-    });
+    const evalRes = await FieldIntelligenceService.evaluateFollowUp(
+      'audit-user-1',
+      rec.recommendationId,
+      {
+        moisture: NaN,
+      }
+    );
     const pass = evalRes.status === 'insufficient_evidence' && !evalRes.conditionMet;
     results.push({
       id: 16,
@@ -629,10 +635,18 @@ async function runAuditMatrix() {
       soilMoistureOverride: 20,
       forceRefresh: true,
     });
-    await FieldIntelligenceService.recordFarmerAction('audit-user-1', rec.recommendationId, 'irrigated');
-    const evalRes = await FieldIntelligenceService.evaluateFollowUp('audit-user-1', rec.recommendationId, {
-      moisture: 88,
-    });
+    await FieldIntelligenceService.recordFarmerAction(
+      'audit-user-1',
+      rec.recommendationId,
+      'irrigated'
+    );
+    const evalRes = await FieldIntelligenceService.evaluateFollowUp(
+      'audit-user-1',
+      rec.recommendationId,
+      {
+        moisture: 88,
+      }
+    );
     // If it says 'achieved' when 88% is severely waterlogged, that's an agronomic issue!
     const isWaterlogged = evalRes.status === 'achieved';
     results.push({
@@ -794,14 +808,18 @@ async function runAuditMatrix() {
   console.log('| ID | Scenario | Status | Actual Action / Result | Reasoning |');
   console.log('|---|---|---|---|---|');
   for (const r of results) {
-    console.log(`| ${r.id} | ${r.scenario} | **${r.status}** | ${r.actualAction} | ${r.reasoning} |`);
+    console.log(
+      `| ${r.id} | ${r.scenario} | **${r.status}** | ${r.actualAction} | ${r.reasoning} |`
+    );
   }
 
   console.log('\n===============================================================');
   const passes = results.filter((r) => r.status === 'PASS').length;
   const fails = results.filter((r) => r.status === 'FAIL').length;
   const reviews = results.filter((r) => r.status === 'REQUIRES_DOMAIN_REVIEW').length;
-  console.log(`Total: ${results.length} | Passed: ${passes} | Failed: ${fails} | Domain Review: ${reviews}`);
+  console.log(
+    `Total: ${results.length} | Passed: ${passes} | Failed: ${fails} | Domain Review: ${reviews}`
+  );
   console.log('===============================================================');
 }
 

@@ -98,7 +98,7 @@ export class FieldIntelligenceService {
     let sensorSource: string | undefined;
     let sensorSourceType: string | undefined;
     let sensorQualityStatus: string | undefined;
-    let sensorProvenance: 'measured' | 'simulated' | 'missing' = 'measured';
+    let sensorProvenance: 'measured' | 'simulated' | 'missing';
     let freshnessMinutes = 0;
     let isStale = false;
 
@@ -505,7 +505,8 @@ export class FieldIntelligenceService {
       explanation = `Soil moisture is critically depleted at ${sensorMoisture}%. While light-to-moderate rain (${forecastRainMm}mm) is forecast, it is insufficient on its own to replenish the root zone. A light 10–15mm cycle provides necessary hydration while leaving buffer capacity for incoming precipitation.`;
       alternatives.push({
         action: 'Hold irrigation for 12 hours to observe rainfall onset',
-        tradeOff: 'Avoids supplemental pumping if downpour exceeds forecast, but prolongs daytime moisture stress.',
+        tradeOff:
+          'Avoids supplemental pumping if downpour exceeds forecast, but prolongs daytime moisture stress.',
       });
       expectedCondition = {
         parameter: 'Soil Moisture',
@@ -795,7 +796,7 @@ export class FieldIntelligenceService {
     }
 
     const now = Date.now();
-    let sensorMoisture: number | null = null;
+    let sensorMoisture: number | null;
     let sensorTemp: number | null = null;
     let sensorHumidity: number | null = null;
     let sensorSource: string;

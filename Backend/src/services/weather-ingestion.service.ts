@@ -384,16 +384,24 @@ export class WeatherIngestionService {
    */
   static async ingestRecord(record: any): Promise<void> {
     const isConnected = isDBConnected || mongoose.connection.readyState === 1;
-    const dateStr = record.dateStr || (record.date ? new Date(record.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+    const dateStr =
+      record.dateStr ||
+      (record.date
+        ? new Date(record.date).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0]);
     const normalized = {
       locationName: record.locationName || 'Thanjavur, Tamil Nadu',
-      coordinates: record.coordinates || { latitude: record.latitude || 10.79, longitude: record.longitude || 79.13 },
+      coordinates: record.coordinates || {
+        latitude: record.latitude || 10.79,
+        longitude: record.longitude || 79.13,
+      },
       granularity: record.granularity || 'daily',
       dateStr,
       timestamp: record.timestamp || new Date(record.date || Date.now()),
       temperature_2m_mean: record.temperature_2m_mean,
       precipitation_sum: record.precipitation_sum ?? record.precipitationMm,
-      et0_fao_evapotranspiration: record.et0_fao_evapotranspiration ?? record.et0EvapotranspirationMm,
+      et0_fao_evapotranspiration:
+        record.et0_fao_evapotranspiration ?? record.et0EvapotranspirationMm,
       source: record.source || 'open-meteo-reanalysis',
       dataType: record.dataType || 'historical_reanalysis_estimate',
       importedAt: new Date(),

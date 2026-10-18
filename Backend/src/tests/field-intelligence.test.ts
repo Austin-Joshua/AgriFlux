@@ -543,13 +543,20 @@ export async function runFieldIntelligenceTests(): Promise<
     } catch (e: any) {
       errorThrown = true;
       statusCode = e.statusCode || 500;
-      assert.ok(e.message.includes('Service Unavailable'), 'Error must specify Service Unavailable');
+      assert.ok(
+        e.message.includes('Service Unavailable'),
+        'Error must specify Service Unavailable'
+      );
     } finally {
       (env as any).NODE_ENV = originalEnv;
     }
 
     assert.strictEqual(errorThrown, true, 'Must throw error when DB is unavailable in production');
-    assert.strictEqual(statusCode, 503, 'Must return HTTP 503 in production without durable persistence');
+    assert.strictEqual(
+      statusCode,
+      503,
+      'Must return HTTP 503 in production without durable persistence'
+    );
 
     results.push({
       name: 'Production Safety: Recommendation generation fails closed with HTTP 503 when durable DB is offline',
@@ -583,7 +590,11 @@ export async function runFieldIntelligenceTests(): Promise<
       (env as any).NODE_ENV = originalEnv;
     }
 
-    assert.strictEqual(errorThrown, true, 'Must reject farmer action when DB is offline in production');
+    assert.strictEqual(
+      errorThrown,
+      true,
+      'Must reject farmer action when DB is offline in production'
+    );
     assert.strictEqual(statusCode, 503, 'Must return HTTP 503 without durable storage');
 
     results.push({
@@ -611,9 +622,13 @@ export async function runFieldIntelligenceTests(): Promise<
     let errorThrown = false;
     let statusCode = 0;
     try {
-      await FieldIntelligenceService.evaluateFollowUp('farmer_prod_offline', testRec.recommendationId, {
-        moisture: 35,
-      });
+      await FieldIntelligenceService.evaluateFollowUp(
+        'farmer_prod_offline',
+        testRec.recommendationId,
+        {
+          moisture: 35,
+        }
+      );
     } catch (e: any) {
       errorThrown = true;
       statusCode = e.statusCode || 500;
@@ -621,7 +636,11 @@ export async function runFieldIntelligenceTests(): Promise<
       (env as any).NODE_ENV = originalEnv;
     }
 
-    assert.strictEqual(errorThrown, true, 'Must reject follow-up evaluation when DB is offline in production');
+    assert.strictEqual(
+      errorThrown,
+      true,
+      'Must reject follow-up evaluation when DB is offline in production'
+    );
     assert.strictEqual(statusCode, 503, 'Must return HTTP 503 without durable storage');
 
     results.push({
@@ -663,7 +682,11 @@ export async function runFieldIntelligenceTests(): Promise<
       (env as any).NODE_ENV = originalEnv;
     }
 
-    assert.strictEqual(errorThrown, true, 'Must reject specialist review when DB is offline in production');
+    assert.strictEqual(
+      errorThrown,
+      true,
+      'Must reject specialist review when DB is offline in production'
+    );
     assert.strictEqual(statusCode, 503, 'Must return HTTP 503 without durable storage');
 
     results.push({

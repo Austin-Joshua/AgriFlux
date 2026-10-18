@@ -35,7 +35,11 @@ export interface VerificationCertificate {
 }
 
 export type LedgerHealthStatus = 'healthy' | 'degraded' | 'unavailable' | 'not_yet_verified';
-export type KeySource = 'dedicated_audit_key' | 'jwt_secret_legacy' | 'development_default' | 'unconfigured';
+export type KeySource =
+  | 'dedicated_audit_key'
+  | 'jwt_secret_legacy'
+  | 'development_default'
+  | 'unconfigured';
 
 export class BlockchainService {
   private static instance: BlockchainService;
@@ -46,7 +50,11 @@ export class BlockchainService {
   private initializingPromise: Promise<void> | null = null;
   private writeQueue: Promise<any> = Promise.resolve();
   private ledgerStatus: LedgerHealthStatus = 'not_yet_verified';
-  private lastVerification: { isValid: boolean; brokenBlockIndex?: number; reason?: string } | null = null;
+  private lastVerification: {
+    isValid: boolean;
+    brokenBlockIndex?: number;
+    reason?: string;
+  } | null = null;
   private lastVerifiedAt: string | null = null;
   private degradedReason: string | null = null;
 
@@ -242,7 +250,8 @@ export class BlockchainService {
     // Database is not connected
     if (env.NODE_ENV === 'production') {
       this.ledgerStatus = 'unavailable';
-      this.degradedReason = 'MongoDB is unavailable in production; persistent audit ledger offline.';
+      this.degradedReason =
+        'MongoDB is unavailable in production; persistent audit ledger offline.';
       this.chain = [];
     } else {
       // In development/test mode, retain volatile in-memory demonstration blocks
@@ -473,14 +482,7 @@ export class BlockchainService {
     while (!hash.startsWith(targetPrefix)) {
       nonce++;
       if (nonce > 1000000) break;
-      hash = this.calculateHash(
-        index,
-        previousBlock.hash,
-        timestamp,
-        merkleRoot,
-        nonce,
-        blockType
-      );
+      hash = this.calculateHash(index, previousBlock.hash, timestamp, merkleRoot, nonce, blockType);
     }
 
     const signature = this.signBlock(hash);
@@ -503,9 +505,9 @@ export class BlockchainService {
         await BlockchainBlock.create(newBlock);
       } catch (dbErr: any) {
         // Do NOT append to in-memory chain if persistence failed!
-        throw new Error(
-          `Failed to persist audit block #${index} to MongoDB: ${dbErr.message}`
-        );
+        throw new Error(`Failed to persist audit block #${index} to MongoDB: ${dbErr.message}`, {
+          cause: dbErr,
+        });
       }
     } else {
       if (env.NODE_ENV === 'production') {

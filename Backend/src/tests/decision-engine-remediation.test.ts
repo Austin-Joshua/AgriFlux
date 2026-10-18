@@ -1,6 +1,6 @@
 /**
  * AgriFlux Phase 4.1 Decision Engine Defect Remediation & Verification Suite
- * 
+ *
  * Regression coverage for verified defects:
  * 1. Missing moisture returns INSUFFICIENT_DATA (Requirement 4.1)
  * 2. NaN and Infinity rejected, cannot produce optimal recommendation (Requirement 4.2)
@@ -155,7 +155,11 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
       forceRefresh: true,
     });
     assert.strictEqual(resB.action, 'IRRIGATE_LIGHT');
-    assert.notStrictEqual(resB.action, 'MONITOR_OPTIMAL', 'Drought must never fall through to MONITOR_OPTIMAL');
+    assert.notStrictEqual(
+      resB.action,
+      'MONITOR_OPTIMAL',
+      'Drought must never fall through to MONITOR_OPTIMAL'
+    );
 
     // 4C: Rain 15mm - <20mm -> POSTPONE_IRRIGATION with drought watch
     const resC = await FieldIntelligenceService.generateRecommendation('remediation-farmer-1', {
@@ -208,7 +212,10 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
 
     const obs = rec.supportingObservations;
     assert.ok(obs?.referenceET0MmDay?.value != null, 'Reference ET0 must be computed and present');
-    assert.ok(obs?.recentRainfall3dMm?.value != null, 'Recent rainfall must be computed and present');
+    assert.ok(
+      obs?.recentRainfall3dMm?.value != null,
+      'Recent rainfall must be computed and present'
+    );
     results.push({
       name: 'Remediation 5: Weather reanalysis properties (precipitation_sum, et0_fao_evapotranspiration) reach decision engine',
       passed: true,
@@ -229,23 +236,39 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
       forceRefresh: true,
     });
 
-    await FieldIntelligenceService.recordFarmerAction('remediation-farmer-1', baseRec.recommendationId, 'irrigated');
+    await FieldIntelligenceService.recordFarmerAction(
+      'remediation-farmer-1',
+      baseRec.recommendationId,
+      'irrigated'
+    );
 
     // 6A: Valid recovery within optimal range (22% -> 54%)
-    const evalSuccess = await FieldIntelligenceService.evaluateFollowUp('remediation-farmer-1', baseRec.recommendationId, {
-      moisture: 54,
-    });
+    const evalSuccess = await FieldIntelligenceService.evaluateFollowUp(
+      'remediation-farmer-1',
+      baseRec.recommendationId,
+      {
+        moisture: 54,
+      }
+    );
     assert.strictEqual(evalSuccess.status, 'achieved');
     assert.strictEqual(evalSuccess.conditionMet, true);
 
     // 6B: Over-irrigation saturation / waterlogging (22% -> 85%)
-    const evalOver = await FieldIntelligenceService.evaluateFollowUp('remediation-farmer-1', baseRec.recommendationId, {
-      moisture: 85,
-    });
+    const evalOver = await FieldIntelligenceService.evaluateFollowUp(
+      'remediation-farmer-1',
+      baseRec.recommendationId,
+      {
+        moisture: 85,
+      }
+    );
     assert.strictEqual(evalOver.status, 'worsened');
     assert.strictEqual(evalOver.conditionMet, false);
-    assert.ok(evalOver.explanation.includes('hypoxia') || evalOver.explanation.includes('waterlogging'));
-    assert.ok(evalOver.causalAttributionDisclaimer.includes('Observational telemetry comparison only'));
+    assert.ok(
+      evalOver.explanation.includes('hypoxia') || evalOver.explanation.includes('waterlogging')
+    );
+    assert.ok(
+      evalOver.causalAttributionDisclaimer.includes('Observational telemetry comparison only')
+    );
 
     results.push({
       name: 'Remediation 6: Follow-up evaluation flags excessive moisture (>75%) as worsened rather than achieved',
@@ -269,7 +292,10 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
 
     const card = rec.supportingObservations?.soilHealthCard;
     assert.ok(card != null, 'Soil Health Card observation must be present');
-    assert.ok(card?.source.includes('ICAR-TNAU') || card?.source.includes('Soil'), 'Must attribute to ICAR-TNAU regional survey');
+    assert.ok(
+      card?.source.includes('ICAR-TNAU') || card?.source.includes('Soil'),
+      'Must attribute to ICAR-TNAU regional survey'
+    );
     assert.ok(typeof card?.availableN === 'number' && card.availableN > 0);
     assert.ok(typeof card?.availableK === 'number' && card.availableK > 0);
 
@@ -336,7 +362,11 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
 
     const historyA = await FieldIntelligenceService.getHistory('farmer-tenant-a', 'farm-01', 50);
     const hasLeak = historyA.some((r) => r.userId === 'farmer-tenant-b');
-    assert.strictEqual(hasLeak, false, 'Tenant A must never see Tenant B recommendations in history');
+    assert.strictEqual(
+      hasLeak,
+      false,
+      'Tenant A must never see Tenant B recommendations in history'
+    );
 
     results.push({
       name: 'Remediation 9: Memory-mode history queries enforce strict cross-tenant isolation',
@@ -372,7 +402,10 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
       (env as any).NODE_ENV = originalEnv;
     }
 
-    assert.ok(failedClosed, 'Must fail closed with HTTP 503 when durable write cannot be completed');
+    assert.ok(
+      failedClosed,
+      'Must fail closed with HTTP 503 when durable write cannot be completed'
+    );
     results.push({
       name: 'Remediation 10: Database failures fail closed and do not report critical writes as successful',
       passed: true,
@@ -396,8 +429,14 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
       forceRefresh: true,
     };
 
-    const run1 = await FieldIntelligenceService.generateRecommendation('remediation-farmer-1', payload);
-    const run2 = await FieldIntelligenceService.generateRecommendation('remediation-farmer-1', payload);
+    const run1 = await FieldIntelligenceService.generateRecommendation(
+      'remediation-farmer-1',
+      payload
+    );
+    const run2 = await FieldIntelligenceService.generateRecommendation(
+      'remediation-farmer-1',
+      payload
+    );
 
     assert.strictEqual(run1.action, run2.action);
     assert.strictEqual(run1.urgency, run2.urgency);
@@ -419,13 +458,19 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
   // Test 12: Provenance transparency across responses
   try {
     // 12A: Calibrated operator input
-    const recCalibrated = await FieldIntelligenceService.generateRecommendation('remediation-farmer-1', {
-      fieldId: 'field-01',
-      soilMoistureOverride: 32,
-      forceRefresh: true,
-    });
+    const recCalibrated = await FieldIntelligenceService.generateRecommendation(
+      'remediation-farmer-1',
+      {
+        fieldId: 'field-01',
+        soilMoistureOverride: 32,
+        forceRefresh: true,
+      }
+    );
     assert.strictEqual(recCalibrated.supportingObservations?.soilMoisture?.provenance, 'measured');
-    assert.strictEqual(recCalibrated.supportingObservations?.soilMoisture?.source, 'manual_operator_input');
+    assert.strictEqual(
+      recCalibrated.supportingObservations?.soilMoisture?.source,
+      'manual_operator_input'
+    );
 
     // 12B: Explicit simulation mode
     const recSim = await FieldIntelligenceService.generateRecommendation('remediation-farmer-1', {
@@ -437,10 +482,13 @@ export async function runDecisionEngineRemediationTests(): Promise<TestResult[]>
     assert.strictEqual(recSim.supportingObservations?.soilMoisture?.dataQualityStatus, 'simulated');
 
     // 12C: Missing telemetry
-    const recMissing = await FieldIntelligenceService.generateRecommendation('remediation-farmer-1', {
-      fieldId: 'field-02',
-      forceRefresh: true,
-    });
+    const recMissing = await FieldIntelligenceService.generateRecommendation(
+      'remediation-farmer-1',
+      {
+        fieldId: 'field-02',
+        forceRefresh: true,
+      }
+    );
     assert.strictEqual(recMissing.action, 'INSUFFICIENT_DATA');
     assert.strictEqual(recMissing.supportingObservations?.soilMoisture?.value, null);
 
