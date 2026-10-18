@@ -35,10 +35,8 @@ const Onboarding: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="relative p-0.5 rounded-3xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-2xl mx-auto mb-6 w-20 h-20 flex-shrink-0 animate-pulse-slow">
-            <div className="w-full h-full bg-white dark:bg-gray-800 rounded-[22px] flex items-center justify-center p-3.5">
-              <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
-            </div>
+          <div className="w-20 h-20 rounded-3xl overflow-hidden shadow-2xl mx-auto mb-6 flex-shrink-0 animate-pulse-slow">
+            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">
             Almost there, <span className="text-gradient">{user?.name?.split(' ')[0]}</span>!

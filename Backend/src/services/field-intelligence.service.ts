@@ -924,26 +924,66 @@ export class FieldIntelligenceService {
 
     if (isDBConnected) {
       try {
-        const updated = await FieldRecommendation.findOneAndUpdate(
-          { recommendationId, userId },
-          { farmerAction: actionRecord },
-          { new: true }
-        );
-        if (updated) return updated;
+        const existing = await FieldRecommendation.findOne({ recommendationId });
+        if (existing) {
+          // Verify ownership: Farmer must own the recommendation, unless it's demo data
+          if (
+            existing.userId &&
+            existing.userId.toString() !== userId.toString() &&
+            existing.userId !== 'demo-farmer' &&
+            userId !== 'demo-farmer'
+          ) {
+            const err: any = new Error(
+              'Access denied: You do not have ownership of this field recommendation.'
+            );
+            err.statusCode = 403;
+            throw err;
+          }
+
+          // Idempotency: If exact same action was already recorded, return existing state
+          if (existing.farmerAction && existing.farmerAction.actionTaken === actionTaken) {
+            return existing;
+          }
+
+          existing.farmerAction = actionRecord;
+          await existing.save();
+          return existing;
+        }
       } catch (err: any) {
+        if (err.statusCode) throw err;
         console.warn(`⚠️ [FIELD INTELLIGENCE] Action record error: ${err.message}`);
       }
     }
 
     if (memoryRecommendations[recommendationId]) {
       const memRec = memoryRecommendations[recommendationId];
-      if (!memRec.userId || memRec.userId === userId) {
-        memRec.farmerAction = actionRecord;
+      if (
+        memRec.userId &&
+        memRec.userId.toString() !== userId.toString() &&
+        memRec.userId !== 'demo-farmer' &&
+        userId !== 'demo-farmer'
+      ) {
+        const err: any = new Error(
+          'Access denied: You do not have ownership of this field recommendation.'
+        );
+        err.statusCode = 403;
+        throw err;
+      }
+
+      // Idempotency check for in-memory store
+      if (memRec.farmerAction && memRec.farmerAction.actionTaken === actionTaken) {
         return memRec;
       }
+
+      memRec.farmerAction = actionRecord;
+      return memRec;
     }
 
-    return { recommendationId, farmerAction: actionRecord };
+    const notFoundErr: any = new Error(
+      `Field recommendation with ID '${recommendationId}' was not found.`
+    );
+    notFoundErr.statusCode = 404;
+    throw notFoundErr;
   }
 
   /**
@@ -964,16 +1004,34 @@ export class FieldIntelligenceService {
     let rec: any = null;
     if (isDBConnected) {
       try {
-        rec = await FieldRecommendation.findOne({ recommendationId, userId });
+        rec = await FieldRecommendation.findOne({ recommendationId });
       } catch {
         rec = null;
       }
     }
     if (!rec && memoryRecommendations[recommendationId]) {
-      const memRec = memoryRecommendations[recommendationId];
-      if (!memRec.userId || memRec.userId === userId) {
-        rec = memRec;
-      }
+      rec = memoryRecommendations[recommendationId];
+    }
+
+    if (!rec) {
+      const notFoundErr: any = new Error(
+        `Field recommendation with ID '${recommendationId}' was not found.`
+      );
+      notFoundErr.statusCode = 404;
+      throw notFoundErr;
+    }
+
+    if (
+      rec.userId &&
+      rec.userId.toString() !== userId.toString() &&
+      rec.userId !== 'demo-farmer' &&
+      userId !== 'demo-farmer'
+    ) {
+      const forbiddenErr: any = new Error(
+        'Access denied: You do not have ownership of this field recommendation.'
+      );
+      forbiddenErr.statusCode = 403;
+      throw forbiddenErr;
     }
 
     const baselineMoisture = rec?.supportingObservations?.soilMoisture?.value;
@@ -1257,7 +1315,11 @@ export class FieldIntelligenceService {
       return memoryRecommendations[recommendationId];
     }
 
-    return { recommendationId, agronomistReview: reviewRecord };
+    const notFoundErr: any = new Error(
+      `Field recommendation with ID '${recommendationId}' was not found for review.`
+    );
+    notFoundErr.statusCode = 404;
+    throw notFoundErr;
   }
 
   /**

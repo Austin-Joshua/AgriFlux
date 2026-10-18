@@ -326,5 +326,127 @@ export async function runFieldIntelligenceTests(): Promise<
     });
   }
 
+  // Test 11: Rejects farmer action on non-existent recommendation ID with 404
+  try {
+    let errorCaught = false;
+    try {
+      await FieldIntelligenceService.recordFarmerAction(
+        testUserId,
+        'rec_non_existent_id_99999',
+        'irrigated'
+      );
+    } catch (err: any) {
+      errorCaught = true;
+      assert.strictEqual(err.statusCode, 404, 'Must throw 404 for non-existent recommendation');
+      assert.ok(err.message.includes('not found'), 'Error message must state not found');
+    }
+    assert.strictEqual(errorCaught, true, 'Must throw error on phantom recommendation');
+    results.push({
+      name: 'Field Intelligence Security: Rejects farmer action on non-existent recommendation with 404',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Field Intelligence Security: Rejects farmer action on non-existent recommendation with 404',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 12: Enforces tenant ownership isolation and rejects cross-farmer action with 403
+  try {
+    const ownerRec = await FieldIntelligenceService.generateRecommendation('farmer_alice_original', {
+      fieldId: 'field-alice-01',
+      cropType: 'Cotton',
+      soilMoistureOverride: 28,
+    });
+
+    let forbiddenCaught = false;
+    try {
+      await FieldIntelligenceService.recordFarmerAction(
+        'farmer_mallory_unauthorized',
+        ownerRec.recommendationId,
+        'dismissed'
+      );
+    } catch (err: any) {
+      forbiddenCaught = true;
+      assert.strictEqual(err.statusCode, 403, 'Must throw 403 Forbidden for cross-tenant access');
+      assert.ok(err.message.includes('Access denied'), 'Must state access denied');
+    }
+    assert.strictEqual(forbiddenCaught, true, 'Cross-farmer action must fail closed with 403');
+    results.push({
+      name: 'Field Intelligence Security: Enforces ownership isolation rejecting cross-farmer action with 403',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Field Intelligence Security: Enforces ownership isolation rejecting cross-farmer action with 403',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 13: Rejects agronomist review on non-existent recommendation with 404
+  try {
+    let review404 = false;
+    try {
+      await FieldIntelligenceService.recordAgronomistReview(
+        testUserId,
+        'agronomist_01',
+        'Dr. Test',
+        'rec_ghost_review_404',
+        'endorsed'
+      );
+    } catch (err: any) {
+      review404 = true;
+      assert.strictEqual(err.statusCode, 404, 'Must throw 404 on review of non-existent recommendation');
+    }
+    assert.strictEqual(review404, true, 'Agronomist review on phantom ID must reject with 404');
+    results.push({
+      name: 'Field Intelligence Security: Rejects agronomist review on non-existent recommendation with 404',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Field Intelligence Security: Rejects agronomist review on non-existent recommendation with 404',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 14: Handles duplicate farmer action submission idempotently without state corruption
+  try {
+    const dupRec = await FieldIntelligenceService.generateRecommendation(testUserId, {
+      fieldId: 'field-idempotent-01',
+      cropType: 'Wheat',
+      soilMoistureOverride: 25,
+    });
+
+    const firstAction = await FieldIntelligenceService.recordFarmerAction(
+      testUserId,
+      dupRec.recommendationId,
+      'irrigated',
+      'Initial irrigation cycle'
+    );
+    const secondAction = await FieldIntelligenceService.recordFarmerAction(
+      testUserId,
+      dupRec.recommendationId,
+      'irrigated',
+      'Repeated click or network retry'
+    );
+
+    assert.strictEqual(firstAction.farmerAction.actionTaken, secondAction.farmerAction.actionTaken);
+    results.push({
+      name: 'Field Intelligence Resilience: Idempotent duplicate farmer action handling verified',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Field Intelligence Resilience: Idempotent duplicate farmer action handling verified',
+      passed: false,
+      error: err.message,
+    });
+  }
+
   return results;
 }

@@ -98,6 +98,20 @@ interface FieldRecommendationData {
     humidity?: { value: number; unit: string };
     forecastRainMm?: { value: number; unit: string };
     forecastRainProbability?: { value: number; unit: string };
+    satelliteCanopyNDVI?: {
+      value: number | null;
+      isAvailable: boolean;
+      vigor: string;
+      cloudCoverPct?: number;
+      acquisitionDate?: string;
+      source: string;
+    };
+    districtYieldBenchmark?: {
+      crop: string;
+      district: string;
+      yieldKgHa: number;
+      source: string;
+    };
   };
   farmerAction?: {
     actionTaken: string;
@@ -485,6 +499,21 @@ const AIDecisionPanel: React.FC = () => {
               </span>
               <span className="text-[10px] text-gray-400 font-medium">Root-Zone</span>
             </div>
+            <div className="mt-1 flex items-center gap-1">
+              {obs?.soilMoisture?.source === 'esp32_hardware' ? (
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                  ESP32 Measured
+                </span>
+              ) : obs?.soilMoisture?.source === 'manual_operator_input' ? (
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                  Calibrated Input
+                </span>
+              ) : (
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                  Simulated Baseline
+                </span>
+              )}
+            </div>
 
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
@@ -515,6 +544,11 @@ const AIDecisionPanel: React.FC = () => {
                 pH {obs?.soilPh?.value || 6.4}
               </span>
               <span className="text-[10px] text-gray-400 font-medium">Optimal</span>
+            </div>
+            <div className="mt-1 flex items-center gap-1">
+              <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                N:{obs?.soilNitrogen?.value || 165} P:{obs?.soilPhosphorus?.value || 18} K:{obs?.soilPotassium?.value || 175}
+              </span>
             </div>
 
             <div className="w-full bg-gradient-to-r from-red-400 via-emerald-400 to-blue-400 rounded-full h-1.5 mt-2 relative">
@@ -547,6 +581,11 @@ const AIDecisionPanel: React.FC = () => {
               </span>
               <span className="text-[10px] text-gray-400 font-medium">
                 {obs?.humidity?.value || 60}% RH
+              </span>
+            </div>
+            <div className="mt-1 flex items-center gap-1">
+              <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                Historical Reanalysis
               </span>
             </div>
 
@@ -582,6 +621,11 @@ const AIDecisionPanel: React.FC = () => {
               </span>
               <span className="text-[10px] text-gray-400 font-medium">Next 24h</span>
             </div>
+            <div className="mt-1 flex items-center gap-1">
+              <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                Open-Meteo Model
+              </span>
+            </div>
 
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
@@ -597,6 +641,33 @@ const AIDecisionPanel: React.FC = () => {
               <span>30mm+</span>
             </div>
           </div>
+        </div>
+
+        {/* Multi-Source Provenance & Satellite Verification Ribbon */}
+        <div className="mt-3 p-3 rounded-xl bg-gray-50/80 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-700/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+              <ShieldCheck size={13} className="text-emerald-500" /> Multi-Source Provenance:
+            </span>
+            {obs?.satelliteCanopyNDVI?.isAvailable ? (
+              <span className="px-2 py-0.5 rounded-md bg-emerald-100/80 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold flex items-center gap-1 border border-emerald-500/20">
+                🛰️ Sentinel-2 L2A NDVI: {obs.satelliteCanopyNDVI.value} ({obs.satelliteCanopyNDVI.vigor})
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded-md bg-amber-100/80 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 text-[10px] font-bold flex items-center gap-1 border border-amber-500/20">
+                🛰️ Sentinel-2 L2A: Overpass Pending / Cloud-Masked
+              </span>
+            )}
+            <span className="px-2 py-0.5 rounded-md bg-teal-100/80 dark:bg-teal-950/50 text-teal-800 dark:text-teal-300 text-[10px] font-bold flex items-center gap-1 border border-teal-500/20">
+              🧪 Soil Health Card Chemistry
+            </span>
+            <span className="px-2 py-0.5 rounded-md bg-blue-100/80 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300 text-[10px] font-bold flex items-center gap-1 border border-blue-500/20">
+              📈 DES APY District Baseline ({obs?.districtYieldBenchmark?.yieldKgHa || 3820} kg/ha)
+            </span>
+          </div>
+          <span className="text-[10px] text-gray-400 font-semibold">
+            Rule Version: {recommendation?.ruleVersion || 'v2.1-QUANTEX-FAO56'}
+          </span>
         </div>
       </div>
 

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c1e" />
+      <stop offset="50%" stop-color="#011b13" />
+      <stop offset="100%" stop-color="#000e0a" />
+    </linearGradient>
+
+    <!-- Glowing Border Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="35%" stop-color="#10b981" />
+      <stop offset="70%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#34d399" />
+    </linearGradient>
+
+    <!-- Leaf 1 (Main Right Leaf) Gradient -->
+    <linearGradient id="mainLeafGrad" x1="20%" y1="90%" x2="90%" y2="10%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="40%" stop-color="#10b981" />
+      <stop offset="80%" stop-color="#4ade80" />
+      <stop offset="100%" stop-color="#bbf7d0" />
+    </linearGradient>
+
+    <!-- Leaf 2 (Left Leaf) Gradient -->
+    <linearGradient id="leftLeafGrad" x1="10%" y1="80%" x2="90%" y2="10%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#86efac" />
+    </linearGradient>
+
+    <!-- Terraced Fields Gradient -->
+    <linearGradient id="fieldGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#4ade80" />
+    </linearGradient>
+
+    <!-- Outer Glow Filter -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Container Squircle Background with Glowing Border -->
+  <rect x="14" y="14" width="484" height="484" rx="112" ry="112" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="8" filter="url(#neonGlow)" />
+  <rect x="20" y="20" width="472" height="472" rx="106" ry="106" fill="none" stroke="#6ee7b7" stroke-width="1.5" stroke-opacity="0.4" />
+
+  <!-- Terraced Agricultural Contour Arcs (Bottom Basin) -->
+  <!-- Bottom Contour Curve 1 (Outer Arc) -->
+  <path d="M 86 312 C 160 316, 200 324, 238 338 C 218 376, 178 410, 140 416 C 98 386, 86 348, 86 312 Z" fill="url(#fieldGrad)" opacity="0.9" />
+
+  <!-- Bottom Contour Curve 2 (Middle Arc) -->
+  <path d="M 148 422 C 196 426, 260 368, 304 316 C 360 318, 400 312, 426 304 C 426 314, 420 328, 412 340 C 330 362, 230 430, 196 442 C 176 438, 160 430, 148 422 Z" fill="url(#fieldGrad)" opacity="0.95" />
+
+  <!-- Bottom Contour Curve 3 (Inner Right Arc) -->
+  <path d="M 224 444 C 278 414, 350 354, 420 344 C 424 354, 426 366, 422 378 C 368 406, 310 440, 266 444 C 250 446, 236 446, 224 444 Z" fill="url(#fieldGrad)" />
+
+  <!-- Top Curve Horizon Line of the Terraced Basin -->
+  <path d="M 84 300 C 180 300, 330 286, 428 300 C 430 306, 426 314, 420 318 C 324 306, 180 316, 84 316 Z" fill="#6ee7b7" opacity="0.85" />
+
+  <!-- Plant Shoot Sprouting From Fields -->
+  <!-- Left Sprout Leaf -->
+  <path d="M 248 310 C 244 260, 218 214, 134 176 C 130 224, 160 274, 230 294 C 220 262, 180 226, 150 208 C 182 232, 212 264, 224 292 Z" fill="url(#leftLeafGrad)" />
+  <path d="M 134 176 C 170 210, 210 252, 228 294" stroke="#d1fae5" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.75" />
+
+  <!-- Main Right Leaf (Dominant Foliage) -->
+  <path d="M 252 320 C 248 240, 274 150, 386 86 C 386 160, 360 248, 264 316 Z" fill="url(#mainLeafGrad)" />
+  <!-- Main Leaf Center Glow Vein -->
+  <path d="M 252 320 C 262 250, 298 178, 386 86" stroke="#ecfdf5" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.8" />
+  <!-- Secondary Leaf Subtle Inner Shadow/Highlight -->
+  <path d="M 264 316 C 316 260, 362 198, 386 86 C 330 148, 290 226, 276 304 Z" fill="#34d399" opacity="0.35" />
+</svg>

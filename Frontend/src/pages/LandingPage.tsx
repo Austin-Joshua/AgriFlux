@@ -47,10 +47,8 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo & Identity */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-green-400 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-              <div className="w-9 h-9 rounded-[10px] bg-white dark:bg-dark-900 flex items-center justify-center p-1">
-                <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
-              </div>
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
+              <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
             </div>
             <div className="flex flex-col text-left">
               <span className="text-lg font-black text-slate-900 dark:text-white leading-none tracking-tight font-display">
@@ -784,7 +782,9 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="AgriFlux" className="w-6 h-6 object-contain" />
+              <div className="w-7 h-7 rounded-lg overflow-hidden shadow-sm flex-shrink-0">
+                <img src={logo} alt="AgriFlux" className="w-full h-full object-cover" />
+              </div>
               <span className="font-bold text-slate-900 dark:text-white text-sm">
                 AgriFlux Intelligence Platform
               </span>

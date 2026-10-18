@@ -666,10 +666,11 @@ interface BlockchainLedgerSummary {
                   </span>
                 </div>
                 <p className="text-xs text-gray-300 mt-1 max-w-2xl leading-relaxed">
-                  Every sensor telemetry batch, mobile OTP credential, agronomist prescription, and
-                  hardware actuator command is cryptographically sealed into an immutable block. If
-                  any database record is tampered with or modified by an attacker, the downstream
-                  SHA-256 hashes break immediately.
+                  In-Process Proof-of-Authority (PoA) Cryptographic Audit Ledger: Every sensor
+                  telemetry batch, mobile OTP credential, agronomist prescription, and hardware
+                  actuator command is cryptographically sealed into an immutable SHA-256 Merkle
+                  chain. If any runtime telemetry or prescription record is altered or tampered with,
+                  the downstream block hashes and signatures break immediately.
                 </p>
               </div>
 
