@@ -6,7 +6,11 @@ import { env } from './env';
 
 export let isDBConnected = false;
 
-const seedDefaultAccounts = async () => {
+export const seedDefaultAccounts = async () => {
+  if (env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEEDING !== 'true') {
+    console.log('🔒 [SECURITY] Production mode active: default demo account seeding is refused.');
+    return;
+  }
   try {
     const accounts = [
       {

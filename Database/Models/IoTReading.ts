@@ -2,6 +2,9 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IIoTReading extends Document {
   deviceId: string;
+  fieldId?: string;
+  farmId?: string;
+  userId?: string;
   moisture: number;
   temperature: number;
   humidity: number;
@@ -15,6 +18,9 @@ export interface IIoTReading extends Document {
 const IoTReadingSchema: Schema = new Schema(
   {
     deviceId: { type: String, required: true, default: 'esp32-node-01' },
+    fieldId: { type: String, index: true },
+    farmId: { type: String, index: true },
+    userId: { type: String, index: true },
     moisture: { type: Number, required: true, min: 0, max: 100 },
     temperature: { type: Number, required: true, min: -10, max: 60 },
     humidity: { type: Number, required: true, min: 0, max: 100 },
@@ -31,6 +37,7 @@ const IoTReadingSchema: Schema = new Schema(
 );
 
 IoTReadingSchema.index({ deviceId: 1, createdAt: -1 });
+IoTReadingSchema.index({ fieldId: 1, createdAt: -1 });
 IoTReadingSchema.index({ createdAt: -1 });
 // 30-day rolling data retention: prevents unconstrained collection and index bloat
 IoTReadingSchema.index({ createdAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });

@@ -1,0 +1,164 @@
+{
+  "executionTimestamp": "2026-10-18T18:20:01.975Z",
+  "targetHost": "https://agriflux-backend.onrender.com",
+  "environment": "production",
+  "totalTests": 14,
+  "passed": 14,
+  "failed": 0,
+  "tests": [
+    {
+      "id": "SMOKE_01",
+      "name": "Root Platform Health",
+      "endpoint": "/",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 803,
+      "passed": true,
+      "snippet": "{\"status\":\"online\",\"service\":\"AgriFlux Autonomous Intelligence Mesh API\",\"version\":\"2.0.0\",\"documentation\":\"/api\",\"healt"
+    },
+    {
+      "id": "SMOKE_02",
+      "name": "System Diagnostic Health Check",
+      "endpoint": "/health",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 248,
+      "passed": true,
+      "snippet": "{\"status\":\"healthy\",\"system\":\"AgriFlux Autonomous Intelligence Mesh\",\"environment\":\"production\",\"uptimeSeconds\":154,\"wor"
+    },
+    {
+      "id": "SMOKE_03",
+      "name": "Blockchain Cryptographic Verification",
+      "endpoint": "/api/blockchain/verify",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 249,
+      "passed": true,
+      "snippet": "{\"success\":true,\"isValid\":true,\"summary\":{\"totalBlocks\":6,\"lastBlockHash\":\"009949a978434ebc0d1175cf0b18be9eebf07ed645463"
+    },
+    {
+      "id": "SMOKE_04",
+      "name": "Cryptographic Ledger Block Query & Health",
+      "endpoint": "/api/blockchain/chain?limit=5",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 256,
+      "passed": true,
+      "snippet": "{\"success\":true,\"summary\":{\"totalBlocks\":6,\"lastBlockHash\":\"009949a978434ebc0d1175cf0b18be9eebf07ed645463e7d6c4510ad4c7c"
+    },
+    {
+      "id": "SMOKE_05",
+      "name": "Environmental Variable Registry",
+      "endpoint": "/api/environmental/registry",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 245,
+      "passed": true,
+      "snippet": "{\"success\":true,\"version\":\"1.0.0\",\"totalVariables\":18,\"registry\":{\"temperature_2m_mean\":{\"canonicalName\":\"temperature_2m"
+    },
+    {
+      "id": "SMOKE_06",
+      "name": "Historical Weather Observation Query",
+      "endpoint": "/api/environmental/weather?limit=3",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 506,
+      "passed": true,
+      "snippet": "{\"success\":true,\"metadata\":{\"location\":\"Thanjavur, Tamil Nadu\",\"coordinates\":{\"latitude\":10.790861,\"longitude\":79.098145"
+    },
+    {
+      "id": "SMOKE_07",
+      "name": "Soil Profile Geolocation Query",
+      "endpoint": "/api/environmental/soil?latitude=10.79&longitude=79.09",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 470,
+      "passed": true,
+      "snippet": "{\"success\":true,\"metadata\":{\"disclaimer\":\"Soil test profile reflects laboratory or Soil Health Card chemistry (0-15cm sa"
+    },
+    {
+      "id": "SMOKE_08",
+      "name": "Sentinel-2 Satellite NDVI Query",
+      "endpoint": "/api/environmental/satellite/ndvi",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 483,
+      "passed": true,
+      "snippet": "{\"success\":true,\"metadata\":{\"region\":\"Thanjavur, Tamil Nadu\",\"tileId\":\"T44NPM\",\"constellation\":\"Copernicus Sentinel-2\",\""
+    },
+    {
+      "id": "SMOKE_09",
+      "name": "DES APY Crop Statistics Baseline",
+      "endpoint": "/api/environmental/crop-statistics?district=Thanjavur&crop=Rice",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 720,
+      "passed": true,
+      "snippet": "{\"success\":true,\"baseline\":{\"isAvailable\":true,\"district\":\"Thanjavur\",\"crop\":\"Rice\",\"agriculturalYear\":\"1997 - 1998\",\"is"
+    },
+    {
+      "id": "SMOKE_10",
+      "name": "IoT Telemetry Live State",
+      "endpoint": "/api/iot-data",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 258,
+      "passed": true,
+      "snippet": "{\"success\":true,\"data\":{\"deviceId\":\"esp32-node-01\",\"moisture\":45,\"temperature\":24.5,\"humidity\":62,\"pumpStatus\":false,\"is"
+    },
+    {
+      "id": "SMOKE_11",
+      "name": "IoT Telemetry Historical Series",
+      "endpoint": "/api/iot-data/history?limit=5",
+      "method": "GET",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "durationMs": 479,
+      "passed": true,
+      "snippet": "{\"success\":true,\"source\":\"memory_buffer\",\"data\":[{\"deviceId\":\"esp32-node-01\",\"moisture\":45,\"temperature\":24.5,\"humidity\""
+    },
+    {
+      "id": "SMOKE_12",
+      "name": "Unauthorized Gating on Field Context",
+      "endpoint": "/api/field-intelligence/context",
+      "method": "GET",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "durationMs": 242,
+      "passed": true,
+      "snippet": "{\"message\":\"No authorization token, access denied\"}"
+    },
+    {
+      "id": "SMOKE_13",
+      "name": "Unauthorized Gating on Recommendation Generation",
+      "endpoint": "/api/field-intelligence/recommend",
+      "method": "POST",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "durationMs": 238,
+      "passed": true,
+      "snippet": "{\"message\":\"No authorization token, access denied\"}"
+    },
+    {
+      "id": "SMOKE_14",
+      "name": "Authentication Rejects Invalid Credentials",
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "durationMs": 1186,
+      "passed": true,
+      "snippet": "{\"success\":false,\"message\":\"Invalid email/mobile number or password.\"}"
+    }
+  ]
+}

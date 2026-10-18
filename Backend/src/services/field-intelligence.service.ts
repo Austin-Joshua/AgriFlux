@@ -13,10 +13,11 @@ import { BlockchainService } from './blockchain.service';
 
 export interface FieldContextInput {
   fieldId?: string;
+  deviceId?: string;
   fieldName?: string;
   cropType?: string;
   cropStage?: string;
-  soilMoistureOverride?: number;
+  soilMoistureOverride?: number | null;
   soilPhOverride?: number;
   nitrogenOverride?: number;
   phosphorusOverride?: number;
@@ -54,11 +55,102 @@ export class FieldIntelligenceService {
     const latitude = context.latitude || 10.790861;
     const longitude = context.longitude || 79.098145;
 
-    // --- 1. SENSOR TELEMETRY ACQUISITION ---
+    // --- 0. STRICT INPUT VALIDATION ---
+    if (context.soilPhOverride !== undefined && context.soilPhOverride !== null) {
+      const ph = Number(context.soilPhOverride);
+      if (isNaN(ph) || !isFinite(ph) || ph < 0 || ph > 14) {
+        const err: any = new Error(
+          `Invalid soil pH override: "${context.soilPhOverride}". Must be a valid numeric pH in physical range [0, 14].`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+    if (context.nitrogenOverride !== undefined && context.nitrogenOverride !== null) {
+      const n = Number(context.nitrogenOverride);
+      if (isNaN(n) || !isFinite(n) || n < 0 || n > 2000) {
+        const err: any = new Error(
+          `Invalid soil nitrogen override: "${context.nitrogenOverride}". Must be a non-negative numeric value [0, 2000] kg/ha.`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+    if (context.phosphorusOverride !== undefined && context.phosphorusOverride !== null) {
+      const p = Number(context.phosphorusOverride);
+      if (isNaN(p) || !isFinite(p) || p < 0 || p > 2000) {
+        const err: any = new Error(
+          `Invalid soil phosphorus override: "${context.phosphorusOverride}". Must be a non-negative numeric value [0, 2000] kg/ha.`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+    if (context.potassiumOverride !== undefined && context.potassiumOverride !== null) {
+      const k = Number(context.potassiumOverride);
+      if (isNaN(k) || !isFinite(k) || k < 0 || k > 2000) {
+        const err: any = new Error(
+          `Invalid soil potassium override: "${context.potassiumOverride}". Must be a non-negative numeric value [0, 2000] kg/ha.`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+    if (context.forecastRainMm !== undefined && context.forecastRainMm !== null) {
+      const r = Number(context.forecastRainMm);
+      if (isNaN(r) || !isFinite(r) || r < 0 || r > 1000) {
+        const err: any = new Error(
+          `Invalid forecast rainfall override: "${context.forecastRainMm}". Must be a non-negative numeric value [0, 1000] mm.`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+    if (context.forecastRainProbability !== undefined && context.forecastRainProbability !== null) {
+      const prob = Number(context.forecastRainProbability);
+      if (isNaN(prob) || !isFinite(prob) || prob < 0 || prob > 100) {
+        const err: any = new Error(
+          `Invalid forecast rain probability: "${context.forecastRainProbability}". Must be in percentage range [0, 100].`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+    if (context.ambientTemp !== undefined && context.ambientTemp !== null) {
+      const t = Number(context.ambientTemp);
+      if (isNaN(t) || !isFinite(t) || t < -30 || t > 70) {
+        const err: any = new Error(
+          `Invalid ambient temperature: "${context.ambientTemp}". Must be in plausible range [-30, 70] °C.`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+    if (context.humidity !== undefined && context.humidity !== null) {
+      const h = Number(context.humidity);
+      if (isNaN(h) || !isFinite(h) || h < 0 || h > 100) {
+        const err: any = new Error(
+          `Invalid relative humidity: "${context.humidity}". Must be in percentage range [0, 100].`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+
+    // --- 1. SENSOR TELEMETRY ACQUISITION (Scoped by field and device) ---
     let latestSensor: any = null;
     if (isDBConnected) {
       try {
-        latestSensor = await IoTReading.findOne({}).sort({ createdAt: -1 });
+        const sensorFilter: any = {
+          $or: [
+            { fieldId: fieldId },
+            ...(context.deviceId ? [{ deviceId: context.deviceId }] : []),
+            ...(fieldId === 'field-01'
+              ? [{ deviceId: 'esp32-node-01', fieldId: { $in: [null, undefined, 'field-01'] } }]
+              : []),
+          ],
+        };
+        latestSensor = await IoTReading.findOne(sensorFilter).sort({ createdAt: -1 });
       } catch {
         latestSensor = null;
       }
@@ -145,6 +237,9 @@ export class FieldIntelligenceService {
           now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
         freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
         isStale = freshnessMinutes > 15;
+        if (isStale) {
+          sensorQualityStatus = 'stale';
+        }
       } else {
         sensorMoisture = null;
         sensorSource = 'missing_telemetry';
@@ -433,6 +528,11 @@ export class FieldIntelligenceService {
       `Soil Chemistry: ${soilSource} (pH ${soilPh}, texture: ${soilTexture}).`,
       `District Benchmark: DES historical baseline for Thanjavur Rice is ${districtYieldBaselineKgHa} kg/ha.`,
     ];
+    if (isStale) {
+      assumptions.push(
+        `⚠️ CAUTION: Sensor telemetry is stale (${freshnessMinutes}m old, exceeding 15-minute validity window). Recommendation is based on historical telemetry and may not reflect current root-zone conditions.`
+      );
+    }
     const alternatives: { action: string; tradeOff: string }[] = [];
 
     let action: IFieldRecommendation['action'];
@@ -785,11 +885,20 @@ export class FieldIntelligenceService {
     const latitude = context.latitude || 10.790861;
     const longitude = context.longitude || 79.098145;
 
-    // 1. Sensor acquisition
+    // 1. Sensor acquisition (Scoped by field and device)
     let latestSensor: any = null;
     if (isDBConnected) {
       try {
-        latestSensor = await IoTReading.findOne({}).sort({ createdAt: -1 });
+        const sensorFilter: any = {
+          $or: [
+            { fieldId: fieldId },
+            ...(context.deviceId ? [{ deviceId: context.deviceId }] : []),
+            ...(fieldId === 'field-01'
+              ? [{ deviceId: 'esp32-node-01', fieldId: { $in: [null, undefined, 'field-01'] } }]
+              : []),
+          ],
+        };
+        latestSensor = await IoTReading.findOne(sensorFilter).sort({ createdAt: -1 });
       } catch {
         latestSensor = null;
       }
@@ -846,6 +955,9 @@ export class FieldIntelligenceService {
         now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
       freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
       isStale = freshnessMinutes > 15;
+      if (isStale) {
+        sensorQualityStatus = 'stale';
+      }
     } else if (context.allowSimulation || context.isSimulated) {
       const fieldDefaultMoisture =
         fieldId === 'field-01'
@@ -1625,13 +1737,20 @@ export class FieldIntelligenceService {
 
     if (isDBConnected) {
       try {
-        const updated = await FieldRecommendation.findOneAndUpdate(
-          { recommendationId },
-          { agronomistReview: reviewRecord },
-          { new: true }
-        );
+        const existing = await FieldRecommendation.findOne({ recommendationId });
+        if (existing) {
+          // Idempotency: if already reviewed with same status and notes, return existing without duplicate audit block
+          if (
+            existing.agronomistReview &&
+            existing.agronomistReview.status === status &&
+            existing.agronomistReview.notes === reviewRecord.notes
+          ) {
+            return existing;
+          }
 
-        if (updated) {
+          existing.agronomistReview = reviewRecord;
+          await existing.save();
+
           try {
             await BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
               recommendationId,
@@ -1644,7 +1763,7 @@ export class FieldIntelligenceService {
           } catch (auditErr: any) {
             console.warn('⚠️ [FIELD INTELLIGENCE] Prescription audit notice:', auditErr.message);
           }
-          return updated;
+          return existing;
         }
       } catch (err: any) {
         console.warn(`⚠️ [FIELD INTELLIGENCE] Agronomist review error: ${err.message}`);
@@ -1673,7 +1792,16 @@ export class FieldIntelligenceService {
         throw dbErr;
       }
 
-      memoryRecommendations[recommendationId].agronomistReview = reviewRecord;
+      const memRec = memoryRecommendations[recommendationId];
+      if (
+        memRec.agronomistReview &&
+        memRec.agronomistReview.status === status &&
+        memRec.agronomistReview.notes === reviewRecord.notes
+      ) {
+        return memRec;
+      }
+
+      memRec.agronomistReview = reviewRecord;
 
       try {
         await BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
@@ -1688,7 +1816,7 @@ export class FieldIntelligenceService {
         /* audit safe */
       }
 
-      return memoryRecommendations[recommendationId];
+      return memRec;
     }
 
     const notFoundErr: any = new Error(

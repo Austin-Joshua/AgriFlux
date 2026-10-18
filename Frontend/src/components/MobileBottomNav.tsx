@@ -168,7 +168,7 @@ const MobileBottomNav: React.FC = () => {
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 6px)' }}
         aria-label={t('nav.mobileNav', 'Mobile Navigation')}
       >
-        <div className="bg-white/98 dark:bg-gray-950/98 border-t border-gray-200/90 dark:border-gray-800/90 shadow-[0_-6px_25px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-2 pt-1 pb-1 flex items-center justify-between w-full max-w-full relative">
+        <div className="bg-white/98 dark:bg-gray-950/98 border-t border-gray-200/90 dark:border-gray-800/90 shadow-[0_-6px_25px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-2 pt-1 pb-1 flex items-center justify-between w-full max-w-full sm:max-w-2xl sm:mx-auto relative">
           {/* Left 2 Tabs */}
           {leftItems.map(renderTab)}
 

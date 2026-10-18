@@ -423,79 +423,108 @@ const AgronomistDashboard: React.FC = () => {
 
   return (
     <div className="space-y-5">
-      {/* Welcome Header — Clean & Symmetrical (Farmer Base Reference) */}
+      {/* Dynamic Contextual Header Based on Selected Agronomist View */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="page-header">
-            {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`, greeting)},{' '}
-            <span className="text-gradient font-black">
-              {user?.name?.split(' ')[0] || user?.name || t('agronomist.specialist', 'Specialist')}
-            </span>{' '}
-            👋
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-            {t('agronomist.cropDiagnosticsSubtitle', 'Crop diagnostics, consultation triage, and field decision reviews')}
-          </p>
+          {activeTab === 'overview' && (
+            <>
+              <h1 className="page-header">
+                {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`, greeting)},{' '}
+                <span className="text-gradient font-black">
+                  {user?.name?.split(' ')[0] || user?.name || t('agronomist.specialist', 'Specialist')}
+                </span>{' '}
+                👋
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                {t('agronomist.cropDiagnosticsSubtitle', 'Crop diagnostics, consultation triage, and field decision reviews')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'fieldDecisions' && (
+            <>
+              <h1 className="page-header flex items-center gap-2">
+                <span>🎯</span>
+                <span>{t('agronomist.decisionReviewsTitle', 'Field Decisions Review')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                {t('agronomist.decisionReviewsSubtitle', 'Agronomic verification, prescription endorsement, and immutable audit gates')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'fieldVisits' && (
+            <>
+              <h1 className="page-header flex items-center gap-2">
+                <span>📅</span>
+                <span>{t('agronomist.consultationsTitle', 'Farmer Consultations')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                {t('agronomist.consultationsSubtitle', 'Diagnostic appointment triage, schedule management, and expert video queue')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'soilReports' && (
+            <>
+              <h1 className="page-header flex items-center gap-2">
+                <span>🧪</span>
+                <span>{t('agronomist.soilDiagnosticsTitle', 'Soil Diagnostics Review')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                {t('agronomist.soilDiagnosticsSubtitle', 'Laboratory chemistry, Soil Health Card NPK evaluation, and pH balance monitoring')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'advisory' && (
+            <>
+              <h1 className="page-header flex items-center gap-2">
+                <span>📡</span>
+                <span>{t('agronomist.regionalAdvisoryTitle', 'Regional Advisory Broadcast')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                {t('agronomist.regionalAdvisorySubtitle', 'Broadcast verified agronomic advisories, weather warnings, and pest alerts to farmers')}
+              </p>
+            </>
+          )}
         </div>
+
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-200 dark:border-primary-700/50">
-            <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
-            {t('agronomist.activeDuty', 'Active Duty')} · {user?.expertise || 'Field Agronomy'}
-          </span>
+          {activeTab === 'overview' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-200 dark:border-primary-700/50">
+              <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
+              {t('agronomist.activeDuty', 'Active Duty')} · {user?.expertise || 'Field Agronomy'}
+            </span>
+          )}
+          {activeTab === 'fieldDecisions' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-bold border border-purple-200 dark:border-purple-700/50">
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+              {reviews.filter((r) => !r.agronomistReview).length || 0} Awaiting Endorsement
+            </span>
+          )}
+          {activeTab === 'fieldVisits' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold border border-blue-200 dark:border-blue-700/50">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              {consultations.filter((c) => c.status === 'pending').length || 0} Pending Requests
+            </span>
+          )}
+          {activeTab === 'soilReports' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold border border-amber-200 dark:border-amber-700/50">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              ICAR-TNAU Standards
+            </span>
+          )}
+          {activeTab === 'advisory' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-200 dark:border-emerald-700/50">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Broadcast Channel Live
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Stat Cards Grid — Symmetrical 4-Column Layout using Farmer Card Design */}
-      <div
-        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
-        style={{ animationDelay: '100ms' }}
-      >
-        <StatCard
-          title={t('agronomist.farmsMonitored', 'Farms Monitored')}
-          value={`42 ${t('agronomist.parcels', 'Parcels')}`}
-          change={t('agronomist.thisMonth', '+4 this month')}
-          positive={true}
-          icon={<Sprout size={22} className="text-primary-600" />}
-          color="text-primary-600 dark:text-primary-400"
-          bgColor="bg-primary-100 dark:bg-primary-900/30"
-          accentColor="#22c55e"
-          onClick={() => handleTabSelect('overview')}
-        />
-        <StatCard
-          title={t('nav.consultationsQueue', 'Farmer Consultations')}
-          value={`${consultations.filter((c) => c.status === 'pending').length || 0} ${t('common.pending', 'Pending')}`}
-          change={t('agronomist.triageActive', 'Triage Active')}
-          positive={true}
-          icon={<Calendar size={22} className="text-blue-600" />}
-          color="text-blue-600 dark:text-blue-400"
-          bgColor="bg-blue-100 dark:bg-blue-900/30"
-          accentColor="#3b82f6"
-          onClick={() => handleTabSelect('fieldVisits')}
-        />
-        <StatCard
-          title={t('nav.fieldDecisions', 'Decision Reviews')}
-          value={`${reviews.filter((r) => !r.agronomistReview).length || 0} ${t('agronomist.awaiting', 'Awaiting')}`}
-          change="FAO-56 Gates"
-          positive={true}
-          icon={<Target size={22} className="text-purple-600" />}
-          color="text-purple-600 dark:text-purple-400"
-          bgColor="bg-purple-100 dark:bg-purple-900/30"
-          accentColor="#8b5cf6"
-          onClick={() => handleTabSelect('fieldDecisions')}
-        />
-        <StatCard
-          title={t('agronomist.soilReports', 'Soil Diagnostics')}
-          value={`88/100 ${t('dashboard.optimal', 'Optimal')}`}
-          change={t('agronomist.labCalibrated', 'Lab Calibrated')}
-          positive={true}
-          icon={<Leaf size={22} className="text-earth-600" />}
-          color="text-earth-600 dark:text-earth-400"
-          bgColor="bg-earth-100 dark:bg-earth-900/30"
-          accentColor="#b8823d"
-          onClick={() => handleTabSelect('soilReports')}
-        />
-      </div>
-
+      {/* Tab Navigation Pill Bar */}
       <div className="overflow-x-auto max-w-full scrollbar-none pb-1">
         <div
           role="tablist"
@@ -529,6 +558,59 @@ const AgronomistDashboard: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Stat Cards Grid — Rendered ONLY on Overview Tab */}
+      {activeTab === 'overview' && (
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
+          style={{ animationDelay: '100ms' }}
+        >
+          <StatCard
+            title={t('agronomist.farmsMonitored', 'Farms Monitored')}
+            value={`42 ${t('agronomist.parcels', 'Parcels')}`}
+            change={t('agronomist.thisMonth', '+4 this month')}
+            positive={true}
+            icon={<Sprout size={22} className="text-primary-600" />}
+            color="text-primary-600 dark:text-primary-400"
+            bgColor="bg-primary-100 dark:bg-primary-900/30"
+            accentColor="#22c55e"
+            onClick={() => handleTabSelect('overview')}
+          />
+          <StatCard
+            title={t('nav.consultationsQueue', 'Farmer Consultations')}
+            value={`${consultations.filter((c) => c.status === 'pending').length || 0} ${t('common.pending', 'Pending')}`}
+            change={t('agronomist.triageActive', 'Triage Active')}
+            positive={true}
+            icon={<Calendar size={22} className="text-blue-600" />}
+            color="text-blue-600 dark:text-blue-400"
+            bgColor="bg-blue-100 dark:bg-blue-900/30"
+            accentColor="#3b82f6"
+            onClick={() => handleTabSelect('fieldVisits')}
+          />
+          <StatCard
+            title={t('nav.fieldDecisions', 'Decision Reviews')}
+            value={`${reviews.filter((r) => !r.agronomistReview).length || 0} ${t('agronomist.awaiting', 'Awaiting')}`}
+            change="FAO-56 Gates"
+            positive={true}
+            icon={<Target size={22} className="text-purple-600" />}
+            color="text-purple-600 dark:text-purple-400"
+            bgColor="bg-purple-100 dark:bg-purple-900/30"
+            accentColor="#8b5cf6"
+            onClick={() => handleTabSelect('fieldDecisions')}
+          />
+          <StatCard
+            title={t('agronomist.soilReports', 'Soil Diagnostics')}
+            value={`88/100 ${t('dashboard.optimal', 'Optimal')}`}
+            change={t('agronomist.labCalibrated', 'Lab Calibrated')}
+            positive={true}
+            icon={<Leaf size={22} className="text-earth-600" />}
+            color="text-earth-600 dark:text-earth-400"
+            bgColor="bg-earth-100 dark:bg-earth-900/30"
+            accentColor="#b8823d"
+            onClick={() => handleTabSelect('soilReports')}
+          />
+        </div>
+      )}
 
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

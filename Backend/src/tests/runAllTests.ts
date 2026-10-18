@@ -18,6 +18,8 @@ import { runActuatorStateMachineTests } from './actuator-state-machine.test';
 import { runFieldIntelligenceIntegrationTests } from './field-intelligence-integration.test';
 import { runBlockchainTests } from './blockchain.test';
 import { runDecisionEngineRemediationTests } from './decision-engine-remediation.test';
+import { runQuantexRemediationTests } from './quantex-remediation-audit.test';
+import { runQuantexE2EWorkflowTests } from './quantex-e2e-workflow.test';
 
 async function main() {
   console.log('================================================================');
@@ -70,6 +72,14 @@ async function main() {
     {
       name: 'Suite 12: Decision Engine Defect Remediation & Verification Suite',
       runner: runDecisionEngineRemediationTests,
+    },
+    {
+      name: 'Suite 13: Quantex Master Audit & Defect Remediation Verification',
+      runner: runQuantexRemediationTests,
+    },
+    {
+      name: 'Suite 14: Quantex Closed-Loop End-to-End Workflow Verification',
+      runner: runQuantexE2EWorkflowTests,
     },
   ];
 

@@ -340,7 +340,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
     navigate('/login', { replace: true, state: null });
   };
 
-  const w = 'lg:w-64';
+  const w = 'w-72 sm:w-80 lg:w-64 max-w-[85vw]';
 
   // Role-specific navigation items selection
   const userRole = user?.role || 'farmer';
@@ -382,6 +382,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
 
       {/* Sidebar Panel */}
       <aside
+        style={{
+          paddingTop: 'max(env(safe-area-inset-top), 0px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom), 0px)',
+        }}
         className={`fixed top-0 left-0 h-[100dvh] pb-6 lg:pb-0 lg:h-screen ${w} glass-sidebar z-50 transform transition-all duration-300 ease-in-out flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       >

@@ -11,9 +11,25 @@ import { isDBConnected } from '../config/db';
  * Supports persistent telemetry storage in MongoDB with memory fallback.
  */
 
+export interface IoTReadingData {
+  deviceId: string;
+  fieldId?: string;
+  farmId?: string;
+  userId?: string;
+  moisture: number;
+  temperature: number;
+  humidity: number;
+  pumpStatus: boolean;
+  isSimulated: boolean;
+  status: 'healthy' | 'warning' | 'critical' | 'sensor_fault';
+  timestamp: string;
+  isOnline: boolean;
+}
+
 // In-memory buffer for latest readings (retained for demo mode / quick access)
-let latestIoTData = {
+let latestIoTData: IoTReadingData = {
   deviceId: 'esp32-node-01',
+  fieldId: 'field-01',
   moisture: 45.0,
   temperature: 24.5,
   humidity: 62.0,
@@ -25,7 +41,7 @@ let latestIoTData = {
 };
 
 // In-memory historical ring buffer (last 50 readings for fallback)
-const inMemoryHistory: (typeof latestIoTData)[] = [latestIoTData];
+const inMemoryHistory: IoTReadingData[] = [latestIoTData];
 
 // Actuator command state machine
 export interface ActuatorCommand {
@@ -53,7 +69,17 @@ const commandHistory: ActuatorCommand[] = [];
  */
 export const postIoTData = async (req: Request, res: Response) => {
   try {
-    const { moisture, temperature, humidity, pumpStatus, deviceId, isSimulated } = req.body;
+    const {
+      moisture,
+      temperature,
+      humidity,
+      pumpStatus,
+      deviceId,
+      fieldId,
+      farmId,
+      userId,
+      isSimulated,
+    } = req.body;
 
     // Strict validation: missing fields must NOT silently coerce to zero
     if (moisture === undefined || moisture === null || isNaN(Number(moisture))) {
@@ -104,6 +130,13 @@ export const postIoTData = async (req: Request, res: Response) => {
     }
 
     const targetDeviceId = String(deviceId || 'esp32-node-01');
+    const targetFieldId = fieldId
+      ? String(fieldId)
+      : targetDeviceId === 'esp32-node-01'
+        ? 'field-01'
+        : undefined;
+    const targetFarmId = farmId ? String(farmId) : undefined;
+    const targetUserId = userId ? String(userId) : undefined;
     const targetPumpStatus = Boolean(pumpStatus);
     const targetSimulated = Boolean(isSimulated);
 
@@ -118,6 +151,9 @@ export const postIoTData = async (req: Request, res: Response) => {
 
     latestIoTData = {
       deviceId: targetDeviceId,
+      fieldId: targetFieldId,
+      farmId: targetFarmId,
+      userId: targetUserId,
       moisture: Math.round(numMoisture * 10) / 10,
       temperature: Math.round(numTemp * 10) / 10,
       humidity: Math.round(numHumidity * 10) / 10,
@@ -139,6 +175,9 @@ export const postIoTData = async (req: Request, res: Response) => {
       try {
         await IoTReading.create({
           deviceId: targetDeviceId,
+          fieldId: targetFieldId,
+          farmId: targetFarmId,
+          userId: targetUserId,
           moisture: latestIoTData.moisture,
           temperature: latestIoTData.temperature,
           humidity: latestIoTData.humidity,
@@ -155,7 +194,7 @@ export const postIoTData = async (req: Request, res: Response) => {
     }
 
     console.log(
-      `📡 [IoT SYNC] Synced: M:${latestIoTData.moisture}% T:${latestIoTData.temperature}°C H:${latestIoTData.humidity}% P:${latestIoTData.pumpStatus} [${targetSimulated ? 'SIMULATOR' : 'HARDWARE'}] [Durable: ${storageDurable}]`
+      `📡 [IoT SYNC] Synced: M:${latestIoTData.moisture}% T:${latestIoTData.temperature}°C H:${latestIoTData.humidity}% P:${latestIoTData.pumpStatus} [${targetSimulated ? 'SIMULATOR' : 'HARDWARE'}] [Field: ${targetFieldId || 'unscoped'}] [Durable: ${storageDurable}]`
     );
 
     // Broadcast real-time update to all connected Socket.IO clients
@@ -186,17 +225,56 @@ export const postIoTData = async (req: Request, res: Response) => {
  * GET /api/iot-data
  * Sends latest sensor reading to frontend
  */
-export const getIoTData = async (_req: Request, res: Response) => {
+export const getIoTData = async (req: Request, res: Response) => {
   try {
-    const lastUpdate = new Date(latestIoTData.timestamp).getTime();
+    const fieldId = req.query?.fieldId ? String(req.query.fieldId) : undefined;
+    const deviceId = req.query?.deviceId ? String(req.query.deviceId) : undefined;
+
+    if (isDBConnected && (fieldId || deviceId)) {
+      const filter: any = {};
+      if (fieldId) {
+        filter.$or = [{ fieldId }, { deviceId: fieldId }];
+      } else if (deviceId) {
+        filter.deviceId = deviceId;
+      }
+      const dbRec = await IoTReading.findOne(filter).sort({ createdAt: -1 });
+      if (dbRec) {
+        const lastUpdate = new Date(dbRec.createdAt || dbRec.rawTimestamp).getTime();
+        const isStale = Date.now() - lastUpdate > 15000;
+        return res.status(200).json({
+          success: true,
+          data: {
+            deviceId: dbRec.deviceId,
+            fieldId: dbRec.fieldId,
+            moisture: dbRec.moisture,
+            temperature: dbRec.temperature,
+            humidity: dbRec.humidity,
+            pumpStatus: dbRec.pumpStatus,
+            isSimulated: dbRec.isSimulated,
+            status: dbRec.status,
+            timestamp: new Date(dbRec.createdAt || dbRec.rawTimestamp).toISOString(),
+            isOnline: !isStale,
+            isStale,
+          },
+        });
+      }
+    }
+
+    // Fallback to in-memory history matching fieldId or latestIoTData
+    const matchingMem =
+      inMemoryHistory.find(
+        (r: any) => !fieldId || r.fieldId === fieldId || r.deviceId === fieldId
+      ) || latestIoTData;
+
+    const lastUpdate = new Date(matchingMem.timestamp).getTime();
     const now = Date.now();
     const isStale = now - lastUpdate > 15000;
 
     return res.status(200).json({
       success: true,
       data: {
-        ...latestIoTData,
-        isOnline: latestIoTData.isOnline && !isStale,
+        ...matchingMem,
+        isOnline: matchingMem.isOnline && !isStale,
         isStale,
       },
     });
@@ -214,10 +292,19 @@ export const getIoTData = async (_req: Request, res: Response) => {
  */
 export const getIoTHistory = async (req: Request, res: Response) => {
   try {
-    const limit = Math.min(100, Math.max(5, Number(req.query.limit) || 20));
+    const limit = Math.min(100, Math.max(5, Number(req.query?.limit) || 20));
+    const fieldId = req.query?.fieldId ? String(req.query.fieldId) : undefined;
+    const deviceId = req.query?.deviceId ? String(req.query.deviceId) : undefined;
+
+    const filter: any = {};
+    if (fieldId) {
+      filter.$or = [{ fieldId }, { deviceId: fieldId }];
+    } else if (deviceId) {
+      filter.deviceId = deviceId;
+    }
 
     if (isDBConnected) {
-      const records = await IoTReading.find({}).sort({ createdAt: -1 }).limit(limit);
+      const records = await IoTReading.find(filter).sort({ createdAt: -1 }).limit(limit);
       if (records.length > 0) {
         return res.status(200).json({
           success: true,
@@ -228,10 +315,13 @@ export const getIoTHistory = async (req: Request, res: Response) => {
     }
 
     // Fallback to in-memory history
+    const filteredMem = inMemoryHistory.filter(
+      (r: any) => !fieldId || r.fieldId === fieldId || r.deviceId === fieldId
+    );
     return res.status(200).json({
       success: true,
       source: 'memory_buffer',
-      data: inMemoryHistory.slice(0, limit).reverse(),
+      data: filteredMem.slice(0, limit).reverse(),
     });
   } catch (error: any) {
     return res.status(500).json({

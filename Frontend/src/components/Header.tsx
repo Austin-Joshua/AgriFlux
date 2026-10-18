@@ -396,7 +396,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 glass-header px-2 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-1 sm:gap-2 md:gap-3 w-full max-w-full overflow-x-clip select-none">
+    <header
+      style={{ paddingTop: 'max(env(safe-area-inset-top), 0.5rem)' }}
+      className="sticky top-0 z-30 glass-header px-2 sm:px-4 pb-2 sm:pb-2.5 flex items-center justify-between gap-1 sm:gap-2 md:gap-3 w-full max-w-full select-none"
+    >
       {mobileSearchOpen ? (
         /* Full-width Mobile Search Bar Overlay */
         <div ref={mobileSearchRef} className="flex md:hidden items-center gap-1.5 w-full animate-fade-in relative py-0.5">
@@ -701,105 +704,128 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </button>
 
           {notifOpen && (
-            <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm font-display">
-                  {t('notifications.title')}
-                </h3>
-                <button
-                  onClick={handleMarkAllRead}
-                  className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest hover:underline"
-                >
-                  {t('notifications.markAllRead')}
-                </button>
-              </div>
-
-              <div className="max-h-80 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-700/50">
-                {!selectedNotif ? (
-                  notifications.length === 0 ? (
-                    <div className="py-8 text-center bg-white dark:bg-gray-800/50">
-                      <p className="text-sm text-gray-500">{t('notifications.empty')}</p>
-                    </div>
-                  ) : (
-                    notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        onClick={() => {
-                          setSelectedNotif(n);
-                          handleMarkAsRead(n.id);
-                        }}
-                        className={`flex gap-3 px-4 py-4 transition-all duration-150 cursor-pointer group relative hover:bg-white dark:hover:bg-gray-700/60 ${n.unread ? 'bg-primary-50/20 dark:bg-primary-900/10' : ''}`}
-                      >
-                        <div
-                          className={`w-10 h-10 rounded-xl ${n.bg} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}
-                        >
-                          <n.icon size={18} className={n.color} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <p
-                              className={`text-sm tracking-tight ${n.unread ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-600 dark:text-gray-400'}`}
-                            >
-                              {n.titleKey ? t(n.titleKey, n.title) : n.title}
-                            </p>
-                            {n.unread && (
-                              <span className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1.5 shadow-glow-green" />
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
-                            {n.bodyKey ? t(n.bodyKey, n.body) : n.body}
-                          </p>
-                          <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 mt-2 uppercase">
-                            {n.timeKey ? t(n.timeKey, n.time) : n.time}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  )
-                ) : (
-                  <div className="p-4 bg-white dark:bg-gray-800/50 animate-fade-in">
+            <>
+              {/* Mobile backdrop for clean outside dismissal */}
+              <div
+                className="fixed inset-0 z-[90] bg-black/25 backdrop-blur-[2px] sm:hidden"
+                onClick={() => setNotifOpen(false)}
+              />
+              <div className="fixed left-3 right-3 top-[calc(max(env(safe-area-inset-top),0.5rem)+3.25rem)] w-auto max-w-md mx-auto sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mx-0 sm:w-80 sm:max-w-none glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100] border border-gray-100/80 dark:border-gray-800">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-sm font-display">
+                      {t('notifications.title')}
+                    </h3>
+                    {unreadCount > 0 && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2.5">
                     <button
-                      onClick={() => setSelectedNotif(null)}
-                      className="flex items-center gap-1.5 text-[10px] font-black uppercase text-gray-400 hover:text-primary-600 mb-4 transition-colors"
+                      onClick={handleMarkAllRead}
+                      className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest hover:underline"
                     >
-                      <ChevronRight size={14} className="rotate-180" /> {t('notifications.back')}
+                      {t('notifications.markAllRead')}
                     </button>
-                    <div className="flex gap-4 items-start mb-4">
-                      <div
-                        className={`w-12 h-12 rounded-2xl ${selectedNotif.bg} flex items-center justify-center shadow-lg border border-white dark:border-gray-700`}
-                      >
-                        <selectedNotif.icon size={22} className={selectedNotif.color} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 dark:text-white leading-tight">
-                          {selectedNotif.titleKey ? t(selectedNotif.titleKey, selectedNotif.title) : selectedNotif.title}
-                        </h4>
-                        <p className="text-[10px] font-black text-gray-400 uppercase mt-1">
-                          {selectedNotif.timeKey ? t(selectedNotif.timeKey, selectedNotif.time) : selectedNotif.time}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-600/50">
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                        {selectedNotif.bodyKey ? t(selectedNotif.bodyKey, selectedNotif.body) : selectedNotif.body}
-                      </p>
-                    </div>
                     <button
-                      onClick={() => setSelectedNotif(null)}
-                      className="btn-primary w-full mt-4 text-xs font-bold py-2 shadow-glow-green"
+                      onClick={() => setNotifOpen(false)}
+                      className="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      aria-label="Close notifications"
                     >
-                      {t('common.gotIt', 'Got it')}
+                      <X size={15} />
                     </button>
                   </div>
-                )}
-              </div>
+                </div>
 
-              <div className="border-t border-gray-100/50 dark:border-gray-700/50 px-4 py-3 bg-gray-50/30 dark:bg-gray-800/20">
-                <button className="w-full text-center text-[10px] font-black uppercase tracking-widest text-primary-600 dark:text-primary-400 hover:text-primary-700 transition-colors">
-                  {t('common.viewAll')}
-                </button>
+                <div className="max-h-80 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-700/50">
+                  {!selectedNotif ? (
+                    notifications.length === 0 ? (
+                      <div className="py-8 text-center bg-white dark:bg-gray-800/50">
+                        <p className="text-sm text-gray-500">{t('notifications.empty')}</p>
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={() => {
+                            setSelectedNotif(n);
+                            handleMarkAsRead(n.id);
+                          }}
+                          className={`flex gap-3 px-4 py-4 transition-all duration-150 cursor-pointer group relative hover:bg-white dark:hover:bg-gray-700/60 ${n.unread ? 'bg-primary-50/20 dark:bg-primary-900/10' : ''}`}
+                        >
+                          <div
+                            className={`w-10 h-10 rounded-xl ${n.bg} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}
+                          >
+                            <n.icon size={18} className={n.color} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p
+                                className={`text-sm tracking-tight ${n.unread ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-600 dark:text-gray-400'}`}
+                              >
+                                {n.titleKey ? t(n.titleKey, n.title) : n.title}
+                              </p>
+                              {n.unread && (
+                                <span className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1.5 shadow-glow-green" />
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+                              {n.bodyKey ? t(n.bodyKey, n.body) : n.body}
+                            </p>
+                            <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 mt-2 uppercase">
+                              {n.timeKey ? t(n.timeKey, n.time) : n.time}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )
+                  ) : (
+                    <div className="p-4 bg-white dark:bg-gray-800/50 animate-fade-in">
+                      <button
+                        onClick={() => setSelectedNotif(null)}
+                        className="flex items-center gap-1.5 text-[10px] font-black uppercase text-gray-400 hover:text-primary-600 mb-4 transition-colors"
+                      >
+                        <ChevronRight size={14} className="rotate-180" /> {t('notifications.back')}
+                      </button>
+                      <div className="flex gap-4 items-start mb-4">
+                        <div
+                          className={`w-12 h-12 rounded-2xl ${selectedNotif.bg} flex items-center justify-center shadow-lg border border-white dark:border-gray-700`}
+                        >
+                          <selectedNotif.icon size={22} className={selectedNotif.color} />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900 dark:text-white leading-tight">
+                            {selectedNotif.titleKey ? t(selectedNotif.titleKey, selectedNotif.title) : selectedNotif.title}
+                          </h4>
+                          <p className="text-[10px] font-black text-gray-400 uppercase mt-1">
+                            {selectedNotif.timeKey ? t(selectedNotif.timeKey, selectedNotif.time) : selectedNotif.time}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-600/50">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                          {selectedNotif.bodyKey ? t(selectedNotif.bodyKey, selectedNotif.body) : selectedNotif.body}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setSelectedNotif(null)}
+                        className="btn-primary w-full mt-4 text-xs font-bold py-2 shadow-glow-green"
+                      >
+                        {t('common.gotIt', 'Got it')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-gray-100/50 dark:border-gray-700/50 px-4 py-3 bg-gray-50/30 dark:bg-gray-800/20">
+                  <button className="w-full text-center text-[10px] font-black uppercase tracking-widest text-primary-600 dark:text-primary-400 hover:text-primary-700 transition-colors">
+                    {t('common.viewAll')}
+                  </button>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 
@@ -823,22 +849,29 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             />
           </button>
           {langOpen && (
-            <div className="absolute right-0 top-full mt-2 w-44 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    i18n.changeLanguage(lang.code);
-                    setLangOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left transition-all duration-150 hover:bg-primary-50/60 dark:hover:bg-primary-900/20
-                    ${i18n.language === lang.code ? 'text-primary-600 dark:text-primary-400 font-semibold bg-primary-50/40 dark:bg-primary-900/10' : 'text-gray-700 dark:text-gray-300'}`}
-                >
-                  <span className="text-base">{lang.flag}</span>
-                  <span>{lang.label}</span>
-                </button>
-              ))}
-            </div>
+            <>
+              {/* Mobile backdrop for clean outside dismissal */}
+              <div
+                className="fixed inset-0 z-[90] bg-black/25 backdrop-blur-[2px] sm:hidden"
+                onClick={() => setLangOpen(false)}
+              />
+              <div className="absolute right-0 sm:right-0 top-full mt-2 w-48 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100] border border-gray-100/80 dark:border-gray-800">
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      i18n.changeLanguage(lang.code);
+                      setLangOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left transition-all duration-150 hover:bg-primary-50/60 dark:hover:bg-primary-900/20
+                      ${i18n.language === lang.code ? 'text-primary-600 dark:text-primary-400 font-semibold bg-primary-50/40 dark:bg-primary-900/10' : 'text-gray-700 dark:text-gray-300'}`}
+                  >
+                    <span className="text-base">{lang.flag}</span>
+                    <span>{lang.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
@@ -878,33 +911,46 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </button>
 
           {accountOpen && (
-            <div
-              id="profile-dropdown-menu"
-              className="absolute right-0 top-full mt-2 w-72 sm:w-80 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100] border border-gray-100/90 dark:border-gray-800"
-            >
-              {/* User Identity Banner */}
-              <div className="p-4 bg-gradient-to-br from-emerald-50/80 to-teal-50/50 dark:from-dark-850 dark:to-dark-900 border-b border-gray-100 dark:border-gray-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-sm shadow-md flex-shrink-0">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
-                      {user?.name || 'AgriFlux User'}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {user?.email || user?.phone || 'farmer@agriflux.com'}
-                    </p>
-                    <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40 dark:border-emerald-700/40">
-                      {user?.role === 'agronomist'
-                        ? `🔬 ${t('header.seniorAgronomist', 'Senior Agronomist')}`
-                        : user?.role === 'admin'
-                          ? `🛡️ ${t('header.systemAdmin', 'System Admin')}`
-                          : `🌾 ${t('header.verifiedFarmer', 'Verified Farmer')}`}
-                    </span>
+            <>
+              {/* Mobile backdrop for clean outside dismissal */}
+              <div
+                className="fixed inset-0 z-[90] bg-black/25 backdrop-blur-[2px] sm:hidden"
+                onClick={() => setAccountOpen(false)}
+              />
+              <div
+                id="profile-dropdown-menu"
+                className="fixed left-3 right-3 top-[calc(max(env(safe-area-inset-top),0.5rem)+3.25rem)] w-auto max-w-md mx-auto sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mx-0 sm:w-80 sm:max-w-none max-h-[calc(100dvh-5rem)] overflow-y-auto glass-panel rounded-2xl shadow-2xl animate-slide-down z-[100] border border-gray-100/90 dark:border-gray-800"
+              >
+                {/* User Identity Banner */}
+                <div className="p-4 bg-gradient-to-br from-emerald-50/80 to-teal-50/50 dark:from-dark-850 dark:to-dark-900 border-b border-gray-100 dark:border-gray-800 relative">
+                  <button
+                    onClick={() => setAccountOpen(false)}
+                    className="sm:hidden absolute top-3 right-3 p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-black/5 transition-colors"
+                    aria-label="Close profile menu"
+                  >
+                    <X size={16} />
+                  </button>
+                  <div className="flex items-center gap-3 pr-6 sm:pr-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-sm shadow-md flex-shrink-0">
+                      {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                        {user?.name || 'AgriFlux User'}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {user?.email || user?.phone || 'farmer@agriflux.com'}
+                      </p>
+                      <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40 dark:border-emerald-700/40">
+                        {user?.role === 'agronomist'
+                          ? `🔬 ${t('header.seniorAgronomist', 'Senior Agronomist')}`
+                          : user?.role === 'admin'
+                            ? `🛡️ ${t('header.systemAdmin', 'System Admin')}`
+                            : `🌾 ${t('header.verifiedFarmer', 'Verified Farmer')}`}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
               {/* Primary Workspace Dashboard Link */}
               <div className="p-2 border-b border-gray-100 dark:border-gray-800">
@@ -1019,7 +1065,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 </button>
               </div>
             </div>
-          )}
+          </>
+        )}
         </div>
       </div>
         </>

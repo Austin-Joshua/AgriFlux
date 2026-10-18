@@ -514,95 +514,151 @@ interface BlockchainLedgerHealth {
 
   return (
     <div className="space-y-5">
-      {/* Header Banner */}
+      {/* Dynamic Contextual Header Based on Selected Admin View */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="page-header text-gray-900 dark:text-white">
-              {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`, greeting)},{' '}
-              <span className="text-gradient font-black">
-                {user?.name?.split(' ')[0] || user?.name || t('admin.adminGreeting', 'Administrator')}
-              </span>{' '}
-              👋
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-xs font-black border border-red-200/50">
-              {t('admin.directControl', 'DIRECT CONTROL')}
-            </span>
-          </div>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            {t('admin.fullAccess', 'Complete platform governance, immutable cryptographic ledger, and hardware interlock')}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={handleEmergencyStop}
-            className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all duration-150 shadow-md ${
-              emergencyCutoffActive
-                ? 'bg-red-600 text-white animate-pulse shadow-red-500/50'
-                : 'bg-red-50 hover:bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-300 dark:border-red-800'
-            }`}
-          >
-            <Power size={14} />
-            {emergencyCutoffActive ? t('admin.releaseEmergencyStop', 'RELEASE E-STOP') : t('admin.emergencyStop', 'EMERGENCY E-STOP')}
-          </button>
-          <button
-            onClick={() => toast.success('Platform audit snapshot downloaded.')}
-            className="px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            <Download size={13} /> {t('admin.exportReport', 'Export Report')}
-          </button>
-        </div>
-      </div>
+          {activeTab === 'overview' && (
+            <>
+              <div className="flex items-center gap-2">
+                <h1 className="page-header text-gray-900 dark:text-white">
+                  {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`, greeting)},{' '}
+                  <span className="text-gradient font-black">
+                    {user?.name?.split(' ')[0] || user?.name || t('admin.adminGreeting', 'Administrator')}
+                  </span>{' '}
+                  👋
+                </h1>
+                <span className="px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-xs font-black border border-red-200/50">
+                  {t('admin.directControl', 'DIRECT CONTROL')}
+                </span>
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                {t('admin.fullAccess', 'Complete platform governance, immutable cryptographic ledger, and hardware interlock')}
+              </p>
+            </>
+          )}
 
-      {/* KPI Stat Cards — Symmetrical 4-Column Layout using Farmer Card Design */}
-      <div
-        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
-        style={{ animationDelay: '100ms' }}
-      >
-        <StatCard
-          title={t('admin.totalRegistered', 'Total Registered')}
-          value={`271 ${t('admin.users', 'Users')}`}
-          change={`+34 ${t('admin.thisMonth', 'this month')}`}
-          positive={true}
-          icon={<Users size={22} className="text-primary-600" />}
-          color="text-primary-600 dark:text-primary-400"
-          bgColor="bg-primary-100 dark:bg-primary-900/30"
-          accentColor="#22c55e"
-          onClick={() => setActiveTab('users')}
-        />
-        <StatCard
-          title={t('admin.hardwareNodes', 'Hardware Nodes')}
-          value={`18 / 18 ${t('common.online', 'Online')}`}
-          change="LoRa Mesh 100%"
-          positive={true}
-          icon={<Cpu size={22} className="text-blue-600" />}
-          color="text-blue-600 dark:text-blue-400"
-          bgColor="bg-blue-100 dark:bg-blue-900/30"
-          accentColor="#3b82f6"
-          onClick={() => setActiveTab('system')}
-        />
-        <StatCard
-          title={t('admin.farmerInquiries', 'Farmer Inquiries')}
-          value={`3 ${t('common.pending', 'Pending')}`}
-          change={t('admin.triageQueue', 'Triage Queue')}
-          positive={true}
-          icon={<Calendar size={22} className="text-amber-600" />}
-          color="text-amber-600 dark:text-amber-400"
-          bgColor="bg-amber-100 dark:bg-amber-900/30"
-          accentColor="#f59e0b"
-          onClick={() => setActiveTab('activity')}
-        />
-        <StatCard
-          title={t('admin.systemHealth', 'System Health')}
-          value={t('admin.nominal', 'Nominal')}
-          change={t('admin.zeroFaults', 'Zero Faults')}
-          positive={true}
-          icon={<ShieldCheck size={22} className="text-emerald-600" />}
-          color="text-emerald-600 dark:text-emerald-400"
-          bgColor="bg-emerald-100 dark:bg-emerald-900/30"
-          accentColor="#10b981"
-          onClick={() => setActiveTab('blockchain')}
-        />
+          {activeTab === 'users' && (
+            <>
+              <h1 className="page-header text-gray-900 dark:text-white flex items-center gap-2">
+                <span>👥</span>
+                <span>{t('admin.usersPageTitle', 'User Governance & Permissions')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                {t('admin.usersPageSubtitle', 'Platform user accounts, role-based access control (Farmer / Agronomist / Admin), and status management')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'blockchain' && (
+            <>
+              <h1 className="page-header text-gray-900 dark:text-white flex items-center gap-2">
+                <span>🛡️</span>
+                <span>{t('admin.blockchainPageTitle', 'Cryptographic Audit Ledger')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                {t('admin.blockchainPageSubtitle', 'Immutable SHA-256 Merkle chain verification, tamper detection, and Proof-of-Authority block explorer')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'actuators' && (
+            <>
+              <div className="flex items-center gap-2">
+                <h1 className="page-header text-gray-900 dark:text-white flex items-center gap-2">
+                  <span>🕹️</span>
+                  <span>{t('admin.actuatorsPageTitle', 'Hardware Actuator Overrides')}</span>
+                </h1>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-black border border-amber-200/50">
+                  HARDWARE OVERRIDE
+                </span>
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                {t('admin.actuatorsPageSubtitle', 'Direct manual hardware controls for field pumps, solenoid zone valves, misting systems, and emergency interlocks')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'system' && (
+            <>
+              <h1 className="page-header text-gray-900 dark:text-white flex items-center gap-2">
+                <span>⚙️</span>
+                <span>{t('admin.systemPageTitle', 'Cloud Infrastructure & Telemetry Health')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                {t('admin.systemPageSubtitle', 'Real-time monitoring of LoRaWAN edge mesh, API gateway latency, and database cluster metrics')}
+              </p>
+            </>
+          )}
+
+          {activeTab === 'activity' && (
+            <>
+              <h1 className="page-header text-gray-900 dark:text-white flex items-center gap-2">
+                <span>📋</span>
+                <span>{t('admin.activityPageTitle', 'Security Audit Trail & Logs')}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                {t('admin.activityPageSubtitle', 'Real-time event logging, privileged admin mutations, and authentication history')}
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          {(activeTab === 'overview' || activeTab === 'actuators') && (
+            <button
+              onClick={handleEmergencyStop}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all duration-150 shadow-md ${
+                emergencyCutoffActive
+                  ? 'bg-red-600 text-white animate-pulse shadow-red-500/50'
+                  : 'bg-red-50 hover:bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-300 dark:border-red-800'
+              }`}
+            >
+              <Power size={14} />
+              {emergencyCutoffActive ? t('admin.releaseEmergencyStop', 'RELEASE E-STOP') : t('admin.emergencyStop', 'EMERGENCY E-STOP')}
+            </button>
+          )}
+
+          {activeTab === 'overview' && (
+            <button
+              onClick={() => toast.success('Platform audit snapshot downloaded.')}
+              className="px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              <Download size={13} /> {t('admin.exportReport', 'Export Report')}
+            </button>
+          )}
+
+          {activeTab === 'users' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-200 dark:border-primary-700/50">
+              <Users size={14} />
+              {userList.length} Registered Accounts
+            </span>
+          )}
+
+          {activeTab === 'blockchain' && (
+            <button
+              onClick={handleVerifyChain}
+              disabled={verifyingChain}
+              className="btn-primary px-3.5 py-1.5 text-xs font-bold flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            >
+              <ShieldCheck size={14} />
+              <span>{verifyingChain ? 'Verifying...' : 'Verify Cryptographic Integrity'}</span>
+            </button>
+          )}
+
+          {activeTab === 'system' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold border border-blue-200 dark:border-blue-700/50">
+              <Cpu size={14} />
+              18/18 Edge Nodes Active
+            </span>
+          )}
+
+          {activeTab === 'activity' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold border border-amber-200 dark:border-amber-700/50">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              Live Security Stream
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Tab Navigation Pill Bar */}
@@ -636,6 +692,59 @@ interface BlockchainLedgerHealth {
           ))}
         </div>
       </div>
+
+      {/* KPI Stat Cards — Rendered ONLY on Overview Tab */}
+      {activeTab === 'overview' && (
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
+          style={{ animationDelay: '100ms' }}
+        >
+          <StatCard
+            title={t('admin.totalRegistered', 'Total Registered')}
+            value={`271 ${t('admin.users', 'Users')}`}
+            change={`+34 ${t('admin.thisMonth', 'this month')}`}
+            positive={true}
+            icon={<Users size={22} className="text-primary-600" />}
+            color="text-primary-600 dark:text-primary-400"
+            bgColor="bg-primary-100 dark:bg-primary-900/30"
+            accentColor="#22c55e"
+            onClick={() => setActiveTab('users')}
+          />
+          <StatCard
+            title={t('admin.hardwareNodes', 'Hardware Nodes')}
+            value={`18 / 18 ${t('common.online', 'Online')}`}
+            change="LoRa Mesh 100%"
+            positive={true}
+            icon={<Cpu size={22} className="text-blue-600" />}
+            color="text-blue-600 dark:text-blue-400"
+            bgColor="bg-blue-100 dark:bg-blue-900/30"
+            accentColor="#3b82f6"
+            onClick={() => setActiveTab('system')}
+          />
+          <StatCard
+            title={t('admin.farmerInquiries', 'Farmer Inquiries')}
+            value={`3 ${t('common.pending', 'Pending')}`}
+            change={t('admin.triageQueue', 'Triage Queue')}
+            positive={true}
+            icon={<Calendar size={22} className="text-amber-600" />}
+            color="text-amber-600 dark:text-amber-400"
+            bgColor="bg-amber-100 dark:bg-amber-900/30"
+            accentColor="#f59e0b"
+            onClick={() => setActiveTab('activity')}
+          />
+          <StatCard
+            title={t('admin.systemHealth', 'System Health')}
+            value={t('admin.nominal', 'Nominal')}
+            change={t('admin.zeroFaults', 'Zero Faults')}
+            positive={true}
+            icon={<ShieldCheck size={22} className="text-emerald-600" />}
+            color="text-emerald-600 dark:text-emerald-400"
+            bgColor="bg-emerald-100 dark:bg-emerald-900/30"
+            accentColor="#10b981"
+            onClick={() => setActiveTab('blockchain')}
+          />
+        </div>
+      )}
 
       {/* OVERVIEW TAB */}
       {activeTab === 'overview' && (

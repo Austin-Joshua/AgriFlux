@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   AreaChart,
@@ -67,11 +67,6 @@ const IrrigationIntelligence: React.FC = () => {
 
   const [isToggling, setIsToggling] = useState(false);
 
-  // Animation trigger for "flash" effect
-  const [flashKey, setFlashKey] = useState(0);
-  useEffect(() => {
-    setFlashKey((prev) => prev + 1);
-  }, [lastSync]);
   const [reportModal, setReportModal] = useState<{
     isOpen: boolean;
     title: string;

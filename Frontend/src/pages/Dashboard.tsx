@@ -222,7 +222,7 @@ const Dashboard: React.FC = () => {
 
       {/* Stat Cards Grid — Symmetrical 4-Column Layout */}
       <div
-        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
+        className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 animate-slide-up-fade"
         style={{ animationDelay: '100ms' }}
       >
         <StatCard
