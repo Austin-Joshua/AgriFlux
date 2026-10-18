@@ -92,7 +92,7 @@ const ClimateRisk: React.FC = () => {
           <div className="p-3 bg-gold-100 dark:bg-gold-900/30 rounded-2xl text-gold-600 mb-4">
             <CloudLightning size={24} />
           </div>
-          <p className="section-header mb-4">Risk Assessment</p>
+          <p className="section-header mb-4">{t('climate.riskAssessment', 'Risk Assessment')}</p>
           <div className="relative w-36 h-36 mb-3">
             <svg className="w-36 h-36 -rotate-90" viewBox="0 0 36 36">
               <path
@@ -121,22 +121,22 @@ const ClimateRisk: React.FC = () => {
               <span className="text-4xl font-black text-gold-600 dark:text-gold-400 font-display">
                 {riskScore}
               </span>
-              <span className="text-[10px] text-gray-500 font-bold">OPTIMAL</span>
+              <span className="text-[10px] text-gray-500 font-bold">{t('climate.optimal', 'OPTIMAL')}</span>
             </div>
           </div>
-          <span className="badge-gold px-4 py-1.5 animate-pulse-slow">Low Risk</span>
+          <span className="badge-gold px-4 py-1.5 animate-pulse-slow">{t('climate.lowRisk', 'Low Risk')}</span>
           <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-3 font-medium">
-            Favorable conditions for rice cultivation continue
+            {t('climate.favorableConditions', 'Favorable conditions for rice cultivation continue')}
           </p>
 
           <div className="mt-4 w-full grid grid-cols-2 gap-2 text-center">
             <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
               <p className="text-lg font-bold text-orange-600">12%</p>
-              <p className="text-xs text-gray-500">Drought Risk</p>
+              <p className="text-xs text-gray-500">{t('climate.droughtRisk', 'Drought Risk')}</p>
             </div>
             <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
               <p className="text-lg font-bold text-blue-600">8%</p>
-              <p className="text-xs text-gray-500">Flood Risk</p>
+              <p className="text-xs text-gray-500">{t('climate.floodRisk', 'Flood Risk')}</p>
             </div>
           </div>
         </div>
@@ -157,7 +157,7 @@ const ClimateRisk: React.FC = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h3 className="section-header mb-4">Rainfall Forecast vs Historical</h3>
+          <h3 className="section-header mb-4">{t('climate.rainfallForecastTitle', 'Rainfall Forecast vs Historical')}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={rainfallData}>
               <defs>
@@ -200,7 +200,7 @@ const ClimateRisk: React.FC = () => {
         </div>
 
         <div className="card">
-          <h3 className="section-header mb-4">Temperature Range Forecast</h3>
+          <h3 className="section-header mb-4">{t('climate.tempRangeTitle', 'Temperature Range Forecast')}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={tempData} barGap={2}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />

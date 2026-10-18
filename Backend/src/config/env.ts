@@ -20,6 +20,7 @@ interface EnvConfig {
   FIREBASE_CLIENT_EMAIL: string;
   FIREBASE_PRIVATE_KEY: string;
   ALLOW_DEMO_LOGIN: boolean;
+  AUDIT_SIGNING_KEY: string;
 }
 
 /**
@@ -66,6 +67,7 @@ const getEnv = (): EnvConfig => {
       process.env.FIREBASE_CLIENT_EMAIL || 'firebase-adminsdk@agriflux.iam.gserviceaccount.com',
     FIREBASE_PRIVATE_KEY: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
     ALLOW_DEMO_LOGIN: process.env.ALLOW_DEMO_LOGIN === 'true' || envStatus !== 'production',
+    AUDIT_SIGNING_KEY: process.env.AUDIT_SIGNING_KEY || '',
   };
 };
 

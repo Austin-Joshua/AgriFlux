@@ -144,27 +144,28 @@ const BookConsultation: React.FC = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4"
       >
-        <SEO title="Booking Confirmed" />
+        <SEO title={t('consultation.bookingConfirmed')} />
         <div className="w-24 h-24 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-600 mb-6 shadow-glow-green">
           <CheckCircle size={56} />
         </div>
         <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4">
-          Consultation Booked!
+          {t('consultation.consultationBooked')}
         </h1>
         <div className="max-w-lg bg-gray-50 dark:bg-gray-800/50 p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl">
           <p className="text-gray-600 dark:text-gray-400 mb-6 text-lg leading-relaxed">
-            Your 1-to-1 video call with{' '}
-            <strong className="text-primary-600">{selectedExpert?.name}</strong> has been scheduled
-            for <span className="font-bold">{date}</span> at{' '}
-            <span className="font-bold">{time}</span>.
+            {t('consultation.scheduledFor', 'Your 1-to-1 video call with {{expert}} has been scheduled for {{date}} at {{time}}.', {
+              expert: selectedExpert?.name,
+              date,
+              time,
+            })}
           </p>
           <div className="flex items-center justify-center gap-2 text-primary-500 font-bold text-sm bg-primary-50 dark:bg-primary-900/20 py-3 rounded-xl">
             <Video size={18} />
-            WhatsApp Meeting Link Sent
+            {t('consultation.whatsappSent')}
           </div>
         </div>
         <button onClick={() => navigate('/dashboard')} className="btn-primary mt-10 px-12 py-4">
-          Back to Dashboard
+          {t('consultation.backToDashboard')}
         </button>
       </motion.div>
     );
@@ -172,7 +173,7 @@ const BookConsultation: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-10 px-4 animate-fade-in">
-      <SEO title="Book Consultation" />
+      <SEO title={t('nav.bookConsultation')} />
 
       {/* Header — Standardized */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -182,13 +183,13 @@ const BookConsultation: React.FC = () => {
             {t('nav.bookConsultation')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-            Connect with certified agronomists for professional farm guidance.
+            {t('consultation.subtitle')}
           </p>
         </div>
         <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800/50">
           <ShieldCheck size={18} className="text-primary-600" />
           <span className="text-xs font-bold text-primary-700 dark:text-primary-400">
-            Verified Professional Network
+            {t('consultation.verifiedNetwork')}
           </span>
         </div>
       </div>
@@ -201,9 +202,9 @@ const BookConsultation: React.FC = () => {
           style={{ width: `${((step - 1) / 2) * 100}%` }}
         />
         {[
-          { number: 1, label: 'Select Expert' },
-          { number: 2, label: 'Schedule & Query' },
-          { number: 3, label: 'Review & Confirm' },
+          { number: 1, label: t('consultation.selectExpert') },
+          { number: 2, label: t('consultation.scheduleQuery') },
+          { number: 3, label: t('consultation.reviewConfirm') },
         ].map((s) => (
           <div key={s.number} className="relative z-10 flex flex-col items-center gap-2">
             <button
@@ -244,11 +245,10 @@ const BookConsultation: React.FC = () => {
             <div className="card space-y-6 shadow-2xl relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-b from-primary-500/5 to-transparent opacity-50 pointer-events-none" />
               <h3 className="section-header flex items-center gap-3">
-                <User size={20} className="text-primary-500" /> Select Expert
+                <User size={20} className="text-primary-500" /> {t('consultation.selectExpert')}
               </h3>
               <p className="text-xs text-gray-500 -mt-3">
-                Choose a verified expert from our certified agronomist network for your
-                consultation.
+                {t('consultation.chooseExpertDesc')}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {experts.map((expert) => (
@@ -309,7 +309,7 @@ const BookConsultation: React.FC = () => {
                 onClick={() => setStep(2)}
                 className="btn-primary px-8 py-3.5 flex items-center gap-2 text-sm font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next Step &rarr;
+                {t('common.nextStep')}
               </button>
             </div>
           </div>
@@ -325,17 +325,17 @@ const BookConsultation: React.FC = () => {
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 blur-3xl -mr-16 -mt-16" />
               <h3 className="section-header flex items-center gap-3">
-                <MessageSquare size={20} className="text-primary-500" /> Session Details
+                <MessageSquare size={20} className="text-primary-500" /> {t('consultation.sessionDetails')}
               </h3>
 
               <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-                    Describe your query or issue
+                    {t('consultation.describeQuery')}
                   </label>
                   <textarea
                     className="input-field min-h-[100px] resize-y text-sm bg-gray-50/50 dark:bg-gray-800/30"
-                    placeholder="e.g. My wheat crop shows yellowing at leaf tips. Soil test indicated high pH last season. Need treatment plan..."
+                    placeholder={t('consultation.queryPlaceholder')}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     required
@@ -345,7 +345,7 @@ const BookConsultation: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-                      <Calendar size={14} /> Preferred Date
+                      <Calendar size={14} /> {t('consultation.preferredDate')}
                     </label>
                     <input
                       type="date"
@@ -358,7 +358,7 @@ const BookConsultation: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-                      <Clock size={14} /> Preferred Time Slot
+                      <Clock size={14} /> {t('consultation.preferredTimeSlot')}
                     </label>
                     <input
                       type="time"
@@ -377,7 +377,7 @@ const BookConsultation: React.FC = () => {
                 onClick={() => setStep(1)}
                 className="btn-outline px-8 py-3.5 text-sm font-bold uppercase tracking-widest"
               >
-                &larr; Back
+                {t('common.back')}
               </button>
               <button
                 type="button"
@@ -385,7 +385,7 @@ const BookConsultation: React.FC = () => {
                 onClick={() => setStep(3)}
                 className="btn-primary px-8 py-3.5 flex items-center gap-2 text-sm font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next Step &rarr;
+                {t('common.nextStep')}
               </button>
             </div>
           </div>
@@ -402,7 +402,7 @@ const BookConsultation: React.FC = () => {
               {/* Summary of Selection */}
               <div className="card p-6 border border-primary-500/20 bg-primary-50/10 dark:bg-primary-900/5 space-y-4">
                 <h4 className="text-xs font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest">
-                  Selected Consultation Details
+                  {t('consultation.selectedDetails')}
                 </h4>
                 <div className="flex gap-4 items-center">
                   <img
@@ -422,20 +422,20 @@ const BookConsultation: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4 text-sm pt-2 border-t dark:border-gray-800">
                   <div>
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
-                      Scheduled Date
+                      {t('consultation.scheduledDate')}
                     </span>
                     <span className="font-bold text-gray-800 dark:text-gray-200">{date}</span>
                   </div>
                   <div>
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
-                      Time Slot
+                      {t('consultation.timeSlot')}
                     </span>
                     <span className="font-bold text-gray-800 dark:text-gray-200">{time}</span>
                   </div>
                 </div>
                 <div className="pt-2">
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
-                    Your Query
+                    {t('consultation.yourQuery')}
                   </span>
                   <p className="text-sm text-gray-700 dark:text-gray-300 font-medium italic mt-1 bg-white/40 dark:bg-gray-900/30 p-3 rounded-xl">
                     "{query}"
@@ -447,10 +447,10 @@ const BookConsultation: React.FC = () => {
               <div className="card !p-8 space-y-6 shadow-xl border-b-4 border-primary-500">
                 <div className="flex items-center justify-between">
                   <h3 className="section-header flex items-center gap-3">
-                    <Video size={20} className="text-primary-500" /> Mode of Consultation
+                    <Video size={20} className="text-primary-500" /> {t('consultation.modeOfConsultation')}
                   </h3>
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary-600 bg-primary-100 dark:bg-primary-900/30 px-3 py-1 rounded-full">
-                    Included In Premium
+                    {t('consultation.includedInPremium')}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -460,10 +460,10 @@ const BookConsultation: React.FC = () => {
                     </div>
                     <div>
                       <p className="font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                        HD Video Call
+                        {t('consultation.videoCall')}
                       </p>
                       <p className="text-xs text-gray-500 font-medium">
-                        30 Min Session · WhatsApp/Meet
+                        {t('consultation.sessionDuration')}
                       </p>
                     </div>
                     <CheckCircle size={24} className="ml-auto text-primary-500" />
@@ -474,10 +474,10 @@ const BookConsultation: React.FC = () => {
                     </div>
                     <div>
                       <p className="font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                        On-Site Visit
+                        {t('consultation.onSiteVisit')}
                       </p>
                       <p className="text-xs text-gray-500 font-medium">
-                        Coming Soon to your region
+                        {t('consultation.comingSoon')}
                       </p>
                     </div>
                   </div>
@@ -487,17 +487,17 @@ const BookConsultation: React.FC = () => {
               {/* Fee and Submit */}
               <div className="card bg-gray-900 dark:bg-white text-white dark:text-gray-900 !p-6 space-y-4 shadow-3xl">
                 <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest opacity-70">
-                  <span>Booking Fee</span>
+                  <span>{t('consultation.fee')}</span>
                   <span className="line-through text-red-400">₹499</span>
                 </div>
                 <div className="flex justify-between items-end">
-                  <span className="text-sm font-black">Total Amount</span>
+                  <span className="text-sm font-black">{t('consultation.totalAmount')}</span>
                   <span className="text-3xl font-black text-primary-400 dark:text-primary-600">
-                    FREE
+                    {t('consultation.free')}
                   </span>
                 </div>
                 <p className="text-[10px] opacity-60 font-medium text-gray-300 dark:text-gray-600">
-                  Limited period hackathon offer for registered users.
+                  {t('consultation.limitedOffer')}
                 </p>
                 <button
                   type="submit"
@@ -507,10 +507,10 @@ const BookConsultation: React.FC = () => {
                   {loading ? (
                     <div className="flex items-center justify-center gap-3">
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>PROCESSING...</span>
+                      <span>{t('common.processing')}</span>
                     </div>
                   ) : (
-                    'CONFIRM BOOKING'
+                    t('consultation.confirmBooking')
                   )}
                 </button>
               </div>
@@ -521,7 +521,7 @@ const BookConsultation: React.FC = () => {
                 onClick={() => setStep(2)}
                 className="btn-outline px-8 py-3.5 text-sm font-bold uppercase tracking-widest"
               >
-                &larr; Back
+                {t('common.back')}
               </button>
             </div>
           </div>

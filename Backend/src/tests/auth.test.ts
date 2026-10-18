@@ -324,9 +324,6 @@ export async function runAuthTests(): Promise<{ name: string; passed: boolean; e
     );
     assert.strictEqual(loginRes.jsonPayload.success, false);
 
-    // Restore original environment
-    (env as any).NODE_ENV = originalEnv;
-
     results.push({
       name: 'Security: Disconnected DB in production fails closed with HTTP 503 (no in-memory bypass)',
       passed: true,
@@ -337,6 +334,9 @@ export async function runAuthTests(): Promise<{ name: string; passed: boolean; e
       passed: false,
       error: err.message,
     });
+  } finally {
+    const { env } = await import('../config/env');
+    (env as any).NODE_ENV = 'development';
   }
 
   // Test 9: Administrative role elevation validation
@@ -392,6 +392,54 @@ export async function runAuthTests(): Promise<{ name: string; passed: boolean; e
       passed: false,
       error: err.message,
     });
+  }
+
+  // Test 11: Production Safety - Consultation booking fails closed with HTTP 503 when DB is offline
+  try {
+    const { env } = await import('../config/env');
+    const originalEnv = env.NODE_ENV;
+    (env as any).NODE_ENV = 'production';
+
+    const { bookConsultation } = await import('../controllers/consultation.controller');
+    const req: any = {
+      user: { id: 'farmer_1111', role: 'farmer' },
+      body: {
+        expertId: 'expert_01',
+        expertName: 'Dr. Test Agronomist',
+        specialization: 'Soil Chemistry',
+        date: '2026-11-01',
+        time: '10:00 AM',
+        query: 'Checking soil salinity after recent flooding in the Cauvery Delta region.',
+      },
+    };
+    const res = createMockRes();
+
+    await bookConsultation(req, res);
+
+    assert.strictEqual(
+      res.statusCode,
+      503,
+      'Booking consultation in production with offline DB must fail closed with 503'
+    );
+    assert.strictEqual(res.jsonPayload.success, false);
+    assert.ok(
+      res.jsonPayload.message.includes('Service Unavailable'),
+      'Must return clear Service Unavailable message'
+    );
+
+    results.push({
+      name: 'Production Safety: Consultation booking fails closed with HTTP 503 when durable DB is offline',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Production Safety: Consultation booking fails closed with HTTP 503 when durable DB is offline',
+      passed: false,
+      error: err.message,
+    });
+  } finally {
+    const { env } = await import('../config/env');
+    (env as any).NODE_ENV = 'development';
   }
 
   return results;

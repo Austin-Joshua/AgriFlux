@@ -120,7 +120,7 @@ const EquipmentRental: React.FC = () => {
           </p>
         </div>
         <div className="relative z-10 flex gap-3 mt-6 sm:mt-0">
-          <button className="btn-primary">List Equipment</button>
+          <button className="btn-primary">{t('equipment.listEquipment', 'List Equipment')}</button>
         </div>
       </div>
 
@@ -130,7 +130,7 @@ const EquipmentRental: React.FC = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search by name, brand, or location..."
+            placeholder={t('equipment.searchPlaceholder', 'Search by name, brand, or location...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all dark:text-white text-lg"
@@ -148,7 +148,7 @@ const EquipmentRental: React.FC = () => {
                       : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-primary-500/50'
                   }`}
             >
-              {cat}
+              {cat === 'All' ? t('common.all', 'All') : cat}
             </button>
           ))}
         </div>
@@ -176,7 +176,7 @@ const EquipmentRental: React.FC = () => {
                   <span
                     className={`px-2.5 py-1 text-xs font-bold rounded-lg shadow-sm backdrop-blur-md ${eq.availability ? 'bg-green-500/90 text-white' : 'bg-red-500/90 text-white'}`}
                   >
-                    {eq.availability ? 'Available Now' : 'Currently Rented'}
+                    {eq.availability ? t('equipment.availableNow', 'Available Now') : t('equipment.currentlyRented', 'Currently Rented')}
                   </span>
                 </div>
               </div>
@@ -191,27 +191,27 @@ const EquipmentRental: React.FC = () => {
                   </h3>
                   <div className="bg-primary-50 dark:bg-primary-900/30 px-3 py-1.5 rounded-xl border border-primary-100 dark:border-primary-800/50 text-right">
                     <span className="block text-xs text-primary-600 dark:text-primary-400 font-medium">
-                      Rent
+                      {t('equipment.rent', 'Rent')}
                     </span>
                     <span className="block text-lg font-black text-primary-700 dark:text-primary-300">
                       ₹{eq.pricePerDay}
-                      <span className="text-xs font-normal">/day</span>
+                      <span className="text-xs font-normal">/{t('equipment.day', 'day')}</span>
                     </span>
                   </div>
                 </div>
 
                 <div className="flex gap-4 mt-3 text-sm text-gray-600 dark:text-gray-400 font-medium">
                   <div className="flex items-center gap-1.5">
-                    <MapPin size={16} className="text-gray-400" /> {eq.distance} km away
+                    <MapPin size={16} className="text-gray-400" /> {eq.distance} {t('equipment.kmAway', 'km away')}
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Fuel size={16} className="text-gray-400" /> Diesel
+                    <Fuel size={16} className="text-gray-400" /> {t('equipment.diesel', 'Diesel')}
                   </div>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 uppercase font-bold tracking-wider">
-                    Key Features
+                    {t('equipment.keyFeatures', 'Key Features')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {eq.features.map((f) => (
@@ -233,11 +233,11 @@ const EquipmentRental: React.FC = () => {
                   disabled={!eq.availability}
                 >
                   <Calendar size={18} />
-                  {eq.availability ? 'Book Now' : 'Not Available'}
+                  {eq.availability ? t('equipment.bookNow', 'Book Now') : t('equipment.notAvailable', 'Not Available')}
                 </button>
                 <button
                   className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-all"
-                  title="Owner Details"
+                  title={t('equipment.ownerDetails', 'Owner Details')}
                 >
                   <Info size={20} />
                 </button>
@@ -250,8 +250,8 @@ const EquipmentRental: React.FC = () => {
       {filteredEquipment.length === 0 && (
         <div className="text-center py-16">
           <Tractor size={48} className="mx-auto text-gray-300 dark:text-gray-700 mb-4" />
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">No equipment found</h3>
-          <p className="text-gray-500 mt-2">Try adjusting your filters or search terms.</p>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('equipment.noEquipmentFound', 'No equipment found')}</h3>
+          <p className="text-gray-500 mt-2">{t('equipment.adjustFilters', 'Try adjusting your filters or search terms.')}</p>
         </div>
       )}
     </div>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home, Leaf, ArrowLeft, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-primary-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-6">
@@ -23,21 +25,20 @@ const NotFoundPage: React.FC = () => {
         {/* Text */}
         <div>
           <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display">
-            Page Not Found
+            {t('notFound.title', 'Page Not Found')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-3 text-base leading-relaxed max-w-sm mx-auto">
-            The page you're looking for doesn't exist or has been moved. Let's get you back to your
-            farm.
+            {t('notFound.subtitle', "The page you're looking for doesn't exist or has been moved. Let's get you back to your farm.")}
           </p>
         </div>
 
         {/* Quick Links */}
         <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
           {[
-            { label: 'Dashboard', route: '/dashboard', icon: Home },
-            { label: 'Marketplace', route: '/marketplace', icon: Search },
-            { label: 'Soil Advisor', route: '/soil', icon: Leaf },
-            { label: 'Crop Health', route: '/crop-health', icon: Leaf },
+            { label: t('notFound.dashboard', 'Dashboard'), route: '/dashboard', icon: Home },
+            { label: t('notFound.marketplace', 'Marketplace'), route: '/marketplace', icon: Search },
+            { label: t('notFound.soilAdvisor', 'Soil Advisor'), route: '/soil', icon: Leaf },
+            { label: t('notFound.cropHealth', 'Crop Health'), route: '/crop-health', icon: Leaf },
           ].map(({ label, route, icon: Icon }) => (
             <button
               key={route}
@@ -57,14 +58,14 @@ const NotFoundPage: React.FC = () => {
             className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-primary-500 hover:text-primary-600 rounded-xl font-semibold transition-all"
           >
             <ArrowLeft size={16} />
-            Go Back
+            {t('notFound.goBack', 'Go Back')}
           </button>
           <button
             onClick={() => navigate('/dashboard')}
             className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             <Home size={16} />
-            Back to Dashboard
+            {t('notFound.dashboard', 'Back to Dashboard')}
           </button>
         </div>
 

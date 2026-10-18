@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
 const Register: React.FC = () => {
+  const { t } = useTranslation();
   const { register, loginWithProvider, sendOtp, verifyOtp, isLoading, requiresOnboarding } =
     useAuth();
   const navigate = useNavigate();
@@ -167,15 +169,15 @@ const Register: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col justify-center py-1 max-w-xl mx-auto">
-      <SEO title="Create Account" />
+      <SEO title={t('auth.createAccount', 'Create Account')} />
 
       {/* Header */}
       <div className="mb-3.5">
         <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight leading-tight">
-          Create Account
+          {t('auth.createAccount', 'Create Account')}
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs">
-          Join AgriFlux to manage crop health, soil, and farm insights
+          {t('auth.registerDesktopDesc', 'Join AgriFlux to manage crop health, soil, and farm insights')}
         </p>
       </div>
 
@@ -200,7 +202,7 @@ const Register: React.FC = () => {
               htmlFor="register-name"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
             >
-              Full Name *
+              {t('auth.fullName', 'Full Name')} *
             </label>
             <div className="relative group">
               <User
@@ -214,7 +216,7 @@ const Register: React.FC = () => {
                 value={form.name}
                 onChange={handleChange}
                 className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
-                placeholder="Ravi Kumar"
+                placeholder={t('auth.placeholderName', 'Your full name')}
                 autoComplete="name"
                 required
               />
@@ -227,7 +229,7 @@ const Register: React.FC = () => {
               htmlFor="register-email"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
             >
-              Email Address (Optional)
+              {t('auth.email', 'Email Address')} ({t('auth.optional', 'Optional')})
             </label>
             <div className="relative group">
               <Mail
@@ -241,7 +243,7 @@ const Register: React.FC = () => {
                 value={form.email}
                 onChange={handleChange}
                 className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
-                placeholder="farmer@agriflux.com"
+                placeholder={t('auth.placeholderEmail', 'e.g. farmer@agriflux.com')}
                 autoComplete="email"
               />
             </div>
@@ -255,11 +257,11 @@ const Register: React.FC = () => {
               htmlFor="register-phone"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 block cursor-pointer"
             >
-              Mobile Phone Number *
+              {t('auth.phone', 'Mobile Phone Number')} *
             </label>
             {isOtpVerified && (
               <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 size={13} /> Verified
+                <CheckCircle2 size={13} /> {t('auth.verified', 'Verified')}
               </span>
             )}
           </div>
@@ -277,7 +279,7 @@ const Register: React.FC = () => {
                 value={form.phone}
                 onChange={handleChange}
                 className="input-field pl-9 h-10 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs sm:text-sm w-full rounded-xl"
-                placeholder="+91 98765 43210"
+                placeholder={t('auth.placeholderPhone', '+91 98765 43210')}
                 autoComplete="tel"
                 required
               />
@@ -295,12 +297,12 @@ const Register: React.FC = () => {
               }`}
             >
               {otpLoading
-                ? 'Sending...'
+                ? t('common.loading', 'Sending...')
                 : isOtpVerified
-                  ? 'Verified'
+                  ? t('auth.verified', 'Verified')
                   : resendTimer > 0
-                    ? `Resend ${resendTimer}s`
-                    : 'Send Code'}
+                    ? `${t('auth.resendCode', 'Resend')} ${resendTimer}s`
+                    : t('auth.sendCode', 'Send Code')}
             </button>
           </div>
 
@@ -315,7 +317,7 @@ const Register: React.FC = () => {
                 disabled={isOtpVerified}
                 aria-label="6-digit mobile verification code"
                 className="input-field h-9.5 px-3 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs font-mono font-bold tracking-widest text-center rounded-xl flex-1"
-                placeholder="6-digit code"
+                placeholder={t('auth.enterCode', '6-digit code')}
               />
               {!isOtpVerified && (
                 <button
@@ -324,7 +326,7 @@ const Register: React.FC = () => {
                   disabled={otpLoading || otp.length < 6}
                   className="h-9.5 px-4 min-h-[38px] rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all active:scale-[0.98]"
                 >
-                  Verify
+                  {t('auth.verify', 'Verify')}
                 </button>
               )}
             </div>
@@ -338,7 +340,7 @@ const Register: React.FC = () => {
               htmlFor="register-farm"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
             >
-              Farm Name (Optional)
+              {t('auth.farmNameOptional', 'Farm Name (Optional)')}
             </label>
             <div className="relative group">
               <Wheat
@@ -352,7 +354,7 @@ const Register: React.FC = () => {
                 value={form.farmName}
                 onChange={handleChange}
                 className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
-                placeholder="Green Valley Farm"
+                placeholder={t('auth.placeholderFarm', 'Name of your agricultural estate')}
               />
             </div>
           </div>
@@ -362,7 +364,7 @@ const Register: React.FC = () => {
               htmlFor="register-location"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
             >
-              District / State (Optional)
+              {t('auth.districtState', 'District / State')} ({t('auth.optional', 'Optional')})
             </label>
             <div className="relative group">
               <MapPin
@@ -376,7 +378,7 @@ const Register: React.FC = () => {
                 value={form.location}
                 onChange={handleChange}
                 className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
-                placeholder="Mysuru, Karnataka"
+                placeholder={t('auth.placeholderLocation', 'State, Country')}
               />
             </div>
           </div>
@@ -389,7 +391,7 @@ const Register: React.FC = () => {
               htmlFor="register-password"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
             >
-              Password *
+              {t('auth.password', 'Password')} *
             </label>
             <div className="relative group">
               <Lock
@@ -415,7 +417,7 @@ const Register: React.FC = () => {
               htmlFor="register-confirm-password"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
             >
-              Confirm Password *
+              {t('auth.confirmPassword', 'Confirm Password')} *
             </label>
             <div className="relative group">
               <Lock
@@ -441,11 +443,11 @@ const Register: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? 'Hide password characters' : 'Show password characters'}
+            aria-label={showPassword ? t('auth.hidePassword', 'Hide password') : t('auth.showPassword', 'Show password')}
             aria-pressed={showPassword}
             className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline flex items-center"
           >
-            {showPassword ? 'Hide Password' : 'Show Password'}
+            {showPassword ? t('auth.hidePassword', 'Hide Password') : t('auth.showPassword', 'Show Password')}
           </button>
         </div>
 
@@ -459,10 +461,10 @@ const Register: React.FC = () => {
           {isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Creating account...</span>
+              <span>{t('auth.creatingAccount', 'Creating account...')}</span>
             </>
           ) : (
-            <span>Create Account</span>
+            <span>{t('auth.createAccount', 'Create Account')}</span>
           )}
         </button>
       </form>
@@ -472,7 +474,7 @@ const Register: React.FC = () => {
         <div className="relative flex items-center gap-4 mb-2.5">
           <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
           <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold leading-none">
-            or continue with
+            {t('auth.orContinueWith', 'or continue with')}
           </span>
           <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
         </div>
@@ -487,19 +489,19 @@ const Register: React.FC = () => {
           ) : (
             <GoogleIcon />
           )}
-          <span>Sign up with Google</span>
+          <span>{t('auth.signInWithGoogle', 'Sign up with Google')}</span>
         </button>
       </div>
 
       {/* Footer */}
       <p className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">
-        Already have an account?{' '}
+        {t('auth.hasAccount', 'Already have an account?')}{' '}
         <Link
           id="register-signin-link"
           to="/login"
           className="text-primary-600 dark:text-primary-400 font-bold hover:underline ml-1"
         >
-          Sign In
+          {t('auth.login', 'Sign In')}
         </Link>
       </p>
     </div>

@@ -151,13 +151,10 @@ const YieldPrediction: React.FC = () => {
       content = (
         <div className="space-y-4">
           <p>
-            Methodology: <strong>Calibrated Agronomic Formula</strong>
+            {t('yield.methodologyLabel', 'Methodology:')} <strong>{t('yield.calibratedFormula', 'Calibrated Agronomic Formula')}</strong>
           </p>
           <p>
-            Yield estimates are computed via calibrated agronomic rule-based formulas incorporating
-            base crop potential, NPK stoichiometry, rainfall distribution, and temperature-humidity
-            indices. This deterministic formula provides advisory guidance and is distinct from
-            trained machine-learning empirical models.
+            {t('yield.methodologyExplanation', 'Yield estimates are computed via calibrated agronomic rule-based formulas incorporating base crop potential, NPK stoichiometry, rainfall distribution, and temperature-humidity indices. This deterministic formula provides advisory guidance and is distinct from trained machine-learning empirical models.')}
           </p>
         </div>
       );
@@ -288,7 +285,7 @@ const YieldPrediction: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Input Form */}
         <div className="xl:col-span-2 card">
-          <h3 className="section-header mb-4">Input Parameters</h3>
+          <h3 className="section-header mb-4">{t('yield.inputParameters', 'Input Parameters')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="label">{t('yield.cropType')}</label>
@@ -354,7 +351,7 @@ const YieldPrediction: React.FC = () => {
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Running AI Model...
+                {t('yield.runningModel', 'Running AI Model...')}
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
@@ -366,7 +363,7 @@ const YieldPrediction: React.FC = () => {
 
         {/* Radar Chart */}
         <div className="card glass-gold flex flex-col border-gold-200 dark:border-gold-900/40">
-          <h3 className="section-header mb-3 text-gold-700 dark:text-gold-400">Nutrient Profile</h3>
+          <h3 className="section-header mb-3 text-gold-700 dark:text-gold-400">{t('yield.nutrientProfile', 'Nutrient Profile')}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <RadarChart data={radarData}>
               <PolarGrid stroke={isDark ? '#4b5563' : '#e5e7eb'} />

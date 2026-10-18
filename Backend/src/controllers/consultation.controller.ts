@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Consultation from '../../../Database/Models/Consultation';
 import { isDBConnected } from '../config/db';
+import { env } from '../config/env';
 
 interface MockUser {
   id: string;
@@ -65,6 +66,14 @@ export const bookConsultation = async (req: Request, res: Response) => {
     }
 
     if (!isDBConnected) {
+      if (env.NODE_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          message:
+            'Service Unavailable: Database connection required to book consultations in production. Please retry shortly.',
+        });
+      }
+
       // Concurrency check: prevent overlapping active bookings for the same expert and slot
       const isSlotConflict = tempConsultations.some(
         (c) =>
@@ -211,6 +220,14 @@ export const updateConsultationStatus = async (req: Request, res: Response) => {
     }
 
     if (!isDBConnected) {
+      if (env.NODE_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          message:
+            'Service Unavailable: Database connection required to update consultation status in production.',
+        });
+      }
+
       const consultation = tempConsultations.find((c) => c._id === id);
       if (!consultation) {
         return res.status(404).json({ message: 'Consultation not found' });

@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { API_URL } from '../config';
 
 const ForgotPassword: React.FC = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -40,7 +42,7 @@ const ForgotPassword: React.FC = () => {
             <Leaf size={28} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-display">
-            AgriFlux
+            {t('common.agriflux', 'AgriFlux')}
           </h1>
         </div>
 
@@ -49,22 +51,22 @@ const ForgotPassword: React.FC = () => {
             <div className="text-center">
               <CheckCircle size={48} className="text-primary-500 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Check Your Email
+                {t('auth.checkYourEmail', 'Check Your Email')}
               </h2>
               <p className="text-gray-500 dark:text-gray-400 mb-6">
-                We sent a password reset link to <strong>{email}</strong>
+                {t('auth.sentResetLinkTo', 'We sent a password reset link to')} <strong>{email}</strong>
               </p>
               <Link to="/login" className="btn-primary inline-flex items-center gap-2">
-                <ArrowLeft size={16} /> Back to Login
+                <ArrowLeft size={16} /> {t('auth.backToLogin', 'Back to Sign In')}
               </Link>
             </div>
           ) : (
             <>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white font-display mb-1">
-                Forgot Password?
+                {t('auth.forgotPassword', 'Forgot Password?')}
               </h2>
               <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-                Enter your email to receive a reset link
+                {t('auth.enterEmailReset', 'Enter your email to receive a reset link')}
               </p>
 
               {error && (
@@ -76,7 +78,7 @@ const ForgotPassword: React.FC = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="label">Email Address</label>
+                  <label className="label">{t('auth.email', 'Email Address')}</label>
                   <div className="relative">
                     <Mail
                       size={16}
@@ -87,7 +89,7 @@ const ForgotPassword: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="input-field pl-10"
-                      placeholder="your@email.com"
+                      placeholder={t('auth.placeholderEmail', 'farmer@agriflux.com')}
                       required
                     />
                   </div>
@@ -98,7 +100,7 @@ const ForgotPassword: React.FC = () => {
                   disabled={isLoading}
                   className="btn-primary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {isLoading ? 'Sending Link...' : 'Send Reset Link'}
+                  {isLoading ? t('common.loading', 'Sending Link...') : t('auth.sendResetLink', 'Send Reset Link')}
                 </button>
               </form>
 
@@ -107,7 +109,7 @@ const ForgotPassword: React.FC = () => {
                   to="/login"
                   className="text-sm text-primary-600 dark:text-primary-400 hover:underline flex items-center justify-center gap-1"
                 >
-                  <ArrowLeft size={14} /> Back to Login
+                  <ArrowLeft size={14} /> {t('auth.backToLogin', 'Back to Sign In')}
                 </Link>
               </div>
             </>

@@ -249,7 +249,7 @@ const SustainabilityScore: React.FC = () => {
         {/* Radar + Trend */}
         <div className="space-y-4">
           <div className="card">
-            <h3 className="section-header mb-2">Sustainability Radar</h3>
+            <h3 className="section-header mb-2">{t('sustainability.radarTitle', 'Sustainability Radar')}</h3>
             <ResponsiveContainer width="100%" height={200}>
               <RadarChart data={radarData}>
                 <PolarGrid />
@@ -267,7 +267,7 @@ const SustainabilityScore: React.FC = () => {
           </div>
 
           <div className="card">
-            <h3 className="section-header mb-3">Score Trend (6 Months)</h3>
+            <h3 className="section-header mb-3">{t('sustainability.scoreTrendTitle', 'Score Trend (6 Months)')}</h3>
             <ResponsiveContainer width="100%" height={130}>
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />

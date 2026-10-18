@@ -306,7 +306,7 @@ const GovernmentSubsidies: React.FC = () => {
         <p className="text-xs text-blue-600 dark:text-blue-400 flex items-start gap-2">
           <FileText size={14} className="flex-shrink-0 mt-0.5" />
           <span>
-            <strong>Disclaimer:</strong> {t('subsidies.disclaimer')}
+            <strong>{t('common.disclaimer', 'Disclaimer:')}</strong> {t('subsidies.disclaimer')}
           </span>
         </p>
       </div>

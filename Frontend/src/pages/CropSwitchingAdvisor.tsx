@@ -135,10 +135,10 @@ const CropSwitchingAdvisor: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Config */}
         <div className="card space-y-3">
-          <h3 className="section-header text-gold-700 dark:text-gold-400 mb-2">Farm Conditions</h3>
+          <h3 className="section-header text-gold-700 dark:text-gold-400 mb-2">{t('switching.farmConditions', 'Farm Conditions')}</h3>
           <div className="space-y-3">
             <div>
-              <label className="label">Current Crop</label>
+              <label className="label">{t('switching.currentCrop', 'Current Crop')}</label>
               <select
                 className="input-field"
                 value={currentCrop}
@@ -155,7 +155,7 @@ const CropSwitchingAdvisor: React.FC = () => {
 
             <div>
               <div className="flex justify-between mb-1">
-                <label className="label mb-0">Rainfall Deficit Risk</label>
+                <label className="label mb-0">{t('switching.rainfallDeficitRisk', 'Rainfall Deficit Risk')}</label>
                 <span
                   className={`text-sm font-bold ${rainfallRisk > 30 ? 'text-red-500' : rainfallRisk > 15 ? 'text-yellow-500' : 'text-primary-500'}`}
                 >
@@ -174,7 +174,7 @@ const CropSwitchingAdvisor: React.FC = () => {
 
             <div>
               <div className="flex justify-between mb-1">
-                <label className="label mb-0">Temperature Increase</label>
+                <label className="label mb-0">{t('switching.temperatureIncrease', 'Temperature Increase')}</label>
                 <span
                   className={`text-sm font-bold ${tempRisk > 3 ? 'text-red-500' : 'text-orange-500'}`}
                 >
@@ -196,12 +196,12 @@ const CropSwitchingAdvisor: React.FC = () => {
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Analyzing...
+                  {t('switching.analyzing', 'Analyzing...')}
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
                   <Sprout size={16} />
-                  Get AI Recommendation
+                  {t('switching.getRecommendation', 'Get AI Recommendation')}
                 </span>
               )}
             </button>
@@ -212,7 +212,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                 {currentCrop} Profile
               </h4>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Water Need</span>
+                <span className="text-gray-500">{t('switching.waterNeed', 'Water Need')}</span>
                 <span
                   className={`badge ${cropInfo.waterNeed === 'Very High' ? 'badge-red' : cropInfo.waterNeed === 'High' ? 'badge-yellow' : 'badge-green'}`}
                 >
@@ -221,7 +221,7 @@ const CropSwitchingAdvisor: React.FC = () => {
               </div>
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-gray-500">Climate Resilience</span>
+                  <span className="text-gray-500">{t('switching.climateResilience', 'Climate Resilience')}</span>
                   <span className="font-semibold text-gray-700 dark:text-gray-300">
                     {cropInfo.climateResilience}%
                   </span>
@@ -247,10 +247,10 @@ const CropSwitchingAdvisor: React.FC = () => {
               <div className="flex items-center gap-6">
                 <div>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">
-                    Risk Assessment
+                    {t('switching.riskAssessment', 'Risk Assessment')}
                   </p>
                   <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                    Climate Threat for {submittedData.crop}
+                    {t('switching.climateThreat', { crop: submittedData.crop, defaultValue: `Climate Threat for ${submittedData.crop}` })}
                   </p>
                 </div>
                 <div className="flex items-baseline gap-2">
@@ -259,7 +259,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                   >
                     {overallRisk}%
                   </p>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Risk Level</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase">{t('switching.riskLevel', 'Risk Level')}</p>
                 </div>
               </div>
               <div
@@ -277,7 +277,7 @@ const CropSwitchingAdvisor: React.FC = () => {
           {/* Switch Recommendations */}
           {(analyzed || activeRules.length > 0) && (
             <div className="space-y-3">
-              <h3 className="section-header">🤖 AI Crop Switch Recommendations</h3>
+              <h3 className="section-header">🤖 {t('switching.aiCropSwitchRecs', 'AI Crop Switch Recommendations')}</h3>
               {(activeRules.length > 0 ? activeRules : cropInfo.switchRules.slice(0, 1)).map(
                 (rule, i) => (
                   <div
@@ -290,13 +290,13 @@ const CropSwitchingAdvisor: React.FC = () => {
                           <div className="space-y-6 text-gray-700 dark:text-gray-300">
                             <div className="p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl">
                               <h4 className="font-bold text-primary-700 dark:text-primary-400 mb-2 flex items-center gap-2">
-                                <Sprout size={18} /> Primary Justification
+                                <Sprout size={18} /> {t('switching.primaryJustification', 'Primary Justification')}
                               </h4>
                               <p className="text-sm font-medium">{rule.reason}</p>
                             </div>
                             <div>
                               <h4 className="font-bold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">
-                                Expected Impact Analysis
+                                {t('switching.expectedImpactAnalysis', 'Expected Impact Analysis')}
                               </h4>
                               <ul className="space-y-3 text-sm">
                                 <li className="flex gap-2">
@@ -304,7 +304,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                                     size={16}
                                     className="text-green-500 shrink-0 mt-0.5"
                                   />{' '}
-                                  <strong>Yield Protection:</strong> Up to 85% higher yield
+                                  <strong>{t('switching.yieldProtection', 'Yield Protection')}:</strong> Up to 85% higher yield
                                   retention under predicted stress conditions.
                                 </li>
                                 <li className="flex gap-2">
@@ -312,7 +312,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                                     size={16}
                                     className="text-green-500 shrink-0 mt-0.5"
                                   />{' '}
-                                  <strong>Water Savings:</strong> Significant reduction in
+                                  <strong>{t('switching.waterSavings', 'Water Savings')}:</strong> Significant reduction in
                                   irrigation requirements compared to {submittedData.crop}.
                                 </li>
                                 <li className="flex gap-2">
@@ -320,7 +320,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                                     size={16}
                                     className="text-green-500 shrink-0 mt-0.5"
                                   />{' '}
-                                  <strong>Market Outlook:</strong> {rule.alternative} has a strong
+                                  <strong>{t('switching.marketOutlook', 'Market Outlook')}:</strong> {rule.alternative} has a strong
                                   baseline profit score of{' '}
                                   {CROPS_DB[rule.alternative]?.profitScore || 75}/100 with growing
                                   demand.
@@ -355,9 +355,9 @@ const CropSwitchingAdvisor: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <span className="badge-green whitespace-nowrap">Recommended</span>
+                        <span className="badge-green whitespace-nowrap">{t('switching.recommended', 'Recommended')}</span>
                         <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-500 px-2 py-1 rounded-md flex items-center gap-1 font-bold group-hover:text-primary-600 transition-colors">
-                          <FileText size={10} /> View Report
+                          <FileText size={10} /> {t('switching.viewReport', 'View Report')}
                         </span>
                       </div>
                     </div>
@@ -372,7 +372,7 @@ const CropSwitchingAdvisor: React.FC = () => {
 
           {/* Alternative Crops Grid */}
           <div className="card">
-            <h3 className="section-header mb-4">Alternative Climate-Resilient Crops</h3>
+            <h3 className="section-header mb-4">{t('switching.altCrops', 'Alternative Climate-Resilient Crops')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {cropInfo.alternatives.map((alt) => (
                 <div
@@ -384,7 +384,7 @@ const CropSwitchingAdvisor: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-sm text-gray-800 dark:text-gray-200">{alt}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Climate resilient</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('switching.climateResilient', 'Climate resilient')}</p>
                   </div>
                 </div>
               ))}

@@ -8,17 +8,20 @@ const router = Router();
  * GET /api/blockchain/chain
  * Returns full cryptographic chain and audit summary
  */
-router.get('/chain', (_req: Request, res: Response) => {
+router.get('/chain', async (_req: Request, res: Response) => {
   try {
+    await blockchain.initialize();
     const summary = blockchain.getChainSummary();
+    const health = blockchain.getHealthStatus();
     const chain = blockchain.getChain();
     res.json({
       success: true,
       summary,
+      health,
       chain,
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message || 'Error fetching chain' });
   }
 });
 
@@ -26,20 +29,23 @@ router.get('/chain', (_req: Request, res: Response) => {
  * GET /api/blockchain/verify
  * Validates the cryptographic integrity of every block across the ledger
  */
-router.get('/verify', (_req: Request, res: Response) => {
+router.get('/verify', async (_req: Request, res: Response) => {
   try {
+    await blockchain.initialize();
     const validation = blockchain.isChainValid();
     const summary = blockchain.getChainSummary();
+    const health = blockchain.getHealthStatus();
     res.json({
       success: true,
       isValid: validation.isValid,
       brokenBlockIndex: validation.brokenBlockIndex,
       reason: validation.reason,
       summary,
+      health,
       verifiedAt: new Date().toISOString(),
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message || 'Error verifying chain' });
   }
 });
 
@@ -48,43 +54,51 @@ router.get('/verify', (_req: Request, res: Response) => {
  * Seals an arbitrary event (telemetry, prescription, actuator, user verification) into an immutable block
  * Strictly requires admin or agronomist authorization to prevent ledger poisoning.
  */
-router.post('/log', auth, requireRole('admin', 'agronomist'), (req: Request, res: Response) => {
-  try {
-    const { blockType, data } = req.body;
-    if (!blockType || !data) {
-      return res.status(400).json({ success: false, message: 'blockType and data are required.' });
+router.post(
+  '/log',
+  auth,
+  requireRole('admin', 'agronomist'),
+  async (req: Request, res: Response) => {
+    try {
+      const { blockType, data } = req.body;
+      if (!blockType || !data) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'blockType and data are required.' });
+      }
+
+      const validTypes: BlockType[] = [
+        'GENESIS',
+        'TELEMETRY_LOG',
+        'PRESCRIPTION_AUDIT',
+        'ACTUATOR_OVERRIDE',
+        'USER_CREDIBILITY',
+        'SECURITY_EVENT',
+      ];
+
+      if (!validTypes.includes(blockType)) {
+        return res.status(400).json({ success: false, message: `Invalid blockType: ${blockType}` });
+      }
+
+      const newBlock = await blockchain.addBlock(blockType, data);
+      res.status(201).json({
+        success: true,
+        message: 'Event cryptographically sealed in AgriFlux Blockchain Ledger.',
+        block: newBlock,
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message || 'Failed to seal block' });
     }
-
-    const validTypes: BlockType[] = [
-      'GENESIS',
-      'TELEMETRY_LOG',
-      'PRESCRIPTION_AUDIT',
-      'ACTUATOR_OVERRIDE',
-      'USER_CREDIBILITY',
-      'SECURITY_EVENT',
-    ];
-
-    if (!validTypes.includes(blockType)) {
-      return res.status(400).json({ success: false, message: `Invalid blockType: ${blockType}` });
-    }
-
-    const newBlock = blockchain.addBlock(blockType, data);
-    res.status(201).json({
-      success: true,
-      message: 'Event cryptographically sealed in AgriFlux Blockchain Ledger.',
-      block: newBlock,
-    });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
   }
-});
+);
 
 /**
  * GET /api/blockchain/certificate/:index
  * Issues a cryptographic compliance certificate for bank loans, insurance claims, or organic verification.
  */
-router.get('/certificate/:index', (req: Request, res: Response) => {
+router.get('/certificate/:index', async (req: Request, res: Response) => {
   try {
+    await blockchain.initialize();
     const rawIndex = Array.isArray(req.params.index)
       ? String(req.params.index[0])
       : String(req.params.index);

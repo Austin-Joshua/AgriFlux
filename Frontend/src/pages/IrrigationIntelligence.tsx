@@ -99,20 +99,17 @@ const IrrigationIntelligence: React.FC = () => {
       content = (
         <div className="space-y-4">
           <p>
-            Current System Efficiency: <strong>{efficiency}%</strong>
+            {t('irrigation.currentEfficiency', 'Current System Efficiency:')} <strong>{efficiency}%</strong>
           </p>
           <p>
-            Irrigation efficiency measures the ratio of water successfully delivered to the root
-            zone versus the total water withdrawn from the source.
+            {t('irrigation.efficiencyExplanation', 'Irrigation efficiency measures the ratio of water successfully delivered to the root zone versus the total water withdrawn from the source.')}
           </p>
           <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-xl border border-primary-100 dark:border-primary-800">
             <h4 className="font-bold text-primary-700 dark:text-primary-300 mb-2">
-              AI Optimization Report
+              {t('irrigation.aiOptimizationReport', 'AI Optimization Report')}
             </h4>
             <p className="text-sm">
-              Your systems are operating at high efficiency. Precision scheduling based on
-              evapotranspiration (ET) rates has reduced surface runoff by 22% compared to historical
-              patterns.
+              {t('irrigation.aiOptimizationDesc', 'Your systems are operating at high efficiency. Precision scheduling based on evapotranspiration (ET) rates has reduced surface runoff by 22% compared to historical patterns.')}
             </p>
           </div>
         </div>
@@ -122,14 +119,13 @@ const IrrigationIntelligence: React.FC = () => {
       content = (
         <div className="space-y-4">
           <p>
-            Current moisture level:{' '}
+            {t('irrigation.currentMoistureLevel', 'Current moisture level:')}{' '}
             <strong>
-              {moisture}% ({moisture > 40 ? 'Optimal' : 'Low'})
+              {moisture}% ({moisture > 40 ? t('irrigation.optimal', 'Optimal') : t('irrigation.low', 'Low')})
             </strong>
           </p>
           <p>
-            Maintaining soil moisture within the "Management Allowed Depletion" (MAD) range ensures
-            plants never reach the permanent wilting point.
+            {t('irrigation.madExplanation', 'Maintaining soil moisture within the "Management Allowed Depletion" (MAD) range ensures plants never reach the permanent wilting point.')}
           </p>
         </div>
       );
@@ -261,10 +257,10 @@ const IrrigationIntelligence: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Config Form (Minified for space) */}
         <div className="card">
-          <h3 className="section-header mb-4">Farm Config</h3>
+          <h3 className="section-header mb-4">{t('irrigation.farmConfig', 'Farm Config')}</h3>
           <div className="space-y-4">
             <div>
-              <label className="label">Crop Type</label>
+              <label className="label">{t('irrigation.cropType', 'Crop Type')}</label>
               <select
                 className="input-field"
                 value={cropType}
@@ -276,7 +272,7 @@ const IrrigationIntelligence: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="label">Soil Type</label>
+              <label className="label">{t('irrigation.soilType', 'Soil Type')}</label>
               <select
                 className="input-field"
                 value={soilType}
@@ -294,7 +290,7 @@ const IrrigationIntelligence: React.FC = () => {
         <div className="card glass-gold border-gold-300 relative overflow-hidden flex flex-col justify-between h-full">
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="section-header text-gold-700 dark:text-gold-300">Relay Control</h3>
+              <h3 className="section-header text-gold-700 dark:text-gold-300">{t('irrigation.relayControl', 'Relay Control')}</h3>
               <div
                 className={`w-2.5 h-2.5 rounded-full ${pumpActive ? 'bg-green-500 shadow-glow-green animate-pulse' : 'bg-red-500'}`}
               />
@@ -302,7 +298,7 @@ const IrrigationIntelligence: React.FC = () => {
             <div className="space-y-4">
               <div className="p-4 bg-white/40 dark:bg-black/20 rounded-2xl border border-gold-200/50">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gold-700/60 dark:text-gold-400/60 flex items-center gap-1.5">
-                  <Zap size={10} /> Pump Status
+                  <Zap size={10} /> {pumpActive ? t('irrigation.pumpActive', 'Pump Active') : t('irrigation.pumpInactive', 'Pump Standby')}
                 </p>
                 <p
                   className={`text-4xl font-black font-display tracking-tight mt-1 ${pumpActive ? 'text-green-600' : 'text-red-500'}`}
@@ -342,8 +338,8 @@ const IrrigationIntelligence: React.FC = () => {
               : isToggling
                 ? 'Syncing...'
                 : pumpActive
-                  ? 'Stop Pump'
-                  : 'Start Pump'}
+                  ? t('irrigation.turnPumpOff', 'Turn Pump OFF')
+                  : t('irrigation.turnPumpOn', 'Turn Pump ON')}
           </button>
 
           <div className="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
@@ -353,17 +349,17 @@ const IrrigationIntelligence: React.FC = () => {
 
         {/* Resource Metrics */}
         <div className="card flex flex-col justify-between h-full">
-          <h3 className="section-header mb-4">Resource Metrics</h3>
+          <h3 className="section-header mb-4">{t('irrigation.resourceMetrics', 'Resource Metrics')}</h3>
           <div className="space-y-4">
             <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-center">
               <p className="text-2xl font-bold text-blue-600 font-display">
                 {waterSaved.toLocaleString()}
               </p>
-              <p className="text-xs text-blue-500 mt-0.5">Liters Saved</p>
+              <p className="text-xs text-blue-500 mt-0.5">{t('irrigation.litersSaved', 'Liters Saved')}</p>
             </div>
             <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-xl text-center">
               <p className="text-2xl font-bold text-primary-600 font-display">{efficiency}%</p>
-              <p className="text-xs text-primary-500 mt-0.5">Efficiency Score</p>
+              <p className="text-xs text-primary-500 mt-0.5">{t('irrigation.efficiencyScore', 'Efficiency Score')}</p>
             </div>
           </div>
         </div>
@@ -373,8 +369,8 @@ const IrrigationIntelligence: React.FC = () => {
         {/* Schedule Chart */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="section-header">Weekly Schedule</h3>
-            <span className="badge-blue">Required vs AI Recommended</span>
+            <h3 className="section-header">{t('irrigation.weeklySchedule', 'Weekly Schedule')}</h3>
+            <span className="badge-blue">{t('irrigation.requiredVsRecommended', 'Required vs AI Recommended')}</span>
           </div>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={scheduleData}>
@@ -391,8 +387,8 @@ const IrrigationIntelligence: React.FC = () => {
         {/* ET Chart */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="section-header">Evapotranspiration Today</h3>
-            <span className="badge-gold">Thermal Intensity</span>
+            <h3 className="section-header">{t('irrigation.evapotranspirationToday', 'Evapotranspiration Today')}</h3>
+            <span className="badge-gold">{t('irrigation.thermalIntensity', 'Thermal Intensity')}</span>
           </div>
           <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={etData}>

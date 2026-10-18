@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, User, Lock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { useAuth, UserRole } from '../context/AuthContext';
 import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
@@ -10,24 +11,28 @@ const DEMO_ACCOUNTS = {
   farmer: {
     identifier: 'farmer@agriflux.com',
     password: 'password123',
-    roleLabel: 'Farmer',
+    roleLabelKey: 'auth.roleFarmer',
+    roleFallback: 'Farmer',
     badge: '🌾',
   },
   agronomist: {
     identifier: 'agronomist@agriflux.com',
     password: 'agro123',
-    roleLabel: 'Agronomist',
+    roleLabelKey: 'auth.roleAgronomist',
+    roleFallback: 'Agronomist',
     badge: '🔬',
   },
   admin: {
     identifier: 'admin@agriflux.com',
     password: 'admin123',
-    roleLabel: 'Admin',
+    roleLabelKey: 'auth.roleAdmin',
+    roleFallback: 'Admin',
     badge: '🛡️',
   },
 };
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const { login, loginWithProvider, isLoading, requiresOnboarding, isAuthenticated, user } =
     useAuth();
   const navigate = useNavigate();
@@ -98,7 +103,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier.trim() || !password) {
-      setError('Please enter your email or phone number, and password.');
+      setError(t('auth.invalidCredentials', 'Please enter your email or phone number, and password.'));
       return;
     }
 
@@ -106,11 +111,11 @@ const Login: React.FC = () => {
     try {
       const loggedInUser = await login(identifier.trim(), password);
       const role = loggedInUser?.role || selectedRole;
-      toast.success(`Welcome back, ${loggedInUser?.name || 'User'}!`);
+      toast.success(`${t('common.welcome', 'Welcome back')}, ${loggedInUser?.name || t('common.farmer', 'User')}!`);
       navigate(getSafeRedirect(role));
     } catch {
-      setError('Invalid credentials. Please verify your email/phone and password.');
-      toast.error('Invalid credentials. Please try again.');
+      setError(t('auth.invalidCredentials', 'Invalid credentials. Please verify your email/phone and password.'));
+      toast.error(t('auth.invalidCredentials', 'Invalid credentials. Please try again.'));
     }
   };
 
@@ -119,7 +124,7 @@ const Login: React.FC = () => {
     setError('');
     try {
       await loginWithProvider('google', selectedRole);
-      toast.success('Successfully signed in with Google.');
+      toast.success(t('auth.loginSuccess', 'Successfully signed in with Google.'));
       if (!requiresOnboarding) {
         navigate(getSafeRedirect(selectedRole));
       }
@@ -132,22 +137,22 @@ const Login: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col justify-center">
-      <SEO title="Sign In" />
+      <SEO title={t('auth.login', 'Sign In')} />
 
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight">
-          Welcome Back 👋
+          {t('auth.welcomeBack', 'Welcome Back')} 👋
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-xs sm:text-sm">
-          Sign in to access your farm intelligence and advisory
+          {t('auth.loginSubtitle', 'Sign in to access your farm intelligence and advisory')}
         </p>
       </div>
 
       {/* Simple Role Selector Tabs */}
       <div
         role="tablist"
-        aria-label="User Account Role"
+        aria-label={t('admin.role', 'User Account Role')}
         className="flex gap-1.5 bg-gray-100 dark:bg-gray-800/80 rounded-2xl p-1 mb-5 border border-gray-200/60 dark:border-white/5"
       >
         {(['farmer', 'agronomist', 'admin'] as const).map((role) => {
@@ -167,7 +172,7 @@ const Login: React.FC = () => {
               }`}
             >
               <span>{acc.badge}</span>
-              <span>{acc.roleLabel}</span>
+              <span>{t(acc.roleLabelKey, acc.roleFallback)}</span>
             </button>
           );
         })}
@@ -193,7 +198,7 @@ const Login: React.FC = () => {
             htmlFor="identifier-input"
             className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
           >
-            Email or Phone Number
+            {t('auth.emailOrPhone', 'Email or Phone Number')}
           </label>
           <div className="relative group">
             <User
@@ -206,7 +211,7 @@ const Login: React.FC = () => {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 transition-all text-xs sm:text-sm w-full rounded-xl"
-              placeholder="e.g. farmer@agriflux.com or 9876543210"
+              placeholder={t('auth.emailOrPhonePlaceholder', 'e.g. farmer@agriflux.com or 9876543210')}
               autoComplete="username"
               required
             />
@@ -220,13 +225,13 @@ const Login: React.FC = () => {
               htmlFor="password-input"
               className="text-xs font-bold text-gray-700 dark:text-gray-300 block cursor-pointer"
             >
-              Password
+              {t('auth.password', 'Password')}
             </label>
             <Link
               to="/forgot-password"
               className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline"
             >
-              Forgot Password?
+              {t('auth.forgotPassword', 'Forgot Password?')}
             </Link>
           </div>
           <div className="relative group">
@@ -248,7 +253,7 @@ const Login: React.FC = () => {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-label={showPassword ? t('auth.hidePassword', 'Hide password') : t('auth.showPassword', 'Show password')}
               aria-pressed={showPassword}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -266,10 +271,10 @@ const Login: React.FC = () => {
           {isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Signing in...</span>
+              <span>{t('auth.authenticating', 'Signing in...')}</span>
             </>
           ) : (
-            <span>Sign In</span>
+            <span>{t('auth.login', 'Sign In')}</span>
           )}
         </button>
       </form>
@@ -279,7 +284,7 @@ const Login: React.FC = () => {
         <div className="relative flex items-center gap-4 mb-4">
           <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
           <span className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold leading-none">
-            or continue with
+            {t('auth.orContinueWith', 'or continue with')}
           </span>
           <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
         </div>
@@ -294,19 +299,19 @@ const Login: React.FC = () => {
           ) : (
             <GoogleIcon />
           )}
-          <span>Sign in with Google</span>
+          <span>{t('auth.signInWithGoogle', 'Sign in with Google')}</span>
         </button>
       </div>
 
       {/* Footer */}
       <p className="mt-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-        Don&apos;t have an account?{' '}
+        {t('auth.noAccount', "Don't have an account?")}{' '}
         <Link
           id="login-register-link"
           to="/register"
           className="text-primary-600 dark:text-primary-400 font-bold hover:underline ml-1"
         >
-          Create Account
+          {t('auth.createAccount', 'Create Account')}
         </Link>
       </p>
     </div>

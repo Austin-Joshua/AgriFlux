@@ -421,20 +421,20 @@ const AgronomistDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="page-header">
-            {greeting},{' '}
+            {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`, greeting)},{' '}
             <span className="text-gradient font-black">
-              {user?.name?.split(' ')[0] || user?.name || 'Specialist'}
+              {user?.name?.split(' ')[0] || user?.name || t('agronomist.specialist', 'Specialist')}
             </span>{' '}
             👋
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-            Crop diagnostics, consultation triage, and field decision reviews
+            {t('agronomist.cropDiagnosticsSubtitle', 'Crop diagnostics, consultation triage, and field decision reviews')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold border border-primary-200 dark:border-primary-700/50">
             <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
-            Active Duty · {user?.expertise || 'Field Agronomy'}
+            {t('agronomist.activeDuty', 'Active Duty')} · {user?.expertise || 'Field Agronomy'}
           </span>
         </div>
       </div>
@@ -446,7 +446,7 @@ const AgronomistDashboard: React.FC = () => {
       >
         <StatCard
           title={t('agronomist.farmsMonitored', 'Farms Monitored')}
-          value="42 Parcels"
+          value={`42 ${t('agronomist.parcels', 'Parcels')}`}
           change="+4 this month"
           positive={true}
           icon={<Sprout size={22} className="text-primary-600" />}
@@ -513,12 +513,12 @@ const AgronomistDashboard: React.FC = () => {
               {tab === 'overview'
                 ? `📊 ${t('common.overview', 'Overview')}`
                 : tab === 'fieldVisits'
-                  ? `📅 Consultations (${consultations.filter((c) => c.status === 'pending').length || 0})`
+                  ? `📅 ${t('agronomist.consultationsTab', 'Consultations')} (${consultations.filter((c) => c.status === 'pending').length || 0})`
                   : tab === 'fieldDecisions'
-                    ? `🎯 Decision Reviews (${reviews.filter((r) => !r.agronomistReview).length || 0})`
+                    ? `🎯 ${t('agronomist.decisionReviewsTab', 'Decision Reviews')} (${reviews.filter((r) => !r.agronomistReview).length || 0})`
                     : tab === 'soilReports'
-                      ? `🧪 ${t('agronomist.soilReports', 'Soil Diagnostics')}`
-                      : `📡 ${t('agronomist.advisoryTab', 'Regional Advisory')}`}
+                      ? `🧪 ${t('agronomist.soilDiagnosticsTab', 'Soil Diagnostics')}`
+                      : `📡 ${t('agronomist.regionalAdvisoryTab', 'Regional Advisory')}`}
             </button>
           ))}
         </div>
@@ -718,12 +718,12 @@ const AgronomistDashboard: React.FC = () => {
       {activeTab === 'fieldVisits' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="section-header">📅 Expert Consultations & Bookings</h3>
+            <h3 className="section-header">📅 {t('agronomist.consultationsBookings', 'Expert Consultations & Bookings')}</h3>
             <button
               onClick={fetchConsultations}
               className="text-xs text-primary-600 hover:underline"
             >
-              Refresh
+              {t('common.refresh', 'Refresh')}
             </button>
           </div>
           {loadingConsultations ? (
@@ -732,7 +732,7 @@ const AgronomistDashboard: React.FC = () => {
             </div>
           ) : consultations.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-8">
-              No consultations requested yet.
+              {t('agronomist.noConsultationsYet', 'No consultations requested yet.')}
             </p>
           ) : (
             <div className="space-y-3">
@@ -767,11 +767,11 @@ const AgronomistDashboard: React.FC = () => {
                           </span>
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                          Farmer: <strong>{farmerName}</strong> · Location:{' '}
+                          {t('agronomist.farmerLabel', 'Farmer')}: <strong>{farmerName}</strong> · {t('common.location', 'Location')}:{' '}
                           <strong>{location}</strong>
                         </p>
                         <p className="text-xs text-primary-700 dark:text-primary-400 mt-1">
-                          Requested Expert: <strong>{v.expertName}</strong> ({v.specialization})
+                          {t('agronomist.requestedExpert', 'Requested Expert')}: <strong>{v.expertName}</strong> ({v.specialization})
                         </p>
                         <div className="mt-2 p-2.5 bg-gray-50 dark:bg-gray-800/40 rounded-xl text-xs text-gray-600 dark:text-gray-300 font-medium italic border border-gray-100 dark:border-gray-800">
                           " {v.query} "
@@ -784,7 +784,7 @@ const AgronomistDashboard: React.FC = () => {
                           <Calendar size={12} />
                           {v.date}
                         </p>
-                        <p className="text-[11px] text-gray-500 font-bold mt-0.5">Time: {v.time}</p>
+                        <p className="text-[11px] text-gray-500 font-bold mt-0.5">{t('agronomist.time', 'Time')}: {v.time}</p>
                       </div>
                       {v.status === 'pending' && (
                         <div className="flex gap-2">
@@ -792,13 +792,13 @@ const AgronomistDashboard: React.FC = () => {
                             onClick={() => handleUpdateStatus(v._id, 'confirmed')}
                             className="px-3 py-1.5 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
                           >
-                            Approve
+                            {t('common.approve', 'Approve')}
                           </button>
                           <button
                             onClick={() => handleUpdateStatus(v._id, 'cancelled')}
                             className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
                           >
-                            Reject
+                            {t('common.reject', 'Reject')}
                           </button>
                         </div>
                       )}
@@ -888,24 +888,23 @@ const AgronomistDashboard: React.FC = () => {
               disabled={loadingReviews}
               className="btn-outline flex items-center gap-1.5 text-xs py-2 px-3 self-end sm:self-auto"
             >
-              <RotateCw size={14} className={loadingReviews ? 'animate-spin' : ''} /> Refresh Queue
+              <RotateCw size={14} className={loadingReviews ? 'animate-spin' : ''} /> {t('agronomist.refreshQueue', 'Refresh Queue')}
             </button>
           </div>
 
           {loadingReviews ? (
             <div className="card text-center py-12">
               <Loader size={24} className="animate-spin text-primary-600 mx-auto mb-2" />
-              <p className="text-xs text-gray-500">Loading pending field reviews...</p>
+              <p className="text-xs text-gray-500">{t('agronomist.loadingReviews', 'Loading pending field reviews...')}</p>
             </div>
           ) : reviews.length === 0 ? (
             <div className="card text-center py-12">
               <ShieldCheck size={32} className="text-emerald-500 mx-auto mb-2 opacity-80" />
               <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                No Pending Field Decision Reviews
+                {t('agronomist.noPendingReviews', 'No Pending Field Decision Reviews')}
               </p>
               <p className="text-xs text-gray-400 mt-1">
-                All farmer recommendations are endorsed or operating within normal agronomic
-                thresholds.
+                {t('agronomist.noPendingReviewsDesc', 'All farmer recommendations are endorsed or operating within normal agronomic thresholds.')}
               </p>
             </div>
           ) : (

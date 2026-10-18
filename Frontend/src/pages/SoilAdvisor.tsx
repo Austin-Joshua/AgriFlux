@@ -512,7 +512,7 @@ const SoilAdvisor: React.FC = () => {
                 </h3>
                 <form onSubmit={analyze} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="label">Salinity (dS/m)</label>
+                    <label className="label">{t('soilAdvisor.salinity', 'Salinity (dS/m)')}</label>
                     <input
                       name="salinity"
                       type="number"
@@ -524,7 +524,7 @@ const SoilAdvisor: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="label">pH Level</label>
+                    <label className="label">{t('soilAdvisor.phLevel', 'pH Level')}</label>
                     <input
                       name="ph"
                       type="number"
@@ -536,7 +536,7 @@ const SoilAdvisor: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="label">Moisture (%)</label>
+                    <label className="label">{t('soilAdvisor.moisture', 'Moisture (%)')}</label>
                     <input
                       name="moisture"
                       type="number"
@@ -547,7 +547,7 @@ const SoilAdvisor: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="label">Water Table (m)</label>
+                    <label className="label">{t('soilAdvisor.waterTable', 'Water Table (m)')}</label>
                     <input
                       name="waterLevel"
                       type="number"
@@ -559,7 +559,7 @@ const SoilAdvisor: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="label">Germination Rate (%)</label>
+                    <label className="label">{t('soilAdvisor.germinationRate', 'Germination Rate (%)')}</label>
                     <input
                       name="germination"
                       type="number"
@@ -570,7 +570,7 @@ const SoilAdvisor: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="label">Region</label>
+                    <label className="label">{t('soilAdvisor.region', 'Region')}</label>
                     <select
                       name="region"
                       className="input-field"
@@ -613,13 +613,13 @@ const SoilAdvisor: React.FC = () => {
                               <div className="space-y-6 text-gray-700 dark:text-gray-300">
                                 <div className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                                   <h4 className="font-bold text-primary-700 dark:text-primary-400 mb-2 flex items-center gap-2">
-                                    <Sprout size={18} /> Primary Guidance
+                                    <Sprout size={18} /> {t('soilAdvisor.primaryGuidance', 'Primary Guidance')}
                                   </h4>
                                   <p className="text-sm font-medium">{rec.guidance}</p>
                                 </div>
                                 <div>
                                   <h4 className="font-bold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">
-                                    Agronomic Requirements
+                                    {t('soilAdvisor.agronomicReqs', 'Agronomic Requirements')}
                                   </h4>
                                   <ul className="space-y-3 text-sm">
                                     <li className="flex gap-2">
@@ -627,27 +627,27 @@ const SoilAdvisor: React.FC = () => {
                                         size={16}
                                         className="text-green-500 shrink-0 mt-0.5"
                                       />{' '}
-                                      <strong>Soil Preparation:</strong> {rec.soilPrep}
+                                      <strong>{t('soilAdvisor.soilPrep', 'Soil Preparation:')}</strong> {rec.soilPrep}
                                     </li>
                                     <li className="flex gap-2">
                                       <CheckCircle
                                         size={16}
                                         className="text-green-500 shrink-0 mt-0.5"
                                       />{' '}
-                                      <strong>Water Requirement:</strong> {rec.waterReq}
+                                      <strong>{t('soilAdvisor.waterReq', 'Water Requirement:')}</strong> {rec.waterReq}
                                     </li>
                                     <li className="flex gap-2">
                                       <CheckCircle
                                         size={16}
                                         className="text-green-500 shrink-0 mt-0.5"
                                       />{' '}
-                                      <strong>Yield Potential:</strong> {rec.yieldPotential}
+                                      <strong>{t('soilAdvisor.yieldPotential', 'Yield Potential:')}</strong> {rec.yieldPotential}
                                     </li>
                                   </ul>
                                 </div>
                                 <div className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                                   <h4 className="font-bold text-amber-700 dark:text-amber-500 mb-2 flex items-center gap-2">
-                                    <TrendingUp size={18} /> 10-Year Market Trend
+                                    <TrendingUp size={18} /> {t('soilAdvisor.tenYearTrend', '10-Year Market Trend')}
                                   </h4>
                                   <p className="text-sm font-bold">{rec.tenYearTrend}</p>
                                 </div>

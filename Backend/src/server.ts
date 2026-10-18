@@ -156,16 +156,20 @@ io.on('connection', (socket) => {
     };
 
     // Cryptographically seal socket actuator dispatch into the blockchain ledger
-    blockchain.addBlock('ACTUATOR_OVERRIDE', {
-      channel: 'websocket',
-      action: sanitizedControlData.action,
-      socketId: socket.id,
-      userId: socketUser.id,
-      role: socketUser.role,
-      targetPumpStatus: sanitizedControlData.targetPumpStatus,
-      commandId: sanitizedControlData.commandId,
-      timestamp: sanitizedControlData.issuedAt,
-    });
+    blockchain
+      .addBlock('ACTUATOR_OVERRIDE', {
+        channel: 'websocket',
+        action: sanitizedControlData.action,
+        socketId: socket.id,
+        userId: socketUser.id,
+        role: socketUser.role,
+        targetPumpStatus: sanitizedControlData.targetPumpStatus,
+        commandId: sanitizedControlData.commandId,
+        timestamp: sanitizedControlData.issuedAt,
+      })
+      .catch((err) => {
+        console.warn('⚠️ [SOCKET ACTUATOR AUDIT] Block append notice:', err.message);
+      });
 
     socket.broadcast.emit('iot-control', sanitizedControlData);
   });
@@ -262,9 +266,28 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 // Comprehensive Health & Telemetry Diagnostic Check
 app.get('/health', (_req: Request, res: Response) => {
   const mem = process.memoryUsage();
-  res.status(200).json({
-    status: 'healthy',
+  const bHealth = blockchain.getHealthStatus();
+
+  // Determine overall status truthfully:
+  // healthy: DB connected AND blockchain healthy
+  // degraded: DB connected but blockchain degraded, OR DB disconnected in dev
+  // unavailable: DB disconnected in production, OR blockchain unavailable
+  let overallStatus: 'healthy' | 'degraded' | 'unavailable' = 'healthy';
+
+  if (!isDBConnected) {
+    overallStatus = env.NODE_ENV === 'production' ? 'unavailable' : 'degraded';
+  } else if (bHealth.status === 'degraded') {
+    overallStatus = 'degraded';
+  } else if (bHealth.status === 'unavailable') {
+    overallStatus = 'unavailable';
+  }
+
+  const httpStatus = overallStatus === 'unavailable' ? 503 : 200;
+
+  res.status(httpStatus).json({
+    status: overallStatus,
     system: 'AgriFlux Autonomous Intelligence Mesh',
+    environment: env.NODE_ENV === 'production' ? 'production' : 'development',
     uptimeSeconds: Math.floor(process.uptime()),
     workerPid: process.pid,
     memory: {
@@ -272,11 +295,20 @@ app.get('/health', (_req: Request, res: Response) => {
       heapUsedMb: Math.round(mem.heapUsed / (1024 * 1024)),
       heapTotalMb: Math.round(mem.heapTotal / (1024 * 1024)),
     },
-    database: isDBConnected ? 'connected_mongodb' : 'resilient_in_memory_demo',
+    database: {
+      status: isDBConnected ? 'connected' : 'disconnected',
+      storageMode: isDBConnected ? 'mongodb' : 'volatile_in_memory_demo',
+    },
     blockchain: {
-      chainLength: blockchain.getChain().length,
-      isValid: blockchain.isChainValid().isValid,
-      lastBlockHash: blockchain.getLatestBlock().hash,
+      status: bHealth.status,
+      chainLength: bHealth.chainLength,
+      persistedBlocks: bHealth.persistedBlockCount,
+      storageMode: bHealth.storageMode,
+      keySource: bHealth.keySource,
+      lastVerifiedAt: bHealth.lastVerifiedAt,
+      lastVerificationValid: bHealth.lastVerificationValid,
+      degradedReason: bHealth.degradedReason,
+      lastBlockHash: blockchain.getLatestBlock()?.hash || 'NONE',
     },
     timestamp: new Date().toISOString(),
   });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Wheat, MapPin, Sparkles, ArrowRight, LogOut } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import logo from '../assets/logo-icon.png';
@@ -8,6 +9,7 @@ import SEO from '../components/SEO';
 
 const Onboarding: React.FC = () => {
   const { user, completeOnboarding, logout, isLoading } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [farmName, setFarmName] = useState('');
   const [location, setLocation] = useState('');
@@ -39,10 +41,10 @@ const Onboarding: React.FC = () => {
             <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">
-            Almost there, <span className="text-gradient">{user?.name?.split(' ')[0]}</span>!
+            {t('onboarding.title', 'Almost there')}, <span className="text-gradient">{user?.name?.split(' ')[0]}</span>!
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">
-            To personalize your AI insights, we just need a few more details about your farm.
+            {t('onboarding.subtitle', 'To personalize your AI insights, we just need a few more details about your farm.')}
           </p>
         </div>
 
@@ -55,7 +57,7 @@ const Onboarding: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6 relative z-10 text-left">
             <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-400 dark:text-gray-500 ml-1">
-                Farm Name
+                {t('onboarding.farmName', 'Farm Name')}
               </label>
               <div className="relative group/input">
                 <Wheat
@@ -66,7 +68,7 @@ const Onboarding: React.FC = () => {
                   type="text"
                   value={farmName}
                   onChange={(e) => setFarmName(e.target.value)}
-                  placeholder="e.g. Green Valley Estates"
+                  placeholder={t('onboarding.farmNamePlaceholder', 'e.g. Green Valley Farm')}
                   className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none transition-all dark:text-white font-medium"
                   required
                 />
@@ -75,7 +77,7 @@ const Onboarding: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-400 dark:text-gray-500 ml-1">
-                Location (District, State)
+                {t('onboarding.farmLocation', 'Location')}
               </label>
               <div className="relative group/input">
                 <MapPin
@@ -86,7 +88,7 @@ const Onboarding: React.FC = () => {
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g. Ludhiana, Punjab"
+                  placeholder={t('onboarding.locationPlaceholder', 'e.g. Ludhiana, Punjab')}
                   className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none transition-all dark:text-white font-medium"
                   required
                 />
@@ -102,7 +104,7 @@ const Onboarding: React.FC = () => {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  Complete Setup
+                  {t('onboarding.completeSetup', 'Complete Setup')}
                   <ArrowRight
                     size={18}
                     className="group-hover/btn:translate-x-1 transition-transform"
@@ -120,12 +122,12 @@ const Onboarding: React.FC = () => {
             className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-red-500 transition-colors uppercase tracking-widest"
           >
             <LogOut size={14} />
-            Cancel & Logout
+            {t('onboarding.cancel', 'Cancel & Sign Out')}
           </button>
         </div>
 
         <p className="mt-12 text-center text-[10px] text-gray-400 dark:text-gray-600 font-bold uppercase tracking-widest">
-          Secured by AgriFlux AI Intelligence
+          {t('common.securedBy', 'Secured by AgriFlux AI Intelligence')}
         </p>
       </div>
     </div>

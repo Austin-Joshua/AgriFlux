@@ -327,16 +327,20 @@ export const register = async (req: Request, res: Response) => {
       registerInMemoryUser(mockUser);
 
       // Cryptographically seal registration in blockchain ledger
-      blockchain.addBlock('USER_CREDIBILITY', {
-        event: 'USER_REGISTRATION_VERIFIED',
-        userId: mockUser.id,
-        phoneHash: cleanPhone
-          ? crypto.createHash('sha256').update(cleanPhone).digest('hex')
-          : 'EMAIL_ANCHORED',
-        name: mockUser.name,
-        role: mockUser.role,
-        securityLevel: 'OTP_VERIFIED_CREDIBLE',
-      });
+      try {
+        await blockchain.addBlock('USER_CREDIBILITY', {
+          event: 'USER_REGISTRATION_VERIFIED',
+          userId: mockUser.id,
+          phoneHash: cleanPhone
+            ? crypto.createHash('sha256').update(cleanPhone).digest('hex')
+            : 'EMAIL_ANCHORED',
+          name: mockUser.name,
+          role: mockUser.role,
+          securityLevel: 'OTP_VERIFIED_CREDIBLE',
+        });
+      } catch (auditErr: any) {
+        console.warn('⚠️ [AUTH AUDIT] Block append notice:', auditErr.message);
+      }
 
       const token = jwt.sign(
         { id: mockUser.id, role: mockUser.role, phone: mockUser.phone, email: mockUser.email },
@@ -390,13 +394,17 @@ export const register = async (req: Request, res: Response) => {
     });
 
     // Seal user credibility in blockchain ledger
-    blockchain.addBlock('USER_CREDIBILITY', {
-      event: 'USER_REGISTRATION_VERIFIED',
-      userId: newUser.id,
-      phoneHash: crypto.createHash('sha256').update(cleanPhone).digest('hex'),
-      role: newUser.role,
-      securityLevel: 'OTP_VERIFIED_CREDIBLE',
-    });
+    try {
+      await blockchain.addBlock('USER_CREDIBILITY', {
+        event: 'USER_REGISTRATION_VERIFIED',
+        userId: newUser.id,
+        phoneHash: crypto.createHash('sha256').update(cleanPhone).digest('hex'),
+        role: newUser.role,
+        securityLevel: 'OTP_VERIFIED_CREDIBLE',
+      });
+    } catch (auditErr: any) {
+      console.warn('⚠️ [AUTH AUDIT] Block append notice:', auditErr.message);
+    }
 
     const token = jwt.sign(
       { id: newUser._id, role: newUser.role, phone: newUser.phone, email: newUser.email },
@@ -748,12 +756,16 @@ export const socialLogin = async (req: Request, res: Response) => {
     }
 
     // Log login to blockchain ledger
-    blockchain.addBlock('SECURITY_EVENT', {
-      event: isNewUser ? 'SOCIAL_SIGNUP_GOOGLE' : 'ACCOUNT_MERGED_GOOGLE_LOGIN',
-      userId: user.id,
-      email: user.email,
-      accountUnified: !isNewUser,
-    });
+    try {
+      await blockchain.addBlock('SECURITY_EVENT', {
+        event: isNewUser ? 'SOCIAL_SIGNUP_GOOGLE' : 'ACCOUNT_MERGED_GOOGLE_LOGIN',
+        userId: user.id,
+        email: user.email,
+        accountUnified: !isNewUser,
+      });
+    } catch (auditErr: any) {
+      console.warn('⚠️ [AUTH AUDIT] Block append notice:', auditErr.message);
+    }
 
     const token = jwt.sign(
       { id: user._id, role: user.role, email: user.email, phone: user.phone },

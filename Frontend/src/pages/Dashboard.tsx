@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
         style={{ animationDelay: '100ms' }}
       >
         <StatCard
-          title={t('dashboard.soilHealth')}
+          title={t('dashboard.soilHealth', 'Soil Health')}
           value={`${soilScore}/100`}
           change="+5 pts"
           icon={<Leaf size={22} className="text-earth-600" />}
@@ -231,7 +231,7 @@ const Dashboard: React.FC = () => {
           route="/soil"
         />
         <StatCard
-          title="Crop Health"
+          title={t('dashboard.cropHealth', 'Crop Health')}
           value="Optimal (96%)"
           change="NDVI Active"
           icon={<Satellite size={22} className="text-primary-600" />}
@@ -241,8 +241,8 @@ const Dashboard: React.FC = () => {
           route="/crop-health"
         />
         <StatCard
-          title={t('dashboard.irrigationStatus')}
-          value="Optimal"
+          title={t('dashboard.irrigationStatus', 'Irrigation Status')}
+          value={t('dashboard.optimal', 'Optimal')}
           change="Water Saved"
           icon={<Droplets size={22} className="text-blue-600" />}
           color="text-blue-600 dark:text-blue-400"
@@ -251,8 +251,8 @@ const Dashboard: React.FC = () => {
           route="/irrigation"
         />
         <StatCard
-          title="Crop Resilience"
-          value="Resilient"
+          title={t('dashboard.cropResilience', 'Crop Resilience')}
+          value={t('dashboard.resilient', 'Resilient')}
           change="Advisory Ready"
           icon={<Sprout size={22} className="text-emerald-600" />}
           color="text-emerald-600 dark:text-emerald-400"
@@ -271,9 +271,9 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 card">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h3 className="section-header">Crop Yield Trend</h3>
+              <h3 className="section-header">{t('dashboard.yieldTrend', 'Crop Yield Trend')}</h3>
               <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
-                Actual vs AI Forecast (kg/ha)
+                {t('dashboard.actualVsForecast', 'Actual vs AI Forecast (kg/ha)')}
               </p>
             </div>
             <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
@@ -290,7 +290,7 @@ const Dashboard: React.FC = () => {
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                 >
-                  {type === 'area' ? 'Area' : 'Bar'}
+                  {type === 'area' ? t('dashboard.area', 'Area') : t('dashboard.bar', 'Bar')}
                 </button>
               ))}
             </div>
@@ -341,7 +341,7 @@ const Dashboard: React.FC = () => {
                       stroke="#22c55e"
                       fill="url(#yieldGrad)"
                       strokeWidth={2.5}
-                      name="Actual"
+                      name={t('dashboard.actual', 'Actual')}
                     />
                     <Area
                       type="monotone"
@@ -350,7 +350,7 @@ const Dashboard: React.FC = () => {
                       fill="url(#forecastGrad)"
                       strokeWidth={2}
                       strokeDasharray="5 3"
-                      name="AI Forecast"
+                      name={t('dashboard.aiForecast', 'AI Forecast')}
                     />
                   </AreaChart>
                 ) : (
@@ -370,12 +370,12 @@ const Dashboard: React.FC = () => {
                         fontSize: 12,
                       }}
                     />
-                    <Bar dataKey="yield" fill="#22c55e" radius={[6, 6, 0, 0]} name="Actual" />
+                    <Bar dataKey="yield" fill="#22c55e" radius={[6, 6, 0, 0]} name={t('dashboard.actual', 'Actual')} />
                     <Bar
                       dataKey="forecast"
                       fill="#f59e0b"
                       radius={[6, 6, 0, 0]}
-                      name="AI Forecast"
+                      name={t('dashboard.aiForecast', 'AI Forecast')}
                     />
                   </BarChart>
                 )}
@@ -393,7 +393,7 @@ const Dashboard: React.FC = () => {
           onClick={() => toast.success('🌤️ Weather Analysis: Stable conditions for harvest.')}
         >
           <div className="flex items-center justify-between mb-2">
-            <h3 className="section-header">7-Day Weather</h3>
+            <h3 className="section-header">{t('dashboard.sevenDayWeather', '7-Day Weather')}</h3>
             <Droplets
               size={18}
               className="text-blue-400 group-hover/weather:scale-125 transition-transform"
@@ -422,7 +422,7 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
           <div className="mt-4 pt-3 border-t border-gray-50 dark:border-gray-800 flex items-center justify-center gap-2 text-[10px] font-black text-blue-500 uppercase tracking-widest opacity-0 group-hover/weather:opacity-100 transition-opacity">
-            <Sparkles size={10} /> View Historical Comparison
+            <Sparkles size={10} /> {t('dashboard.viewHistorical', 'View Historical Comparison')}
           </div>
         </div>
       </div>
@@ -443,10 +443,10 @@ const Dashboard: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                  Live AI Crop Diagnostic
+                  {t('dashboard.liveAiDiagnostic', 'Live AI Crop Diagnostic')}
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
-                  {data.confidenceScore}% Confidence
+                  {data.confidenceScore}% {t('dashboard.confidence', 'Confidence')}
                 </span>
               </div>
               <p className="text-sm sm:text-base font-black text-slate-900 dark:text-white mt-0.5">
@@ -456,7 +456,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1.5 self-end sm:self-center text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
-            <span>View Detailed AI Report</span>
+            <span>{t('common.viewAll', 'View Detailed AI Report')}</span>
             <ChevronRight size={14} />
           </div>
         </div>
@@ -520,7 +520,7 @@ const Dashboard: React.FC = () => {
           style={{ animationDelay: '350ms' }}
         >
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700/50">
-            <h3 className="section-header">🗺️ Farm Location</h3>
+            <h3 className="section-header">🗺️ {t('dashboard.farmLocation', 'Farm Location')}</h3>
             <Map size={16} className="text-primary-500" />
           </div>
           <div className="relative w-full group/map" style={{ height: '180px' }}>
@@ -534,7 +534,7 @@ const Dashboard: React.FC = () => {
             />
             <div className="absolute top-3 left-3 glass rounded-xl px-3 py-1.5 text-xs font-semibold text-primary-700 dark:text-primary-300 shadow-md flex items-center gap-1.5 border border-white/20">
               <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
-              Live Satellite Feed
+              {t('dashboard.liveSatelliteFeed', 'Live Satellite Feed')}
             </div>
             <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end opacity-0 group-hover/map:opacity-100 transition-opacity duration-300 pointer-events-none">
               <div className="glass px-2 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-tighter">
@@ -563,7 +563,7 @@ const Dashboard: React.FC = () => {
               rel="noreferrer"
               className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1"
             >
-              Open in Maps <ArrowRight size={10} />
+              {t('dashboard.openInMaps', 'Open in Maps')} <ArrowRight size={10} />
             </a>
           </div>
         </div>
@@ -573,16 +573,16 @@ const Dashboard: React.FC = () => {
       <div className="card animate-slide-up-fade" style={{ animationDelay: '380ms' }}>
         <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
           <div>
-            <h3 className="section-header">📅 My Expert Consultations</h3>
+            <h3 className="section-header">📅 {t('dashboard.myExpertConsultations', 'My Expert Consultations')}</h3>
             <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
-              Track requested sessions and their confirmation status
+              {t('dashboard.trackRequestedSessions', 'Track requested sessions and their confirmation status')}
             </p>
           </div>
           <button
             onClick={() => navigate('/book-consultation')}
             className="btn-primary !py-2 !px-4 text-xs font-bold uppercase tracking-wider"
           >
-            + Book Consultation
+            + {t('consultation.bookConsultation', 'Book Consultation')}
           </button>
         </div>
         {loadingBookings ? (
@@ -591,9 +591,9 @@ const Dashboard: React.FC = () => {
           </div>
         ) : bookings.length === 0 ? (
           <div className="text-center py-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">No consultations booked yet.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.noConsultationsBooked', 'No consultations booked yet.')}</p>
             <p className="text-xs text-gray-400 mt-1">
-              Connect with our certified network of soil & crop experts to optimize your farm yield.
+              {t('dashboard.connectWithExperts', 'Connect with our certified network of soil & crop experts to optimize your farm yield.')}
             </p>
           </div>
         ) : (

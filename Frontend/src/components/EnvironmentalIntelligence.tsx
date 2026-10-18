@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import {
   CloudRain,
@@ -123,6 +124,7 @@ interface VariableRegistryItem {
 }
 
 const EnvironmentalIntelligence: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'weather' | 'satellite' | 'soil' | 'apy' | 'registry'>(
     'weather'
   );
@@ -302,7 +304,7 @@ const EnvironmentalIntelligence: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <h3 className="section-header !mb-0 text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              Environmental & Agronomic Intelligence Hub
+              {t('environmental.title', 'Environmental & Agronomic Intelligence Hub')}
             </h3>
           </div>
           <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5 flex items-center gap-1.5">
@@ -322,7 +324,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             }`}
           >
             <CloudRain size={13} />
-            Open-Meteo Weather
+            {t('environmental.historicalWeather', 'Open-Meteo Weather')}
           </button>
           <button
             onClick={() => setActiveTab('satellite')}
@@ -333,7 +335,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             }`}
           >
             <Satellite size={13} />
-            Copernicus Sentinel-2
+            {t('environmental.satelliteNdvi', 'Copernicus Sentinel-2')}
           </button>
           <button
             onClick={() => setActiveTab('soil')}
@@ -344,7 +346,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             }`}
           >
             <FlaskConical size={13} />
-            Regional Soil Benchmark
+            {t('environmental.regionalSoil', 'Regional Soil Benchmark')}
           </button>
           <button
             onClick={() => setActiveTab('apy')}
@@ -355,7 +357,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             }`}
           >
             <Sprout size={13} />
-            DES Crop Statistics
+            {t('environmental.cropStats', 'DES Crop Statistics')}
           </button>
           <button
             onClick={() => setActiveTab('registry')}
@@ -366,7 +368,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             }`}
           >
             <BookOpen size={13} />
-            Variable Registry
+            {t('environmental.variableRegistry', 'Variable Registry')}
           </button>
         </div>
       </div>
@@ -378,18 +380,18 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300">
               <FileSpreadsheet size={15} className="text-blue-600 shrink-0" />
               <span>
-                <strong>Data Provenance:</strong> Open-Meteo ERA5-Land Reanalysis (2021–2026).
-                Values are <em>historical model estimates</em>, distinct from direct capacitive IoT
+                <strong>{t('environmental.dataProvenance', 'Data Provenance')}:</strong> Open-Meteo ERA5-Land Reanalysis (2021–2026).
+                Values are <em>{t('environmental.historicalModelEstimates', 'historical model estimates')}</em>, distinct from direct capacitive IoT
                 soil probes.
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium text-[11px]">
-                Status: Verified Reanalysis
+                {t('environmental.statusVerified', 'Status: Verified Reanalysis')}
               </span>
               <button
                 onClick={fetchWeather}
-                title="Refresh observations"
+                title={t('environmental.refreshObservations', 'Refresh observations')}
                 className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               >
                 <RefreshCw size={13} className={loadingWeather ? 'animate-spin' : ''} />
@@ -403,7 +405,7 @@ const EnvironmentalIntelligence: React.FC = () => {
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs font-medium">
                   <Thermometer size={14} className="text-amber-500" />
-                  Mean Temp
+                  {t('environmental.meanTemp', 'Mean Temp')}
                 </div>
                 <div className="mt-1 flex items-baseline gap-1">
                   <span className="text-lg font-black text-gray-900 dark:text-white">
@@ -411,13 +413,13 @@ const EnvironmentalIntelligence: React.FC = () => {
                   </span>
                   <span className="text-xs text-gray-400 font-semibold">°C</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">ERA5 2m ambient</span>
+                <span className="text-[10px] text-gray-400 font-medium">{t('environmental.era5Ambient', 'ERA5 2m ambient')}</span>
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs font-medium">
                   <CloudRain size={14} className="text-blue-500" />
-                  Precipitation
+                  {t('environmental.precipitation', 'Precipitation')}
                 </div>
                 <div className="mt-1 flex items-baseline gap-1">
                   <span className="text-lg font-black text-blue-600 dark:text-blue-400">
@@ -425,13 +427,13 @@ const EnvironmentalIntelligence: React.FC = () => {
                   </span>
                   <span className="text-xs text-gray-400 font-semibold">mm</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">Cumulative rainfall</span>
+                <span className="text-[10px] text-gray-400 font-medium">{t('environmental.cumulativeRainfall', 'Cumulative rainfall')}</span>
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs font-medium">
                   <Sun size={14} className="text-orange-500" />
-                  FAO-56 ET₀
+                  {t('environmental.faoEt0', 'FAO-56 ET₀')}
                 </div>
                 <div className="mt-1 flex items-baseline gap-1">
                   <span className="text-lg font-black text-amber-600 dark:text-amber-400">
@@ -439,19 +441,19 @@ const EnvironmentalIntelligence: React.FC = () => {
                   </span>
                   <span className="text-xs text-gray-400 font-semibold">mm</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">Evapotranspiration</span>
+                <span className="text-[10px] text-gray-400 font-medium">{t('environmental.evapotranspiration', 'Evapotranspiration')}</span>
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs font-medium">
                   <Calendar size={14} className="text-primary-500" />
-                  Timeline
+                  {t('environmental.timeline', 'Timeline')}
                 </div>
                 <div className="mt-1 flex items-baseline gap-1">
                   <span className="text-lg font-black text-gray-900 dark:text-white">
                     {weatherSummary.observationsCount}
                   </span>
-                  <span className="text-xs text-gray-400 font-semibold">pts</span>
+                  <span className="text-xs text-gray-400 font-semibold">{t('environmental.pts', 'pts')}</span>
                 </div>
                 <span className="text-[10px] text-gray-400 font-medium">
                   {weatherGranularity} series
@@ -463,7 +465,7 @@ const EnvironmentalIntelligence: React.FC = () => {
           {/* Granularity & Time Range Filter Bar */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Range:</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('common.range', 'Range:')}</span>
               {[7, 14, 30].map((days) => (
                 <button
                   key={days}
@@ -480,7 +482,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Mode:</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('common.mode', 'Mode:')}</span>
               <button
                 onClick={() => setWeatherGranularity('daily')}
                 className={`px-2.5 py-1 text-xs rounded-md font-semibold transition-all ${
@@ -489,7 +491,7 @@ const EnvironmentalIntelligence: React.FC = () => {
                     : 'text-gray-500 hover:text-gray-800 dark:text-gray-400'
                 }`}
               >
-                Daily Summary
+                {t('environmental.dailySummary', 'Daily Summary')}
               </button>
               <button
                 onClick={() => setWeatherGranularity('hourly')}
@@ -509,7 +511,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             {loadingWeather ? (
               <div className="h-64 flex flex-col items-center justify-center gap-2 text-gray-400">
                 <Loader className="animate-spin text-primary-500" size={24} />
-                <span className="text-xs">Loading Thanjavur weather reanalysis...</span>
+                <span className="text-xs">{t('environmental.loadingWeather', 'Loading Thanjavur weather reanalysis...')}</span>
               </div>
             ) : chartPoints.length === 0 ? (
               <div className="h-64 flex flex-col items-center justify-center gap-2 text-gray-400">
@@ -603,7 +605,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
               <Satellite size={15} className="text-emerald-600 shrink-0" />
               <span>
-                <strong>Copernicus Sentinel-2 MSI (Level-2A):</strong> Tile T44NPM · 10m Spatial
+                <strong>{t('environmental.sentinelTitle', 'Copernicus Sentinel-2 MSI (Level-2A):')}</strong> Tile T44NPM · 10m Spatial
                 Resolution. NDVI computed as (B08 - B04) / (B08 + B04) with SCL cloud masking.
               </span>
             </div>
@@ -615,7 +617,7 @@ const EnvironmentalIntelligence: React.FC = () => {
           {loadingSatellite ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
               <Loader className="animate-spin text-blue-500" size={24} />
-              <span className="text-xs">Checking Copernicus satellite observations...</span>
+              <span className="text-xs">{t('environmental.checkingSatellite', 'Checking Copernicus satellite observations...')}</span>
             </div>
           ) : satelliteData &&
             satelliteData.isDataAvailable &&
@@ -642,7 +644,7 @@ const EnvironmentalIntelligence: React.FC = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs text-gray-400">Acquisition:</span>
+                      <span className="text-xs text-gray-400">{t('environmental.acquisition', 'Acquisition:')}</span>
                       <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                         {new Date(obs.acquisitionDate).toLocaleDateString('en-IN', {
                           year: 'numeric',
@@ -656,17 +658,17 @@ const EnvironmentalIntelligence: React.FC = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                     <div className="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                        Mean NDVI
+                        {t('environmental.meanNdvi', 'Mean NDVI')}
                       </span>
                       <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">
                         {obs.ndvi.mean.toFixed(2)}
                       </p>
-                      <span className="text-[10px] text-gray-400">Vigor scale 0.0 - 1.0</span>
+                      <span className="text-[10px] text-gray-400">{t('environmental.vigorScale', 'Vigor scale 0.0 - 1.0')}</span>
                     </div>
 
                     <div className="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                        NDVI Range
+                        {t('environmental.ndviRange', 'NDVI Range')}
                       </span>
                       <p className="text-lg font-black text-gray-900 dark:text-white">
                         {obs.ndvi.min.toFixed(2)} - {obs.ndvi.max.toFixed(2)}
@@ -678,22 +680,22 @@ const EnvironmentalIntelligence: React.FC = () => {
 
                     <div className="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                        Cloud Cover
+                        {t('environmental.cloudCover', 'Cloud Cover')}
                       </span>
                       <p className="text-lg font-black text-blue-600 dark:text-blue-400">
                         {obs.cloudCoveragePercentage}%
                       </p>
-                      <span className="text-[10px] text-gray-400">SCL filter applied</span>
+                      <span className="text-[10px] text-gray-400">{t('environmental.sclFilterApplied', 'SCL filter applied')}</span>
                     </div>
 
                     <div className="p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                        Spatial Res
+                        {t('environmental.spatialRes', 'Spatial Res')}
                       </span>
                       <p className="text-lg font-black text-purple-600 dark:text-purple-400">
                         {obs.spatialResolutionMeters}m
                       </p>
-                      <span className="text-[10px] text-gray-400">Ground pixel size</span>
+                      <span className="text-[10px] text-gray-400">{t('environmental.groundPixelSize', 'Ground pixel size')}</span>
                     </div>
                   </div>
                 </div>
@@ -720,30 +722,30 @@ const EnvironmentalIntelligence: React.FC = () => {
 
               <div className="max-w-lg mx-auto p-3 rounded-xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700/60 text-left text-xs space-y-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                  Processing Pipeline Requirements:
+                  {t('environmental.pipelineReqs', 'Processing Pipeline Requirements:')}
                 </span>
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <CheckCircle2 size={13} className="text-primary-500 shrink-0" />
-                  <span>Band 04 (Red, 665nm) at 10m spatial resolution</span>
+                  <span>{t('environmental.reqBand04', 'Band 04 (Red, 665nm) at 10m spatial resolution')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <CheckCircle2 size={13} className="text-primary-500 shrink-0" />
-                  <span>Band 08 (Near-Infrared, 842nm) at 10m spatial resolution</span>
+                  <span>{t('environmental.reqBand08', 'Band 08 (Near-Infrared, 842nm) at 10m spatial resolution')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <CheckCircle2 size={13} className="text-primary-500 shrink-0" />
-                  <span>Scene Classification Layer (SCL) for cloud/cirrus/shadow masking</span>
+                  <span>{t('environmental.reqScl', 'Scene Classification Layer (SCL) for cloud/cirrus/shadow masking')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <CheckCircle2 size={13} className="text-primary-500 shrink-0" />
-                  <span>Geographic Target: Tile T44NPM (Cauvery Delta Basin)</span>
+                  <span>{t('environmental.reqGeo', 'Geographic Target: Tile T44NPM (Cauvery Delta Basin)')}</span>
                 </div>
               </div>
 
               <div className="pt-1">
                 <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 shadow-sm">
                   <Satellite size={13} className="text-blue-500" />
-                  Multispectral Ingestion Pipeline Ready (Awaiting L2A Raster Link)
+                  {t('environmental.pipelineReady', 'Multispectral Ingestion Pipeline Ready (Awaiting L2A Raster Link)')}
                 </span>
               </div>
             </div>
@@ -758,24 +760,23 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
               <FlaskConical size={16} className="text-amber-600 shrink-0" />
               <span>
-                <strong>Regional Soil Benchmark (0–15 cm depth):</strong> Agro-ecological profile
+                <strong>{t('environmental.regionalSoilBenchmark', 'Regional Soil Benchmark (0–15 cm depth):')}</strong> Agro-ecological profile
                 based on published ICAR-TNAU Cauvery Delta regional soil surveys.
                 <strong>
                   {' '}
-                  Illustrative benchmark only — NOT an in-situ certified measurement of an
-                  individual farm boundary.
+                  {t('environmental.illustrativeOnly', 'Illustrative benchmark only — NOT an in-situ certified measurement of an individual farm boundary.')}
                 </strong>
               </span>
             </div>
             <span className="px-2.5 py-0.5 rounded-md bg-amber-200/80 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold text-[10px] tracking-wide uppercase shrink-0">
-              Illustrative Regional Benchmark
+              {t('environmental.illustrativeBenchmarkBadge', 'Illustrative Regional Benchmark')}
             </span>
           </div>
 
           {loadingSoil ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
               <Loader className="animate-spin text-amber-500" size={24} />
-              <span className="text-xs">Loading soil profile...</span>
+              <span className="text-xs">{t('environmental.loadingSoilProfile', 'Loading soil profile...')}</span>
             </div>
           ) : soilProfile ? (
             <div className="space-y-4">
@@ -783,10 +784,7 @@ const EnvironmentalIntelligence: React.FC = () => {
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
                 <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong>Provenance Note:</strong> This profile reflects published ICAR-TNAU
-                  regional classification data for Thanjavur alluvial delta soils (pH 6.4, low
-                  available N). For operational field recommendations, an actual certified farm Soil
-                  Health Card must be uploaded.
+                  <strong>{t('environmental.provenanceNote', 'Provenance Note:')}</strong> {t('environmental.provenanceNoteDesc', 'This profile reflects published ICAR-TNAU regional classification data for Thanjavur alluvial delta soils (pH 6.4, low available N). For operational field recommendations, an actual certified farm Soil Health Card must be uploaded.')}
                 </p>
               </div>
 
@@ -828,37 +826,37 @@ const EnvironmentalIntelligence: React.FC = () => {
                   <p className="text-xl font-black text-amber-600 dark:text-amber-400 mt-1">
                     {soilProfile.ph}
                   </p>
-                  <span className="text-[10px] text-gray-400">Slightly Acidic (Rice)</span>
+                  <span className="text-[10px] text-gray-400">{t('environmental.slightlyAcidicRice', 'Slightly Acidic (Rice)')}</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
-                    Salinity (EC)
+                    {t('environmental.salinityEc', 'Salinity (EC)')}
                   </span>
                   <p className="text-xl font-black text-blue-600 dark:text-blue-400 mt-1">
                     {soilProfile.electricalConductivityDsm}
                   </p>
-                  <span className="text-[10px] text-gray-400">dS/m (Non-saline)</span>
+                  <span className="text-[10px] text-gray-400">{t('environmental.nonSaline', 'dS/m (Non-saline)')}</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
-                    Organic Carbon
+                    {t('environmental.organicCarbon', 'Organic Carbon')}
                   </span>
                   <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
                     {soilProfile.organicCarbonPct}%
                   </p>
-                  <span className="text-[10px] text-gray-400">Medium (0.5 - 0.75%)</span>
+                  <span className="text-[10px] text-gray-400">{t('environmental.mediumOrganicCarbon', 'Medium (0.5 - 0.75%)')}</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
-                    Available N
+                    {t('environmental.availableN', 'Available N')}
                   </span>
                   <p className="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">
                     {soilProfile.availableNitrogenKgHa}
                   </p>
-                  <span className="text-[10px] text-gray-400">kg/ha (Needs Basal N)</span>
+                  <span className="text-[10px] text-gray-400">{t('environmental.needsBasalN', 'kg/ha (Needs Basal N)')}</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
@@ -868,7 +866,7 @@ const EnvironmentalIntelligence: React.FC = () => {
                   <p className="text-xl font-black text-orange-600 dark:text-orange-400 mt-1">
                     {soilProfile.availablePhosphorusKgHa}
                   </p>
-                  <span className="text-[10px] text-gray-400">kg/ha (Adequate)</span>
+                  <span className="text-[10px] text-gray-400">{t('environmental.adequateP', 'kg/ha (Adequate)')}</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
@@ -878,7 +876,7 @@ const EnvironmentalIntelligence: React.FC = () => {
                   <p className="text-xl font-black text-teal-600 dark:text-teal-400 mt-1">
                     {soilProfile.availablePotassiumKgHa}
                   </p>
-                  <span className="text-[10px] text-gray-400">kg/ha (High Reserve)</span>
+                  <span className="text-[10px] text-gray-400">{t('environmental.highReserveK', 'kg/ha (High Reserve)')}</span>
                 </div>
               </div>
             </div>
@@ -897,25 +895,23 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
               <Sprout size={16} className="text-emerald-600 shrink-0" />
               <span>
-                <strong>Archived Directorate of Economics & Statistics (DES) Statistics:</strong>{' '}
-                Ministry of Agriculture & Farmers Welfare, Govt of India.
+                <strong>{t('environmental.archivedDesTitle', 'Archived Directorate of Economics & Statistics (DES) Statistics:')}</strong>{' '}
+                {t('environmental.ministryAgri', 'Ministry of Agriculture & Farmers Welfare, Govt of India.')}
                 <strong>
                   {' '}
-                  Historical record from Agricultural Year 1997–1998 (Whole Year). Macro district
-                  statistic only — NOT a current seasonal yield target or individual farm
-                  productivity label.
+                  {t('environmental.historicalRecordNotice', 'Historical record from Agricultural Year 1997–1998 (Whole Year). Macro district statistic only — NOT a current seasonal yield target or individual farm productivity label.')}
                 </strong>
               </span>
             </div>
             <span className="px-2.5 py-0.5 rounded-md bg-emerald-200/80 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-bold text-[10px] tracking-wide uppercase shrink-0">
-              Archived DES Record (1997–1998)
+              {t('environmental.archivedDesBadge', 'Archived DES Record (1997–1998)')}
             </span>
           </div>
 
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300 flex items-start gap-2">
             <AlertCircle size={15} className="text-emerald-600 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              <strong>Historical Scope Notice:</strong> This official report reflects Agricultural
+              <strong>{t('environmental.historicalScopeNotice', 'Historical Scope Notice:')}</strong> This official report reflects Agricultural
               Year 1997–1998 district-wide production for Thanjavur Rice (181,496 Ha, 489,770
               Tonnes, 2.70 t/Ha). It provides macroeconomic historical context and must not be
               conflated with modern seasonal field targets.
@@ -925,7 +921,7 @@ const EnvironmentalIntelligence: React.FC = () => {
           {loadingApy ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
               <Loader className="animate-spin text-emerald-500" size={24} />
-              <span className="text-xs">Loading official DES agricultural statistics...</span>
+              <span className="text-xs">{t('environmental.loadingDes', 'Loading official DES agricultural statistics...')}</span>
             </div>
           ) : apyRecords.length > 0 ? (
             <div className="space-y-4">
@@ -945,13 +941,13 @@ const EnvironmentalIntelligence: React.FC = () => {
                         </span>
                       </div>
                       <p className="text-[11px] text-gray-400 mt-0.5">
-                        Agricultural Year: <strong>{rec.agriculturalYear}</strong> · Status:{' '}
+                        {t('environmental.agriYear', 'Agricultural Year:')} <strong>{rec.agriculturalYear}</strong> · {t('common.status', 'Status')}:{' '}
                         <strong>{rec.verificationStatus.replace('_', ' ')}</strong>
                       </p>
                     </div>
                     <div className="text-right">
                       <span className="text-[10px] text-gray-400 block">
-                        District Average Yield:
+                        {t('environmental.districtAvgYield', 'District Average Yield:')}
                       </span>
                       <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">
                         {rec.yieldTonnePerHectare}{' '}
@@ -964,32 +960,32 @@ const EnvironmentalIntelligence: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                     <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
-                        Cultivation Area
+                        {t('environmental.cultivationArea', 'Cultivation Area')}
                       </span>
                       <p className="text-lg font-black text-gray-900 dark:text-white mt-1">
                         {rec.areaHectares.toLocaleString()}
                       </p>
-                      <span className="text-[10px] text-gray-400">Hectares harvested</span>
+                      <span className="text-[10px] text-gray-400">{t('environmental.hectaresHarvested', 'Hectares harvested')}</span>
                     </div>
 
                     <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
-                        Total Production
+                        {t('environmental.totalProduction', 'Total Production')}
                       </span>
                       <p className="text-lg font-black text-blue-600 dark:text-blue-400 mt-1">
                         {rec.productionTonnes.toLocaleString()}
                       </p>
-                      <span className="text-[10px] text-gray-400">Tonnes harvested</span>
+                      <span className="text-[10px] text-gray-400">{t('environmental.tonnesHarvested', 'Tonnes harvested')}</span>
                     </div>
 
                     <div className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50">
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
-                        Calculated Ratio
+                        {t('environmental.calculatedRatio', 'Calculated Ratio')}
                       </span>
                       <p className="text-lg font-black text-purple-600 dark:text-purple-400 mt-1">
                         {(rec.productionTonnes / rec.areaHectares).toFixed(2)}
                       </p>
-                      <span className="text-[10px] text-gray-400">P / A consistency check</span>
+                      <span className="text-[10px] text-gray-400">{t('environmental.paConsistencyCheck', 'P / A consistency check')}</span>
                     </div>
                   </div>
                 </div>
@@ -1010,8 +1006,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-purple-800 dark:text-purple-300">
               <BookOpen size={15} className="text-purple-600 shrink-0" />
               <span>
-                <strong>Authoritative Variable Registry:</strong> Single typed source of truth
-                across meteorology, orbital remote sensing, soil chemistry, and on-farm IoT sensors.
+                <strong>{t('environmental.variableRegistryTitle', 'Authoritative Variable Registry:')}</strong> {t('environmental.variableRegistrySubtitle', 'Single typed source of truth across meteorology, orbital remote sensing, soil chemistry, and on-farm IoT sensors.')}
               </span>
             </div>
             <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-semibold text-[11px] shrink-0">
@@ -1023,7 +1018,7 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
               <Loader className="animate-spin text-purple-500" size={24} />
               <span className="text-xs">
-                Loading canonical environmental variable definitions...
+                {t('environmental.loadingRegistry', 'Loading canonical environmental variable definitions...')}
               </span>
             </div>
           ) : (
@@ -1031,12 +1026,12 @@ const EnvironmentalIntelligence: React.FC = () => {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                    <th className="py-2.5 px-3">Variable</th>
-                    <th className="py-2.5 px-3">Category</th>
-                    <th className="py-2.5 px-3">Unit</th>
-                    <th className="py-2.5 px-3">Source Type</th>
-                    <th className="py-2.5 px-3">Valid Range</th>
-                    <th className="py-2.5 px-3">Actuator Safe?</th>
+                    <th className="py-2.5 px-3">{t('environmental.variable', 'Variable')}</th>
+                    <th className="py-2.5 px-3">{t('environmental.category', 'Category')}</th>
+                    <th className="py-2.5 px-3">{t('environmental.unit', 'Unit')}</th>
+                    <th className="py-2.5 px-3">{t('environmental.sourceType', 'Source Type')}</th>
+                    <th className="py-2.5 px-3">{t('environmental.validRange', 'Valid Range')}</th>
+                    <th className="py-2.5 px-3">{t('environmental.actuatorSafe', 'Actuator Safe?')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
@@ -1070,11 +1065,11 @@ const EnvironmentalIntelligence: React.FC = () => {
                       <td className="py-2.5 px-3">
                         {v.safeForActuatorCoupling ? (
                           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                            <ShieldCheck size={12} /> Yes (Direct In-Situ)
+                            <ShieldCheck size={12} /> {t('environmental.yesDirectInSitu', 'Yes (Direct In-Situ)')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-500">
-                            <AlertTriangle size={12} /> Decoupled
+                            <AlertTriangle size={12} /> {t('environmental.decoupled', 'Decoupled')}
                           </span>
                         )}
                       </td>
@@ -1091,11 +1086,7 @@ const EnvironmentalIntelligence: React.FC = () => {
       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex items-start gap-2 text-[11px] text-gray-400 dark:text-gray-500">
         <AlertTriangle size={13} className="text-amber-500 shrink-0 mt-0.5" />
         <span>
-          <strong>Operational Safeguard:</strong> Reanalysis weather estimates, satellite NDVI, and
-          district statistical benchmarks are displayed for macro-climatic and contextual
-          monitoring. In accordance with safety rules, they are strictly decoupled from automated
-          closed-loop irrigation actuators until physical on-farm capacitive sensor ground truth is
-          verified.
+          <strong>{t('environmental.operationalSafeguard', 'Operational Safeguard:')}</strong> {t('environmental.operationalSafeguardDesc', 'Reanalysis weather estimates, satellite NDVI, and district statistical benchmarks are displayed for macro-climatic and contextual monitoring. In accordance with safety rules, they are strictly decoupled from automated closed-loop irrigation actuators until physical on-farm capacitive sensor ground truth is verified.')}
         </span>
       </div>
     </div>

@@ -175,15 +175,15 @@ const Settings: React.FC = () => {
   };
 
   const sidebarItems: { key: Section; label: string; icon: React.ElementType; badge?: string }[] = [
-    { key: 'profile', label: 'Profile', icon: User },
-    { key: 'appearance', label: 'Appearance', icon: isDark ? Moon : Sun },
-    { key: 'language', label: 'Language', icon: Globe },
-    { key: 'notifications', label: 'Notifications', icon: Bell },
-    { key: 'security', label: 'Security', icon: Shield },
-    { key: 'subscription', label: 'Subscription', icon: CreditCard, badge: 'PRO' },
-    { key: 'devices', label: 'IoT Devices', icon: Wifi },
-    { key: 'activity', label: 'Activity Log', icon: Activity },
-    { key: 'data', label: 'Data & Privacy', icon: Database },
+    { key: 'profile', label: t('settings.profile', 'Profile'), icon: User },
+    { key: 'appearance', label: t('settings.theme', 'Appearance'), icon: isDark ? Moon : Sun },
+    { key: 'language', label: t('settings.language', 'Language'), icon: Globe },
+    { key: 'notifications', label: t('settings.notifications', 'Notifications'), icon: Bell },
+    { key: 'security', label: t('settings.security', 'Security'), icon: Shield },
+    { key: 'subscription', label: t('settings.subscription', 'Subscription'), icon: CreditCard, badge: 'PRO' },
+    { key: 'devices', label: t('settings.devices', 'Connected Devices'), icon: Wifi },
+    { key: 'activity', label: t('settings.activity', 'Activity Log'), icon: Activity },
+    { key: 'data', label: t('settings.security', 'Data & Privacy'), icon: Database },
   ];
 
   return (
@@ -192,12 +192,12 @@ const Settings: React.FC = () => {
         <div>
           <h1 className="page-header text-gradient font-extrabold">{t('settings.title')}</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">
-            Manage your premium AgriFlux farm account preferences
+            {t('settings.subtitle', 'Manage your premium AgriFlux farm account preferences')}
           </p>
         </div>
         <div className="flex items-center justify-center md:justify-start gap-2">
           <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
-            ⭐ Premium Account
+            ⭐ {t('settings.premiumAccount', 'Premium Account')}
           </span>
         </div>
       </div>
@@ -234,7 +234,7 @@ const Settings: React.FC = () => {
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 w-full"
               >
                 <LogOut size={15} />
-                <span className="flex-1 text-left">Sign Out</span>
+                <span className="flex-1 text-left">{t('settings.signOutNow', 'Sign Out')}</span>
               </button>
             </div>
           </div>
@@ -263,10 +263,10 @@ const Settings: React.FC = () => {
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-2 py-0.5 rounded text-[10px] font-bold">
-                      VERIFIED FARMER
+                      {t('settings.verifiedFarmer', 'VERIFIED FARMER')}
                     </span>
                     <span className="text-[10px] text-green-600 font-bold uppercase tracking-widest">
-                      PRO PLAN
+                      {t('settings.proPlan', 'PRO PLAN')}
                     </span>
                   </div>
                 </div>
@@ -274,14 +274,14 @@ const Settings: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { key: 'name', label: 'Full Name', placeholder: 'Enter your name' },
-                  { key: 'email', label: 'Email', placeholder: 'your@email.com', type: 'email' },
-                  { key: 'phone', label: 'Phone', placeholder: '+91 9876543210', type: 'tel' },
-                  { key: 'farmName', label: 'Farm Name', placeholder: 'Green Valley Farm' },
-                  { key: 'location', label: 'Location', placeholder: 'Karnataka, India' },
-                  { key: 'cropTypes', label: 'Primary Crops', placeholder: 'Rice, Wheat, Corn' },
-                  { key: 'farmSize', label: 'Farm Size (ha)', placeholder: '4.2', type: 'number' },
-                  { key: 'soilType', label: 'Primary Soil Type', placeholder: 'Loamy' },
+                  { key: 'name', label: t('settings.fullName', 'Full Name'), placeholder: 'Enter your name' },
+                  { key: 'email', label: t('settings.email', 'Email'), placeholder: 'your@email.com', type: 'email' },
+                  { key: 'phone', label: t('settings.phone', 'Phone'), placeholder: '+91 9876543210', type: 'tel' },
+                  { key: 'farmName', label: t('settings.farmName', 'Farm Name'), placeholder: 'Green Valley Farm' },
+                  { key: 'location', label: t('settings.location', 'Location'), placeholder: 'Karnataka, India' },
+                  { key: 'cropTypes', label: t('settings.cropTypes', 'Primary Crops'), placeholder: 'Rice, Wheat, Corn' },
+                  { key: 'farmSize', label: t('settings.farmSize', 'Farm Size (ha)'), placeholder: '4.2', type: 'number' },
+                  { key: 'soilType', label: t('settings.soilType', 'Primary Soil Type'), placeholder: 'Loamy' },
                 ].map((f) => (
                   <div key={f.key}>
                     <label className="label">{f.label}</label>
@@ -299,7 +299,7 @@ const Settings: React.FC = () => {
               <button onClick={handleSave} className="btn-primary flex items-center gap-2">
                 {saved ? (
                   <>
-                    <CheckCircle size={16} /> Saved!
+                    <CheckCircle size={16} /> {t('settings.saved', 'Saved!')}
                   </>
                 ) : (
                   <>
@@ -317,16 +317,16 @@ const Settings: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   {
-                    label: 'Light Mode',
+                    label: t('settings.lightMode', 'Light Mode'),
                     value: 'light',
                     icon: Sun,
-                    desc: 'Clean, bright interface for daytime use',
+                    desc: t('settings.lightModeDesc', 'Clean, bright interface for daytime use'),
                   },
                   {
-                    label: 'Dark Mode',
+                    label: t('settings.darkMode', 'Dark Mode'),
                     value: 'dark',
                     icon: Moon,
-                    desc: 'Easy on the eyes for night-time use',
+                    desc: t('settings.darkModeDesc', 'Easy on the eyes for night-time use'),
                   },
                 ].map((opt) => (
                   <button
@@ -364,15 +364,19 @@ const Settings: React.FC = () => {
 
               <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                  Display Density
+                  {t('settings.displayDensity', 'Display Density')}
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
-                  {['Compact', 'Default', 'Comfortable'].map((d) => (
+                  {[
+                    { key: 'Compact', label: t('settings.compact', 'Compact') },
+                    { key: 'Default', label: t('settings.default', 'Default') },
+                    { key: 'Comfortable', label: t('settings.comfortable', 'Comfortable') },
+                  ].map((d) => (
                     <button
-                      key={d}
-                      className={`p-3 rounded-xl border-2 text-sm font-semibold transition-all ${d === 'Default' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700' : 'border-gray-200 dark:border-gray-600 text-gray-500 hover:border-gray-300'}`}
+                      key={d.key}
+                      className={`p-3 rounded-xl border-2 text-sm font-semibold transition-all ${d.key === 'Default' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700' : 'border-gray-200 dark:border-gray-600 text-gray-500 hover:border-gray-300'}`}
                     >
-                      {d}
+                      {d.label}
                     </button>
                   ))}
                 </div>
@@ -413,48 +417,48 @@ const Settings: React.FC = () => {
           {/* Notifications */}
           {activeSection === 'notifications' && (
             <div className="space-y-4">
-              <h3 className="section-header">Notification Preferences</h3>
+              <h3 className="section-header">{t('settings.notificationPreferences', 'Notification Preferences')}</h3>
               <div className="space-y-2">
                 {[
                   {
                     key: 'yieldAlerts',
-                    label: 'Yield Prediction Alerts',
-                    sub: 'Get notified when AI predicts yield changes',
+                    label: t('settings.yieldAlerts', 'Yield Prediction Alerts'),
+                    sub: t('settings.yieldAlertsSub', 'Get notified when AI predicts yield changes'),
                   },
                   {
                     key: 'irrigationReminders',
-                    label: 'Irrigation Reminders',
-                    sub: 'Scheduled irrigation notifications',
+                    label: t('settings.irrigationReminders', 'Irrigation Reminders'),
+                    sub: t('settings.irrigationRemindersSub', 'Scheduled irrigation notifications'),
                   },
                   {
                     key: 'climateRiskAlerts',
-                    label: 'Climate Risk Alerts',
-                    sub: 'Severe weather and drought warnings',
+                    label: t('settings.climateRiskAlerts', 'Climate Risk Alerts'),
+                    sub: t('settings.climateRiskAlertsSub', 'Severe weather and drought warnings'),
                   },
                   {
                     key: 'consultationReminders',
-                    label: 'Consultation Reminders',
-                    sub: 'Upcoming expert session reminders',
+                    label: t('settings.consultationReminders', 'Consultation Reminders'),
+                    sub: t('settings.consultationRemindersSub', 'Upcoming expert session reminders'),
                   },
                   {
                     key: 'soilHealthReports',
-                    label: 'Soil Health Reports',
-                    sub: 'Weekly soil analysis summaries',
+                    label: t('settings.soilHealthReports', 'Soil Health Reports'),
+                    sub: t('settings.soilHealthReportsSub', 'Weekly soil analysis summaries'),
                   },
                   {
                     key: 'marketPriceUpdates',
-                    label: 'Market Price Updates',
-                    sub: 'Crop market price notifications',
+                    label: t('settings.marketPriceUpdates', 'Market Price Updates'),
+                    sub: t('settings.marketPriceUpdatesSub', 'Crop market price notifications'),
                   },
                   {
                     key: 'weeklyDigest',
-                    label: 'Weekly AI Digest',
-                    sub: 'Weekly summary of farm performance',
+                    label: t('settings.weeklyDigest', 'Weekly AI Digest'),
+                    sub: t('settings.weeklyDigestSub', 'Weekly summary of farm performance'),
                   },
                   {
                     key: 'pushNotifications',
-                    label: 'Push Notifications',
-                    sub: 'Allow push notifications on this device',
+                    label: t('settings.pushNotifications', 'Push Notifications'),
+                    sub: t('settings.pushNotificationsSub', 'Allow push notifications on this device'),
                   },
                 ].map((n) => (
                   <div
@@ -489,10 +493,10 @@ const Settings: React.FC = () => {
           {/* Security */}
           {activeSection === 'security' && (
             <div className="space-y-5">
-              <h3 className="section-header">Security Settings</h3>
+              <h3 className="section-header">{t('settings.securitySettings', 'Security Settings')}</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="label">Current Password</label>
+                  <label className="label">{t('settings.currentPassword', 'Current Password')}</label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -508,42 +512,42 @@ const Settings: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="label">New Password</label>
+                  <label className="label">{t('settings.newPassword', 'New Password')}</label>
                   <input type="password" className="input-field" placeholder="••••••••" />
                 </div>
                 <div>
-                  <label className="label">Confirm New Password</label>
+                  <label className="label">{t('settings.confirmNewPassword', 'Confirm New Password')}</label>
                   <input type="password" className="input-field" placeholder="••••••••" />
                 </div>
                 <button className="btn-primary flex items-center gap-2">
                   <Lock size={16} />
-                  Update Password
+                  {t('settings.updatePassword', 'Update Password')}
                 </button>
               </div>
 
               <div className="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
                 <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  Two-Factor Authentication
+                  {t('settings.twoFactorAuth', 'Two-Factor Authentication')}
                 </h4>
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700">
                   <div>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Enable 2FA
+                      {t('settings.enable2fa', 'Enable 2FA')}
                     </p>
                     <p className="text-xs text-gray-500">
-                      Extra layer of security for your account
+                      {t('settings.enable2faSub', 'Extra layer of security for your account')}
                     </p>
                   </div>
-                  <button className="btn-outline text-sm py-1.5 px-3">Enable</button>
+                  <button className="btn-outline text-sm py-1.5 px-3">{t('settings.enable', 'Enable')}</button>
                 </div>
                 <div className="p-3 bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800 rounded-xl flex items-center gap-3">
                   <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
                   <div>
                     <p className="text-xs font-bold text-green-700 dark:text-green-400">
-                      AES-256 Encryption Active
+                      {t('settings.encryptionActive', 'AES-256 Encryption Active')}
                     </p>
                     <p className="text-xs text-green-600 dark:text-green-500">
-                      All your farm data is fully encrypted at rest and in transit.
+                      {t('settings.encryptionDesc', 'All your farm data is fully encrypted at rest and in transit.')}
                     </p>
                   </div>
                 </div>
@@ -552,10 +556,14 @@ const Settings: React.FC = () => {
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                      Active Device Session
+                      {t('settings.activeSession', 'Active Device Session')}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      Signed in as <span className="font-semibold text-gray-700 dark:text-gray-300">{user?.name || user?.email || 'User'}</span> ({user?.role?.toUpperCase() || 'FARMER'})
+                      {t('settings.signedInAs', 'Signed in as')}{' '}
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">
+                        {user?.name || user?.email || 'User'}
+                      </span>{' '}
+                      ({user?.role?.toUpperCase() || 'FARMER'})
                     </p>
                   </div>
                   <button
@@ -564,7 +572,7 @@ const Settings: React.FC = () => {
                     className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl transition-all border border-red-200 dark:border-red-800 cursor-pointer flex-shrink-0"
                   >
                     <LogOut size={14} />
-                    Sign Out Now
+                    {t('settings.signOutNow', 'Sign Out Now')}
                   </button>
                 </div>
               </div>
@@ -574,25 +582,25 @@ const Settings: React.FC = () => {
           {/* Subscription */}
           {activeSection === 'subscription' && (
             <div className="space-y-5">
-              <h3 className="section-header">Subscription & Billing</h3>
+              <h3 className="section-header">{t('settings.subscriptionBilling', 'Subscription & Billing')}</h3>
               <div className="p-4 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-widest opacity-70">
-                      Current Plan
+                      {t('settings.currentPlan', 'Current Plan')}
                     </p>
-                    <p className="text-2xl font-black mt-1">AgriFlux Pro ⭐</p>
-                    <p className="text-sm opacity-80 mt-1">₹2,499 / year · Renews Jan 2027</p>
+                    <p className="text-2xl font-black mt-1">{t('settings.planPro', 'AgriFlux Pro')} ⭐</p>
+                    <p className="text-sm opacity-80 mt-1">{t('settings.annualPlanDesc', '₹2,499 / year · Renews Jan 2027')}</p>
                   </div>
                   <Package size={40} className="opacity-20" />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {[
-                    'Unlimited AI Reports',
-                    'IoT Device Sync',
-                    'Priority Support',
-                    'Market Analytics',
-                    'Expert Consultation',
+                    t('settings.unlimitedAiReports', 'Unlimited AI Reports'),
+                    t('settings.iotDeviceSync', 'IoT Device Sync'),
+                    t('settings.prioritySupport', 'Priority Support'),
+                    t('settings.marketAnalytics', 'Market Analytics'),
+                    t('settings.expertConsultation', 'Expert Consultation'),
                   ].map((f) => (
                     <span
                       key={f}
@@ -606,17 +614,17 @@ const Settings: React.FC = () => {
 
               <div className="space-y-2">
                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                  Recent Invoices
+                  {t('settings.recentInvoices', 'Recent Invoices')}
                 </h4>
                 {[
-                  { date: 'Jan 15, 2026', amount: '₹2,499', status: 'Paid', plan: 'Annual Pro' },
+                  { date: 'Jan 15, 2026', amount: '₹2,499', status: t('settings.paid', 'Paid'), plan: 'Annual Pro' },
                   {
                     date: 'Jan 15, 2025',
                     amount: '₹1,999',
-                    status: 'Paid',
+                    status: t('settings.paid', 'Paid'),
                     plan: 'Annual Standard',
                   },
-                  { date: 'Jan 15, 2024', amount: '₹1,499', status: 'Paid', plan: 'Annual Basic' },
+                  { date: 'Jan 15, 2024', amount: '₹1,499', status: t('settings.paid', 'Paid'), plan: 'Annual Basic' },
                 ].map((inv) => (
                   <div
                     key={inv.date}
@@ -644,11 +652,11 @@ const Settings: React.FC = () => {
               <div className="flex gap-3">
                 <button className="btn-primary flex items-center gap-2 flex-1 justify-center">
                   <RefreshCw size={16} />
-                  Manage Subscription
+                  {t('settings.manageSubscription', 'Manage Subscription')}
                 </button>
                 <button className="btn-outline flex items-center gap-2">
                   <CreditCard size={16} />
-                  Update Payment
+                  {t('settings.updatePayment', 'Update Payment')}
                 </button>
               </div>
             </div>
@@ -658,9 +666,9 @@ const Settings: React.FC = () => {
           {activeSection === 'devices' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="section-header">Connected IoT Devices</h3>
+                <h3 className="section-header">{t('settings.connectedDevices', 'Connected IoT Devices')}</h3>
                 <span className="text-xs font-bold text-primary-600 bg-primary-50 dark:bg-primary-900/20 px-2 py-1 rounded-lg">
-                  {IOT_DEVICES.filter((d) => d.status === 'online').length} Online
+                  {IOT_DEVICES.filter((d) => d.status === 'online').length} {t('settings.online', 'Online')}
                 </span>
               </div>
               <div className="space-y-2">
@@ -678,12 +686,12 @@ const Settings: React.FC = () => {
                         <span
                           className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${device.status === 'online' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}
                         >
-                          {device.status}
+                          {device.status === 'online' ? t('settings.online', 'Online') : t('settings.offline', 'Offline')}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
                         <span className="text-xs text-gray-400">{device.id}</span>
-                        <span className="text-xs text-gray-400">Synced {device.lastSync}</span>
+                        <span className="text-xs text-gray-400">{t('settings.synced', 'Synced')} {device.lastSync}</span>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
@@ -700,7 +708,7 @@ const Settings: React.FC = () => {
                         </span>
                       </div>
                       {device.battery < 20 && (
-                        <p className="text-[10px] text-red-500 font-bold">Low Battery</p>
+                        <p className="text-[10px] text-red-500 font-bold">{t('settings.lowBattery', 'Low Battery')}</p>
                       )}
                     </div>
                     <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
@@ -708,7 +716,7 @@ const Settings: React.FC = () => {
                 ))}
               </div>
               <button className="w-full py-2.5 border-2 border-dashed border-gray-200 dark:border-gray-700 text-gray-500 text-sm font-semibold rounded-xl hover:border-primary-400 hover:text-primary-600 transition-all">
-                + Pair New Device
+                {t('settings.pairNewDevice', '+ Pair New Device')}
               </button>
             </div>
           )}
@@ -717,10 +725,10 @@ const Settings: React.FC = () => {
           {activeSection === 'activity' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="section-header">Recent Activity</h3>
+                <h3 className="section-header">{t('settings.recentActivity', 'Recent Activity')}</h3>
                 <button className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
                   <Download size={12} />
-                  Export Log
+                  {t('settings.exportLog', 'Export Log')}
                 </button>
               </div>
               <div className="space-y-2">
@@ -745,8 +753,7 @@ const Settings: React.FC = () => {
               <div className="p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800 rounded-xl flex items-start gap-2">
                 <Activity size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-blue-700 dark:text-blue-300">
-                  Activity logs are retained for 90 days. For compliance purposes, export a full log
-                  before deletion.
+                  {t('settings.activityRetentionDesc', 'Activity logs are retained for 90 days. For compliance purposes, export a full log before deletion.')}
                 </p>
               </div>
             </div>
@@ -755,26 +762,25 @@ const Settings: React.FC = () => {
           {/* Data & Privacy */}
           {activeSection === 'data' && (
             <div className="space-y-5">
-              <h3 className="section-header">Data & Privacy</h3>
+              <h3 className="section-header">{t('settings.dataPrivacy', 'Data & Privacy')}</h3>
 
               <div className="space-y-3">
-                <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">Data Export</h4>
+                <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('settings.dataExport', 'Data Export')}</h4>
                 <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700">
                   <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
-                    Download My Farm Data
+                    {t('settings.downloadFarmData', 'Download My Farm Data')}
                   </p>
                   <p className="text-xs text-gray-500 mb-3">
-                    Export all your farm reports, soil analysis, yield predictions, and consultation
-                    history in JSON or PDF format.
+                    {t('settings.downloadFarmDataDesc', 'Export all your farm reports, soil analysis, yield predictions, and consultation history in JSON or PDF format.')}
                   </p>
                   <div className="flex gap-2">
                     <button className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1">
                       <Download size={12} />
-                      Export as JSON
+                      {t('settings.exportJson', 'Export as JSON')}
                     </button>
                     <button className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1">
                       <Download size={12} />
-                      Export as PDF
+                      {t('settings.exportPdf', 'Export as PDF')}
                     </button>
                   </div>
                 </div>
@@ -782,12 +788,12 @@ const Settings: React.FC = () => {
 
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                  Storage Usage
+                  {t('settings.storageUsage', 'Storage Usage')}
                 </h4>
                 <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Used Storage
+                      {t('settings.usedStorage', 'Used Storage')}
                     </span>
                     <span className="text-sm font-bold text-gray-900 dark:text-white">
                       2.4 GB / 10 GB
@@ -799,15 +805,15 @@ const Settings: React.FC = () => {
                   <div className="flex gap-4 mt-2 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
                       <HardDrive size={10} />
-                      Reports: 1.2 GB
+                      {t('settings.reportsStorage', 'Reports')}: 1.2 GB
                     </span>
                     <span className="flex items-center gap-1">
                       <HardDrive size={10} />
-                      Images: 0.9 GB
+                      {t('settings.imagesStorage', 'Images')}: 0.9 GB
                     </span>
                     <span className="flex items-center gap-1">
                       <HardDrive size={10} />
-                      Other: 0.3 GB
+                      {t('settings.otherStorage', 'Other')}: 0.3 GB
                     </span>
                   </div>
                 </div>
@@ -815,22 +821,22 @@ const Settings: React.FC = () => {
 
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                  Privacy Controls
+                  {t('settings.privacyControls', 'Privacy Controls')}
                 </h4>
                 {[
                   {
-                    label: 'Share anonymized data for AI training',
-                    sub: 'Help improve AgriFlux AI models',
+                    label: t('settings.shareAnonymized', 'Share anonymized data for AI training'),
+                    sub: t('settings.shareAnonymizedSub', 'Help improve AgriFlux AI models'),
                     on: true,
                   },
                   {
-                    label: 'Location access for Satellite Mapping',
-                    sub: 'Required for accurate farm mapping',
+                    label: t('settings.locationAccess', 'Location access for Satellite Mapping'),
+                    sub: t('settings.locationAccessSub', 'Required for accurate farm mapping'),
                     on: true,
                   },
                   {
-                    label: 'Marketing communications',
-                    sub: 'Receive product updates and offers',
+                    label: t('settings.marketingComm', 'Marketing communications'),
+                    sub: t('settings.marketingCommSub', 'Receive product updates and offers'),
                     on: false,
                   },
                 ].map((item, i) => (
@@ -858,18 +864,17 @@ const Settings: React.FC = () => {
               <div className="pt-4 border-t border-red-100 dark:border-red-900/30 space-y-3">
                 <h4 className="text-sm font-bold text-red-600 flex items-center gap-2">
                   <AlertTriangle size={14} />
-                  Danger Zone
+                  {t('settings.dangerZone', 'Danger Zone')}
                 </h4>
                 <div className="p-3 border border-red-200 dark:border-red-800 rounded-xl">
                   <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                    Delete My Account
+                    {t('settings.deleteAccount', 'Delete My Account')}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5 mb-3">
-                    Permanently delete your account and all associated farm data. This action cannot
-                    be undone.
+                    {t('settings.deleteAccountDesc', 'Permanently delete your account and all associated farm data. This action cannot be undone.')}
                   </p>
                   <button className="flex items-center gap-2 text-xs font-bold text-red-600 border border-red-300 dark:border-red-700 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
-                    <Trash2 size={13} /> Delete Account
+                    <Trash2 size={13} /> {t('settings.deleteAccount', 'Delete Account')}
                   </button>
                 </div>
               </div>

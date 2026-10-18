@@ -315,7 +315,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <Search size={14} className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t('header.searchPlaceholder', 'Search fields, advisories, tools...')}
             value={searchQuery}
             onFocus={() => setSearchOpen(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -338,7 +338,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               {searchQuery ? `Results for "${searchQuery}"` : 'Quick Navigate'}
             </p>
             {filteredSearch.length === 0 ? (
-              <p className="px-4 py-3 text-sm text-gray-500">No results found.</p>
+              <p className="px-4 py-3 text-sm text-gray-500">{t('common.noResults', 'No results found.')}</p>
             ) : (
               filteredSearch.map((item) => (
                 <button
@@ -380,7 +380,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           title="Generate Smart Farm Report"
         >
           <Sparkles size={14} className="text-yellow-200 animate-pulse flex-shrink-0" />
-          <span className="font-bold">AI Report</span>
+          <span className="font-bold">{t('header.aiReport', 'AI Report')}</span>
         </button>
 
         {/* Notifications Bell */}
@@ -489,7 +489,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                       onClick={() => setSelectedNotif(null)}
                       className="btn-primary w-full mt-4 text-xs font-bold py-2 shadow-glow-green"
                     >
-                      Got it
+                      {t('common.gotIt', 'Got it')}
                     </button>
                   </div>
                 )}
@@ -595,10 +595,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     </p>
                     <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40 dark:border-emerald-700/40">
                       {user?.role === 'agronomist'
-                        ? '🔬 Senior Agronomist'
+                        ? `🔬 ${t('header.seniorAgronomist', 'Senior Agronomist')}`
                         : user?.role === 'admin'
-                          ? '🛡️ System Admin'
-                          : '🌾 Verified Farmer'}
+                          ? `🛡️ ${t('header.systemAdmin', 'System Admin')}`
+                          : `🌾 ${t('header.verifiedFarmer', 'Verified Farmer')}`}
                     </span>
                   </div>
                 </div>
@@ -621,7 +621,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
                 >
                   <LayoutDashboard size={16} className="text-emerald-600 dark:text-emerald-400" />
-                  <span>Workspace Dashboard</span>
+                  <span>{t('header.workspaceDashboard', 'Workspace Dashboard')}</span>
                   <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
@@ -634,7 +634,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
                 >
                   <Settings size={16} className="text-gray-500 dark:text-gray-400" />
-                  <span>Account & Preferences</span>
+                  <span>{t('header.accountPreferences', 'Account & Preferences')}</span>
                   <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>
@@ -655,8 +655,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     <LogOut size={14} className="text-red-600 dark:text-red-400" />
                   </div>
                   <div className="text-left flex-1">
-                    <p className="leading-tight">Sign Out</p>
-                    <p className="text-[10px] text-gray-400 font-normal">Terminate session</p>
+                    <p className="leading-tight">{t('common.signOut', 'Sign Out')}</p>
+                    <p className="text-[10px] text-gray-400 font-normal">{t('header.endSession', 'Terminate session')}</p>
                   </div>
                 </button>
               </div>

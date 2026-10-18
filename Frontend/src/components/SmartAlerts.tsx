@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Bell, CloudRain, TrendingUp, Lightbulb, ChevronRight, Info } from 'lucide-react';
 import { useRealisticData } from '../hooks/useRealisticData';
 
@@ -13,6 +14,7 @@ interface Alert {
 }
 
 const SmartAlerts: React.FC = () => {
+  const { t } = useTranslation();
   const data = useRealisticData();
 
   const alerts: Alert[] = useMemo(() => {
@@ -23,8 +25,8 @@ const SmartAlerts: React.FC = () => {
       list.push({
         id: 'weather-1',
         type: 'warning',
-        title: 'High Rainfall Expected',
-        message: 'Heavy rain predicted within 48h. Ensure drainage channels are clear.',
+        title: t('notifications.highRainfallTitle', 'High Rainfall Expected'),
+        message: t('notifications.highRainfallMsg', 'Heavy rain predicted within 48h. Ensure drainage channels are clear.'),
         icon: <CloudRain size={16} />,
         color: 'text-blue-600',
         bg: 'bg-blue-50 dark:bg-blue-900/20',
@@ -36,8 +38,8 @@ const SmartAlerts: React.FC = () => {
       list.push({
         id: 'soil-1',
         type: 'info',
-        title: 'Soil pH Adjustment',
-        message: 'Soil is slightly acidic. Recommended: 50kg/ha Lime application.',
+        title: t('notifications.soilPhTitle', 'Soil pH Adjustment'),
+        message: t('notifications.soilPhMsg', 'Soil is slightly acidic. Recommended: 50kg/ha Lime application.'),
         icon: <Lightbulb size={16} />,
         color: 'text-gold-600',
         bg: 'bg-gold-50 dark:bg-gold-900/20',
@@ -49,8 +51,11 @@ const SmartAlerts: React.FC = () => {
       list.push({
         id: 'market-1',
         type: 'market',
-        title: 'Market Demand Surge',
-        message: `${data.crop} demand is peaking in ${data.bestMarket.split(' ')[0]}. Sell now for max profit.`,
+        title: t('notifications.marketSurgeTitle', 'Market Demand Surge'),
+        message: t('notifications.marketSurgeMsg', '{{crop}} demand is peaking in {{market}}. Sell now for max profit.', {
+          crop: data.crop,
+          market: data.bestMarket.split(' ')[0],
+        }),
         icon: <TrendingUp size={16} />,
         color: 'text-primary-600',
         bg: 'bg-primary-50 dark:bg-primary-900/20',
@@ -61,15 +66,15 @@ const SmartAlerts: React.FC = () => {
     list.push({
       id: 'info-1',
       type: 'info',
-      title: 'Precision Watering',
-      message: 'Optimal irrigation window: Tonight 10 PM. Save 12% water today.',
+      title: t('notifications.wateringTitle', 'Precision Watering'),
+      message: t('notifications.wateringMsg', 'Optimal irrigation window: Tonight 10 PM. Save 12% water today.'),
       icon: <Info size={16} />,
       color: 'text-gray-600',
       bg: 'bg-gray-50 dark:bg-gray-700/30',
     });
 
     return list;
-  }, [data.rainfall, data.soilPh, data.demandScore, data.crop, data.bestMarket]);
+  }, [data.rainfall, data.soilPh, data.demandScore, data.crop, data.bestMarket, t]);
 
   return (
     <div className="card h-full">
@@ -78,9 +83,11 @@ const SmartAlerts: React.FC = () => {
           <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600">
             <Bell size={18} className="animate-swing" />
           </div>
-          <h3 className="section-header">Live Intelligence Alerts</h3>
+          <h3 className="section-header">{t('notifications.liveAlerts', 'Live Intelligence Alerts')}</h3>
         </div>
-        <span className="text-[10px] font-bold text-gray-400 uppercase">{alerts.length} New</span>
+        <span className="text-[10px] font-bold text-gray-400 uppercase">
+          {alerts.length} {t('notifications.new', 'New')}
+        </span>
       </div>
 
       <div className="space-y-3">
@@ -108,7 +115,7 @@ const SmartAlerts: React.FC = () => {
       </div>
 
       <button className="mt-4 w-full py-2.5 text-xs font-bold text-gray-400 hover:text-primary-600 transition-colors flex items-center justify-center gap-1.5 border-t border-gray-100 dark:border-gray-800">
-        View All Notification History
+        {t('notifications.viewAllHistory', 'View All Notification History')}
       </button>
     </div>
   );

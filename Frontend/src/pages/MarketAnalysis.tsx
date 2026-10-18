@@ -468,7 +468,7 @@ const MarketAnalysis: React.FC = () => {
                     <TrendingUp size={10} /> {t('market.gainers')}
                   </p>
                   <div className="flex justify-between items-end">
-                    <span className="text-sm font-bold">Tomato (Nashik)</span>
+                    <span className="text-sm font-bold">{t('market.tomatoNashik', 'Tomato (Nashik)')}</span>
                     <span className="text-lg font-black text-green-500">+18.4%</span>
                   </div>
                 </div>
@@ -477,7 +477,7 @@ const MarketAnalysis: React.FC = () => {
                     <TrendingDown size={10} /> {t('market.losers')}
                   </p>
                   <div className="flex justify-between items-end">
-                    <span className="text-sm font-bold">Onion (Maharashtra)</span>
+                    <span className="text-sm font-bold">{t('market.onionMaharashtra', 'Onion (Maharashtra)')}</span>
                     <span className="text-lg font-black text-red-500">-12.1%</span>
                   </div>
                 </div>

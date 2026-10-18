@@ -94,10 +94,10 @@ const ClimateSimulator: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Controls */}
         <div className="card border border-yellow-200/50 dark:border-yellow-800/30 space-y-5">
-          <h3 className="section-header text-gold-700 dark:text-gold-400">Scenario Controls</h3>
+          <h3 className="section-header text-gold-700 dark:text-gold-400">{t('simulator.scenarioControls', 'Scenario Controls')}</h3>
 
           <div>
-            <label className="label">Crop</label>
+            <label className="label">{t('simulator.crop', 'Crop')}</label>
             <select className="input-field" value={crop} onChange={(e) => setCrop(e.target.value)}>
               {Object.keys(BASE_YIELD).map((c) => (
                 <option key={c}>{c}</option>
@@ -107,7 +107,7 @@ const ClimateSimulator: React.FC = () => {
 
           <div>
             <div className="flex justify-between mb-1">
-              <label className="label mb-0">🌧️ Rainfall Change</label>
+              <label className="label mb-0">🌧️ {t('simulator.rainfallChange', 'Rainfall Change')}</label>
               <span
                 className={`text-sm font-bold ${rainfallChange >= 0 ? 'text-blue-500' : 'text-red-500'}`}
               >
@@ -131,7 +131,7 @@ const ClimateSimulator: React.FC = () => {
 
           <div>
             <div className="flex justify-between mb-1">
-              <label className="label mb-0">🌡️ Temperature Change</label>
+              <label className="label mb-0">🌡️ {t('simulator.tempChange', 'Temperature Change')}</label>
               <span
                 className={`text-sm font-bold ${tempChange > 2 ? 'text-red-500' : 'text-orange-500'}`}
               >
@@ -155,17 +155,17 @@ const ClimateSimulator: React.FC = () => {
 
           <div>
             <div className="flex justify-between mb-1">
-              <label className="label mb-0">☀️ Drought Severity</label>
+              <label className="label mb-0">☀️ {t('simulator.droughtSeverity', 'Drought Severity')}</label>
               <span
                 className={`text-sm font-bold ${drought > 1 ? 'text-red-500' : drought > 0 ? 'text-yellow-500' : 'text-primary-500'}`}
               >
                 {drought === 0
-                  ? 'None'
+                  ? t('simulator.none', 'None')
                   : drought <= 1
-                    ? 'Mild'
+                    ? t('simulator.mild', 'Mild')
                     : drought <= 2
-                      ? 'Moderate'
-                      : 'Severe'}
+                      ? t('simulator.moderate', 'Moderate')
+                      : t('simulator.severe', 'Severe')}
               </span>
             </div>
             <input
@@ -178,8 +178,8 @@ const ClimateSimulator: React.FC = () => {
               className="w-full accent-red-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-0.5">
-              <span>None</span>
-              <span>Severe</span>
+              <span>{t('simulator.none', 'None')}</span>
+              <span>{t('simulator.severe', 'Severe')}</span>
             </div>
           </div>
 
@@ -187,12 +187,12 @@ const ClimateSimulator: React.FC = () => {
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Simulating...
+                {t('simulator.simulating', 'Simulating...')}
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
                 <Play size={16} />
-                Run Simulation
+                {t('simulator.runSimulation', 'Run Simulation')}
               </span>
             )}
           </button>
@@ -200,7 +200,7 @@ const ClimateSimulator: React.FC = () => {
           {/* Quick Scenarios */}
           <div>
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
-              Quick Scenarios
+              {t('simulator.quickScenarios', 'Quick Scenarios')}
             </p>
             {SCENARIOS.slice(1).map((s) => (
               <button
@@ -228,7 +228,7 @@ const ClimateSimulator: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="flex-1">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Predicted Yield for {crop}
+                  {t('simulator.predictedYieldFor', 'Predicted Yield for {{crop}}', { crop })}
                 </p>
                 <p className="text-4xl font-bold font-display text-gray-900 dark:text-white mt-1">
                   {result.predicted.toLocaleString()}
@@ -236,21 +236,20 @@ const ClimateSimulator: React.FC = () => {
                 </p>
                 <div className="flex items-center gap-3 mt-2">
                   <span className="text-sm text-gray-500">
-                    Baseline: {result.base.toLocaleString()} kg/ha
+                    {t('simulator.baseline', 'Baseline')}: {result.base.toLocaleString()} kg/ha
                   </span>
                   <span
                     className={`badge ${Number(result.change) >= 0 ? 'badge-green' : 'badge-red'}`}
                   >
                     {Number(result.change) >= 0 ? '+' : ''}
-                    {result.change}% vs baseline
+                    {result.change}% {t('simulator.vsBaseline', 'vs baseline')}
                   </span>
                 </div>
               </div>
 
               {Number(result.change) < -20 && (
                 <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
-                  ⚠️ <strong>High Impact Alert:</strong> Consider switching to a more resilient crop
-                  variety
+                  ⚠️ <strong>{t('simulator.highImpactAlert', 'High Impact Alert:')}</strong> {t('simulator.switchCropAdvice', 'Consider switching to a more resilient crop variety')}
                 </div>
               )}
             </div>
@@ -258,7 +257,7 @@ const ClimateSimulator: React.FC = () => {
 
           {/* Scenario Comparison Chart */}
           <div className="card">
-            <h3 className="section-header mb-4">Scenario Comparison</h3>
+            <h3 className="section-header mb-4">{t('simulator.scenarioComparison', 'Scenario Comparison')}</h3>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={chartData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />

@@ -117,6 +117,7 @@ interface PostCropModalProps {
 }
 
 const PostCropModal: React.FC<PostCropModalProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     crop: '',
     variety: '',
@@ -189,12 +190,13 @@ const PostCropModal: React.FC<PostCropModalProps> = ({ onClose }) => {
               <Plus size={20} className="text-white" />
             </div>
             <div>
-              <h2 className="text-white font-bold">Post Crop Listing</h2>
-              <p className="text-primary-100 text-xs">Reach 350+ verified buyers instantly</p>
+              <h2 className="text-white font-bold">{t('marketplace.postListing')}</h2>
+              <p className="text-primary-100 text-xs">{t('marketplace.postSubtitle')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label={t('common.close')}
             className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center text-white transition-all"
           >
             <X size={16} />
@@ -202,14 +204,14 @@ const PostCropModal: React.FC<PostCropModalProps> = ({ onClose }) => {
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {field('Crop Name', 'crop', 'text', 'e.g. Wheat')}
-            {field('Variety', 'variety', 'text', 'e.g. Sharbati')}
+            {field(t('marketplace.cropName'), 'crop', 'text', 'e.g. Wheat')}
+            {field(t('marketplace.variety'), 'variety', 'text', 'e.g. Sharbati')}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {field('Quantity', 'quantity', 'number', 'e.g. 50')}
+            {field(t('marketplace.quantity'), 'quantity', 'number', 'e.g. 50')}
             <div>
               <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
-                Unit
+                {t('marketplace.unit')}
               </label>
               <select
                 value={form.unit}
@@ -222,8 +224,8 @@ const PostCropModal: React.FC<PostCropModalProps> = ({ onClose }) => {
               </select>
             </div>
           </div>
-          {field('Expected Price (₹/unit)', 'price', 'number', 'e.g. 2400')}
-          {field('Location (District, State)', 'location', 'text', 'e.g. Ludhiana, Punjab')}
+          {field(t('marketplace.expectedPrice'), 'price', 'number', 'e.g. 2400')}
+          {field(t('marketplace.locationField'), 'location', 'text', 'e.g. Ludhiana, Punjab')}
           <button
             type="submit"
             disabled={submitting}
@@ -232,11 +234,11 @@ const PostCropModal: React.FC<PostCropModalProps> = ({ onClose }) => {
             {submitting ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{' '}
-                Submitting...
+                {t('common.submitting')}
               </>
             ) : (
               <>
-                <CheckCircle2 size={18} /> Post Listing
+                <CheckCircle2 size={18} /> {t('marketplace.postListing')}
               </>
             )}
           </button>
@@ -348,16 +350,17 @@ const Marketplace: React.FC = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                        {selectedCropReport.cropType} Quality Report
+                        {selectedCropReport.cropType} {t('marketplace.qualityReport')}
                       </h2>
                       <p className="text-sm text-gray-500 font-bold uppercase tracking-widest flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        Verified by AgriFlux Lab · Batch #AF-{rndInt(1000, 9999)}
+                        {t('marketplace.verifiedLab')} · Batch #AF-{rndInt(1000, 9999)}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedCropReport(null)}
+                    aria-label={t('common.close')}
                     className="p-2 bg-gray-100 dark:bg-gray-800 rounded-xl hover:scale-110 transition-transform"
                   >
                     <X size={20} />
@@ -368,32 +371,32 @@ const Marketplace: React.FC = () => {
                   <div className="space-y-6">
                     <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/50">
                       <h4 className="text-xs font-black text-primary-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <TrendingUp size={14} /> AI Quality Grade: A+
+                        <TrendingUp size={14} /> {t('marketplace.aiQualityGrade')}
                       </h4>
                       <div className="space-y-4">
                         {[
                           {
-                            label: 'Moisture Content',
+                            label: t('marketplace.moistureContent'),
                             value: '12.4%',
-                            status: 'Optimal',
+                            status: t('common.optimal', 'Optimal'),
                             color: 'text-blue-500',
                           },
                           {
-                            label: 'Protein (NIR)',
+                            label: t('marketplace.proteinNir'),
                             value: '14.2%',
-                            status: 'High',
+                            status: t('common.high', 'High'),
                             color: 'text-green-500',
                           },
                           {
-                            label: 'Foreign Matter',
+                            label: t('marketplace.foreignMatter'),
                             value: '0.02%',
-                            status: 'Minimal',
+                            status: t('common.minimal', 'Minimal'),
                             color: 'text-green-500',
                           },
                           {
-                            label: 'Gluten Index',
+                            label: t('marketplace.glutenIndex'),
                             value: '92',
-                            status: 'Excellent',
+                            status: t('common.excellent', 'Excellent'),
                             color: 'text-primary-500',
                           },
                         ].map((stat) => (
@@ -417,10 +420,10 @@ const Marketplace: React.FC = () => {
                       <ShieldCheck className="text-amber-600" size={24} />
                       <div>
                         <p className="text-xs font-black text-amber-800 dark:text-amber-400 uppercase tracking-tighter">
-                          Microbial Safety
+                          {t('marketplace.microbialSafety')}
                         </p>
                         <p className="text-[10px] text-amber-700 dark:text-amber-500 font-bold">
-                          Negative for Aflatoxins & Mycotoxins
+                          {t('marketplace.safetyPassed')}
                         </p>
                       </div>
                     </div>
@@ -429,7 +432,7 @@ const Marketplace: React.FC = () => {
                   <div className="space-y-6">
                     <div className="p-6 bg-primary-600 rounded-3xl text-white shadow-xl shadow-primary-500/20">
                       <p className="text-primary-100 text-xs font-black uppercase tracking-widest mb-1">
-                        Current Inventory
+                        {t('marketplace.currentInventory')}
                       </p>
                       <p className="text-3xl font-black">
                         {selectedCropReport.quantity} {selectedCropReport.unit}
@@ -437,7 +440,7 @@ const Marketplace: React.FC = () => {
                       <div className="mt-4 pt-4 border-t border-white/20 flex justify-between items-end">
                         <div>
                           <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest">
-                            Listing Price
+                            {t('marketplace.listingPrice')}
                           </p>
                           <p className="text-xl font-black">₹{selectedCropReport.price}/MT</p>
                         </div>
@@ -448,14 +451,14 @@ const Marketplace: React.FC = () => {
                           }}
                           className="px-6 py-2 bg-white text-primary-600 rounded-xl text-xs font-black hover:scale-105 active:scale-95 transition-all"
                         >
-                          SECURE BATCH
+                          {t('marketplace.secureBatch')}
                         </button>
                       </div>
                     </div>
 
                     <div className="space-y-3">
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                        Agronomist Observations
+                        {t('marketplace.agronomistObservations')}
                       </p>
                       <div className="p-4 bg-gray-50 dark:bg-gray-800/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
                         <p className="text-xs text-gray-600 dark:text-gray-400 font-medium italic leading-relaxed">
@@ -485,7 +488,7 @@ const Marketplace: React.FC = () => {
             {t('nav.marketplace')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-            Browse and purchase high-quality crops directly from certified farms.
+            {t('marketplace.subtitle')}
           </p>
         </div>
         <button
@@ -493,7 +496,7 @@ const Marketplace: React.FC = () => {
           className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all font-semibold hover:scale-105 active:scale-95"
         >
           <Plus size={18} />
-          Post a Listing
+          {t('marketplace.postListing')}
         </button>
       </div>
 
@@ -504,19 +507,19 @@ const Marketplace: React.FC = () => {
       >
         {[
           {
-            label: 'Active Listings',
+            label: t('marketplace.activeListings'),
             value: `${rndInt(1220, 1280).toLocaleString()}`,
             trend: `+${rndInt(12, 18)}% this week`,
             color: 'border-l-blue-500',
           },
           {
-            label: 'Successful Trades (30d)',
+            label: t('marketplace.successfulTrades'),
             value: `₹${rndInt(38, 48) / 10}Cr`,
             trend: `+${rndInt(6, 12)}% this week`,
             color: 'border-l-green-500',
           },
           {
-            label: 'Verified Buyers',
+            label: t('marketplace.verifiedBuyers'),
             value: `${rndInt(340, 365)}+`,
             trend: 'Across 12 states',
             color: 'border-l-purple-500',
@@ -539,7 +542,7 @@ const Marketplace: React.FC = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search crops, locations, farmers..."
+            placeholder={t('marketplace.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all dark:text-white"
@@ -552,11 +555,14 @@ const Marketplace: React.FC = () => {
               onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
             >
-              {cat}
+              {cat === 'All' ? t('marketplace.allCrops', 'All Crops') : cat}
             </button>
           ))}
         </div>
-        <button className="p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors flex-shrink-0">
+        <button
+          aria-label={t('common.filter', 'Filter')}
+          className="p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-400 hover:text-primary-600 transition-colors flex-shrink-0"
+        >
           <Filter size={20} />
         </button>
       </div>
@@ -598,11 +604,11 @@ const Marketplace: React.FC = () => {
                   <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
                     <div className="px-2.5 py-1 bg-gradient-to-r from-primary-500 to-green-500 text-white rounded-lg text-xs font-bold shadow-lg flex items-center gap-1">
                       <TrendingUp size={12} />
-                      AI Match: {listing.matchScore}%
+                      {t('marketplace.aiMatch', 'AI Match')}: {listing.matchScore}%
                     </div>
                     {listing.cropType === SESSION_CROP && (
                       <div className="px-2.5 py-1 bg-teal-500 text-white rounded-lg text-[10px] font-black shadow-lg animate-pulse-slow">
-                        HIGH DEMAND
+                        {t('marketplace.highDemand', 'HIGH DEMAND')}
                       </div>
                     )}
                   </div>
@@ -612,7 +618,8 @@ const Marketplace: React.FC = () => {
                       setSelectedCropReport(listing);
                     }}
                     className="absolute bottom-3 right-3 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white transition-all opacity-0 group-hover:opacity-100 shadow-xl"
-                    title="View Detailed Report"
+                    title={t('marketplace.qualityReport')}
+                    aria-label={t('marketplace.qualityReport')}
                   >
                     <Info size={18} />
                   </button>
@@ -634,7 +641,7 @@ const Marketplace: React.FC = () => {
                   <div className="mt-4 grid grid-cols-2 gap-4">
                     <div className="bg-gray-50 dark:bg-gray-800/50 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700">
                       <span className="text-[10px] font-bold text-gray-400 block uppercase tracking-wider">
-                        Available
+                        {t('marketplace.available')}
                       </span>
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
                         {listing.quantity} {listing.unit}
@@ -642,7 +649,7 @@ const Marketplace: React.FC = () => {
                     </div>
                     <div className="bg-primary-50 dark:bg-primary-900/10 p-2.5 rounded-xl border border-primary-100 dark:border-primary-800/30">
                       <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 block uppercase tracking-wider">
-                        Price
+                        {t('marketplace.price')}
                       </span>
                       <span className="text-sm font-bold text-primary-700 dark:text-primary-300">
                         ₹{listing.price}/ton
@@ -655,10 +662,11 @@ const Marketplace: React.FC = () => {
                       disabled={buyingId === listing.id}
                       className="flex-1 py-3 bg-gray-900 dark:bg-white dark:text-gray-900 text-white rounded-xl text-xs font-black shadow-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all active:scale-95 disabled:opacity-50"
                     >
-                      {buyingId === listing.id ? 'PROCESSING...' : 'BUY NOW'}
+                      {buyingId === listing.id ? t('common.processing') : t('marketplace.buyNow')}
                     </button>
                     <button
                       onClick={(e) => handleContact(e, listing.farmerName)}
+                      aria-label={t('marketplace.contactSeller')}
                       className="p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
                     >
                       <ShoppingCart size={16} className="text-gray-400" />
@@ -666,11 +674,11 @@ const Marketplace: React.FC = () => {
                   </div>
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
                     <span className="text-[10px] font-bold text-gray-400">
-                      By:{' '}
+                      {t('marketplace.by')}{' '}
                       <span className="text-gray-700 dark:text-gray-300">{listing.farmerName}</span>
                     </span>
                     <span className="text-[10px] font-bold text-primary-500 uppercase">
-                      Verified Crop
+                      {t('marketplace.verifiedSeller')}
                     </span>
                   </div>
                 </div>
@@ -684,9 +692,9 @@ const Marketplace: React.FC = () => {
         <div className="text-center py-16 card rounded-2xl">
           <Info className="mx-auto text-gray-300 dark:text-gray-700 mb-3" size={48} />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-            No listings found
+            {t('marketplace.noListings')}
           </h3>
-          <p className="text-gray-500">Try adjusting your filters or search terms.</p>
+          <p className="text-gray-500">{t('marketplace.noListingsDesc')}</p>
           <button
             onClick={() => {
               setSearchTerm('');
@@ -694,7 +702,7 @@ const Marketplace: React.FC = () => {
             }}
             className="mt-4 text-primary-600 text-sm font-medium hover:underline"
           >
-            Clear filters
+            {t('common.clearFilters')}
           </button>
         </div>
       )}

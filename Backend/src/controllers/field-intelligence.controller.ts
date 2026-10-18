@@ -51,7 +51,8 @@ export const getRecommendation = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('❌ [FIELD INTELLIGENCE ERROR]', error.message);
-    return res.status(500).json({
+    const status = error.statusCode || 500;
+    return res.status(status).json({
       success: false,
       message: error.message || 'Error generating field recommendation',
     });

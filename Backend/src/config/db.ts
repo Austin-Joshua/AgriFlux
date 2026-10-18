@@ -69,9 +69,15 @@ export const connectDB = async () => {
       console.warn('⚠️ [DBMS] MongoDB connection lost. Degrading to fail-safe state.');
     });
 
-    mongoose.connection.on('reconnected', () => {
+    mongoose.connection.on('reconnected', async () => {
       isDBConnected = true;
       console.log('📡 [DBMS] MongoDB connection restored.');
+      try {
+        const { blockchain } = await import('../services/blockchain.service');
+        await blockchain.initialize({ forceRehydrate: true });
+      } catch (e: any) {
+        console.warn('⚠️ [DBMS] Ledger rehydration error on reconnect:', e.message);
+      }
     });
 
     mongoose.connection.on('error', (err) => {
@@ -79,6 +85,14 @@ export const connectDB = async () => {
     });
 
     await seedDefaultAccounts();
+
+    try {
+      const { blockchain } = await import('../services/blockchain.service');
+      await blockchain.initialize();
+      console.log('⛓️ [BLOCKCHAIN] Persistent audit ledger initialized.');
+    } catch (e: any) {
+      console.warn(`⚠️ [BLOCKCHAIN] Ledger initialization notice: ${e.message}`);
+    }
   } catch (error: any) {
     isDBConnected = false;
     console.warn(`⚠️  MongoDB not available: ${error.message}`);

@@ -1,17 +1,77 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, Outlet, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import logo from '../assets/logo-icon.png';
 import { useTranslation } from 'react-i18next';
 
+const LANGUAGES = [
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'hi', label: 'हिंदी', flag: '🇮🇳' },
+  { code: 'ta', label: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'te', label: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'kn', label: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'ml', label: 'മലയാളം', flag: '🇮🇳' },
+];
+
 const AuthLayout: React.FC = () => {
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isLogin = location.pathname === '/login';
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+
+  const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-3 sm:p-6 py-6 sm:py-10 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 overflow-x-hidden overflow-y-auto relative font-sans">
+      {/* Floating Language Switcher for Auth Pages */}
+      <div ref={langRef} className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50">
+        <button
+          type="button"
+          onClick={() => setLangOpen(!langOpen)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200/80 dark:border-gray-700 shadow-sm text-xs font-bold text-gray-700 dark:text-gray-200 hover:scale-105 transition-all"
+          aria-label="Change Language"
+        >
+          <span className="text-sm">{currentLang.flag}</span>
+          <span>{currentLang.label}</span>
+          <ChevronDown size={12} className={`transition-transform ${langOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {langOpen && (
+          <div className="absolute right-0 top-full mt-1.5 w-44 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-[100] animate-slide-down">
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                type="button"
+                onClick={() => {
+                  i18n.changeLanguage(lang.code);
+                  setLangOpen(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-left transition-colors hover:bg-primary-50 dark:hover:bg-primary-950/40 ${
+                  i18n.language === lang.code
+                    ? 'text-primary-600 dark:text-primary-400 bg-primary-50/50 dark:bg-primary-900/20'
+                    : 'text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <span>{lang.flag}</span>
+                <span>{lang.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Dynamic Background Splashes to match Website Pages */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden lg:block hidden">
         <motion.div
@@ -114,7 +174,7 @@ const AuthLayout: React.FC = () => {
                 >
                   {isLogin ? (
                     <>
-                      Sign Up{' '}
+                      {t('auth.register', 'Sign Up')}{' '}
                       <ArrowRight
                         size={15}
                         className="group-hover:translate-x-1 transition-transform"
@@ -126,7 +186,7 @@ const AuthLayout: React.FC = () => {
                         size={15}
                         className="group-hover:-translate-x-1 transition-transform"
                       />{' '}
-                      Sign In
+                      {t('auth.login', 'Sign In')}
                     </>
                   )}
                 </Link>

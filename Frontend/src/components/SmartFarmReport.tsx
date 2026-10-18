@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Download,
@@ -40,13 +41,13 @@ export interface ReportData {
   factors: string[];
 }
 
-const STEPS = [
-  'Analysing soil parameters...',
-  'Querying weather data...',
-  'Running crop recommendation model...',
-  'Fetching live market prices...',
-  'Calculating profit projections...',
-  'Generating final report...',
+const STEP_KEYS = [
+  'smartReport.analysingSoil',
+  'smartReport.queryingWeather',
+  'smartReport.runningRecommendation',
+  'smartReport.fetchingPrices',
+  'smartReport.calculatingProfit',
+  'smartReport.generatingReport',
 ];
 
 const riskColor = (r: 'Low' | 'Medium' | 'High') =>
@@ -57,6 +58,7 @@ const riskColor = (r: 'Low' | 'Medium' | 'High') =>
       : 'text-red-600 bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400';
 
 const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, reportData }) => {
+  const { t, i18n } = useTranslation();
   const [phase, setPhase] = useState<'loading' | 'done'>('loading');
   const [stepIdx, setStepIdx] = useState(0);
   const [report, setReport] = useState<ReportData | null>(null);
@@ -72,7 +74,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
     const iv = setInterval(() => {
       i++;
       setStepIdx(i);
-      if (i >= STEPS.length - 1) {
+      if (i >= STEP_KEYS.length - 1) {
         clearInterval(iv);
         setTimeout(() => {
           if (reportData) {
@@ -155,11 +157,11 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                   </div>
                   <div>
                     <h2 className="text-white font-bold text-base sm:text-lg leading-tight">
-                      Smart Farm AI Report
+                      {t('smartReport.title')}
                     </h2>
                     <p className="text-emerald-100 text-[11px] sm:text-xs">
-                      Powered by AgriFlux AI Engine ·{' '}
-                      {new Date().toLocaleDateString('en-IN', {
+                      {t('smartReport.generatedBy')} ·{' '}
+                      {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-IN' : i18n.language, {
                         day: 'numeric',
                         month: 'short',
                         year: 'numeric',
@@ -170,7 +172,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                 <button
                   onClick={onClose}
                   className="print:hidden w-8 h-8 sm:w-9 sm:h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition-all flex-shrink-0"
-                  aria-label="Close report"
+                  aria-label={t('common.close')}
                 >
                   <X size={18} />
                 </button>
@@ -182,9 +184,9 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
               {phase === 'loading' ? (
                 <div className="space-y-4 py-4">
                   <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
-                    AgriFlux AI is analysing your farm data…
+                    {t('smartReport.analysingData')}
                   </p>
-                  {STEPS.map((step, i) => (
+                  {STEP_KEYS.map((stepKey, i) => (
                     <motion.div
                       key={i}
                       className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${i <= stepIdx ? 'bg-primary-50 dark:bg-primary-900/20' : 'opacity-30'}`}
@@ -210,7 +212,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                       <span
                         className={`text-sm font-medium ${i <= stepIdx ? 'text-primary-700 dark:text-primary-300' : 'text-gray-400'}`}
                       >
-                        {step}
+                        {t(stepKey)}
                       </span>
                     </motion.div>
                   ))}
@@ -228,7 +230,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                       <ShieldCheck className="text-primary-600 dark:text-primary-400" size={24} />
                       <div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                          AI Confidence Score
+                          {t('smartReport.confidenceScore')}
                         </p>
                         <p className="text-2xl font-black text-primary-700 dark:text-primary-300">
                           {report.confidence}%
@@ -238,7 +240,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                     <span
                       className={`px-3 py-1.5 rounded-full text-xs font-bold border ${riskColor(report.riskLevel)}`}
                     >
-                      {report.riskLevel} Risk
+                      {t(`common.${report.riskLevel.toLowerCase()}`, report.riskLevel)} {t('common.risk', 'Risk')}
                     </span>
                   </div>
 
@@ -248,7 +250,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                       <div className="flex items-center gap-2 mb-2">
                         <Leaf size={16} className="text-primary-500" />
                         <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Recommended Crop
+                          {t('dashboard.recommendedCrop', 'Recommended Crop')}
                         </span>
                       </div>
                       <p className="text-xl font-black text-gray-900 dark:text-white">
@@ -262,40 +264,42 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                       <div className="flex items-center gap-2 mb-2">
                         <TrendingUp size={16} className="text-blue-500" />
                         <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Expected Yield
+                          {t('yield.expectedYield', 'Expected Yield')}
                         </span>
                       </div>
                       <p className="text-xl font-black text-gray-900 dark:text-white">
                         {report.yieldEstimate}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Per hectare</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                        {t('yield.perHectare', 'Per hectare')}
+                      </p>
                     </div>
                     <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <BarChart3 size={16} className="text-teal-500" />
                         <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Predicted Price Range
+                          {t('market.predictedPriceRange', 'Predicted Price Range')}
                         </span>
                       </div>
                       <p className="text-xl font-black text-gray-900 dark:text-white">
                         ₹{report.priceMin}–₹{report.priceMax}/kg
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                        Market estimate (mandi)
+                        {t('market.marketEstimate', 'Market estimate (mandi)')}
                       </p>
                     </div>
                     <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <MapPin size={16} className="text-red-400" />
                         <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Best Selling Region
+                          {t('market.bestSellingRegion', 'Best Selling Region')}
                         </span>
                       </div>
                       <p className="text-xl font-black text-gray-900 dark:text-white">
                         {report.bestRegion}
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                        Demand score: {report.demandScore}%
+                        {t('market.demandScore', 'Demand score')}: {report.demandScore}%
                       </p>
                     </div>
                   </div>
@@ -304,7 +308,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                   <div className="bg-gradient-to-r from-primary-50 to-teal-50 dark:from-primary-900/20 dark:to-teal-900/10 border border-primary-200 dark:border-teal-800 rounded-2xl p-4 flex items-center justify-between">
                     <div>
                       <p className="text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider mb-1">
-                        Estimated Profit (per season)
+                        {t('dashboard.estimatedProfit', 'Estimated Profit (per season)')}
                       </p>
                       <p className="text-2xl font-black text-gray-900 dark:text-white">
                         {report.profitEstimate}
@@ -317,22 +321,22 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                   <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4">
                     <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                       <AlertCircle size={14} />
-                      Why this recommendation?
+                      {t('dashboard.whyRecommendation', 'Why this recommendation?')}
                     </p>
                     <div className="grid grid-cols-3 gap-3 mb-3">
                       <div className="text-center">
                         <p className="text-lg font-black text-primary-600 dark:text-primary-400">
                           {report.soilPh}
                         </p>
-                        <p className="text-xs text-gray-500">Soil pH</p>
+                        <p className="text-xs text-gray-500">{t('soilAdvisor.soilPh', 'Soil pH')}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-lg font-black text-blue-500">{report.humidity}%</p>
-                        <p className="text-xs text-gray-500">Humidity</p>
+                        <p className="text-xs text-gray-500">{t('environmental.humidity', 'Humidity')}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-lg font-black text-indigo-500">{report.rainfall}mm</p>
-                        <p className="text-xs text-gray-500">Rainfall</p>
+                        <p className="text-xs text-gray-500">{t('environmental.rainfall', 'Rainfall')}</p>
                       </div>
                     </div>
                     <div className="space-y-1.5">
@@ -351,9 +355,9 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                   {/* Trust Footer */}
                   <div className="flex items-center justify-center gap-6 pt-2 border-t border-gray-100 dark:border-gray-800">
                     {[
-                      { icon: ShieldCheck, label: 'Secure & Encrypted' },
-                      { icon: Sparkles, label: 'AI Powered Insights' },
-                      { icon: Droplets, label: 'Real-time Data' },
+                      { icon: ShieldCheck, label: t('common.secureEncrypted', 'Secure & Encrypted') },
+                      { icon: Sparkles, label: t('common.aiPowered', 'AI Powered Insights') },
+                      { icon: Droplets, label: t('common.realTimeData', 'Real-time Data') },
                     ].map(({ icon: Icon, label }) => (
                       <div
                         key={label}
@@ -375,14 +379,14 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                   onClick={onClose}
                   className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors font-bold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  Close
+                  {t('common.close', 'Close')}
                 </button>
                 <button
                   onClick={handlePrint}
                   className="flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition-all"
                 >
                   <Download size={15} />
-                  <span>Download Report (PDF)</span>
+                  <span>{t('smartReport.downloadReport', 'Download Report (PDF)')}</span>
                 </button>
               </div>
             )}

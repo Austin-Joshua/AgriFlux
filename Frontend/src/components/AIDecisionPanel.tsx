@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   MapPin,
   Target,
@@ -174,6 +175,7 @@ interface TimelineEvent {
 }
 
 const AIDecisionPanel: React.FC = () => {
+  const { t } = useTranslation();
   const { token, user } = useAuth();
   const [selectedField, setSelectedField] = useState<FieldOption>(FIELDS[0]);
   const [recommendation, setRecommendation] = useState<FieldRecommendationData | null>(null);
@@ -398,18 +400,18 @@ const AIDecisionPanel: React.FC = () => {
       return {
         bar: 'bg-amber-500',
         text: 'text-amber-600 dark:text-amber-400',
-        label: 'Drought Stress',
+        label: t('decisionEngine.droughtStress', 'Drought Stress'),
       };
     if (val > 70)
       return {
         bar: 'bg-blue-500',
         text: 'text-blue-600 dark:text-blue-400',
-        label: 'Field Saturated',
+        label: t('decisionEngine.fieldSaturated', 'Field Saturated'),
       };
     return {
       bar: 'bg-emerald-500',
       text: 'text-emerald-600 dark:text-emerald-400',
-      label: 'Optimal Range',
+      label: t('decisionEngine.optimalRange', 'Optimal Range'),
     };
   };
 
@@ -439,20 +441,19 @@ const AIDecisionPanel: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white font-display">
-                  Field Intelligence Engine
+                  {t('decisionEngine.title', 'Field Intelligence Engine')}
                 </h2>
                 <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                  Rule: {recommendation?.ruleVersion || 'v2.1-QUANTEX-FAO56'}
+                  {t('decisionEngine.rule', 'Rule')}: {recommendation?.ruleVersion || 'v2.1-QUANTEX-FAO56'}
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/40">
                   {obs?.soilMoisture?.provenance === 'measured'
-                    ? '⚡ ESP32 Measured'
-                    : '🔬 Simulated Calibration Profile'}
+                    ? `⚡ ${t('decisionEngine.measuredEsp32', 'ESP32 Measured')}`
+                    : `🔬 ${t('decisionEngine.simulatedProfile', 'Simulated Calibration Profile')}`}
                 </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Deterministic FAO-56 decision gates connecting in-situ IoT sensors, ERA5 reanalysis,
-                and Sentinel-2 NDVI.
+                {t('decisionEngine.subtitle', 'Deterministic FAO-56 decision gates connecting in-situ IoT sensors, ERA5 reanalysis, and Sentinel-2 NDVI.')}
               </p>
             </div>
           </div>
@@ -500,20 +501,20 @@ const AIDecisionPanel: React.FC = () => {
               <span className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white font-display">
                 {moistureValue}%
               </span>
-              <span className="text-[10px] text-gray-400 font-medium">Root-Zone</span>
+              <span className="text-[10px] text-gray-400 font-medium">{t('decisionEngine.rootZone', 'Root-Zone')}</span>
             </div>
             <div className="mt-1 flex items-center gap-1">
               {obs?.soilMoisture?.source === 'esp32_hardware' ? (
                 <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-                  ESP32 Measured
+                  {t('decisionEngine.esp32Measured', 'ESP32 Measured')}
                 </span>
               ) : obs?.soilMoisture?.source === 'manual_operator_input' ? (
                 <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-500/20">
-                  Calibrated Input
+                  {t('decisionEngine.calibratedInput', 'Calibrated Input')}
                 </span>
               ) : (
                 <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-                  Simulated Baseline
+                  {t('decisionEngine.simulatedBaseline', 'Simulated Baseline')}
                 </span>
               )}
             </div>
@@ -525,9 +526,9 @@ const AIDecisionPanel: React.FC = () => {
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-              <span>0% Deficit</span>
-              <span>50% Target</span>
-              <span>100% Sat</span>
+              <span>0% {t('decisionEngine.deficit', 'Deficit')}</span>
+              <span>50% {t('decisionEngine.target', 'Target')}</span>
+              <span>100% {t('decisionEngine.sat', 'Sat')}</span>
             </div>
           </div>
 
@@ -546,7 +547,7 @@ const AIDecisionPanel: React.FC = () => {
               <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
                 pH {obs?.soilPh?.value || 6.4}
               </span>
-              <span className="text-[10px] text-gray-400 font-medium">Optimal</span>
+              <span className="text-[10px] text-gray-400 font-medium">{t('decisionEngine.optimal', 'Optimal')}</span>
             </div>
             <div className="mt-1 flex items-center gap-1">
               <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
@@ -561,9 +562,9 @@ const AIDecisionPanel: React.FC = () => {
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
-              <span>Acidic</span>
+              <span>{t('decisionEngine.acidic', 'Acidic')}</span>
               <span>pH 7.0</span>
-              <span>Alkaline</span>
+              <span>{t('decisionEngine.alkaline', 'Alkaline')}</span>
             </div>
           </div>
 
@@ -622,7 +623,7 @@ const AIDecisionPanel: React.FC = () => {
               <span className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 font-display">
                 {obs?.forecastRainMm?.value || 0} mm
               </span>
-              <span className="text-[10px] text-gray-400 font-medium">Next 24h</span>
+              <span className="text-[10px] text-gray-400 font-medium">{t('decisionEngine.next24h', 'Next 24h')}</span>
             </div>
             <div className="mt-1 flex items-center gap-1">
               <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-500/20">
@@ -718,7 +719,7 @@ const AIDecisionPanel: React.FC = () => {
             <div className="flex items-center gap-2 min-w-0">
               <CheckCircle2 size={16} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
               <div className="truncate">
-                <span className="font-bold text-blue-900 dark:text-blue-300">Target Outcome: </span>
+                <span className="font-bold text-blue-900 dark:text-blue-300">{t('decisionEngine.targetOutcome', 'Target Outcome')}: </span>
                 <span className="text-blue-700 dark:text-blue-400">
                   {recommendation?.expectedFollowUpCondition?.description ||
                     'Soil moisture between 48% - 55% within 2 hours'}

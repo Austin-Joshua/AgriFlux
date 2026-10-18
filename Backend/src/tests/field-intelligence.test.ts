@@ -14,6 +14,7 @@
  */
 import assert from 'assert';
 import { FieldIntelligenceService } from '../services/field-intelligence.service';
+import { env } from '../config/env';
 
 export async function runFieldIntelligenceTests(): Promise<
   { name: string; passed: boolean; error?: string }[]
@@ -522,6 +523,156 @@ export async function runFieldIntelligenceTests(): Promise<
   } catch (err: any) {
     results.push({
       name: 'Field Intelligence Security: Agronomist review seals tamper-proof record in cryptographic audit ledger',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 17: Production Safety - Recommendation generation fails closed with HTTP 503 when DB is offline
+  try {
+    const originalEnv = env.NODE_ENV;
+    (env as any).NODE_ENV = 'production';
+
+    let errorThrown = false;
+    let statusCode = 0;
+    try {
+      await FieldIntelligenceService.generateRecommendation('farmer_prod_offline', {
+        fieldId: 'field-prod-offline',
+        cropType: 'Rice',
+      });
+    } catch (e: any) {
+      errorThrown = true;
+      statusCode = e.statusCode || 500;
+      assert.ok(e.message.includes('Service Unavailable'), 'Error must specify Service Unavailable');
+    } finally {
+      (env as any).NODE_ENV = originalEnv;
+    }
+
+    assert.strictEqual(errorThrown, true, 'Must throw error when DB is unavailable in production');
+    assert.strictEqual(statusCode, 503, 'Must return HTTP 503 in production without durable persistence');
+
+    results.push({
+      name: 'Production Safety: Recommendation generation fails closed with HTTP 503 when durable DB is offline',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Production Safety: Recommendation generation fails closed with HTTP 503 when durable DB is offline',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 18: Production Safety - Farmer action recording fails closed with HTTP 503 when DB is offline
+  try {
+    const originalEnv = env.NODE_ENV;
+    (env as any).NODE_ENV = 'production';
+
+    let errorThrown = false;
+    let statusCode = 0;
+    try {
+      await FieldIntelligenceService.recordFarmerAction(
+        'farmer_prod_offline',
+        'rec_non_existent',
+        'irrigated'
+      );
+    } catch (e: any) {
+      errorThrown = true;
+      statusCode = e.statusCode || 500;
+    } finally {
+      (env as any).NODE_ENV = originalEnv;
+    }
+
+    assert.strictEqual(errorThrown, true, 'Must reject farmer action when DB is offline in production');
+    assert.strictEqual(statusCode, 503, 'Must return HTTP 503 without durable storage');
+
+    results.push({
+      name: 'Production Safety: Farmer action recording fails closed with HTTP 503 when durable DB is offline',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Production Safety: Farmer action recording fails closed with HTTP 503 when durable DB is offline',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 19: Production Safety - Follow-up evaluation fails closed with HTTP 503 when DB is offline
+  try {
+    const testRec = await FieldIntelligenceService.generateRecommendation('farmer_prod_offline', {
+      fieldId: 'field-prod-eval-test',
+      cropType: 'Tomato',
+    });
+
+    const originalEnv = env.NODE_ENV;
+    (env as any).NODE_ENV = 'production';
+
+    let errorThrown = false;
+    let statusCode = 0;
+    try {
+      await FieldIntelligenceService.evaluateFollowUp('farmer_prod_offline', testRec.recommendationId, {
+        moisture: 35,
+      });
+    } catch (e: any) {
+      errorThrown = true;
+      statusCode = e.statusCode || 500;
+    } finally {
+      (env as any).NODE_ENV = originalEnv;
+    }
+
+    assert.strictEqual(errorThrown, true, 'Must reject follow-up evaluation when DB is offline in production');
+    assert.strictEqual(statusCode, 503, 'Must return HTTP 503 without durable storage');
+
+    results.push({
+      name: 'Production Safety: Follow-up evaluation fails closed with HTTP 503 when durable DB is offline',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Production Safety: Follow-up evaluation fails closed with HTTP 503 when durable DB is offline',
+      passed: false,
+      error: err.message,
+    });
+  }
+
+  // Test 20: Production Safety - Agronomist review fails closed with HTTP 503 when DB is offline
+  try {
+    const testRec = await FieldIntelligenceService.generateRecommendation('farmer_prod_offline', {
+      fieldId: 'field-prod-rev-test',
+      cropType: 'Wheat',
+    });
+
+    const originalEnv = env.NODE_ENV;
+    (env as any).NODE_ENV = 'production';
+
+    let errorThrown = false;
+    let statusCode = 0;
+    try {
+      await FieldIntelligenceService.recordAgronomistReview(
+        'farmer_prod_offline',
+        'agronomist_01',
+        'Dr. Specialist',
+        testRec.recommendationId,
+        'endorsed'
+      );
+    } catch (e: any) {
+      errorThrown = true;
+      statusCode = e.statusCode || 500;
+    } finally {
+      (env as any).NODE_ENV = originalEnv;
+    }
+
+    assert.strictEqual(errorThrown, true, 'Must reject specialist review when DB is offline in production');
+    assert.strictEqual(statusCode, 503, 'Must return HTTP 503 without durable storage');
+
+    results.push({
+      name: 'Production Safety: Agronomist review fails closed with HTTP 503 when durable DB is offline',
+      passed: true,
+    });
+  } catch (err: any) {
+    results.push({
+      name: 'Production Safety: Agronomist review fails closed with HTTP 503 when durable DB is offline',
       passed: false,
       error: err.message,
     });

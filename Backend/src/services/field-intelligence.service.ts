@@ -4,6 +4,7 @@ import FieldRecommendation, {
 } from '../../../Database/Models/FieldRecommendation';
 import IoTReading from '../../../Database/Models/IoTReading';
 import { isDBConnected } from '../config/db';
+import { env } from '../config/env';
 import { WeatherIngestionService } from './weather-ingestion.service';
 import { SatelliteProcessingService } from './satellite-processing.service';
 import { SoilDataService } from './soil-data.service';
@@ -579,9 +580,24 @@ export class FieldIntelligenceService {
         await FieldRecommendation.create(result);
       } catch (err: any) {
         console.warn(`⚠️ [FIELD INTELLIGENCE] DB save error: ${err.message}`);
+        if (env.NODE_ENV === 'production') {
+          const dbErr: any = new Error(
+            'Service Unavailable: Failed to persist field recommendation to durable storage. Please retry.'
+          );
+          dbErr.statusCode = 503;
+          throw dbErr;
+        }
       }
+    } else {
+      if (env.NODE_ENV === 'production') {
+        const dbErr: any = new Error(
+          'Service Unavailable: Database connection required to persist field recommendations in production. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
+      }
+      memoryRecommendations[recommendationId] = result;
     }
-    memoryRecommendations[recommendationId] = result;
 
     return result;
   }
@@ -979,15 +995,15 @@ export class FieldIntelligenceService {
           await existing.save();
 
           try {
-            BlockchainService.getInstance().addBlock('ACTUATOR_OVERRIDE', {
+            await BlockchainService.getInstance().addBlock('ACTUATOR_OVERRIDE', {
               recommendationId,
               farmerAction: actionTaken,
               actorId: actorId || userId,
               actorName: actorName || 'Farmer',
               recordedAt: actionRecord.recordedAt.toISOString(),
             });
-          } catch {
-            /* audit safe */
+          } catch (auditErr: any) {
+            console.warn('⚠️ [FIELD INTELLIGENCE] Audit block notice:', auditErr.message);
           }
 
           return existing;
@@ -995,10 +1011,33 @@ export class FieldIntelligenceService {
       } catch (err: any) {
         if (err.statusCode) throw err;
         console.warn(`⚠️ [FIELD INTELLIGENCE] Action record error: ${err.message}`);
+        if (env.NODE_ENV === 'production') {
+          const dbErr: any = new Error(
+            'Service Unavailable: Failed to persist farmer action to durable storage. Please retry.'
+          );
+          dbErr.statusCode = 503;
+          throw dbErr;
+        }
+      }
+    } else {
+      if (env.NODE_ENV === 'production') {
+        const dbErr: any = new Error(
+          'Service Unavailable: Database connection required to record farmer action in production. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
       }
     }
 
     if (memoryRecommendations[recommendationId]) {
+      if (env.NODE_ENV === 'production') {
+        const dbErr: any = new Error(
+          'Service Unavailable: Database connection required to record farmer action in production. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
+      }
+
       const memRec = memoryRecommendations[recommendationId];
       if (
         memRec.userId &&
@@ -1021,7 +1060,7 @@ export class FieldIntelligenceService {
       memRec.farmerAction = actionRecord;
 
       try {
-        BlockchainService.getInstance().addBlock('ACTUATOR_OVERRIDE', {
+        await BlockchainService.getInstance().addBlock('ACTUATOR_OVERRIDE', {
           recommendationId,
           farmerAction: actionTaken,
           actorId: actorId || userId,
@@ -1197,24 +1236,37 @@ export class FieldIntelligenceService {
       try {
         rec.followUpEvaluation = evaluation;
         await rec.save();
-      } catch {
-        /* ignore */
+      } catch (err: any) {
+        if (env.NODE_ENV === 'production') {
+          const dbErr: any = new Error(
+            'Service Unavailable: Failed to persist follow-up evaluation in durable storage. Please retry.'
+          );
+          dbErr.statusCode = 503;
+          throw dbErr;
+        }
       }
+    } else if (env.NODE_ENV === 'production') {
+      const dbErr: any = new Error(
+        'Service Unavailable: Database connection required to evaluate follow-up in production. Please retry.'
+      );
+      dbErr.statusCode = 503;
+      throw dbErr;
     }
+
     if (memoryRecommendations[recommendationId]) {
       memoryRecommendations[recommendationId].followUpEvaluation = evaluation;
     }
 
     try {
-      BlockchainService.getInstance().addBlock('TELEMETRY_LOG', {
+      await BlockchainService.getInstance().addBlock('TELEMETRY_LOG', {
         recommendationId,
         evaluationStatus: evaluation.status,
         conditionMet: evaluation.conditionMet,
         observedDelta: evaluation.observedDelta,
         evaluatedAt: evaluation.evaluatedAt.toISOString(),
       });
-    } catch {
-      /* audit safe */
+    } catch (auditErr: any) {
+      console.warn('⚠️ [FIELD INTELLIGENCE] Telemetry audit block notice:', auditErr.message);
     }
 
     return evaluation;
@@ -1394,17 +1446,54 @@ export class FieldIntelligenceService {
           /* audit safe */
         }
 
-        if (updated) return updated;
+        if (updated) {
+          try {
+            await BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
+              recommendationId,
+              status,
+              reviewerId,
+              reviewerName,
+              notes: reviewRecord.notes,
+              reviewedAt: reviewRecord.reviewedAt.toISOString(),
+            });
+          } catch (auditErr: any) {
+            console.warn('⚠️ [FIELD INTELLIGENCE] Prescription audit notice:', auditErr.message);
+          }
+          return updated;
+        }
       } catch (err: any) {
         console.warn(`⚠️ [FIELD INTELLIGENCE] Agronomist review error: ${err.message}`);
+        if (env.NODE_ENV === 'production') {
+          const dbErr: any = new Error(
+            'Service Unavailable: Failed to persist specialist review to durable storage. Please retry.'
+          );
+          dbErr.statusCode = 503;
+          throw dbErr;
+        }
+      }
+    } else {
+      if (env.NODE_ENV === 'production') {
+        const dbErr: any = new Error(
+          'Service Unavailable: Database connection required to record specialist review in production. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
       }
     }
 
     if (memoryRecommendations[recommendationId]) {
+      if (env.NODE_ENV === 'production') {
+        const dbErr: any = new Error(
+          'Service Unavailable: Database connection required to record specialist review in production. Please retry.'
+        );
+        dbErr.statusCode = 503;
+        throw dbErr;
+      }
+
       memoryRecommendations[recommendationId].agronomistReview = reviewRecord;
 
       try {
-        BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
+        await BlockchainService.getInstance().addBlock('PRESCRIPTION_AUDIT', {
           recommendationId,
           status,
           reviewerId,

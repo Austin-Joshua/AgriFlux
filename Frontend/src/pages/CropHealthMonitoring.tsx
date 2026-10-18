@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Activity } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ReportModal from '../components/ReportModal';
 
 const NDVI_ZONES = [
@@ -46,6 +47,7 @@ const NDVI_ZONES = [
 ];
 
 const CropHealthMonitoring: React.FC = () => {
+  const { t } = useTranslation();
   const [selectedZone, setSelectedZone] = useState<number | null>(null);
   const [reportModal, setReportModal] = useState<{
     isOpen: boolean;
@@ -80,7 +82,7 @@ const CropHealthMonitoring: React.FC = () => {
             red light (which vegetation absorbs).
           </p>
           <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-xl border border-primary-100 dark:border-primary-800">
-            <h4 className="font-bold text-primary-700 dark:text-primary-300 mb-2">AI Analysis</h4>
+            <h4 className="font-bold text-primary-700 dark:text-primary-300 mb-2">{t('cropHealthMonitor.aiAnalysis', 'AI Analysis')}</h4>
             <p className="text-sm">
               Your farm's average NDVI is stable. Zone E shows exceptional vitality, while Zone C is
               suppressing the overall average due to localized stress. Automated satellite
@@ -89,13 +91,13 @@ const CropHealthMonitoring: React.FC = () => {
           </div>
           <ul className="list-disc pl-5 space-y-2 text-sm">
             <li>
-              <strong>Photosynthetic Activity:</strong> High across 70% of the farm.
+              <strong>{t('cropHealthMonitor.photosyntheticActivity', 'Photosynthetic Activity:')}</strong> High across 70% of the farm.
             </li>
             <li>
-              <strong>Biomass Density:</strong> Increasing in NW quadrants.
+              <strong>{t('cropHealthMonitor.biomassDensity', 'Biomass Density:')}</strong> Increasing in NW quadrants.
             </li>
             <li>
-              <strong>Next Scan:</strong> Expected in 48 hours via Sentinel-2.
+              <strong>{t('cropHealthMonitor.nextScan', 'Next Scan:')}</strong> Expected in 48 hours via Sentinel-2.
             </li>
           </ul>
         </div>
@@ -127,12 +129,12 @@ const CropHealthMonitoring: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-xs text-gray-400">Chlorophyll Index</p>
-              <p className="font-bold">8.4 (High)</p>
+              <p className="text-xs text-gray-400">{t('cropHealthMonitor.chlorophyllIndex', 'Chlorophyll Index')}</p>
+              <p className="font-bold">8.4 ({t('cropHealthMonitor.high', 'High')})</p>
             </div>
             <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-xs text-gray-400">Leaf Area Index</p>
-              <p className="font-bold">3.2 LAI</p>
+              <p className="text-xs text-gray-400">{t('cropHealthMonitor.leafAreaIndex', 'Leaf Area Index')}</p>
+              <p className="font-bold">3.2 {t('cropHealthMonitor.lai', 'LAI')}</p>
             </div>
           </div>
         </div>
@@ -161,12 +163,12 @@ const CropHealthMonitoring: React.FC = () => {
           </div>
           <div className="p-4 border border-yellow-200 dark:border-yellow-800/50 rounded-xl bg-yellow-50/50 dark:bg-yellow-900/10">
             <h4 className="font-bold text-sm mb-2 text-yellow-700 dark:text-yellow-400">
-              Probable Causes:
+              {t('cropHealthMonitor.probableCauses', 'Probable Causes:')}
             </h4>
             <ol className="list-decimal pl-5 space-y-1 text-xs">
-              <li>Clogging in drip irrigation emitters (Sector C14).</li>
-              <li>Early-stage blast disease (Spectral signature matches).</li>
-              <li>Localized soil salinity issues.</li>
+              <li>{t('cropHealthMonitor.cause1', 'Clogging in drip irrigation emitters (Sector C14).')}</li>
+              <li>{t('cropHealthMonitor.cause2', 'Early-stage blast disease (Spectral signature matches).')}</li>
+              <li>{t('cropHealthMonitor.cause3', 'Localized soil salinity issues.')}</li>
             </ol>
           </div>
         </div>
@@ -176,7 +178,7 @@ const CropHealthMonitoring: React.FC = () => {
       content = (
         <div className="space-y-4">
           <p>
-            Monitored Area: <strong>9.0 Hectares (22.2 Acres)</strong>
+            {t('cropHealthMonitor.monitoredArea', 'Monitored Area:')} <strong>9.0 {t('cropHealthMonitor.hectares', 'Hectares')} (22.2 {t('cropHealthMonitor.acres', 'Acres')})</strong>
           </p>
           <p>
             Precise boundary mapping ensures that AI analytics are focused strictly on your
@@ -224,18 +226,18 @@ const CropHealthMonitoring: React.FC = () => {
         <div>
           <h1 className="page-header flex items-center gap-3">
             <Activity className="text-primary-600 dark:text-primary-400" />
-            Satellite Crop Health
+            {t('cropHealthMonitor.title', 'Satellite Crop Health')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-            Precision NDVI & EVI vegetation analytics via satellite vision
+            {t('cropHealthMonitor.subtitle', 'Precision NDVI & EVI vegetation analytics via satellite vision')}
           </p>
         </div>
         <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
           <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
-            🛰️ Satellite AI Vision
+            {t('cropHealthMonitor.satelliteAiVision', '🛰️ Satellite AI Vision')}
           </span>
           <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40">
-            Copernicus Sentinel-2 L2A Calibration Profile
+            {t('cropHealthMonitor.sentinelCalibration', 'Copernicus Sentinel-2 L2A Calibration Profile')}
           </span>
         </div>
       </div>
@@ -244,21 +246,24 @@ const CropHealthMonitoring: React.FC = () => {
       <div className="standard-grid">
         {[
           {
-            label: 'Avg NDVI Score',
+            key: 'avgNdviScore',
+            label: t('cropHealthMonitor.avgNdviScore', 'Avg NDVI Score'),
             value: avgNDVI,
             color: 'text-primary-600',
             bg: 'glass-gold border-gold-200',
             icon: '🌿',
           },
           {
-            label: 'Field Health',
-            value: `${healthyCount}/${NDVI_ZONES.length} Healthy`,
+            key: 'fieldHealth',
+            label: t('cropHealthMonitor.fieldHealth', 'Field Health'),
+            value: `${healthyCount}/${NDVI_ZONES.length} ${t('cropHealthMonitor.healthy', 'Healthy')}`,
             color: 'text-primary-600',
             bg: 'bg-primary-50 dark:bg-primary-900/20',
             icon: '✅',
           },
           {
-            label: 'Total Farm Area',
+            key: 'totalFarmArea',
+            label: t('cropHealthMonitor.totalFarmArea', 'Total Farm Area'),
             value: '9.0 ha',
             color: 'text-blue-600',
             bg: 'bg-blue-50 dark:bg-blue-900/20',
@@ -266,14 +271,14 @@ const CropHealthMonitoring: React.FC = () => {
           },
         ].map((s) => (
           <div
-            key={s.label}
-            onClick={() => openReport(s.label === 'Field Health' ? 'Healthy Zones' : s.label)}
+            key={s.key}
+            onClick={() => openReport(s.key === 'fieldHealth' ? 'Healthy Zones' : s.label)}
             className={`card !p-6 transition-all hover:scale-[1.02] hover:shadow-2xl duration-300 cursor-pointer group active:scale-95 ${s.bg}`}
           >
             <div className="flex justify-between items-start">
               <span className="text-3xl group-hover:rotate-12 transition-transform">{s.icon}</span>
               <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary-500 transition-colors">
-                Analytical Report
+                {t('cropHealthMonitor.analyticalReport', 'Analytical Report')}
               </span>
             </div>
             <p className={`text-3xl font-black mt-4 ${s.color}`}>{s.value}</p>
@@ -288,23 +293,23 @@ const CropHealthMonitoring: React.FC = () => {
         {/* Simulated Farm Map */}
         <div className="lg:col-span-3 card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="section-header">Farm Vegetation Map</h3>
+            <h3 className="section-header">{t('cropHealthMonitor.farmVegetationMap', 'Farm Vegetation Map')}</h3>
             <div className="flex items-center gap-3 text-xs">
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded bg-primary-700 inline-block" />
-                Excellent
+                {t('cropHealthMonitor.excellent', 'Excellent')}
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded bg-primary-400 inline-block" />
-                Good
+                {t('cropHealthMonitor.good', 'Good')}
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded bg-yellow-400 inline-block" />
-                Moderate
+                {t('cropHealthMonitor.moderate', 'Moderate')}
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded bg-red-400 inline-block" />
-                Stressed
+                {t('cropHealthMonitor.stressed', 'Stressed')}
               </span>
             </div>
           </div>
@@ -486,17 +491,17 @@ const CropHealthMonitoring: React.FC = () => {
 
             {/* Legend */}
             <div className="absolute bottom-2 right-3 text-[9px] font-black uppercase tracking-widest text-teal-400/80 bg-slate-900/80 px-2 py-0.5 rounded border border-teal-500/30 backdrop-blur-sm">
-              Telemetric Scan Active
+              {t('cropHealthMonitor.telemetricScanActive', 'Telemetric Scan Active')}
             </div>
             <div className="absolute bottom-2 left-3 text-[9px] font-bold text-gray-400">
-              Click zones for details
+              {t('cropHealthMonitor.clickZonesForDetails', 'Click zones for details')}
             </div>
           </div>
         </div>
 
         {/* Zone Details */}
         <div className="lg:col-span-2 space-y-3">
-          <h3 className="section-header">Zone Analysis</h3>
+          <h3 className="section-header">{t('cropHealthMonitor.zoneAnalysis', 'Zone Analysis')}</h3>
           {NDVI_ZONES.map((zone, i) => (
             <div
               key={zone.zone}
@@ -516,7 +521,13 @@ const CropHealthMonitoring: React.FC = () => {
                 <span
                   className={`badge ${zone.status === 'Healthy' || zone.status === 'Excellent' ? 'badge-green' : zone.status === 'Moderate' ? 'badge-yellow' : 'badge-red'}`}
                 >
-                  {zone.status}
+                  {zone.status === 'Healthy'
+                    ? t('cropHealthMonitor.healthy', 'Healthy')
+                    : zone.status === 'Moderate'
+                      ? t('cropHealthMonitor.moderate', 'Moderate')
+                      : zone.status === 'Stressed'
+                        ? t('cropHealthMonitor.stressed', 'Stressed')
+                        : zone.status}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
@@ -529,14 +540,13 @@ const CropHealthMonitoring: React.FC = () => {
                   <p className="font-bold text-gray-800 dark:text-gray-200">{zone.evi}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400">Area</p>
+                  <p className="text-gray-500 dark:text-gray-400">{t('cropHealthMonitor.area', 'Area')}</p>
                   <p className="font-bold text-gray-800 dark:text-gray-200">{zone.area}</p>
                 </div>
               </div>
               {selectedZone === i && zone.status === 'Stressed' && (
                 <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-xs text-red-600 dark:text-red-400">
-                  ⚠️ Intervention needed: Possible water stress or pest infestation. Recommend field
-                  inspection.
+                  {t('cropHealthMonitor.interventionNeeded', '⚠️ Intervention needed: Possible water stress or pest infestation. Recommend field inspection.')}
                 </div>
               )}
             </div>
@@ -547,33 +557,29 @@ const CropHealthMonitoring: React.FC = () => {
       {/* Scientific Footnotes & Data Source Disclaimer */}
       <div className="card bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800 p-5 mt-6 space-y-3">
         <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
-          Scientific Methodology & Data Sources
+          {t('cropHealthMonitor.methodology', 'Scientific Methodology & Data Sources')}
         </h4>
         <div className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed space-y-2">
           <p>
-            <strong>Data Source:</strong> Remote sensing spectral data is retrieved from the
-            Copernicus Sentinel-2 satellite constellation at a spatial resolution of 10 meters, with
-            a 5-day revisit cycle. Ground-level validation is synced with our local IoT soil
-            moisture arrays.
+            <strong>{t('cropHealthMonitor.dataSource', 'Data Source:')}</strong> {t('cropHealthMonitor.dataSourceDesc', 'Remote sensing spectral data is retrieved from the Copernicus Sentinel-2 satellite constellation at a spatial resolution of 10 meters, with a 5-day revisit cycle. Ground-level validation is synced with our local IoT soil moisture arrays.')}
           </p>
           <p>
-            <strong>Vegetation Indices Formulae:</strong>
+            <strong>{t('cropHealthMonitor.vegetationIndicesFormulae', 'Vegetation Indices Formulae:')}</strong>
           </p>
           <ul className="list-disc pl-5 space-y-1">
             <li>
-              <strong>Normalized Difference Vegetation Index (NDVI):</strong>{' '}
+              <strong>{t('cropHealthMonitor.ndviFull', 'Normalized Difference Vegetation Index (NDVI):')}</strong>{' '}
               <code className="bg-gray-100 dark:bg-gray-800/60 px-1 py-0.5 rounded font-mono text-primary-600 dark:text-primary-400">
                 NDVI = (NIR - Red) / (NIR + Red)
               </code>
-              . Used to estimate vegetation health, density, and chlorophyll concentration.
+              . {t('cropHealthMonitor.ndviFormulaDesc', 'Used to estimate vegetation health, density, and chlorophyll concentration.')}
             </li>
             <li>
-              <strong>Enhanced Vegetation Index (EVI):</strong>{' '}
+              <strong>{t('cropHealthMonitor.eviFull', 'Enhanced Vegetation Index (EVI):')}</strong>{' '}
               <code className="bg-gray-100 dark:bg-gray-800/60 px-1 py-0.5 rounded font-mono text-primary-600 dark:text-primary-400">
                 EVI = 2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))
               </code>
-              . Optimized to reduce soil background and atmospheric scatter in high biomass density
-              plots.
+              . {t('cropHealthMonitor.eviFormulaDesc', 'Optimized to reduce soil background and atmospheric scatter in high biomass density plots.')}
             </li>
           </ul>
         </div>
