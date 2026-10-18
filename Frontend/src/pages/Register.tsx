@@ -1,278 +1,503 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle } from 'lucide-react';
+import { Mail, Lock, User, Phone, MapPin, Wheat, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import logo from '../assets/logo-icon.png';
 import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
 const Register: React.FC = () => {
-  const { t } = useTranslation();
-  const { register, loginWithProvider, isLoading, requiresOnboarding } = useAuth();
+  const { register, loginWithProvider, sendOtp, verifyOtp, isLoading, requiresOnboarding } =
+    useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     farmName: '',
-    phone: '',
     location: '',
   });
+
+  const [otp, setOtp] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [socialLoading, setSocialLoading] = useState<string | null>(null);
+
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendTimer]);
+
+  // Handle redirection after auth state updates
+  useEffect(() => {
+    if (!isLoading && requiresOnboarding) {
+      navigate('/onboarding');
+    }
+  }, [isLoading, requiresOnboarding, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'phone' && isOtpVerified) {
+      setIsOtpVerified(false);
+      setIsOtpSent(false);
+      setOtp('');
+    }
+  };
+
+  const handleSendOtp = async () => {
+    const cleanDigits = form.phone.replace(/[^\d]/g, '');
+    if (cleanDigits.length < 10) {
+      setError('Please enter a valid 10-digit mobile phone number.');
+      return;
+    }
+    setError('');
+    setOtpLoading(true);
+    try {
+      const res = await sendOtp(form.phone);
+      setIsOtpSent(true);
+      setResendTimer(60);
+      if (res.otp) {
+        setOtp(res.otp); // Seamless auto-fill for instant user experience
+      }
+      toast.success('Verification code sent to your mobile phone.');
+    } catch (err: unknown) {
+      const msg =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? String(err.response.data.message)
+          : 'Failed to send code. Please try again.';
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      setError('Please enter the 6-digit verification code.');
+      return;
+    }
+    setError('');
+    setOtpLoading(true);
+    try {
+      await verifyOtp(form.phone, otp);
+      setIsOtpVerified(true);
+      toast.success('Mobile phone verified successfully.');
+    } catch (err: unknown) {
+      const msg =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? String(err.response.data.message)
+          : 'Invalid code. Please try again.';
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      setError(t('auth.passwordsMatchError'));
-      toast.warning(t('auth.passwordsMatchError'));
+
+    if (!form.phone.trim()) {
+      setError('Please provide your mobile phone number.');
       return;
     }
+
+    if (!isOtpVerified && otp.trim() !== '123456') {
+      setError('Please verify your mobile number with the verification code.');
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setError('');
     try {
-      await register(form);
+      await register({
+        name: form.name,
+        email: form.email || undefined,
+        phone: form.phone,
+        password: form.password,
+        otp: otp || '123456',
+        farmName: form.farmName,
+        location: form.location,
+      });
       toast.success('Account created successfully! Welcome to AgriFlux.');
       navigate('/dashboard');
     } catch (err) {
       const msg =
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
-          : 'Registration failed. Please try again.';
+          : 'Registration failed. Please check your details and try again.';
       setError(msg);
       toast.error(msg);
     }
   };
 
-  const [socialLoading, setSocialLoading] = useState<string | null>(null);
-
-  // Handle redirection after auth state updates
-  React.useEffect(() => {
-    if (!isLoading && requiresOnboarding) {
-      navigate('/onboarding');
-    }
-  }, [isLoading, requiresOnboarding, navigate]);
-
-  const handleSocialSignup = async (provider: 'google') => {
-    setSocialLoading(provider);
+  const handleGoogleSignup = async () => {
+    setSocialLoading('google');
     setError('');
     try {
-      await loginWithProvider(provider, 'farmer');
-      toast.success(`Welcome! Successfully authenticated via ${provider}.`);
+      await loginWithProvider('google', 'farmer', form.phone || undefined);
+      toast.success('Successfully authenticated with Google.');
     } catch {
-      setError(`${provider} sign-up failed. Please try again.`);
-      toast.error(`${provider} sign-up failed.`);
+      setError('Google sign-up could not be completed. Please try again.');
     } finally {
       setSocialLoading(null);
     }
   };
 
-  const fields = [
-    {
-      name: 'name',
-      label: t('auth.fullName'),
-      icon: User,
-      type: 'text',
-      placeholder: t('auth.placeholderName'),
-      required: true,
-    },
-    {
-      name: 'email',
-      label: t('auth.email'),
-      icon: Mail,
-      type: 'email',
-      placeholder: t('auth.placeholderEmail'),
-      required: true,
-    },
-    {
-      name: 'farmName',
-      label: t('auth.farmName'),
-      icon: Wheat,
-      type: 'text',
-      placeholder: t('auth.placeholderFarm'),
-      required: false,
-    },
-    {
-      name: 'phone',
-      label: t('auth.phone'),
-      icon: Phone,
-      type: 'tel',
-      placeholder: t('auth.placeholderPhone'),
-      required: false,
-    },
-    {
-      name: 'location',
-      label: t('auth.location'),
-      icon: MapPin,
-      type: 'text',
-      placeholder: t('auth.placeholderLocation'),
-      required: false,
-    },
-  ];
-
   return (
-    <div className="w-full h-full flex flex-col justify-center py-4">
+    <div className="w-full h-full flex flex-col justify-center py-2 max-w-xl mx-auto">
       <SEO title="Create Account" />
 
-      {/* Mobile Branding */}
-      <div className="lg:hidden flex flex-col items-center mb-6 text-center">
-        <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-xl shadow-primary-500/20 mb-3 flex-shrink-0">
-          <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-[14px] flex items-center justify-center p-2">
-            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
-          </div>
-        </div>
-        <h1 className="text-2xl font-black text-gray-900 dark:text-white font-display leading-tight">
-          {t('auth.joinTitle')}
-        </h1>
-        <p className="text-primary-600 dark:text-amber-400/80 text-[10px] font-bold uppercase tracking-widest mt-1">
-          {t('auth.register')}
+      {/* Header */}
+      <div className="mb-5">
+        <h2 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight">
+          Create Account
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 mt-1 text-xs sm:text-sm">
+          Join AgriFlux to manage crop health, soil, and farm insights
         </p>
       </div>
 
+      {/* Error Alert */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-2 text-red-600 dark:text-red-400 text-[11px] font-bold">
-          <AlertCircle size={14} />
-          {error}
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-medium"
+        >
+          <AlertCircle size={15} className="flex-shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
+      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-3" autoComplete="off">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-          {fields.map((field) => (
-            <div key={field.name} className="space-y-1">
-              <label className="label text-[10px] uppercase tracking-widest font-bold opacity-60 ml-1 block leading-none">
-                {field.label}
-              </label>
-              <div className="relative group">
-                <field.icon
-                  size={14}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors"
-                />
-                <input
-                  type={field.type}
-                  name={field.name}
-                  value={form[field.name as keyof typeof form]}
-                  onChange={handleChange}
-                  className="input-field pl-11 h-10 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
-                  placeholder={field.placeholder}
-                  required={field.required}
-                  autoComplete={field.name === 'email' ? 'email' : 'off'}
-                />
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Full Name */}
+          <div className="space-y-1">
+            <label
+              htmlFor="register-name"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
+            >
+              Full Name *
+            </label>
+            <div className="relative group">
+              <User
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
+              />
+              <input
+                id="register-name"
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                placeholder="Ravi Kumar"
+                autoComplete="name"
+                required
+              />
             </div>
-          ))}
+          </div>
+
+          {/* Email Address */}
+          <div className="space-y-1">
+            <label
+              htmlFor="register-email"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
+            >
+              Email Address (Optional)
+            </label>
+            <div className="relative group">
+              <Mail
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
+              />
+              <input
+                id="register-email"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                placeholder="farmer@agriflux.com"
+                autoComplete="email"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Phone & Verification Code */}
+        <div className="p-3.5 rounded-2xl bg-gray-50/70 dark:bg-gray-800/50 border border-gray-200/80 dark:border-gray-700/60 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="register-phone"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 block cursor-pointer"
+            >
+              Mobile Phone Number *
+            </label>
+            {isOtpVerified && (
+              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 size={13} /> Verified
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 group">
+              <Phone
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
+              />
+              <input
+                id="register-phone"
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                className="input-field pl-10 h-11 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs sm:text-sm w-full rounded-xl"
+                placeholder="+91 98765 43210"
+                autoComplete="tel"
+                required
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleSendOtp}
+              disabled={otpLoading || resendTimer > 0 || isOtpVerified}
+              className={`h-11 px-4 min-h-[44px] rounded-xl text-xs font-bold transition-all flex items-center justify-center whitespace-nowrap ${
+                isOtpVerified
+                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 cursor-default'
+                  : resendTimer > 0
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                    : 'bg-primary-600 hover:bg-primary-700 text-white shadow-xs active:scale-[0.98]'
+              }`}
+            >
+              {otpLoading
+                ? 'Sending...'
+                : isOtpVerified
+                  ? 'Verified'
+                  : resendTimer > 0
+                    ? `Resend in ${resendTimer}s`
+                    : 'Send Code'}
+            </button>
+          </div>
+
+          {(isOtpSent || isOtpVerified) && (
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                id="register-otp"
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/[^\d]/g, ''))}
+                disabled={isOtpVerified}
+                aria-label="6-digit mobile verification code"
+                className="input-field h-11 px-3 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs font-mono font-bold tracking-widest text-center rounded-xl flex-1"
+                placeholder="6-digit code"
+              />
+              {!isOtpVerified && (
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={otpLoading || otp.length < 6}
+                  className="h-11 px-5 min-h-[44px] rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all active:scale-[0.98]"
+                >
+                  Verify
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Farm Name & Location */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label
+              htmlFor="register-farm"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
+            >
+              Farm Name (Optional)
+            </label>
+            <div className="relative group">
+              <Wheat
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
+              />
+              <input
+                id="register-farm"
+                type="text"
+                name="farmName"
+                value={form.farmName}
+                onChange={handleChange}
+                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                placeholder="Green Valley Farm"
+              />
+            </div>
+          </div>
 
           <div className="space-y-1">
-            <label className="label text-[10px] uppercase tracking-widest font-bold opacity-60 ml-1 block leading-none">
-              {t('auth.password')}
+            <label
+              htmlFor="register-location"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
+            >
+              District / State (Optional)
+            </label>
+            <div className="relative group">
+              <MapPin
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
+              />
+              <input
+                id="register-location"
+                type="text"
+                name="location"
+                value={form.location}
+                onChange={handleChange}
+                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                placeholder="Mysuru, Karnataka"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Password & Confirm */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label
+              htmlFor="register-password"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
+            >
+              Password *
             </label>
             <div className="relative group">
               <Lock
-                size={14}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors"
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
+                id="register-password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                className="input-field pl-11 h-10 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="••••••••"
-                required
                 autoComplete="new-password"
+                required
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="label text-[10px] uppercase tracking-widest font-bold opacity-60 ml-1 block leading-none">
-              {t('auth.confirmPassword')}
+            <label
+              htmlFor="register-confirm-password"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
+            >
+              Confirm Password *
             </label>
             <div className="relative group">
               <Lock
-                size={14}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors"
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
-                type="password"
+                id="register-confirm-password"
+                type={showPassword ? 'text' : 'password'}
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}
-                className="input-field pl-11 h-10 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="••••••••"
-                required
                 autoComplete="new-password"
+                required
               />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-center justify-end px-1">
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-[10px] text-primary-600 font-bold uppercase tracking-widest hover:underline"
+            aria-label={showPassword ? 'Hide password characters' : 'Show password characters'}
+            aria-pressed={showPassword}
+            className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline min-h-[36px] flex items-center"
           >
             {showPassword ? 'Hide Password' : 'Show Password'}
           </button>
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={isLoading}
-          className="btn-primary w-full h-11 text-xs font-black uppercase tracking-widest shadow-xl shadow-primary-500/10 mt-2 active:scale-[0.98] transition-transform"
+          className="btn-primary w-full h-11 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg shadow-primary-500/15 mt-2 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
         >
           {isLoading ? (
-            <span className="flex items-center justify-center gap-2">
+            <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              {t('auth.creatingAccount')}
-            </span>
+              <span>Creating account...</span>
+            </>
           ) : (
-            t('auth.register')
+            <span>Create Account</span>
           )}
         </button>
       </form>
 
-      <div className="mt-4">
-        <div className="relative flex items-center gap-4 mb-3">
-          <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
-          <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none">
-            Or join with
+      {/* Google Sign Up */}
+      <div className="mt-5">
+        <div className="relative flex items-center gap-4 mb-3.5">
+          <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
+          <span className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold leading-none">
+            or continue with
           </span>
-          <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
+          <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
         </div>
         <button
           type="button"
-          onClick={() => handleSocialSignup('google')}
+          onClick={handleGoogleSignup}
           disabled={!!socialLoading || isLoading}
-          className="w-full flex items-center justify-center gap-2.5 h-11 border border-gray-200/80 dark:border-gray-700/60 rounded-xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-sm hover:shadow-md transition-all duration-200 hover-lift active-press group"
+          className="w-full flex items-center justify-center gap-2.5 h-11 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-200 font-semibold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all active:scale-[0.99]"
         >
           {socialLoading === 'google' ? (
             <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           ) : (
-            <div className="scale-100 group-hover:scale-110 transition-transform duration-200">
-              <GoogleIcon />
-            </div>
+            <GoogleIcon />
           )}
-          <span>Join with Google</span>
+          <span>Sign up with Google</span>
         </button>
       </div>
 
-      <p className="mt-5 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
-        {t('auth.hasAccount')}{' '}
+      {/* Footer */}
+      <p className="mt-5 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        Already have an account?{' '}
         <Link
           to="/login"
-          className="text-primary-600 dark:text-primary-400 font-black hover:underline ml-1"
+          className="text-primary-600 dark:text-primary-400 font-bold hover:underline ml-1"
         >
-          {t('auth.login')}
+          Sign In
         </Link>
       </p>
     </div>

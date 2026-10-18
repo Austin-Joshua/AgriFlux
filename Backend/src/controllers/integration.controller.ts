@@ -1,6 +1,19 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import User from '../../../Database/Models/User';
 import Report from '../../../Database/Models/Report';
+import { env } from '../config/env';
+
+/**
+ * Constant-time string comparison to prevent side-channel timing attacks
+ */
+const verifyTimingSafeKey = (providedKey: string | undefined, expectedKey: string): boolean => {
+  if (!providedKey || typeof providedKey !== 'string') return false;
+  // Hash both keys to fixed 32-byte SHA-256 digests to eliminate buffer length timing disclosure
+  const hashProvided = crypto.createHash('sha256').update(providedKey).digest();
+  const hashExpected = crypto.createHash('sha256').update(expectedKey).digest();
+  return crypto.timingSafeEqual(hashProvided, hashExpected);
+};
 
 /**
  * GET /api/integration/farmer-stats/:identifier
@@ -12,10 +25,18 @@ export const getFarmerStats = async (req: Request, res: Response) => {
     const { identifier } = req.params;
     const integrationKey = req.headers['x-integration-key'];
 
-    // Security Check
-    const SECRET_KEY =
-      process.env.CITIZENONE_INTEGRATION_KEY || 'agriflux_default_integration_secret';
-    if (integrationKey !== SECRET_KEY) {
+    // Security Check: In production, require explicitly configured integration secret
+    const configuredKey = process.env.CITIZENONE_INTEGRATION_KEY;
+    if (env.NODE_ENV === 'production' && !configuredKey) {
+      return res.status(503).json({
+        success: false,
+        message:
+          'Integration service unavailable: CITIZENONE_INTEGRATION_KEY secret not provisioned.',
+      });
+    }
+
+    const effectiveKey = configuredKey || 'agriflux_default_integration_secret';
+    if (!verifyTimingSafeKey(integrationKey as string, effectiveKey)) {
       return res.status(401).json({ success: false, message: 'Invalid integration key' });
     }
 
@@ -62,23 +83,15 @@ export const getFarmerStats = async (req: Request, res: Response) => {
  * GET /api/integration/status
  * Public health check for the integration system.
  */
-export const getIntegrationStatus = async (req: Request, res: Response) => {
+export const getIntegrationStatus = async (_req: Request, res: Response) => {
   try {
-    const secret = process.env.CITIZENONE_INTEGRATION_KEY || 'agriflux_default_integration_secret';
-    const integrationKey = req.headers['x-integration-key'];
-
-    const isKeyConfigured = secret !== 'agriflux_default_integration_secret';
-    const isClientAuthorized = integrationKey === secret;
-
+    const isConfigured = Boolean(process.env.CITIZENONE_INTEGRATION_KEY);
     res.status(200).json({
       success: true,
       status: 'healthy',
       timestamp: new Date().toISOString(),
       service: 'AgriFlux-CitizenOne-Link',
-      configuration: {
-        isKeyConfigured,
-        isClientAuthorized,
-      },
+      isReady: isConfigured || env.NODE_ENV !== 'production',
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });

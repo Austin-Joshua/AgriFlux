@@ -1,12 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  Bell,
-  CloudRain,
-  TrendingUp,
-  Lightbulb,
-  ChevronRight,
-  Info,
-} from 'lucide-react';
+import { Bell, CloudRain, TrendingUp, Lightbulb, ChevronRight, Info } from 'lucide-react';
 import { useRealisticData } from '../hooks/useRealisticData';
 
 interface Alert {

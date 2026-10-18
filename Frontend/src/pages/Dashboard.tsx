@@ -13,7 +13,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import {
-  TrendingUp,
   Droplets,
   Leaf,
   ArrowUpRight,
@@ -28,6 +27,11 @@ import {
   Clock,
   Video,
   Loader,
+  Satellite,
+  Sprout,
+  ChevronDown,
+  ChevronRight,
+  Globe,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
@@ -163,6 +167,7 @@ const Dashboard: React.FC = () => {
   // Session-stable metrics from hook
   const soilScore = data.confidenceScore - 5; // Derived from health confidence
   const yieldForecast = `${data.yieldKgHa.toLocaleString()} kg/ha`;
+  const [showBenchmarks, setShowBenchmarks] = useState(false);
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
@@ -194,8 +199,8 @@ const Dashboard: React.FC = () => {
         }}
       />
 
-      {/* Welcome Header — Standardized */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Welcome Header — Clean & Standardized */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="page-header">
             {t(`dashboard.${greeting.toLowerCase().replace(' ', '')}`)},{' '}
@@ -208,14 +213,39 @@ const Dashboard: React.FC = () => {
             {t('dashboard.subtitle')}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setReportOpen(true)}
-            className="btn-primary flex items-center gap-2 !py-2.5"
-          >
-            <Sparkles size={16} className="text-yellow-200" />
-            Generate Smart Farm Report
-          </button>
+      </div>
+
+      {/* High-Individuality AI Farm Diagnostic Card */}
+      <div
+        onClick={() => setReportOpen(true)}
+        className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/5 dark:from-emerald-950/40 dark:via-dark-900 dark:to-teal-950/20 border border-emerald-500/30 hover:border-emerald-500/60 shadow-sm hover:shadow-md transition-all cursor-pointer group select-none animate-slide-up-fade"
+        role="button"
+        tabIndex={0}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-500/30 group-hover:scale-105 transition-transform">
+              <Sparkles size={20} className="text-yellow-200 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                  Live AI Crop Diagnostic
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
+                  {data.confidenceScore}% Confidence
+                </span>
+              </div>
+              <p className="text-sm sm:text-base font-black text-slate-900 dark:text-white mt-0.5">
+                {data.crop} ({data.variety}) · Harvest Target: {yieldForecast}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 self-end sm:self-center text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
+            <span>View Detailed AI Report</span>
+            <ChevronRight size={14} />
+          </div>
         </div>
       </div>
 
@@ -240,14 +270,14 @@ const Dashboard: React.FC = () => {
           route="/soil"
         />
         <StatCard
-          title={t('dashboard.yieldForecast')}
-          value={yieldForecast}
-          change="+12%"
-          icon={<TrendingUp size={22} className="text-primary-600" />}
+          title="Crop Health"
+          value="Optimal (96%)"
+          change="NDVI Active"
+          icon={<Satellite size={22} className="text-primary-600" />}
           color="text-primary-600 dark:text-primary-400"
           bgColor="bg-primary-100 dark:bg-primary-900/30"
           accentColor="#22c55e"
-          route="/yield"
+          route="/crop-health"
         />
         <StatCard
           title={t('dashboard.irrigationStatus')}
@@ -260,14 +290,14 @@ const Dashboard: React.FC = () => {
           route="/irrigation"
         />
         <StatCard
-          title="Climate Resilience"
-          value="94%"
-          change="Low Risk"
-          icon={<ShieldCheck size={22} className="text-emerald-600" />}
+          title="Crop Resilience"
+          value="Resilient"
+          change="Advisory Ready"
+          icon={<Sprout size={22} className="text-emerald-600" />}
           color="text-emerald-600 dark:text-emerald-400"
           bgColor="bg-emerald-100 dark:bg-emerald-900/30"
           accentColor="#10b981"
-          route="/climate"
+          route="/crop-switching"
         />
       </div>
 
@@ -436,9 +466,39 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Macro-Environmental & Orbital Intelligence (Open-Meteo & Copernicus Sentinel-2) */}
-      <div className="animate-slide-up-fade" style={{ animationDelay: '220ms' }}>
-        <EnvironmentalIntelligence />
+      {/* Macro-Environmental & Reference Benchmarks (Collapsible for Clean Symmetrical UX) */}
+      <div
+        className="card !p-0 overflow-hidden border border-slate-200/80 dark:border-dark-800 animate-slide-up-fade"
+        style={{ animationDelay: '220ms' }}
+      >
+        <button
+          onClick={() => setShowBenchmarks(!showBenchmarks)}
+          className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-dark-850 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+              <Globe size={18} />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                Regional Environmental Benchmarks & Satellite Registry
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-dark-400">
+                Historical Open-Meteo ERA5-Land reanalysis and Copernicus Sentinel-2 MSI data
+                provenance
+              </p>
+            </div>
+          </div>
+          <ChevronDown
+            size={18}
+            className={`text-slate-400 transition-transform duration-200 ${showBenchmarks ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {showBenchmarks && (
+          <div className="p-4 border-t border-slate-200/80 dark:border-dark-800 animate-fade-in">
+            <EnvironmentalIntelligence />
+          </div>
+        )}
       </div>
 
       {/* Bottom Row */}

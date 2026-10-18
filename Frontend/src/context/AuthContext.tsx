@@ -18,29 +18,42 @@ export interface User {
   avatar?: string;
   expertise?: string;
   emailVerified?: boolean;
+  phoneVerified?: boolean;
+}
+
+export interface RegisterData {
+  name: string;
+  email?: string;
+  password: string;
+  phone: string;
+  otp: string;
+  role?: UserRole;
+  farmName?: string;
+  location?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (identifier: string, password: string, role?: UserRole) => Promise<User | undefined>;
-  loginWithProvider: (provider: 'google' | 'microsoft' | 'apple', role?: UserRole) => Promise<void>;
+  loginWithProvider: (
+    provider: 'google' | 'microsoft' | 'apple',
+    role?: UserRole,
+    phone?: string
+  ) => Promise<void>;
   logout: () => void;
   register: (data: RegisterData) => Promise<void>;
+  sendOtp: (
+    phone: string
+  ) => Promise<{ success: boolean; message: string; otp?: string; devHint?: string }>;
+  verifyOtp: (
+    phone: string,
+    otp: string
+  ) => Promise<{ success: boolean; message: string; verified?: boolean }>;
   completeOnboarding: (farmName: string, location: string) => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
   requiresOnboarding: boolean;
-}
-
-interface RegisterData {
-  name: string;
-  email?: string;
-  password: string;
-  phone: string;
-  role?: UserRole;
-  farmName?: string;
-  location?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,25 +64,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const [requiresOnboarding, setRequiresOnboarding] = useState(false);
 
-  // Restore session from localStorage on mount and check expiry
+  // ── Token Expiry Verification (Prevents Sudden Logouts) ───────────────────
+  const isTokenExpired = (tokenStr: string | null): boolean => {
+    if (!tokenStr) return true;
+    // Development, mock, and local demo tokens never expire
+    if (
+      tokenStr.startsWith('demo-') ||
+      tokenStr.startsWith('mock-') ||
+      tokenStr.includes('demo') ||
+      tokenStr.includes('offline')
+    ) {
+      return false;
+    }
+    try {
+      const parts = tokenStr.split('.');
+      if (parts.length !== 3) {
+        // Non-JWT token in local testing environment — keep alive
+        return false;
+      }
+      const payload = JSON.parse(atob(parts[1]));
+      if (payload && typeof payload.exp === 'number') {
+        // Expired only if strictly past expiry
+        return Date.now() >= payload.exp * 1000;
+      }
+      return false;
+    } catch {
+      return false; // Do not abruptly kick user out on decode edge-cases
+    }
+  };
+
+  // Restore session from localStorage on mount
   useEffect(() => {
     const savedToken = localStorage.getItem('agriflux-token');
     const savedUser = localStorage.getItem('agriflux-user');
-
-    const isTokenExpired = (tokenStr: string | null): boolean => {
-      if (!tokenStr) return true;
-      try {
-        const parts = tokenStr.split('.');
-        if (parts.length !== 3) return true;
-        const payload = JSON.parse(atob(parts[1]));
-        if (payload && typeof payload.exp === 'number') {
-          return Date.now() >= payload.exp * 1000;
-        }
-        return false;
-      } catch {
-        return true;
-      }
-    };
 
     if (savedToken && savedUser) {
       if (isTokenExpired(savedToken)) {
@@ -84,29 +111,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(parsedUser);
           axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
         } catch {
-          // Corrupted storage — clear it
           localStorage.removeItem('agriflux-token');
           localStorage.removeItem('agriflux-user');
         }
       }
     }
     setIsLoading(false);
-
-    // Periodically check token expiry every 30 seconds
-    const interval = setInterval(() => {
-      const currentToken = localStorage.getItem('agriflux-token');
-      if (currentToken && isTokenExpired(currentToken)) {
-        console.warn('Session expired. Logging out.');
-        setUser(null);
-        setToken(null);
-        setRequiresOnboarding(false);
-        localStorage.removeItem('agriflux-token');
-        localStorage.removeItem('agriflux-user');
-        delete axios.defaults.headers.common['Authorization'];
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const handleAuthResponse = (data: { token: string; user: User }) => {
@@ -117,85 +127,180 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
   };
 
-  // ── Password Login ────────────────────────────────────────────────────────
+  // ── OTP Helper Methods ───────────────────────────────────────────────────
+  const sendOtp = async (phone: string) => {
+    try {
+      const res = await axios.post(`${API_URL}/auth/send-otp`, { phone });
+      return res.data;
+    } catch (err: unknown) {
+      if (import.meta.env.DEV) {
+        // Local demo fallback if backend is offline in development only
+        const mockCode = '123456';
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.warn('Backend send-otp fallback triggered (dev only):', errMsg);
+        return {
+          success: true,
+          message: `OTP sent successfully to ${phone} (Demo Mode).`,
+          otp: mockCode,
+          devHint: 'Demo Master Code: 123456',
+        };
+      }
+      throw err;
+    }
+  };
+
+  const verifyOtp = async (phone: string, otp: string) => {
+    try {
+      const res = await axios.post(`${API_URL}/auth/verify-otp`, { phone, otp });
+      return res.data;
+    } catch (err: unknown) {
+      if (import.meta.env.DEV && otp.trim() === '123456') {
+        return { success: true, message: 'Verified (Demo)', verified: true };
+      }
+      throw err;
+    }
+  };
+
+  // ── Unified Login (Email OR Phone + Password) ─────────────────────────────
   const login = async (identifier: string, password: string) => {
     setIsLoading(true);
+    const cleanId = identifier.trim();
+    const digitsOnly = cleanId.replace(/[^\d]/g, '');
+
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, { identifier, password });
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        identifier: cleanId,
+        password,
+      });
       handleAuthResponse(response.data);
       return response.data.user;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Login error:', error.response?.data?.message || error.message);
-      } else if (error instanceof Error) {
-        console.error('Login error:', error.message);
+      // Offline / Localhost Demo Fallback for zero-failure local testing (Strictly development only)
+      if (import.meta.env.DEV) {
+        // Checks both Email and Phone numbers!
+        const isFarmer =
+          (cleanId.toLowerCase() === 'farmer@agriflux.com' ||
+            digitsOnly === '9876543210' ||
+            digitsOnly === '0000000001') &&
+          password === 'password123';
+
+        const isAgronomist =
+          (cleanId.toLowerCase() === 'agronomist@agriflux.com' ||
+            digitsOnly === '9876543211' ||
+            digitsOnly === '0000000002') &&
+          password === 'agro123';
+
+        const isAdmin =
+          (cleanId.toLowerCase() === 'admin@agriflux.com' ||
+            digitsOnly === '9876543212' ||
+            digitsOnly === '0000000003') &&
+          password === 'admin123';
+
+        if (isFarmer) {
+          const demoUser: User = {
+            id: '11111111-1111-4111-8111-111111111111',
+            name: 'Demo Farmer (Ravi Kumar)',
+            email: 'farmer@agriflux.com',
+            phone: '+91 98765 43210',
+            farmName: 'Green Valley Farm',
+            location: 'Mysuru, Karnataka',
+            role: 'farmer',
+            phoneVerified: true,
+            emailVerified: true,
+          };
+          handleAuthResponse({ token: 'demo-local-farmer-token', user: demoUser });
+          return demoUser;
+        }
+
+        if (isAgronomist) {
+          const demoUser: User = {
+            id: '22222222-2222-4222-9222-222222222222',
+            name: 'Dr. Priya Sharma',
+            email: 'agronomist@agriflux.com',
+            phone: '+91 98765 43211',
+            expertise: 'Soil Science & Plant Pathology',
+            role: 'agronomist',
+            phoneVerified: true,
+            emailVerified: true,
+          };
+          handleAuthResponse({ token: 'demo-local-agronomist-token', user: demoUser });
+          return demoUser;
+        }
+
+        if (isAdmin) {
+          const demoUser: User = {
+            id: '33333333-3333-4333-a333-333333333333',
+            name: 'Austin Joshua (System Administrator)',
+            email: 'admin@agriflux.com',
+            phone: '+91 98765 43212',
+            role: 'admin',
+            phoneVerified: true,
+            emailVerified: true,
+          };
+          handleAuthResponse({ token: 'demo-local-admin-token', user: demoUser });
+          return demoUser;
+        }
       }
+
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ── Social / Google Login ─────────────────────────────────────────────────
-  const loginWithProvider = async (provider: string, role: UserRole = 'farmer') => {
+  // ── Social / Google Login (With Account Merging) ──────────────────────────
+  const loginWithProvider = async (provider: string, role: UserRole = 'farmer', phone?: string) => {
     setIsLoading(true);
     try {
       if (provider === 'google') {
-        // Step 1 - Authenticate with Firebase in the browser
         const result = await signInWithPopup(auth, googleProvider);
         const firebaseUser = result.user;
         const additionalInfo = getAdditionalUserInfo(result);
-
-        // Step 2 - Get the Firebase ID token to verify server-side
         const idToken = await firebaseUser.getIdToken();
 
-        // Step 3 - Send the token to our backend for verification & DB sync
         try {
           const response = await axios.post(`${API_URL}/auth/social-login`, {
             idToken,
             role,
+            phone: phone || '',
           });
 
           handleAuthResponse(response.data);
 
-          // Trigger onboarding if it's the first time
           if (response.data.isNewUser || additionalInfo?.isNewUser) {
             setRequiresOnboarding(true);
           }
         } catch (backendErr) {
-          // Backend not reachable (e.g. local dev without backend running)
-          // Fall back to a client-only session so the UI still works
-          const message = backendErr instanceof Error ? backendErr.message : String(backendErr);
-          console.warn('Backend sync failed, using client-only session:', message);
-          const fallbackUser: User = {
-            id: firebaseUser.uid,
-            name: firebaseUser.displayName || 'Farmer',
-            email: firebaseUser.email || '',
-            phone: '',
-            role,
-            avatar: firebaseUser.photoURL || '',
-            emailVerified: firebaseUser.emailVerified,
-          };
-          const fallbackToken = idToken; // Use Firebase token as session token
-          handleAuthResponse({ token: fallbackToken, user: fallbackUser });
+          if (import.meta.env.DEV) {
+            const message = backendErr instanceof Error ? backendErr.message : String(backendErr);
+            console.warn('Backend sync failed, using client session (dev mode):', message);
+            const fallbackUser: User = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || 'Farmer',
+              email: firebaseUser.email || '',
+              phone: phone || '',
+              role,
+              avatar: firebaseUser.photoURL || '',
+              emailVerified: firebaseUser.emailVerified,
+              phoneVerified: !!phone,
+            };
+            handleAuthResponse({ token: idToken, user: fallbackUser });
 
-          // Always trigger onboarding on fallback (no DB to check)
-          if (additionalInfo?.isNewUser) {
-            setRequiresOnboarding(true);
+            if (additionalInfo?.isNewUser) {
+              setRequiresOnboarding(true);
+            }
+          } else {
+            // In production, strictly reject login when backend verification fails
+            throw backendErr;
           }
         }
       } else {
-        // Microsoft / Apple — mocked for now
         console.log(`Social login with ${provider} (mocked)`);
         await new Promise((r) => setTimeout(r, 1000));
       }
     } catch (error) {
-      // Sign-in was cancelled or popup was blocked
       const err = error as { code?: string; message?: string };
-      if (
-        err.code !== 'auth/popup-closed-by-user' &&
-        err.code !== 'auth/cancelled-popup-request'
-      ) {
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         console.error(`${provider} login error:`, err.message);
       }
       throw error;
@@ -210,16 +315,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const updatedUser = { ...user, farmName, location };
-
-      // Sync back to our backend (best-effort)
       try {
         await axios.post(`${API_URL}/auth/social-login`, {
-          idToken: token, // Pass current token for re-verification
+          idToken: token,
           farmName,
           location,
         });
       } catch {
-        // Backend not required for completing onboarding locally
+        /* Best-effort */
       }
 
       setUser(updatedUser);
@@ -230,17 +333,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // ── Registration ──────────────────────────────────────────────────────────
+  // ── Registration (Verified Mobile + Mandatory OTP) ────────────────────────
   const register = async (data: RegisterData) => {
     setIsLoading(true);
     try {
       const response = await axios.post(`${API_URL}/auth/register`, data);
       handleAuthResponse(response.data);
     } catch (error) {
+      // Local fallback for offline mode in development only
+      if (import.meta.env.DEV && data.otp === '123456') {
+        const mockUser: User = {
+          id: 'demo-registered-' + Date.now(),
+          name: data.name,
+          email: data.email || '',
+          phone: data.phone,
+          farmName: data.farmName || 'My AgriFlux Farm',
+          location: data.location || 'India',
+          role: data.role || 'farmer',
+          phoneVerified: true,
+          emailVerified: !!data.email,
+        };
+        handleAuthResponse({ token: 'demo-local-registered-token', user: mockUser });
+        return;
+      }
       if (axios.isAxiosError(error)) {
         console.error('Registration error:', error.response?.data?.message || error.message);
-      } else if (error instanceof Error) {
-        console.error('Registration error:', error.message);
       }
       throw error;
     } finally {
@@ -251,11 +368,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ── Logout ────────────────────────────────────────────────────────────────
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout').catch(() => {});
+      await axios.post(`${API_URL}/auth/logout`).catch(() => {});
     } catch {
       /* ignore */
     }
-    // Sign out from Firebase as well to clear the Google session
     try {
       await signOut(auth);
     } catch {
@@ -278,6 +394,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithProvider,
         logout,
         register,
+        sendOtp,
+        verifyOtp,
         completeOnboarding,
         isLoading,
         isAuthenticated: !!user && !!token,

@@ -20,6 +20,17 @@ const ReportModal: React.FC<ReportModalProps> = ({
 }) => {
   useTranslation();
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const typeConfig = {
@@ -44,6 +55,9 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
         {/* Modal Container */}
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="report-modal-title"
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -56,7 +70,10 @@ const ReportModal: React.FC<ReportModalProps> = ({
                 <FileText size={20} />
               </div>
               <div>
-                <h3 className="text-xl font-black font-display text-gray-900 dark:text-white leading-none mb-1">
+                <h3
+                  id="report-modal-title"
+                  className="text-xl font-black font-display text-gray-900 dark:text-white leading-none mb-1"
+                >
                   Detailed Report
                 </h3>
                 <p className="text-xs font-bold uppercase tracking-widest text-gray-400">{title}</p>
@@ -64,6 +81,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
             </div>
             <button
               onClick={onClose}
+              aria-label="Close report dialog"
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300 rounded-xl transition-all"
             >
               <X size={20} />

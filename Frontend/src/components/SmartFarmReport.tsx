@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -104,20 +105,33 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
     return () => clearInterval(iv);
   }, [isOpen, reportData, data]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const handlePrint = () => window.print();
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/85 backdrop-blur-md"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -126,28 +140,28 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
 
           {/* Modal */}
           <motion.div
-            className="relative z-10 w-full max-w-2xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden print:shadow-none print:rounded-none print:max-w-none"
-            initial={{ scale: 0.9, y: 30, opacity: 0 }}
+            className="relative z-10 w-full max-w-2xl max-h-[85dvh] flex flex-col bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden print:shadow-none print:rounded-none print:max-w-none border border-gray-200/50 dark:border-gray-800"
+            initial={{ scale: 0.95, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.9, y: 30, opacity: 0 }}
+            exit={{ scale: 0.95, y: 20, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-primary-700 via-primary-600 to-green-500 px-7 py-5 print:bg-primary-700">
+            <div className="bg-gradient-to-r from-emerald-600 via-primary-600 to-teal-500 px-4 sm:px-7 py-3.5 sm:py-5 flex-shrink-0 print:bg-primary-700">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                    <Sparkles size={22} className="text-white" />
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Sparkles size={20} className="text-white" />
                   </div>
                   <div>
-                    <h2 className="text-white font-bold text-lg leading-tight">
+                    <h2 className="text-white font-bold text-base sm:text-lg leading-tight">
                       Smart Farm AI Report
                     </h2>
-                    <p className="text-primary-100 text-xs">
+                    <p className="text-emerald-100 text-[11px] sm:text-xs">
                       Powered by AgriFlux AI Engine ·{' '}
                       {new Date().toLocaleDateString('en-IN', {
                         day: 'numeric',
-                        month: 'long',
+                        month: 'short',
                         year: 'numeric',
                       })}
                     </p>
@@ -155,7 +169,8 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
                 </div>
                 <button
                   onClick={onClose}
-                  className="print:hidden w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition-all"
+                  className="print:hidden w-8 h-8 sm:w-9 sm:h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition-all flex-shrink-0"
+                  aria-label="Close report"
                 >
                   <X size={18} />
                 </button>
@@ -163,7 +178,7 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
             </div>
 
             {/* Content */}
-            <div className="p-7 max-h-[75vh] overflow-y-auto">
+            <div className="p-4 sm:p-7 flex-1 overflow-y-auto overscroll-contain">
               {phase === 'loading' ? (
                 <div className="space-y-4 py-4">
                   <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
@@ -355,26 +370,27 @@ const SmartFarmReport: React.FC<SmartFarmReportProps> = ({ isOpen, onClose, repo
 
             {/* Footer Actions */}
             {phase === 'done' && (
-              <div className="px-7 py-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 print:hidden">
+              <div className="px-4 sm:px-7 py-3 sm:py-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between bg-white dark:bg-gray-900 shadow-md flex-shrink-0 print:hidden">
                 <button
                   onClick={onClose}
-                  className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-medium"
+                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors font-bold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   Close
                 </button>
                 <button
                   onClick={handlePrint}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm shadow-lg hover:scale-105 active:scale-95 transition-all"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition-all"
                 >
-                  <Download size={16} />
-                  Download Report (PDF)
+                  <Download size={15} />
+                  <span>Download Report (PDF)</span>
                 </button>
               </div>
             )}
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

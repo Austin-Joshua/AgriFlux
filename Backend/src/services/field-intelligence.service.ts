@@ -583,8 +583,11 @@ export class FieldIntelligenceService {
     }
 
     if (memoryRecommendations[recommendationId]) {
-      memoryRecommendations[recommendationId].farmerAction = actionRecord;
-      return memoryRecommendations[recommendationId];
+      const memRec = memoryRecommendations[recommendationId];
+      if (!memRec.userId || memRec.userId === userId) {
+        memRec.farmerAction = actionRecord;
+        return memRec;
+      }
     }
 
     return { recommendationId, farmerAction: actionRecord };
@@ -607,7 +610,10 @@ export class FieldIntelligenceService {
       }
     }
     if (!rec && memoryRecommendations[recommendationId]) {
-      rec = memoryRecommendations[recommendationId];
+      const memRec = memoryRecommendations[recommendationId];
+      if (!memRec.userId || memRec.userId === userId) {
+        rec = memRec;
+      }
     }
 
     const baselineMoisture = rec?.supportingObservations?.soilMoisture?.value || 30.0;

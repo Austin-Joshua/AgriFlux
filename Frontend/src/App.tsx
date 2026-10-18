@@ -10,6 +10,7 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import PageLoader from './components/PageLoader';
 import ErrorBoundary from './components/ErrorBoundary';
+import ScrollToTop from './components/ScrollToTop';
 
 // Layouts
 import AuthLayout from './layouts/AuthLayout';
@@ -19,6 +20,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import Onboarding from './pages/Onboarding';
+import LandingPage from './pages/LandingPage';
 
 // Pages — lazy loaded (code-splitting for performance)
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -82,6 +84,7 @@ const App: React.FC = () => {
         <AuthProvider>
           <ErrorBoundary>
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 {/* Authentication */}
                 <Route element={<AuthLayout />}>
@@ -100,39 +103,173 @@ const App: React.FC = () => {
 
                 {/* Protected lazy routes */}
                 <Route element={<P />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/marketplace" element={<Marketplace />} />
-                  <Route path="/equipment-rental" element={<EquipmentRental />} />
-                  <Route path="/yield" element={<YieldPrediction />} />
-                  <Route path="/yield-prediction" element={<YieldPrediction />} />
-                  <Route path="/irrigation" element={<IrrigationIntelligence />} />
-                  <Route path="/irrigation-intelligence" element={<IrrigationIntelligence />} />
-                  <Route path="/soil" element={<SoilAdvisor />} />
-                  <Route path="/soil-advisor" element={<SoilAdvisor />} />
-                  <Route path="/soil-intelligence" element={<SoilAdvisor />} />
-                  <Route path="/crop-health" element={<CropHealthMonitoring />} />
-                  <Route path="/crop-health-monitoring" element={<CropHealthMonitoring />} />
-                  <Route path="/climate" element={<ClimateRisk />} />
-                  <Route path="/climate-risk" element={<ClimateRisk />} />
-                  <Route path="/simulator" element={<ClimateSimulator />} />
-                  <Route path="/climate-simulator" element={<ClimateSimulator />} />
-                  <Route path="/crop-switching" element={<CropSwitchingAdvisor />} />
-                  <Route path="/crop-resilience" element={<CropSwitchingAdvisor />} />
-                  <Route path="/sustainability" element={<SustainabilityScore />} />
-                  <Route path="/sustainability-score" element={<SustainabilityScore />} />
-                  <Route path="/sustainability-index" element={<SustainabilityScore />} />
+                  {/* Common Shared Routes */}
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/about" element={<About />} />
-                  <Route path="/subsidies" element={<GovernmentSubsidies />} />
-                  <Route path="/government-subsidies" element={<GovernmentSubsidies />} />
-                  <Route path="/market" element={<MarketAnalysis />} />
-                  <Route path="/market-analysis" element={<MarketAnalysis />} />
-                  <Route path="/investors" element={<InvestorsHub />} />
-                  <Route path="/investors-hub" element={<InvestorsHub />} />
-                  <Route path="/book-consultation" element={<BookConsultation />} />
-                  <Route path="/land-intelligence" element={<LandIntelligence />} />
 
-                  {/* Role-Restricted Portals */}
+                  {/* Distinct Farmer Features */}
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/crop-health"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <CropHealthMonitoring />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/crop-health-monitoring"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <CropHealthMonitoring />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/soil"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <SoilAdvisor />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/soil-advisor"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <SoilAdvisor />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/soil-intelligence"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <SoilAdvisor />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/crop-switching"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <CropSwitchingAdvisor />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/crop-resilience"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <CropSwitchingAdvisor />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/irrigation"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <IrrigationIntelligence />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/irrigation-intelligence"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <IrrigationIntelligence />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/land-intelligence"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <LandIntelligence />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/marketplace"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <Marketplace />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/equipment-rental"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <EquipmentRental />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/subsidies"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <GovernmentSubsidies />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/government-subsidies"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <GovernmentSubsidies />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/market"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <MarketAnalysis />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/market-analysis"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <MarketAnalysis />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/investors"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <InvestorsHub />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/investors-hub"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <InvestorsHub />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/book-consultation"
+                    element={
+                      <ProtectedRoute allowedRoles={['farmer', 'admin']}>
+                        <BookConsultation />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* Distinct Agronomist Features */}
                   <Route
                     path="/agronomist"
                     element={
@@ -141,6 +278,80 @@ const App: React.FC = () => {
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/yield"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <YieldPrediction />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/yield-prediction"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <YieldPrediction />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/climate"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <ClimateRisk />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/climate-risk"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <ClimateRisk />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/simulator"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <ClimateSimulator />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/climate-simulator"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <ClimateSimulator />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/sustainability"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <SustainabilityScore />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/sustainability-score"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <SustainabilityScore />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/sustainability-index"
+                    element={
+                      <ProtectedRoute allowedRoles={['agronomist', 'admin']}>
+                        <SustainabilityScore />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* Distinct Admin Features */}
                   <Route
                     path="/admin"
                     element={
@@ -151,8 +362,10 @@ const App: React.FC = () => {
                   />
                 </Route>
 
-                {/* Redirects */}
-                <Route path="/" element={<HomeRedirect />} />
+                {/* Base Landing Page & Redirects */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/home" element={<LandingPage />} />
+                <Route path="/app" element={<HomeRedirect />} />
                 <Route
                   path="/404"
                   element={

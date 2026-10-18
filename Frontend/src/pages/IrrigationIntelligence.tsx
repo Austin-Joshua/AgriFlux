@@ -11,15 +11,7 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
-import {
-  Droplets,
-  Clock,
-  AlertTriangle,
-  Zap,
-  Activity,
-  Wifi,
-  WifiOff,
-} from 'lucide-react';
+import { Droplets, Clock, AlertTriangle, Zap, Activity, Wifi, WifiOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReportModal from '../components/ReportModal';
 import { useIoT } from '../hooks/useIoT';
@@ -335,12 +327,13 @@ const IrrigationIntelligence: React.FC = () => {
               }
             }}
             disabled={isToggling || (isLiveMode && !isOnline)}
-            className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all duration-300 shadow-lg relative z-10 ${isLiveMode && !isOnline
+            className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all duration-300 shadow-lg relative z-10 ${
+              isLiveMode && !isOnline
                 ? 'bg-gray-400 cursor-not-allowed'
                 : pumpActive
                   ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20'
                   : 'bg-green-600 hover:bg-green-700 text-white shadow-green-600/20'
-              }`}
+            }`}
             aria-label={pumpActive ? 'Stop Irrigation Pump' : 'Start Irrigation Pump'}
             aria-pressed={pumpActive}
           >
@@ -472,13 +465,10 @@ const IrrigationIntelligence: React.FC = () => {
                 </span>
               )}
             </div>
-            <p className="text-gray-400 dark:text-gray-500 text-xs font-bold font-mono">
-              {s.time}
-            </p>
+            <p className="text-gray-400 dark:text-gray-500 text-xs font-bold font-mono">{s.time}</p>
             <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-3">
               <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                Qty:{' '}
-                <span className="text-gray-900 dark:text-gray-200 font-black">{s.amount}</span>
+                Qty: <span className="text-gray-900 dark:text-gray-200 font-black">{s.amount}</span>
               </span>
               <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
                 Dur:{' '}

@@ -10,6 +10,8 @@ export interface IUser extends Document {
     plan: 'free' | 'premium' | 'organization';
     preferences: Record<string, any>;
     emailVerified: boolean;
+    phoneVerified: boolean;
+    googleId?: string;
     farmName?: string;
     location?: string;
     createdAt: Date;
@@ -26,13 +28,14 @@ const UserSchema: Schema = new Schema({
     plan:         { type: String, enum: ['free', 'premium', 'organization'], default: 'free' },
     preferences:  { type: Object, default: {} },
     emailVerified:{ type: Boolean, default: false },
+    phoneVerified:{ type: Boolean, default: false },
+    googleId:     { type: String, sparse: true },
     farmName:     { type: String, maxlength: 150 },
     location:     { type: String, maxlength: 200 },
 }, { timestamps: true });
 
-// Compound indexes for common query patterns
-UserSchema.index({ email: 1 });
-UserSchema.index({ phone: 1 });
-UserSchema.index({ role: 1 });
+// Optimized indexes for authentication and administrative queries
+UserSchema.index({ phone: 1 }, { unique: true, sparse: true });
+UserSchema.index({ role: 1, createdAt: -1 });
 
 export default mongoose.model<IUser>('User', UserSchema);

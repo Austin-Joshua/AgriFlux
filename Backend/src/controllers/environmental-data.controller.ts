@@ -28,11 +28,14 @@ export const getHistoricalWeather = async (req: Request, res: Response) => {
   try {
     const { granularity, startDate, endDate, limit } = req.query;
 
+    const rawLimit = limit ? parseInt(limit as string, 10) : 60;
+    const safeLimit = Math.min(365, Math.max(1, isNaN(rawLimit) ? 60 : rawLimit));
+
     const result = await WeatherIngestionService.queryObservations({
       granularity: (granularity as 'hourly' | 'daily') || 'daily',
       startDate: startDate as string,
       endDate: endDate as string,
-      limit: limit ? parseInt(limit as string, 10) : 60,
+      limit: safeLimit,
     });
 
     return res.status(200).json({
@@ -64,11 +67,13 @@ export const getHistoricalWeather = async (req: Request, res: Response) => {
 export const getSatelliteNDVI = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate, limit } = req.query;
+    const rawLimit = limit ? parseInt(limit as string, 10) : 20;
+    const safeLimit = Math.min(100, Math.max(1, isNaN(rawLimit) ? 20 : rawLimit));
 
     const result = await SatelliteProcessingService.queryObservations({
       startDate: startDate as string,
       endDate: endDate as string,
-      limit: limit ? parseInt(limit as string, 10) : 20,
+      limit: safeLimit,
     });
 
     return res.status(200).json({
@@ -191,6 +196,21 @@ export const getCropStatistics = async (req: Request, res: Response) => {
   }
 };
 
+const validateSafeDataPath = (filePath?: string): boolean => {
+  if (!filePath || typeof filePath !== 'string') return true;
+  const resolved = path.resolve(filePath);
+  const cwd = path.resolve(process.cwd());
+  const parent = path.resolve(process.cwd(), '..');
+  // Ensure strict directory boundary checking to prevent prefix-matching sibling paths
+  const isWithinRepo =
+    resolved === cwd ||
+    resolved === parent ||
+    resolved.startsWith(cwd + path.sep) ||
+    resolved.startsWith(parent + path.sep);
+  const hasValidExt = /\.(csv|xls|xlsx|json)$/i.test(resolved);
+  return isWithinRepo && hasValidExt;
+};
+
 /**
  * POST /api/environmental/crop-statistics/ingest
  * Triggers ingestion of official DES APY report file
@@ -198,6 +218,14 @@ export const getCropStatistics = async (req: Request, res: Response) => {
 export const ingestCropStatistics = async (req: Request, res: Response) => {
   try {
     const customPath = req.body?.filePath;
+    if (customPath && !validateSafeDataPath(customPath)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Security error: File path traversal outside authorized Data directories is strictly prohibited.',
+      });
+    }
+
     const candidatePaths = [
       path.resolve(process.cwd(), '..', 'Data', 'horizontal_crop_vertical_year_report.xls'),
       path.resolve(process.cwd(), 'Data', 'horizontal_crop_vertical_year_report.xls'),
@@ -229,6 +257,14 @@ export const ingestCropStatistics = async (req: Request, res: Response) => {
 export const triggerWeatherIngestion = async (req: Request, res: Response) => {
   try {
     const customPath = req.body?.filePath;
+    if (customPath && !validateSafeDataPath(customPath)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Security error: File path traversal outside authorized Data directories is strictly prohibited.',
+      });
+    }
+
     const candidatePaths = [
       path.resolve(process.cwd(), '..', 'Data', 'open-meteo-10.79N79.10E59m.csv'),
       path.resolve(process.cwd(), 'Data', 'open-meteo-10.79N79.10E59m.csv'),

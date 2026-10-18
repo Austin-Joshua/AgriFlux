@@ -5,7 +5,6 @@ import {
   Menu,
   Sun,
   Moon,
-  Globe,
   Search,
   ChevronDown,
   Bell,
@@ -25,14 +24,18 @@ import {
   Sprout,
   BarChart3,
   Landmark,
+  LayoutDashboard,
+  Sparkles,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import logo from '../assets/logo-icon.png';
+import SmartFarmReport from './SmartFarmReport';
 
 interface HeaderProps {
   onMenuClick: () => void;
-  onCollapseToggle: () => void;
+  onCollapseToggle?: () => void;
 }
 
 const LANGUAGES = [
@@ -87,84 +90,119 @@ const NOTIFICATIONS = [
   },
 ];
 
-const SEARCH_DATA = [
+interface SearchItem {
+  label: string;
+  icon: React.ElementType;
+  route: string;
+  desc: string;
+  roles?: ('farmer' | 'agronomist' | 'admin')[];
+}
+
+const SEARCH_DATA: SearchItem[] = [
   {
-    label: 'Yield Prediction',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    route: '/dashboard',
+    desc: 'Farm telemetry, alerts and field control',
+    roles: ['farmer', 'admin'],
+  },
+  {
+    label: 'Agronomist Command Center',
+    icon: BarChart3,
+    route: '/agronomist',
+    desc: 'Regional farm monitoring, consultations and diagnostics',
+    roles: ['agronomist', 'admin'],
+  },
+  {
+    label: 'Yield Forecasting',
     icon: TrendingUp,
     route: '/yield',
     desc: 'AI crop yield forecasting & optimization',
+    roles: ['agronomist', 'admin'],
   },
   {
     label: 'Irrigation Intelligence',
     icon: Droplets,
     route: '/irrigation',
     desc: 'Closed-loop smart water scheduling',
+    roles: ['farmer', 'admin'],
   },
   {
-    label: 'Soil Health Advisor',
+    label: 'Soil Intelligence',
     icon: Leaf,
     route: '/soil',
-    desc: 'Soil diagnostic, NPK chemistry & plant scanner',
+    desc: 'Soil diagnostic, NPK chemistry & field test recommendations',
+    roles: ['farmer', 'admin'],
   },
   {
     label: 'Crop Health Monitoring',
     icon: Sprout,
     route: '/crop-health',
-    desc: 'Orbital Sentinel-2 NDVI & canopy vigor',
+    desc: 'Orbital Sentinel-2 NDVI & plant disease scanner',
+    roles: ['farmer', 'admin'],
   },
   {
     label: 'Climate Risk Analysis',
     icon: AlertTriangle,
     route: '/climate',
-    desc: 'Extreme weather hazard forecasting',
+    desc: 'Extreme weather hazard forecasting & pest risks',
+    roles: ['agronomist', 'admin'],
   },
   {
     label: 'Climate Simulator',
     icon: Wind,
     route: '/simulator',
-    desc: 'Micro-climate stress testing & scenarios',
+    desc: 'Micro-climate stress testing & what-if scenarios',
+    roles: ['agronomist', 'admin'],
   },
   {
     label: 'Crop Resilience Advisor',
     icon: Sprout,
     route: '/crop-switching',
     desc: 'Optimal crop switching & economic analysis',
+    roles: ['farmer', 'admin'],
   },
   {
-    label: 'Sustainability Score',
+    label: 'Sustainability Index',
     icon: CheckCircle,
     route: '/sustainability',
-    desc: 'Environmental ESG metrics & carbon index',
+    desc: 'Environmental ESG metrics & carbon audit index',
+    roles: ['agronomist', 'admin'],
   },
   {
     label: 'Land Intelligence',
     icon: Map,
     route: '/land-intelligence',
     desc: 'Satellite land boundary & topology',
+    roles: ['farmer', 'admin'],
   },
   {
     label: 'Marketplace',
     icon: Store,
     route: '/marketplace',
     desc: 'Direct farm produce & agricultural inputs',
+    roles: ['farmer', 'admin'],
   },
   {
     label: 'Equipment Rental',
     icon: Tractor,
     route: '/equipment-rental',
     desc: 'Machinery sharing, tractors & drones',
+    roles: ['farmer', 'admin'],
   },
   {
     label: 'Government Subsidies',
     icon: Landmark,
     route: '/subsidies',
     desc: 'PM-KISAN, crop insurance & subsidy schemes',
+    roles: ['farmer', 'admin'],
   },
   {
     label: 'Market Price Intelligence',
     icon: BarChart3,
     route: '/market',
     desc: 'APMC mandis, live price trends & forecasts',
+    roles: ['farmer', 'admin'],
   },
   {
     label: 'Settings & Preferences',
@@ -174,9 +212,9 @@ const SEARCH_DATA = [
   },
 ];
 
-const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { isDark, toggleTheme } = useTheme();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
@@ -185,6 +223,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [reportOpen, setReportOpen] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -196,13 +235,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
 
   const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
   const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const userRole = user?.role || 'farmer';
+  const roleAllowedData = SEARCH_DATA.filter((s) => !s.roles || s.roles.includes(userRole));
   const filteredSearch = searchQuery.trim()
-    ? SEARCH_DATA.filter(
+    ? roleAllowedData.filter(
         (s) =>
           s.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
           s.desc.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : SEARCH_DATA;
+    : roleAllowedData;
 
   const handleMarkAsRead = (id: number) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
@@ -225,52 +267,98 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 glass-header px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 w-full max-w-full overflow-x-clip">
-      {/* Mobile Menu Button */}
-      <button
-        id="mobile-menu-toggle"
-        onClick={onMenuClick}
-        className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 lg:hidden transition-all duration-150 flex-shrink-0"
-        aria-label="Open mobile menu"
-      >
-        <Menu size={20} />
-      </button>
+    <header className="sticky top-0 z-30 glass-header px-2 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-3 w-full max-w-full overflow-x-clip select-none">
+      {/* Left Section: Mobile Menu + Mobile Logo + Desktop Logo (No desktop hamburger) */}
+      <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+        {/* Mobile Hamburger Menu Button - ONLY visible on mobile (<lg) */}
+        <button
+          id="mobile-menu-toggle"
+          onClick={onMenuClick}
+          className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 lg:hidden transition-all duration-150 flex-shrink-0"
+          aria-label="Open mobile menu"
+        >
+          <Menu size={20} />
+        </button>
 
-      {/* Dedicated Hamburger icon for Sidebar Minimization/Maximization (Desktop) */}
-      <button
-        id="sidebar-collapse-toggle"
-        onClick={onCollapseToggle}
-        className="hidden lg:flex p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
-        aria-label="Toggle Sidebar"
-      >
-        <Menu size={20} />
-      </button>
+        {/* Mobile Brand / Logo: Placed right after the hamburger icon and before the search bar */}
+        <div
+          onClick={() => {
+            if (userRole === 'admin') navigate('/admin');
+            else if (userRole === 'agronomist') navigate('/agronomist');
+            else navigate('/dashboard');
+          }}
+          className="flex lg:hidden items-center gap-1.5 cursor-pointer flex-shrink-0 group"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 p-0.5 shadow-sm shadow-primary-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="w-full h-full rounded-[6px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
+              <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
+            </div>
+          </div>
+          <span className="text-sm font-black text-gray-900 dark:text-white tracking-tight leading-none">
+            Agri<span className="text-gradient">Flux</span>
+          </span>
+        </div>
 
-      {/* Search */}
+        {/* Desktop Brand / Logo: Placed outside the sidebar at the start of navbar (Hamburger completely removed on desktop) */}
+        <div
+          onClick={() => {
+            if (userRole === 'admin') navigate('/admin');
+            else if (userRole === 'agronomist') navigate('/agronomist');
+            else navigate('/dashboard');
+          }}
+          className="hidden lg:flex items-center gap-2.5 cursor-pointer group flex-shrink-0 mr-1"
+          role="button"
+          tabIndex={0}
+        >
+          <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-sm shadow-primary-500/25 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
+              <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
+            </div>
+          </div>
+          <div className="flex flex-col text-left">
+            <span className="text-base font-black text-gray-900 dark:text-white leading-none tracking-tight">
+              Agri<span className="text-gradient">Flux</span>
+            </span>
+            <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">
+              {userRole === 'admin'
+                ? 'Admin Command'
+                : userRole === 'agronomist'
+                  ? 'Consulting Suite'
+                  : 'Intelligence Platform'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Center Section: Responsive Search Bar */}
       <div
         ref={searchRef}
-        className="relative flex-1 max-w-[130px] sm:max-w-xs md:max-w-md lg:max-w-lg min-w-0"
+        className="relative flex-1 min-w-[100px] sm:max-w-xs md:max-w-md lg:max-w-lg mx-1.5 sm:mx-2"
       >
         <div
-          className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-200 ${searchOpen ? 'glass-input ring-2 ring-primary-400/50 shadow-glow-green' : 'bg-gray-100/80 dark:bg-gray-800/80'}`}
+          className={`flex items-center gap-2 px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-200 ${
+            searchOpen
+              ? 'glass-input ring-2 ring-primary-400/50 shadow-glow-green bg-white dark:bg-gray-800'
+              : 'bg-gray-100/90 dark:bg-gray-800/90'
+          }`}
         >
-          <Search size={15} className="text-gray-400 flex-shrink-0" />
+          <Search size={14} className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onFocus={() => setSearchOpen(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent text-xs sm:text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none flex-1 min-w-0"
+            className="bg-transparent text-xs sm:text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none flex-1 min-w-0 w-full"
           />
           {searchQuery && (
             <button
-              onClick={() => {
-                setSearchQuery('');
-              }}
+              onClick={() => setSearchQuery('')}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           )}
         </div>
@@ -314,9 +402,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
         )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-        {/* Notifications */}
+      {/* Right Section: All Action Buttons Fully Visible with Balanced Spacing */}
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+        {/* AI Report Button — Desktop only (hidden on mobile & tablet since bottom dock handles it) */}
+        <button
+          id="header-ai-report-btn"
+          onClick={() => setReportOpen(true)}
+          className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-primary-600 to-teal-600 text-white font-bold text-xs shadow-sm shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all duration-150 flex-shrink-0"
+          title="Generate Smart Farm Report"
+        >
+          <Sparkles size={14} className="text-yellow-200 animate-pulse flex-shrink-0" />
+          <span className="font-bold">AI Report</span>
+        </button>
+
+        {/* Notifications Bell */}
         <div ref={notifRef} className="relative flex-shrink-0">
           <button
             id="notification-bell"
@@ -325,12 +424,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
               setAccountOpen(false);
               setLangOpen(false);
             }}
-            className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
+            className="relative p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
             aria-label="Notifications"
           >
-            <Bell size={18} />
+            <Bell size={17} />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" />
             )}
           </button>
 
@@ -437,8 +536,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
           )}
         </div>
 
-        {/* Language Selector (hidden on mobile, visible on sm+) */}
-        <div ref={langRef} className="relative flex-shrink-0 hidden sm:block">
+        {/* Language Selector — Desktop & Tablet only (removed on mobile for cleaner spacing) */}
+        <div ref={langRef} className="hidden md:block relative flex-shrink-0">
           <button
             id="language-selector"
             onClick={() => {
@@ -446,15 +545,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
               setNotifOpen(false);
               setAccountOpen(false);
             }}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 text-xs flex-shrink-0"
+            className="flex items-center gap-1 px-1.5 sm:px-2 py-1.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 text-xs flex-shrink-0"
+            aria-label="Language selector"
           >
-            <Globe size={16} />
-            <span className="hidden sm:inline font-medium text-xs">
-              {currentLang.flag} {currentLang.code.toUpperCase()}
-            </span>
+            <span className="text-sm leading-none">{currentLang.flag}</span>
+            <span className="hidden sm:inline font-bold text-xs uppercase">{currentLang.code}</span>
             <ChevronDown
-              size={12}
-              className={`transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`}
+              size={11}
+              className={`hidden sm:inline transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`}
             />
           </button>
           {langOpen && (
@@ -481,21 +579,21 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
         <button
           id="theme-toggle"
           onClick={toggleTheme}
-          className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
+          className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
           aria-label="Toggle theme"
         >
           {isDark ? (
             <Sun
-              size={18}
+              size={17}
               className="text-yellow-500 dark:text-yellow-400 drop-shadow-[0_0_6px_rgba(234,179,8,0.6)]"
             />
           ) : (
-            <Moon size={18} />
+            <Moon size={17} />
           )}
         </button>
 
-        {/* Settings Icon with Account Preview (hidden on mobile, visible on sm+) */}
-        <div ref={accountRef} className="relative flex-shrink-0 hidden sm:block">
+        {/* Settings / Account Icon - Visible on Both Mobile & Desktop */}
+        <div ref={accountRef} className="relative flex-shrink-0">
           <button
             id="settings-icon"
             onClick={() => {
@@ -503,10 +601,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
               setNotifOpen(false);
               setLangOpen(false);
             }}
-            className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
+            className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
             aria-label="Settings"
           >
-            <Settings size={18} />
+            <Settings size={17} />
           </button>
 
           {accountOpen && (
@@ -557,6 +655,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onCollapseToggle }) => {
           )}
         </div>
       </div>
+
+      {/* Global Smart Farm Report Modal */}
+      <SmartFarmReport isOpen={reportOpen} onClose={() => setReportOpen(false)} />
     </header>
   );
 };

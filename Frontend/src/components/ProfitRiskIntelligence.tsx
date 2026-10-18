@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  AlertCircle,
-  Calculator,
-  PieChart,
-  Activity,
-} from 'lucide-react';
+import { AlertCircle, Calculator, PieChart, Activity } from 'lucide-react';
 import { useRealisticData } from '../hooks/useRealisticData';
 
 const ProfitRiskIntelligence: React.FC = () => {

@@ -98,6 +98,9 @@ export class SatelliteProcessingService {
     if (!samples || samples.length === 0) {
       throw new Error('No pixel samples provided for Sentinel-2 NDVI calculation.');
     }
+    if (samples.length > 2000) {
+      throw new Error('Pixel sample batch exceeds maximum allowed limit (2000 samples).');
+    }
 
     const validNdviValues: number[] = [];
     let cloudPixelCount = 0;

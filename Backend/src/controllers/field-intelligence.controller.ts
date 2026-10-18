@@ -111,7 +111,7 @@ export const getHistory = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id || 'demo-farmer';
     const farmId = (req.query.farmId as string) || 'farm-01';
-    const limit = Number(req.query.limit) || 10;
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 10));
 
     const history = await FieldIntelligenceService.getHistory(userId, farmId, limit);
 

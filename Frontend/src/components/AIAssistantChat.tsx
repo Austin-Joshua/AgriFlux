@@ -9,7 +9,6 @@ interface Message {
   confidence?: number;
 }
 
-
 const rndInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const AIAssistantChat: React.FC = () => {
@@ -449,7 +448,6 @@ const AIAssistantChat: React.FC = () => {
     setMessages((prev) => [...prev, { role: 'assistant', text: responseText, confidence }]);
   };
 
-
   return (
     <>
       {/* Float Button — sits above bottom nav on mobile */}
@@ -457,7 +455,8 @@ const AIAssistantChat: React.FC = () => {
         id="ai-chat-button"
         onClick={() => setOpen(!open)}
         className="fixed bottom-28 lg:bottom-6 right-4 lg:right-6 w-14 h-14 gradient-green rounded-full shadow-lg dark:shadow-dark-xl flex items-center justify-center text-white hover:scale-110 transition-all duration-200 z-50"
-        aria-label="AI Assistant"
+        aria-label={open ? 'Close AgriFlux AI Assistant' : 'Open AgriFlux AI Assistant'}
+        aria-expanded={open}
       >
         {open ? <X size={22} /> : <MessageCircle size={22} />}
       </button>
@@ -465,6 +464,8 @@ const AIAssistantChat: React.FC = () => {
       {/* Chat Panel */}
       {open && (
         <div
+          role="region"
+          aria-label="AgriFlux AI Assistant Chat"
           className="fixed bottom-40 lg:bottom-24 right-4 lg:right-6 w-[340px] sm:w-[420px] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200/60 dark:border-gray-700/60 z-50 flex flex-col overflow-hidden animate-slide-up"
           style={{ maxHeight: '540px' }}
         >

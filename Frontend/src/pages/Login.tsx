@@ -1,148 +1,130 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Phone, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, User, Lock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo-icon.png';
+import { useAuth, UserRole } from '../context/AuthContext';
 import { GoogleIcon } from '../components/SocialIcons';
 import SEO from '../components/SEO';
 
+const DEMO_ACCOUNTS = {
+  farmer: {
+    identifier: 'farmer@agriflux.com',
+    password: 'password123',
+    roleLabel: 'Farmer',
+    badge: '🌾',
+  },
+  agronomist: {
+    identifier: 'agronomist@agriflux.com',
+    password: 'agro123',
+    roleLabel: 'Agronomist',
+    badge: '🔬',
+  },
+  admin: {
+    identifier: 'admin@agriflux.com',
+    password: 'admin123',
+    roleLabel: 'Admin',
+    badge: '🛡️',
+  },
+};
+
 const Login: React.FC = () => {
-  const { t } = useTranslation();
   const { login, loginWithProvider, isLoading, requiresOnboarding, isAuthenticated, user } =
     useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [identifier, setIdentifier] = useState('farmer@agriflux.com');
-  const [password, setPassword] = useState('password123');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('farmer');
+  const [identifier, setIdentifier] = useState(DEMO_ACCOUNTS.farmer.identifier);
+  const [password, setPassword] = useState(DEMO_ACCOUNTS.farmer.password);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
-  const [loginMode, setLoginMode] = useState<'farmer' | 'agronomist' | 'admin'>('farmer');
 
-  // Handle redirection after auth state updates or if already authenticated
+  // Safe deep link redirect path helper (preserves target while defeating CWE-601 open redirects)
+  const getSafeRedirect = useCallback(
+    (userRole: string): string => {
+      const stateObj = location.state as { from?: { pathname?: string } } | null;
+      const fromPath = stateObj?.from?.pathname;
+      if (
+        typeof fromPath === 'string' &&
+        fromPath.startsWith('/') &&
+        !fromPath.startsWith('//') &&
+        fromPath !== '/login'
+      ) {
+        if (fromPath.startsWith('/admin') && userRole !== 'admin') {
+          return '/dashboard';
+        }
+        if (fromPath.startsWith('/agronomist') && userRole !== 'agronomist') {
+          return '/dashboard';
+        }
+        return fromPath;
+      }
+      return userRole === 'admin'
+        ? '/admin'
+        : userRole === 'agronomist'
+          ? '/agronomist'
+          : '/dashboard';
+    },
+    [location.state]
+  );
+
+  // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
       if (requiresOnboarding) {
         navigate('/onboarding');
-      } else if (user.role === 'admin') {
-        navigate('/admin');
-      } else if (user.role === 'agronomist') {
-        navigate('/agronomist');
       } else {
-        navigate('/dashboard');
+        navigate(getSafeRedirect(user.role));
       }
     }
-  }, [isLoading, isAuthenticated, user, requiresOnboarding, navigate]);
+  }, [isLoading, isAuthenticated, user, requiresOnboarding, navigate, getSafeRedirect]);
 
+  // Safe identifier pre-fill from redirect params (e.g. following registration)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const source = params.get('source');
-    const autoUser = params.get('identifier');
-    const autoPass = params.get('password');
-
-    if (source === 'citizenone' && autoUser && autoPass) {
-      // Auto-login for seamless integration
-      const performAutoLogin = async () => {
-        try {
-          setIdentifier(autoUser);
-          setPassword(autoPass);
-          const loggedInUser = await login(autoUser, autoPass);
-          const role = loggedInUser?.role || loginMode;
-          toast.success(`Seamlessly logged in from CitizenOne as ${loggedInUser?.name || 'User'}`);
-          if (role === 'admin') navigate('/admin');
-          else if (role === 'agronomist') navigate('/agronomist');
-          else navigate('/dashboard');
-        } catch (err) {
-          console.error('Auto-login failed:', err);
-        }
-      };
-      performAutoLogin();
+    const prefillUser = params.get('identifier');
+    if (prefillUser) {
+      setIdentifier(prefillUser);
     }
-  }, [location, login, loginMode, navigate]);
+  }, [location.search]);
 
-  const DEMO_CREDENTIALS = {
-    farmer: {
-      identifier: 'farmer@agriflux.com',
-      password: 'password123',
-      label: '🌾 Farmer Workspace',
-      desc: 'Smart Farm Dashboard, IoT Telemetry, Yield & Closed-Loop Engine',
-      route: '/dashboard',
-    },
-    agronomist: {
-      identifier: 'agronomist@agriflux.com',
-      password: 'agro123',
-      label: '🔬 Agronomist Portal',
-      desc: 'Expert Consultation Queue, Soil Health Labs & Advisory Dispatch',
-      route: '/agronomist',
-    },
-    admin: {
-      identifier: 'admin@agriflux.com',
-      password: 'admin123',
-      label: '🛡️ Admin Console',
-      desc: 'System Security, User Roles, Audit Logs & Global Telemetry',
-      route: '/admin',
-    },
-  };
-
-  const switchMode = (mode: 'farmer' | 'agronomist' | 'admin') => {
-    setLoginMode(mode);
-    setIdentifier(DEMO_CREDENTIALS[mode].identifier);
-    setPassword(DEMO_CREDENTIALS[mode].password);
+  const handleRoleSelect = (role: UserRole) => {
+    setSelectedRole(role);
+    setIdentifier(DEMO_ACCOUNTS[role].identifier);
+    setPassword(DEMO_ACCOUNTS[role].password);
     setError('');
-  };
-
-  const handleQuickDemoLogin = async () => {
-    setError('');
-    try {
-      const creds = DEMO_CREDENTIALS[loginMode];
-      const loggedInUser = await login(creds.identifier, creds.password);
-      const role = loggedInUser?.role || loginMode;
-      toast.success(`Welcome to AgriFlux as ${loggedInUser?.name || creds.label}!`);
-      if (role === 'admin') navigate('/admin');
-      else if (role === 'agronomist') navigate('/agronomist');
-      else navigate('/dashboard');
-    } catch {
-      setError('Instant demo authentication failed. Please try again.');
-      toast.error('Demo authentication error.');
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!identifier.trim() || !password) {
+      setError('Please enter your email or phone number, and password.');
+      return;
+    }
+
     setError('');
     try {
-      const loggedInUser = await login(identifier, password);
-      const role = loggedInUser?.role || loginMode;
+      const loggedInUser = await login(identifier.trim(), password);
+      const role = loggedInUser?.role || selectedRole;
       toast.success(`Welcome back, ${loggedInUser?.name || 'User'}!`);
-      if (role === 'admin') navigate('/admin');
-      else if (role === 'agronomist') navigate('/agronomist');
-      else navigate('/dashboard');
+      navigate(getSafeRedirect(role));
     } catch {
-      setError('Invalid credentials. Please try again.');
-      toast.error('Invalid credentials. Please check your email and password.');
+      setError('Invalid credentials. Please verify your email/phone and password.');
+      toast.error('Invalid credentials. Please try again.');
     }
   };
 
-  const handleSocialLogin = async (provider: 'google') => {
-    setSocialLoading(provider);
+  const handleGoogleLogin = async () => {
+    setSocialLoading('google');
     setError('');
     try {
-      await loginWithProvider(provider, loginMode);
-      toast.success(`Welcome back! Successfully authenticated via ${provider}.`);
-
-      // If onboarding is NOT required, navigate to dashboard immediately
-      // (onboarding is handled by the useEffect above)
+      await loginWithProvider('google', selectedRole);
+      toast.success('Successfully signed in with Google.');
       if (!requiresOnboarding) {
-        if (loginMode === 'admin') navigate('/admin');
-        else if (loginMode === 'agronomist') navigate('/agronomist');
-        else navigate('/dashboard');
+        navigate(getSafeRedirect(selectedRole));
       }
     } catch {
-      setError(`${provider} login failed. Please try again.`);
-      toast.error(`${provider} login failed.`);
+      setError('Google sign-in could not be completed. Please try again.');
     } finally {
       setSocialLoading(null);
     }
@@ -152,182 +134,178 @@ const Login: React.FC = () => {
     <div className="w-full h-full flex flex-col justify-center">
       <SEO title="Sign In" />
 
-      {/* Mobile Branding (only visible on mobile) */}
-      <div className="lg:hidden flex flex-col items-center mb-10 text-center">
-        <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-xl shadow-primary-500/20 mb-4 flex-shrink-0">
-          <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-[14px] flex items-center justify-center p-2">
-            <img src={logo} alt="AgriFlux Logo" className="w-full h-full object-contain" />
-          </div>
-        </div>
-        <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">
-          {t('auth.welcomeBack')} 👋
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">{t('auth.loginSubtitle')}</p>
-      </div>
-
-      {/* Desktop Message Header */}
-      <div className="mb-8 hidden lg:block">
-        <h2 className="text-3xl font-black text-gray-900 dark:text-white font-display leading-tight">
-          {t('auth.welcomeBack')} 👋
+      {/* Header */}
+      <div className="mb-6">
+        <h2 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight">
+          Welcome Back 👋
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">
-          {t('auth.loginDesktopDesc')}
+        <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-xs sm:text-sm">
+          Sign in to access your farm intelligence and advisory
         </p>
       </div>
 
-      {/* Login Mode Tabs (Matching Website Style) */}
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-700/50 rounded-2xl p-1 mb-3 border border-gray-200 dark:border-white/5">
-        {(['farmer', 'agronomist', 'admin'] as const).map((mode) => (
-          <button
-            key={mode}
-            onClick={() => switchMode(mode)}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-              loginMode === mode
-                ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg scale-[1.03]'
-                : 'text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
-            }`}
-          >
-            {mode === 'farmer' ? '🌾 Farmer' : mode === 'agronomist' ? '🔬 Agronomist' : '🛡️ Admin'}
-          </button>
-        ))}
+      {/* Simple Role Selector Tabs */}
+      <div
+        role="tablist"
+        aria-label="User Account Role"
+        className="flex gap-1.5 bg-gray-100 dark:bg-gray-800/80 rounded-2xl p-1 mb-5 border border-gray-200/60 dark:border-white/5"
+      >
+        {(['farmer', 'agronomist', 'admin'] as const).map((role) => {
+          const acc = DEMO_ACCOUNTS[role];
+          const isSelected = selectedRole === role;
+          return (
+            <button
+              key={role}
+              role="tab"
+              aria-selected={isSelected}
+              type="button"
+              onClick={() => handleRoleSelect(role)}
+              className={`flex-1 py-2.5 px-3 min-h-[44px] rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 ${
+                isSelected
+                  ? 'bg-primary-600 text-white shadow-md shadow-primary-600/20'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span>{acc.badge}</span>
+              <span>{acc.roleLabel}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Role Scope Description */}
-      <div className="mb-5 px-3.5 py-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-xs">
-        <p className="font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-          <span>{DEMO_CREDENTIALS[loginMode].label}</span>
-        </p>
-        <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-0.5 leading-snug">
-          {DEMO_CREDENTIALS[loginMode].desc}
-        </p>
-      </div>
-
+      {/* Error Alert */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-bold">
-          <AlertCircle size={14} />
-          {error}
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-medium"
+        >
+          <AlertCircle size={15} className="flex-shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
+      {/* Login Form */}
       <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+        {/* Email or Phone Input */}
         <div className="space-y-1.5">
-          <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1">
-            {t('auth.email')}
+          <label
+            htmlFor="identifier-input"
+            className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1 block cursor-pointer"
+          >
+            Email or Phone Number
           </label>
           <div className="relative group">
-            <Phone
+            <User
               size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors"
             />
             <input
               id="identifier-input"
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              className="input-field pl-11 h-10 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
-              placeholder={t('auth.placeholderEmail')}
-              autoComplete="off"
+              className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 transition-all text-xs sm:text-sm w-full rounded-xl"
+              placeholder="e.g. farmer@agriflux.com or 9876543210"
+              autoComplete="username"
               required
             />
           </div>
         </div>
 
+        {/* Password Input */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="label text-xs uppercase tracking-widest font-bold opacity-60 ml-1 mb-0">
-              {t('auth.password')}
+          <div className="flex items-center justify-between px-1">
+            <label
+              htmlFor="password-input"
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 block cursor-pointer"
+            >
+              Password
             </label>
             <Link
               to="/forgot-password"
-              className="text-[10px] text-primary-600 dark:text-primary-400 font-bold hover:underline"
+              className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline"
             >
-              {t('auth.forgotPassword')}
+              Forgot Password?
             </Link>
           </div>
           <div className="relative group">
             <Lock
               size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors"
             />
             <input
               id="password-input"
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="input-field pl-11 pr-11 h-10 bg-white/50 dark:bg-gray-900/40 border-gray-200 dark:border-white/5 hover:border-primary-300 transition-all text-sm"
+              className="input-field pl-10 pr-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 transition-all text-xs sm:text-sm w-full rounded-xl"
               placeholder="••••••••"
-              autoComplete="new-password"
+              autoComplete="current-password"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-500 transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </div>
 
+        {/* Single Primary Sign In Button */}
         <button
           id="login-submit"
           type="submit"
           disabled={isLoading}
-          className="btn-primary w-full py-2.5 text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/10 mt-4 active:scale-95 transition-all duration-150"
+          className="btn-primary w-full h-11 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg shadow-primary-500/15 mt-2 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
         >
           {isLoading ? (
-            <span className="flex items-center justify-center gap-2">
-              <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
-              {t('auth.authenticating')}
-            </span>
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>Signing in...</span>
+            </>
           ) : (
-            t('auth.login')
+            <span>Sign In</span>
           )}
-        </button>
-
-        <button
-          type="button"
-          onClick={handleQuickDemoLogin}
-          disabled={isLoading}
-          className="w-full py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-lg shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 border border-emerald-400/30 hover-lift mt-2"
-        >
-          <span>⚡ Instant Demo Access ({DEMO_CREDENTIALS[loginMode].label.split(' ')[1]})</span>
         </button>
       </form>
 
-      {/* Social Login */}
-      <div className="mt-8">
-        <div className="relative flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
-            {t('auth.orContinueWith', 'Or continue with')}
+      {/* Google Sign In */}
+      <div className="mt-6">
+        <div className="relative flex items-center gap-4 mb-4">
+          <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
+          <span className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold leading-none">
+            or continue with
           </span>
-          <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
+          <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
         </div>
         <button
           type="button"
-          onClick={() => handleSocialLogin('google')}
+          onClick={handleGoogleLogin}
           disabled={!!socialLoading || isLoading}
-          className="w-full flex items-center justify-center gap-3 py-3.5 border border-gray-200/80 dark:border-gray-700/60 rounded-2xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold text-sm shadow-sm hover:shadow-md transition-all duration-200 hover-lift active-press group"
+          className="w-full flex items-center justify-center gap-2.5 h-11 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-200 font-semibold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all active:scale-[0.99]"
         >
           {socialLoading === 'google' ? (
-            <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           ) : (
-            <div className="scale-105 group-hover:scale-115 transition-transform duration-200">
-              <GoogleIcon />
-            </div>
+            <GoogleIcon />
           )}
-          <span>Continue with Google</span>
+          <span>Sign in with Google</span>
         </button>
       </div>
 
-      <p className="mt-8 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
-        {t('auth.noAccount')}{' '}
+      {/* Footer */}
+      <p className="mt-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        Don&apos;t have an account?{' '}
         <Link
           to="/register"
-          className="text-primary-600 dark:text-primary-400 font-black hover:underline ml-1"
+          className="text-primary-600 dark:text-primary-400 font-bold hover:underline ml-1"
         >
-          {t('auth.register')}
+          Create Account
         </Link>
       </p>
     </div>

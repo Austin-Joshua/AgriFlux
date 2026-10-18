@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
-import { connectDB } from './config/db';
+import { connectDB, isDBConnected } from './config/db';
 import { env } from './config/env';
 import authRoutes from './routes/auth.routes';
 import aiRoutes from './routes/ai.routes';
@@ -17,6 +17,8 @@ import integrationRoutes from './routes/integration.routes';
 import iotRoutes from './routes/iot.routes';
 import fieldIntelligenceRoutes from './routes/field-intelligence.routes';
 import environmentalDataRoutes from './routes/environmental-data.routes';
+import blockchainRoutes from './routes/blockchain.routes';
+import { blockchain } from './services/blockchain.service';
 import { WeatherIngestionService } from './services/weather-ingestion.service';
 import { CropStatisticsService } from './services/crop-statistics.service';
 import fs from 'fs';
@@ -53,15 +55,21 @@ const allowedOrigins = [
 ];
 
 const app = express();
+// Enable proxy trust for reverse proxies (Vercel, Cloudflare, AWS, Nginx) so rate limiter inspects client IP
+app.set('trust proxy', 1);
+const isAllowedOrigin = (origin?: string): boolean => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  if (env.NODE_ENV === 'development') return true;
+  // Strictly bound to AgriFlux-owned Vercel domains (prevents arbitrary .vercel.app origins)
+  if (/^https:\/\/agriflux(-[a-z0-9-]+)?\.vercel\.app$/.test(origin)) return true;
+  return false;
+};
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (
-        !origin ||
-        allowedOrigins.includes(origin) ||
-        (origin && origin.endsWith('.vercel.app')) ||
-        env.NODE_ENV === 'development'
-      ) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -77,12 +85,7 @@ const httpServer = createServer(app);
 const io = new SocketServer(httpServer, {
   cors: {
     origin: (origin, callback) => {
-      if (
-        !origin ||
-        allowedOrigins.includes(origin) ||
-        (origin && origin.endsWith('.vercel.app')) ||
-        env.NODE_ENV === 'development'
-      ) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -104,7 +107,7 @@ io.use((socket, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, env.JWT_SECRET);
+      const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
       (socket as any).user = decoded;
     } catch {
       // Invalid token, socket remains unauthenticated
@@ -133,11 +136,34 @@ io.on('connection', (socket) => {
       return;
     }
 
-    console.log(
-      `📡 [SOCKET] Authorized control event from ${socketUser.role} (${socketUser.id}):`,
-      data
-    );
-    socket.broadcast.emit('iot-control', data);
+    const targetPumpStatus = Boolean(data?.pumpStatus);
+    const commandId =
+      typeof data?.commandId === 'string' && data.commandId.length <= 64
+        ? data.commandId
+        : 'ws_' + Math.random().toString(36).substring(2, 10);
+
+    const sanitizedControlData = {
+      commandId,
+      action: targetPumpStatus ? 'ACTIVATE_PUMP' : 'DEACTIVATE_PUMP',
+      targetPumpStatus,
+      issuedAt: new Date().toISOString(),
+      issuedBy: socketUser.id,
+      role: socketUser.role,
+    };
+
+    // Cryptographically seal socket actuator dispatch into the blockchain ledger
+    blockchain.addBlock('ACTUATOR_OVERRIDE', {
+      channel: 'websocket',
+      action: sanitizedControlData.action,
+      socketId: socket.id,
+      userId: socketUser.id,
+      role: socketUser.role,
+      targetPumpStatus: sanitizedControlData.targetPumpStatus,
+      commandId: sanitizedControlData.commandId,
+      timestamp: sanitizedControlData.issuedAt,
+    });
+
+    socket.broadcast.emit('iot-control', sanitizedControlData);
   });
 
   socket.on('disconnect', () => {
@@ -153,7 +179,35 @@ export { io };
 const PORT = env.PORT;
 
 // Global Middleware
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        imgSrc: [
+          "'self'",
+          'data:',
+          'blob:',
+          'https://*.tile.openstreetmap.org',
+          'https://*.tile.openstreetmap.fr',
+          'https://*.basemaps.cartocdn.com',
+          'https://*.google.com',
+          'https://*.googleapis.com',
+          'https://*.gstatic.com',
+          'https://images.unsplash.com',
+        ],
+        connectSrc: ["'self'", 'https://*', 'http://localhost:*', 'ws://localhost:*', 'wss://*'],
+        frameAncestors: ["'none'"],
+        objectSrc: ["'none'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 app.use(hpp());
 app.use(compression());
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
@@ -168,14 +222,60 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-app.use(express.json({ limit: '50kb' })); // Increased limit slightly for analysis data
+app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
-// Health Check
+/**
+ * Strict NoSQL Injection Sanitizer
+ * Recursively strips MongoDB operator keys ($gt, $ne, etc.) and dot notation from all requests.
+ */
+const sanitizeNoSQL = (obj: any): any => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sanitizeNoSQL);
+  const clean: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (
+      key.startsWith('$') ||
+      key.includes('.') ||
+      key === '__proto__' ||
+      key === 'constructor' ||
+      key === 'prototype'
+    ) {
+      continue;
+    }
+    clean[key] = sanitizeNoSQL(value);
+  }
+  return clean;
+};
+
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  if (req.body) req.body = sanitizeNoSQL(req.body);
+  if (req.query) req.query = sanitizeNoSQL(req.query);
+  if (req.params) req.params = sanitizeNoSQL(req.params);
+  next();
+});
+
+// Comprehensive Health & Telemetry Diagnostic Check
 app.get('/health', (_req: Request, res: Response) => {
-  res
-    .status(200)
-    .json({ status: 'healthy', worker: process.pid, timestamp: new Date().toISOString() });
+  const mem = process.memoryUsage();
+  res.status(200).json({
+    status: 'healthy',
+    system: 'AgriFlux Autonomous Intelligence Mesh',
+    uptimeSeconds: Math.floor(process.uptime()),
+    workerPid: process.pid,
+    memory: {
+      rssMb: Math.round(mem.rss / (1024 * 1024)),
+      heapUsedMb: Math.round(mem.heapUsed / (1024 * 1024)),
+      heapTotalMb: Math.round(mem.heapTotal / (1024 * 1024)),
+    },
+    database: isDBConnected ? 'connected_mongodb' : 'resilient_in_memory_demo',
+    blockchain: {
+      chainLength: blockchain.getChain().length,
+      isValid: blockchain.isChainValid().isValid,
+      lastBlockHash: blockchain.getLatestBlock().hash,
+    },
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // API Routes
@@ -186,6 +286,7 @@ app.use('/api/integration', integrationRoutes);
 app.use('/api/iot-data', iotRoutes);
 app.use('/api/field-intelligence', fieldIntelligenceRoutes);
 app.use('/api/environmental', environmentalDataRoutes);
+app.use('/api/blockchain', blockchainRoutes);
 
 // 404
 app.use((_req: Request, res: Response) => {
@@ -203,9 +304,15 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     console.error(err);
   }
 
+  // Sanitize internal database/system errors in production to prevent information leakage (CWE-209)
+  const safeMessage =
+    env.NODE_ENV === 'production' && status >= 500
+      ? 'An unexpected internal error occurred. Please contact system support.'
+      : message;
+
   res.status(status).json({
     success: false,
-    message,
+    message: safeMessage,
     stack: env.NODE_ENV === 'production' ? undefined : err.stack,
   });
 });
@@ -282,4 +389,33 @@ if (cluster.isPrimary && env.NODE_ENV === 'production' && WEB_CONCURRENCY > 1) {
         });
     }
   });
+
+  // Graceful Shutdown Handler (Zero In-Flight Request Loss)
+  const shutdown = (signal: string) => {
+    console.log(`\n🛑 [SHUTDOWN] Received ${signal}. Initiating graceful termination...`);
+
+    httpServer.close(async () => {
+      console.log('🛑 [SHUTDOWN] HTTP/WebSocket listener closed.');
+      try {
+        const mongoose = await import('mongoose');
+        if (mongoose.default.connection.readyState !== 0) {
+          await mongoose.default.connection.close(false);
+          console.log('🛑 [SHUTDOWN] MongoDB connection closed cleanly.');
+        }
+      } catch (err: any) {
+        console.warn('⚠️ [SHUTDOWN] MongoDB close warning:', err.message);
+      }
+      console.log('👋 [SHUTDOWN] Process exited gracefully.');
+      process.exit(0);
+    });
+
+    // Fallback timeout to prevent hanging worker processes
+    setTimeout(() => {
+      console.error('⚠️ [SHUTDOWN] Forced exit due to shutdown timeout.');
+      process.exit(1);
+    }, 10000).unref();
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }

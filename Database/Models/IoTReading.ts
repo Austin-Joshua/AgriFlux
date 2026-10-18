@@ -32,5 +32,8 @@ const IoTReadingSchema: Schema = new Schema(
 
 IoTReadingSchema.index({ deviceId: 1, createdAt: -1 });
 IoTReadingSchema.index({ createdAt: -1 });
+// 30-day rolling data retention: prevents unconstrained collection and index bloat
+IoTReadingSchema.index({ createdAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
 
 export default mongoose.model<IIoTReading>('IoTReading', IoTReadingSchema);
+

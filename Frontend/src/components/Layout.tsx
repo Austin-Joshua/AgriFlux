@@ -11,7 +11,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isFromCitizenOne, setIsFromCitizenOne] = useState(false);
   const location = useLocation();
 
@@ -29,8 +28,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
-
-  const mainMargin = sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64';
 
   return (
     <div className="min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-gray-50 dark:bg-gray-900 flex">
@@ -60,23 +57,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </a>
       )}
 
-      {/* Desktop Sidebar */}
-      <Sidebar
-        isOpen={sidebarOpen}
-        collapsed={sidebarCollapsed}
-        onClose={() => setSidebarOpen(false)}
-      />
+      {/* Desktop Sidebar (Permanent and stable on lg+) */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main content area */}
-      <div className={`flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden ${mainMargin} transition-all duration-200`}>
-        <Header
-          onMenuClick={() => setSidebarOpen(true)}
-          onCollapseToggle={() => setSidebarCollapsed((prev) => !prev)}
-        />
+      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden lg:ml-64 transition-all duration-200">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
         {/* Extra top padding if CitizenOne banner is visible; extra bottom padding on mobile for bottom nav */}
         <main
           id="main-content"
-          className={`flex-1 w-full max-w-full p-2.5 sm:p-4 md:p-6 overflow-x-hidden overflow-y-auto pb-24 lg:pb-6 ${isFromCitizenOne ? 'pt-16' : ''}`}
+          className={`flex-1 w-full max-w-full p-2.5 sm:p-4 md:p-6 overflow-x-hidden overflow-y-auto pb-32 lg:pb-8 ${isFromCitizenOne ? 'pt-16' : ''}`}
         >
           <div className="w-full max-w-7xl mx-auto animate-fade-in">{children}</div>
         </main>
@@ -84,7 +74,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Mobile Bottom Nav (hidden on lg+) */}
       <MobileBottomNav />
-
     </div>
   );
 };

@@ -12,7 +12,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
       return res.status(401).json({ message: 'No authorization token, access denied' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
     (req as any).user = decoded;
     next();
   } catch (error) {

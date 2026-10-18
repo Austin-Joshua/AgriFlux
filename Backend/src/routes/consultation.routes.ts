@@ -18,11 +18,11 @@ router.get(
   consultationController.getAllConsultations
 );
 
-// Agronomist / Admin: update booking status (approve/reject)
+// Agronomist / Admin / Farmer: update booking status (farmers can only cancel own booking)
 router.patch(
   '/:id/status',
   auth,
-  requireRole('agronomist', 'admin'),
+  requireRole('agronomist', 'admin', 'farmer'),
   consultationController.updateConsultationStatus
 );
 

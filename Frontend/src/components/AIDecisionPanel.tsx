@@ -71,7 +71,13 @@ interface FieldRecommendationData {
     description: string;
   };
   supportingObservations: {
-    soilMoisture?: { value: number | null; unit: string; source: string; freshnessMinutes: number; isStale: boolean };
+    soilMoisture?: {
+      value: number | null;
+      unit: string;
+      source: string;
+      freshnessMinutes: number;
+      isStale: boolean;
+    };
     soilTemp?: { value: number; unit: string; source: string };
     soilPh?: { value: number; unit: string; source: string };
     soilNitrogen?: { value: number; unit: string };
@@ -114,7 +120,8 @@ const AIDecisionPanel: React.FC = () => {
     async (field = selectedField, moistureOverride?: number) => {
       setLoading(true);
       try {
-        const targetMoisture = moistureOverride !== undefined ? moistureOverride : field.defaultMoisture;
+        const targetMoisture =
+          moistureOverride !== undefined ? moistureOverride : field.defaultMoisture;
         const payload: Record<string, string | number> = {
           fieldId: field.id,
           fieldName: field.name,
@@ -245,7 +252,9 @@ const AIDecisionPanel: React.FC = () => {
 
   // Guaranteed valid numeric moisture value - never null or undefined
   const moistureValue =
-    obs?.soilMoisture?.value != null ? Number(obs.soilMoisture.value) : selectedField.defaultMoisture;
+    obs?.soilMoisture?.value != null
+      ? Number(obs.soilMoisture.value)
+      : selectedField.defaultMoisture;
 
   const urgencyStyles = {
     critical: {
@@ -276,9 +285,23 @@ const AIDecisionPanel: React.FC = () => {
 
   // Moisture gauge color indicator
   const getMoistureColor = (val: number) => {
-    if (val < 30) return { bar: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400', label: 'Drought Stress' };
-    if (val > 70) return { bar: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400', label: 'Field Saturated' };
-    return { bar: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400', label: 'Optimal Range' };
+    if (val < 30)
+      return {
+        bar: 'bg-amber-500',
+        text: 'text-amber-600 dark:text-amber-400',
+        label: 'Drought Stress',
+      };
+    if (val > 70)
+      return {
+        bar: 'bg-blue-500',
+        text: 'text-blue-600 dark:text-blue-400',
+        label: 'Field Saturated',
+      };
+    return {
+      bar: 'bg-emerald-500',
+      text: 'text-emerald-600 dark:text-emerald-400',
+      label: 'Optimal Range',
+    };
   };
 
   const moistureStatus = getMoistureColor(moistureValue);
@@ -433,7 +456,9 @@ const AIDecisionPanel: React.FC = () => {
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-200 ease-out"
-                style={{ width: `${Math.min(100, ((Number(obs?.ambientTemp?.value || 28) - 10) / 35) * 100)}%` }}
+                style={{
+                  width: `${Math.min(100, ((Number(obs?.ambientTemp?.value || 28) - 10) / 35) * 100)}%`,
+                }}
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
@@ -464,7 +489,9 @@ const AIDecisionPanel: React.FC = () => {
             <div className="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-1.5 mt-2 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-teal-400 to-blue-500 rounded-full transition-all duration-200 ease-out"
-                style={{ width: `${Math.min(100, Math.max(8, Number(obs?.forecastRainProbability?.value || 15)))}%` }}
+                style={{
+                  width: `${Math.min(100, Math.max(8, Number(obs?.forecastRainProbability?.value || 15)))}%`,
+                }}
               />
             </div>
             <div className="flex justify-between text-[8px] text-gray-400 mt-1 font-semibold">
@@ -479,11 +506,15 @@ const AIDecisionPanel: React.FC = () => {
       {/* 2. Autonomous Advisory & Closed-Loop Command Center */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* LEFT CARD: Agronomic Advisory (7 Cols) */}
-        <div className={`lg:col-span-7 card-executive p-4 sm:p-5 border ${urgencyStyles.border} bg-gradient-to-br ${urgencyStyles.accent} relative overflow-hidden flex flex-col justify-between space-y-3.5`}>
+        <div
+          className={`lg:col-span-7 card-executive p-4 sm:p-5 border ${urgencyStyles.border} bg-gradient-to-br ${urgencyStyles.accent} relative overflow-hidden flex flex-col justify-between space-y-3.5`}
+        >
           <div>
             {/* Urgency and Context Badges */}
             <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-              <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${urgencyStyles.badge}`}>
+              <span
+                className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${urgencyStyles.badge}`}
+              >
                 {urgency.toUpperCase()} PRIORITY
               </span>
               <span className="text-xs font-bold text-gray-600 dark:text-gray-300 flex items-center gap-1">
@@ -518,7 +549,8 @@ const AIDecisionPanel: React.FC = () => {
               <div className="truncate">
                 <span className="font-bold text-blue-900 dark:text-blue-300">Target Outcome: </span>
                 <span className="text-blue-700 dark:text-blue-400">
-                  {recommendation?.expectedFollowUpCondition?.description || 'Soil moisture between 48% - 55% within 2 hours'}
+                  {recommendation?.expectedFollowUpCondition?.description ||
+                    'Soil moisture between 48% - 55% within 2 hours'}
                 </span>
               </div>
             </div>
@@ -646,7 +678,8 @@ const AIDecisionPanel: React.FC = () => {
                     ) : (
                       <AlertTriangle size={14} className="text-amber-600" />
                     )}
-                    Outcome: {evaluationResult.conditionMet ? 'Condition Satisfied' : 'Review Needed'}
+                    Outcome:{' '}
+                    {evaluationResult.conditionMet ? 'Condition Satisfied' : 'Review Needed'}
                   </span>
                   <span className="font-extrabold text-[11px]">
                     {evaluationResult.observedDelta}

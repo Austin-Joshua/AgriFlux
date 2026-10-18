@@ -154,7 +154,10 @@ const YieldPrediction: React.FC = () => {
             Methodology: <strong>Calibrated Agronomic Formula</strong>
           </p>
           <p>
-            Yield estimates are computed via calibrated agronomic rule-based formulas incorporating base crop potential, NPK stoichiometry, rainfall distribution, and temperature-humidity indices. This deterministic formula provides advisory guidance and is distinct from trained machine-learning empirical models.
+            Yield estimates are computed via calibrated agronomic rule-based formulas incorporating
+            base crop potential, NPK stoichiometry, rainfall distribution, and temperature-humidity
+            indices. This deterministic formula provides advisory guidance and is distinct from
+            trained machine-learning empirical models.
           </p>
         </div>
       );
@@ -208,7 +211,8 @@ const YieldPrediction: React.FC = () => {
     'Consider split fertilizer application for better absorption',
   ];
 
-  const suggestions = result?.suggestions && result.suggestions.length > 0 ? result.suggestions : defaultSuggestions;
+  const suggestions =
+    result?.suggestions && result.suggestions.length > 0 ? result.suggestions : defaultSuggestions;
 
   return (
     <div className="space-y-6">

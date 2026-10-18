@@ -63,6 +63,21 @@ export const connectDB = async () => {
     isDBConnected = true;
     console.log(`📡 MongoDB Connected: ${conn.connection.host}`);
 
+    // Dynamic connection lifecycle listeners
+    mongoose.connection.on('disconnected', () => {
+      isDBConnected = false;
+      console.warn('⚠️ [DBMS] MongoDB connection lost. Degrading to fail-safe state.');
+    });
+
+    mongoose.connection.on('reconnected', () => {
+      isDBConnected = true;
+      console.log('📡 [DBMS] MongoDB connection restored.');
+    });
+
+    mongoose.connection.on('error', (err) => {
+      console.error('❌ [DBMS] MongoDB runtime error:', err.message);
+    });
+
     await seedDefaultAccounts();
   } catch (error: any) {
     isDBConnected = false;

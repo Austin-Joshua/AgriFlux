@@ -21,7 +21,13 @@ const ReportSchema: Schema = new Schema({
         analysis: { type: String },
         recommendations: [{ type: String }]
     },
-    createdAt: { type: Date, default: Date.now }
-});
+    createdAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
+// High-performance compound indexes for user report retrieval and metric aggregation
+ReportSchema.index({ userId: 1, createdAt: -1 });
+ReportSchema.index({ type: 1, createdAt: -1 });
 
 export default mongoose.model<IReport>('Report', ReportSchema);

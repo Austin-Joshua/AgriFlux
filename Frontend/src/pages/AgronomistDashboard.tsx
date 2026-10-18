@@ -14,24 +14,21 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import {
-  Calendar,
-  AlertTriangle,
-  Send,
-  Loader,
-} from 'lucide-react';
+import { Calendar, AlertTriangle, Send, Loader } from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { toast } from 'react-toastify';
 
 interface Consultation {
   _id: string;
-  userId?: {
-    name?: string;
-    email?: string;
-    farmName?: string;
-    location?: string;
-  } | string;
+  userId?:
+    | {
+        name?: string;
+        email?: string;
+        farmName?: string;
+        location?: string;
+      }
+    | string;
   expertId: string;
   expertName: string;
   specialization: string;
@@ -75,11 +72,7 @@ const AgronomistDashboard: React.FC = () => {
   const handleTabSelect = (tab: 'overview' | 'soilReports' | 'fieldVisits' | 'advisory') => {
     setActiveTab(tab);
     setSearchParams(
-      tab === 'overview'
-        ? {}
-        : tab === 'fieldVisits'
-          ? { tab: 'consultations' }
-          : { tab }
+      tab === 'overview' ? {} : tab === 'fieldVisits' ? { tab: 'consultations' } : { tab }
     );
   };
   const [advisoryText, setAdvisoryText] = useState('');
@@ -133,7 +126,8 @@ const AgronomistDashboard: React.FC = () => {
         specialization: 'Crop Pathology',
         date: '2026-06-28',
         time: '14:00',
-        query: 'Noticed yellow rust spots on wheat leaves in field B. Need fungicide recommendation.',
+        query:
+          'Noticed yellow rust spots on wheat leaves in field B. Need fungicide recommendation.',
         status: 'confirmed',
       },
     ];
@@ -147,13 +141,15 @@ const AgronomistDashboard: React.FC = () => {
   const handleUpdateStatus = async (id: string, newStatus: 'confirmed' | 'cancelled') => {
     try {
       if (token && !id.startsWith('mock-') && !id.startsWith('local-')) {
-        await axios.patch(
-          `${API_URL}/consultations/${id}/status`,
-          { status: newStatus },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        ).catch(() => {});
+        await axios
+          .patch(
+            `${API_URL}/consultations/${id}/status`,
+            { status: newStatus },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+          .catch(() => {});
       }
       // Update local storage if present
       const local = JSON.parse(localStorage.getItem('agriflux_local_consultations') || '[]');
@@ -163,9 +159,7 @@ const AgronomistDashboard: React.FC = () => {
       localStorage.setItem('agriflux_local_consultations', JSON.stringify(updatedLocal));
 
       // Update state
-      setConsultations((prev) =>
-        prev.map((c) => (c._id === id ? { ...c, status: newStatus } : c))
-      );
+      setConsultations((prev) => prev.map((c) => (c._id === id ? { ...c, status: newStatus } : c)));
       toast.success(`Consultation successfully ${newStatus}!`);
     } catch {
       toast.error('Failed to update consultation status.');
@@ -303,12 +297,18 @@ const AgronomistDashboard: React.FC = () => {
       </div>
 
       <div className="overflow-x-auto max-w-full scrollbar-none pb-1">
-        <div className="flex gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl p-1.5 w-max border border-gray-200/50 dark:border-gray-700/50">
+        <div
+          role="tablist"
+          aria-label="Agronomist Views"
+          className="flex gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl p-1.5 w-max border border-gray-200/50 dark:border-gray-700/50"
+        >
           {(['overview', 'fieldVisits', 'soilReports', 'advisory'] as const).map((tab) => (
             <button
               key={tab}
+              role="tab"
+              aria-selected={activeTab === tab}
               onClick={() => handleTabSelect(tab)}
-              className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+              className={`px-3.5 py-2 min-h-[40px] rounded-lg text-xs sm:text-sm font-bold transition-all ${
                 activeTab === tab
                   ? 'bg-white dark:bg-gray-700 shadow text-primary-600 dark:text-primary-300'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'
@@ -540,10 +540,12 @@ const AgronomistDashboard: React.FC = () => {
             <div className="space-y-3">
               {consultations.map((v) => {
                 const isUserObj = typeof v.userId === 'object' && v.userId !== null;
-                const userProps = isUserObj ? v.userId as { name?: string; farmName?: string; location?: string } : null;
-                const farmerName = (userProps?.name) || 'Demo Farmer';
-                const farmName = (userProps?.farmName) || 'Green Valley Farm';
-                const location = (userProps?.location) || 'Mysuru, KA';
+                const userProps = isUserObj
+                  ? (v.userId as { name?: string; farmName?: string; location?: string })
+                  : null;
+                const farmerName = userProps?.name || 'Demo Farmer';
+                const farmName = userProps?.farmName || 'Green Valley Farm';
+                const location = userProps?.location || 'Mysuru, KA';
                 return (
                   <div
                     key={v._id}

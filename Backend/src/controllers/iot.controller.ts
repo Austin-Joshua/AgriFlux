@@ -352,25 +352,34 @@ export const acknowledgeActuator = async (req: Request, res: Response) => {
     const ackTime = new Date().toISOString();
     const finalStatus: ActuatorCommand['status'] = status === 'failed' ? 'failed' : 'acknowledged';
 
+    // Update target command (handles both the latest active command and in-flight historical commands)
+    targetCommand.status = finalStatus;
+    targetCommand.acknowledgedAt = ackTime;
+    if (failureReason) targetCommand.failureReason = failureReason;
+    if (flowRateLpm !== undefined || durationSeconds !== undefined) {
+      targetCommand.executionMetrics = {
+        flowRateLpm: Math.max(0, Math.min(1000, Number(flowRateLpm) || 0)),
+        durationSeconds: Math.max(0, Math.min(86400, Number(durationSeconds) || 0)),
+      };
+    }
+
+    // Also sync activeActuatorCommand if it matches the acknowledged command
     if (activeActuatorCommand && activeActuatorCommand.commandId === commandId) {
       activeActuatorCommand.status = finalStatus;
       activeActuatorCommand.acknowledgedAt = ackTime;
       if (failureReason) activeActuatorCommand.failureReason = failureReason;
-      if (flowRateLpm !== undefined || durationSeconds !== undefined) {
-        activeActuatorCommand.executionMetrics = {
-          flowRateLpm: Number(flowRateLpm) || 0,
-          durationSeconds: Number(durationSeconds) || 0,
-        };
+      if (targetCommand.executionMetrics) {
+        activeActuatorCommand.executionMetrics = targetCommand.executionMetrics;
       }
+    }
 
-      // Update confirmed telemetry pump state if confirmed
-      if (finalStatus === 'acknowledged') {
-        latestIoTData = {
-          ...latestIoTData,
-          pumpStatus: activeActuatorCommand.targetPumpStatus,
-          timestamp: ackTime,
-        };
-      }
+    // Update confirmed telemetry pump state if confirmed
+    if (finalStatus === 'acknowledged') {
+      latestIoTData = {
+        ...latestIoTData,
+        pumpStatus: targetCommand.targetPumpStatus,
+        timestamp: ackTime,
+      };
     }
 
     console.log(
@@ -391,7 +400,7 @@ export const acknowledgeActuator = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: `Actuator confirmation received: ${finalStatus}`,
-      command: activeActuatorCommand,
+      command: targetCommand,
       currentPumpStatus: latestIoTData.pumpStatus,
     });
   } catch (error: any) {

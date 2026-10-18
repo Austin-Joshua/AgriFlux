@@ -28,6 +28,7 @@ import {
   Cpu,
   ToggleRight,
   Activity,
+  ShieldCheck,
   Calendar,
   LucideIcon,
 } from 'lucide-react';
@@ -37,7 +38,7 @@ import logo from '../assets/logo-icon.png';
 
 interface SidebarProps {
   isOpen: boolean;
-  collapsed: boolean;
+  collapsed?: boolean;
   onClose: () => void;
 }
 
@@ -52,43 +53,124 @@ interface NavItemData {
 
 const farmerNavItems: NavItemData[] = [
   { to: '/dashboard', icon: LayoutDashboard, labelKey: 'nav.dashboard', fallback: 'Dashboard' },
-  { to: '/yield', icon: TrendingUp, labelKey: 'nav.yieldPrediction', fallback: 'Yield Prediction' },
+  {
+    to: '/crop-health',
+    icon: Satellite,
+    labelKey: 'nav.cropHealth',
+    fallback: 'Crop Health Monitoring',
+  },
+  {
+    to: '/soil',
+    icon: FlaskConical,
+    labelKey: 'nav.soilIntelligence',
+    fallback: 'Soil Intelligence',
+  },
+  {
+    to: '/crop-switching',
+    icon: Sprout,
+    labelKey: 'nav.cropSwitching',
+    fallback: 'Crop Resilience Advisor',
+  },
   { to: '/irrigation', icon: Droplets, labelKey: 'nav.irrigation', fallback: 'Smart Irrigation' },
-  { to: '/soil', icon: FlaskConical, labelKey: 'nav.soilIntelligence', fallback: 'Soil Intelligence' },
-  { to: '/crop-health', icon: Satellite, labelKey: 'nav.cropHealth', fallback: 'Crop Health' },
-  { to: '/climate', icon: CloudLightning, labelKey: 'nav.climateRisk', fallback: 'Climate Risk' },
-  { to: '/simulator', icon: Wind, labelKey: 'nav.climateSimulator', fallback: 'Climate Simulator' },
-  { to: '/crop-switching', icon: Sprout, labelKey: 'nav.cropSwitching', fallback: 'Crop Switching' },
-  { to: '/sustainability', icon: Award, labelKey: 'nav.sustainability', fallback: 'Sustainability' },
-  { to: '/land-intelligence', icon: Map, labelKey: 'nav.landIntelligence', fallback: 'Land Intelligence' },
+  {
+    to: '/land-intelligence',
+    icon: Map,
+    labelKey: 'nav.landIntelligence',
+    fallback: 'Land Intelligence',
+  },
   { to: '/market', icon: BarChart3, labelKey: 'nav.market', fallback: 'Market Analysis' },
-  { to: '/subsidies', icon: Landmark, labelKey: 'nav.subsidies', fallback: 'Subsidies' },
+  { to: '/subsidies', icon: Landmark, labelKey: 'nav.subsidies', fallback: 'Government Subsidies' },
   { to: '/marketplace', icon: Store, labelKey: 'nav.marketplace', fallback: 'Marketplace' },
-  { to: '/equipment-rental', icon: Tractor, labelKey: 'nav.equipmentRental', fallback: 'Equipment Rental' },
-  { to: '/book-consultation', icon: PhoneCall, labelKey: 'nav.bookConsultation', fallback: 'Book Consultation' },
+  {
+    to: '/equipment-rental',
+    icon: Tractor,
+    labelKey: 'nav.equipmentRental',
+    fallback: 'Equipment Rental',
+  },
+  {
+    to: '/book-consultation',
+    icon: PhoneCall,
+    labelKey: 'nav.bookConsultation',
+    fallback: 'Book Consultation',
+  },
   { to: '/investors', icon: Handshake, labelKey: 'nav.investors', fallback: 'Investors Hub' },
 ];
 
 const agronomistNavItems: NavItemData[] = [
-  { to: '/agronomist', icon: Microscope, labelKey: 'nav.agronomistPortal', fallback: 'Command Center' },
-  { to: '/agronomist?tab=consultations', icon: Calendar, labelKey: 'nav.consultationsQueue', fallback: 'Consultations' },
-  { to: '/soil', icon: FlaskConical, labelKey: 'nav.soilIntelligence', fallback: 'Soil Lab & Diagnosis' },
-  { to: '/crop-health', icon: Satellite, labelKey: 'nav.cropHealth', fallback: 'Satellite NDVI Health' },
-  { to: '/land-intelligence', icon: Map, labelKey: 'nav.landIntelligence', fallback: 'Land Intelligence' },
-  { to: '/yield', icon: TrendingUp, labelKey: 'nav.yieldPrediction', fallback: 'Yield Analytics' },
-  { to: '/irrigation', icon: Droplets, labelKey: 'nav.irrigation', fallback: 'Water Deficit & Irrigation' },
-  { to: '/climate', icon: CloudLightning, labelKey: 'nav.climateRisk', fallback: 'Climate & Pest Risk' },
-  { to: '/simulator', icon: Wind, labelKey: 'nav.climateSimulator', fallback: 'Stress Simulator' },
-  { to: '/crop-switching', icon: Sprout, labelKey: 'nav.cropSwitching', fallback: 'Crop Resilience Engine' },
-  { to: '/sustainability', icon: Award, labelKey: 'nav.sustainability', fallback: 'Sustainability Audit' },
+  {
+    to: '/agronomist',
+    icon: Microscope,
+    labelKey: 'nav.agronomistPortal',
+    fallback: 'Command Center',
+  },
+  {
+    to: '/agronomist?tab=consultations',
+    icon: Calendar,
+    labelKey: 'nav.consultationsQueue',
+    fallback: 'Farmer Consultations',
+  },
+  {
+    to: '/agronomist?tab=soilReports',
+    icon: FlaskConical,
+    labelKey: 'nav.soilReports',
+    fallback: 'Soil Diagnostics Review',
+  },
+  {
+    to: '/agronomist?tab=advisory',
+    icon: PhoneCall,
+    labelKey: 'nav.advisoryTab',
+    fallback: 'Regional Advisory',
+  },
+  {
+    to: '/yield',
+    icon: TrendingUp,
+    labelKey: 'nav.yieldPrediction',
+    fallback: 'Yield Forecasting',
+  },
+  {
+    to: '/climate',
+    icon: CloudLightning,
+    labelKey: 'nav.climateRisk',
+    fallback: 'Climate Risk Analysis',
+  },
+  { to: '/simulator', icon: Wind, labelKey: 'nav.climateSimulator', fallback: 'Climate Simulator' },
+  {
+    to: '/sustainability',
+    icon: Award,
+    labelKey: 'nav.sustainability',
+    fallback: 'Sustainability Index',
+  },
 ];
 
 const adminNavItems: NavItemData[] = [
   { to: '/admin', icon: Shield, labelKey: 'nav.adminConsole', fallback: 'Admin Console' },
   { to: '/admin?tab=users', icon: Users, labelKey: 'nav.adminUsers', fallback: 'User Governance' },
-  { to: '/admin?tab=system', icon: Cpu, labelKey: 'nav.adminSystem', fallback: 'Cloud & Infrastructure' },
-  { to: '/admin?tab=actuators', icon: ToggleRight, labelKey: 'nav.adminActuators', fallback: 'Actuator Overrides' },
-  { to: '/admin?tab=activity', icon: Activity, labelKey: 'nav.adminActivity', fallback: 'Security Audit Logs' },
+  {
+    to: '/admin?tab=blockchain',
+    icon: ShieldCheck,
+    labelKey: 'nav.adminBlockchain',
+    fallback: 'Blockchain Ledger',
+    badge: 'SHA-256',
+    badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  },
+  {
+    to: '/admin?tab=system',
+    icon: Cpu,
+    labelKey: 'nav.adminSystem',
+    fallback: 'Cloud & Infrastructure',
+  },
+  {
+    to: '/admin?tab=actuators',
+    icon: ToggleRight,
+    labelKey: 'nav.adminActuators',
+    fallback: 'Actuator Overrides',
+  },
+  {
+    to: '/admin?tab=activity',
+    icon: Activity,
+    labelKey: 'nav.adminActivity',
+    fallback: 'Security Audit Logs',
+  },
 ];
 
 const adminDirectPortals: NavItemData[] = [
@@ -125,7 +207,18 @@ interface NavItemProps extends NavItemData {
 }
 
 const NavItem: React.FC<NavItemProps> = React.memo(
-  ({ to, icon: Icon, labelKey, fallback, badge, badgeColor, collapsed, onClick, currentPath, currentSearch }) => {
+  ({
+    to,
+    icon: Icon,
+    labelKey,
+    fallback,
+    badge,
+    badgeColor,
+    collapsed,
+    onClick,
+    currentPath,
+    currentSearch,
+  }) => {
     const { t } = useTranslation();
 
     const isItemActive = useMemo(() => {
@@ -152,15 +245,13 @@ const NavItem: React.FC<NavItemProps> = React.memo(
         to={to}
         onClick={onClick}
         title={collapsed ? label : undefined}
-        className={
-          `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer group relative overflow-hidden select-none
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer group relative overflow-hidden select-none
           ${collapsed ? 'justify-center' : ''}
           ${
             isItemActive
               ? 'bg-gradient-to-r from-primary-500/20 to-teal-500/10 text-primary-700 dark:text-primary-300 shadow-sm border border-primary-200/50 dark:border-primary-700/30 font-semibold'
               : 'text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/40 hover:text-primary-700 dark:hover:text-primary-300'
-          }`
-        }
+          }`}
       >
         {isItemActive && (
           <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-gradient-to-b from-primary-500 to-teal-500 rounded-r-full" />
@@ -177,7 +268,8 @@ const NavItem: React.FC<NavItemProps> = React.memo(
         {!collapsed && badge && (
           <span
             className={`text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded-md uppercase ${
-              badgeColor || 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300'
+              badgeColor ||
+              'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300'
             }`}
           >
             {badge}
@@ -190,8 +282,7 @@ const NavItem: React.FC<NavItemProps> = React.memo(
 
 NavItem.displayName = 'NavItem';
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
-  const { t } = useTranslation();
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -225,10 +316,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
   const handleLogout = () => {
     logout();
     toast.info('Signed out successfully.');
-    navigate('/login');
+    navigate('/');
   };
 
-  const w = collapsed ? 'lg:w-[72px]' : 'lg:w-64';
+  const w = 'lg:w-64';
 
   // Role-specific navigation items selection
   const userRole = user?.role || 'farmer';
@@ -241,10 +332,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
 
   const roleBadge =
     userRole === 'admin'
-      ? { label: '🛡️ ADMIN', color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200/50' }
+      ? {
+          label: '🛡️ ADMIN',
+          color:
+            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200/50',
+        }
       : userRole === 'agronomist'
-        ? { label: '🔬 AGRONOMIST', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/50' }
-        : { label: '🌾 FARMER', color: 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 border border-primary-200/50' };
+        ? {
+            label: '🔬 AGRONOMIST',
+            color:
+              'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/50',
+          }
+        : {
+            label: '🌾 FARMER',
+            color:
+              'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 border border-primary-200/50',
+          };
 
   return (
     <>
@@ -261,50 +364,42 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
         className={`fixed top-0 left-0 h-[100dvh] pb-6 lg:pb-0 lg:h-screen ${w} glass-sidebar z-50 transform transition-all duration-300 ease-in-out flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       >
-        {/* Brand Header */}
-        <div
-          className={`flex items-center justify-between px-4 py-5 border-b border-white/10 dark:border-gray-700/30 ${
-            collapsed ? 'px-3' : ''
-          }`}
-        >
+        {/* Mobile Drawer Header with Logo & Close Button */}
+        <div className="flex lg:hidden items-center justify-between px-4 py-4 border-b border-gray-100/60 dark:border-gray-800/60">
           <div
             onClick={() => {
               if (userRole === 'admin') navigate('/admin');
               else if (userRole === 'agronomist') navigate('/agronomist');
               else navigate('/dashboard');
+              onClose();
             }}
-            className={`flex items-center gap-2.5 cursor-pointer transition-transform duration-200 hover:scale-[1.03] ${
-              collapsed ? 'justify-center w-full' : ''
-            }`}
+            className="flex items-center gap-2.5 cursor-pointer"
           >
-            <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-md shadow-primary-500/25 flex-shrink-0">
+            <div className="relative p-0.5 rounded-xl bg-gradient-to-tr from-primary-500 via-primary-600 to-teal-500 shadow-sm shadow-primary-500/20 flex-shrink-0">
               <div className="w-8 h-8 rounded-[10px] bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden p-0.5">
                 <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-contain" />
               </div>
             </div>
-            {!collapsed && (
-              <div className="flex flex-col text-left">
-                <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">
-                  {t('common.agriflux', 'AgriFlux')}
-                </span>
-                <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">
-                  {userRole === 'admin'
-                    ? 'Admin Command'
-                    : userRole === 'agronomist'
-                      ? 'Consulting Suite'
-                      : t('common.intelligencePlatform', 'Intelligence Platform')}
-                </span>
-              </div>
-            )}
+            <div className="flex flex-col text-left">
+              <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">
+                Agri<span className="text-gradient">Flux</span>
+              </span>
+              <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">
+                {userRole === 'admin'
+                  ? 'Admin Command'
+                  : userRole === 'agronomist'
+                    ? 'Consulting Suite'
+                    : 'Intelligence Platform'}
+              </span>
+            </div>
           </div>
-          {!collapsed && (
-            <button
-              onClick={onClose}
-              className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              <X size={18} />
-            </button>
-          )}
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Primary Role-Aware Nav Links Container with Scroll Persistence */}
@@ -372,7 +467,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed, onClose }) => {
                   </p>
                 </div>
                 <div className="mt-0.5">
-                  <span className={`text-[8.5px] font-black px-1.5 py-0.2 rounded-md ${roleBadge.color}`}>
+                  <span
+                    className={`text-[8.5px] font-black px-1.5 py-0.2 rounded-md ${roleBadge.color}`}
+                  >
                     {roleBadge.label}
                   </span>
                 </div>

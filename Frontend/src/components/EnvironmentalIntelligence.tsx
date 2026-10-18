@@ -123,7 +123,9 @@ interface VariableRegistryItem {
 }
 
 const EnvironmentalIntelligence: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'weather' | 'satellite' | 'soil' | 'apy' | 'registry'>('weather');
+  const [activeTab, setActiveTab] = useState<'weather' | 'satellite' | 'soil' | 'apy' | 'registry'>(
+    'weather'
+  );
   const [weatherGranularity, setWeatherGranularity] = useState<'daily' | 'hourly'>('daily');
   const [timeRangeDays, setTimeRangeDays] = useState<number>(14);
 
@@ -291,7 +293,6 @@ const EnvironmentalIntelligence: React.FC = () => {
       observationsCount: weatherData.length,
     };
   }, [weatherData]);
-
 
   return (
     <div className="card overflow-hidden">
@@ -757,9 +758,13 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
               <FlaskConical size={16} className="text-amber-600 shrink-0" />
               <span>
-                <strong>Regional Soil Benchmark (0–15 cm depth):</strong> Agro-ecological profile based
-                on published ICAR-TNAU Cauvery Delta regional soil surveys.
-                <strong> Illustrative benchmark only — NOT an in-situ certified measurement of an individual farm boundary.</strong>
+                <strong>Regional Soil Benchmark (0–15 cm depth):</strong> Agro-ecological profile
+                based on published ICAR-TNAU Cauvery Delta regional soil surveys.
+                <strong>
+                  {' '}
+                  Illustrative benchmark only — NOT an in-situ certified measurement of an
+                  individual farm boundary.
+                </strong>
               </span>
             </div>
             <span className="px-2.5 py-0.5 rounded-md bg-amber-200/80 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold text-[10px] tracking-wide uppercase shrink-0">
@@ -778,7 +783,10 @@ const EnvironmentalIntelligence: React.FC = () => {
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
                 <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong>Provenance Note:</strong> This profile reflects published ICAR-TNAU regional classification data for Thanjavur alluvial delta soils (pH 6.4, low available N). For operational field recommendations, an actual certified farm Soil Health Card must be uploaded.
+                  <strong>Provenance Note:</strong> This profile reflects published ICAR-TNAU
+                  regional classification data for Thanjavur alluvial delta soils (pH 6.4, low
+                  available N). For operational field recommendations, an actual certified farm Soil
+                  Health Card must be uploaded.
                 </p>
               </div>
 
@@ -797,11 +805,14 @@ const EnvironmentalIntelligence: React.FC = () => {
                     </span>
                   </div>
                   <p className="text-[11px] text-gray-400 mt-0.5">
-                    Sample ID: <strong>{soilProfile.sampleId}</strong> · Sampling Depth: 0–15 cm · Texture: <strong>{soilProfile.soilTexture}</strong>
+                    Sample ID: <strong>{soilProfile.sampleId}</strong> · Sampling Depth: 0–15 cm ·
+                    Texture: <strong>{soilProfile.soilTexture}</strong>
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <span className="text-[10px] text-gray-400 block">Regional Survey Authority:</span>
+                  <span className="text-[10px] text-gray-400 block">
+                    Regional Survey Authority:
+                  </span>
                   <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                     {soilProfile.laboratoryName}
                   </span>
@@ -886,9 +897,14 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
               <Sprout size={16} className="text-emerald-600 shrink-0" />
               <span>
-                <strong>Archived Directorate of Economics & Statistics (DES) Statistics:</strong> Ministry of Agriculture &
-                Farmers Welfare, Govt of India.
-                <strong> Historical record from Agricultural Year 1997–1998 (Whole Year). Macro district statistic only — NOT a current seasonal yield target or individual farm productivity label.</strong>
+                <strong>Archived Directorate of Economics & Statistics (DES) Statistics:</strong>{' '}
+                Ministry of Agriculture & Farmers Welfare, Govt of India.
+                <strong>
+                  {' '}
+                  Historical record from Agricultural Year 1997–1998 (Whole Year). Macro district
+                  statistic only — NOT a current seasonal yield target or individual farm
+                  productivity label.
+                </strong>
               </span>
             </div>
             <span className="px-2.5 py-0.5 rounded-md bg-emerald-200/80 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-bold text-[10px] tracking-wide uppercase shrink-0">
@@ -899,7 +915,10 @@ const EnvironmentalIntelligence: React.FC = () => {
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300 flex items-start gap-2">
             <AlertCircle size={15} className="text-emerald-600 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              <strong>Historical Scope Notice:</strong> This official report reflects Agricultural Year 1997–1998 district-wide production for Thanjavur Rice (181,496 Ha, 489,770 Tonnes, 2.70 t/Ha). It provides macroeconomic historical context and must not be conflated with modern seasonal field targets.
+              <strong>Historical Scope Notice:</strong> This official report reflects Agricultural
+              Year 1997–1998 district-wide production for Thanjavur Rice (181,496 Ha, 489,770
+              Tonnes, 2.70 t/Ha). It provides macroeconomic historical context and must not be
+              conflated with modern seasonal field targets.
             </p>
           </div>
 
@@ -926,13 +945,18 @@ const EnvironmentalIntelligence: React.FC = () => {
                         </span>
                       </div>
                       <p className="text-[11px] text-gray-400 mt-0.5">
-                        Agricultural Year: <strong>{rec.agriculturalYear}</strong> · Status: <strong>{rec.verificationStatus.replace('_', ' ')}</strong>
+                        Agricultural Year: <strong>{rec.agriculturalYear}</strong> · Status:{' '}
+                        <strong>{rec.verificationStatus.replace('_', ' ')}</strong>
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-gray-400 block">District Average Yield:</span>
+                      <span className="text-[10px] text-gray-400 block">
+                        District Average Yield:
+                      </span>
                       <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                        {rec.yieldTonnePerHectare} <span className="text-xs font-semibold">t/Ha</span> ({rec.yieldKgPerHectare} <span className="text-xs font-semibold">kg/Ha</span>)
+                        {rec.yieldTonnePerHectare}{' '}
+                        <span className="text-xs font-semibold">t/Ha</span> ({rec.yieldKgPerHectare}{' '}
+                        <span className="text-xs font-semibold">kg/Ha</span>)
                       </p>
                     </div>
                   </div>
@@ -986,8 +1010,8 @@ const EnvironmentalIntelligence: React.FC = () => {
             <div className="flex items-center gap-2 text-purple-800 dark:text-purple-300">
               <BookOpen size={15} className="text-purple-600 shrink-0" />
               <span>
-                <strong>Authoritative Variable Registry:</strong> Single typed source of truth across
-                meteorology, orbital remote sensing, soil chemistry, and on-farm IoT sensors.
+                <strong>Authoritative Variable Registry:</strong> Single typed source of truth
+                across meteorology, orbital remote sensing, soil chemistry, and on-farm IoT sensors.
               </span>
             </div>
             <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-semibold text-[11px] shrink-0">
@@ -998,7 +1022,9 @@ const EnvironmentalIntelligence: React.FC = () => {
           {loadingRegistry ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
               <Loader className="animate-spin text-purple-500" size={24} />
-              <span className="text-xs">Loading canonical environmental variable definitions...</span>
+              <span className="text-xs">
+                Loading canonical environmental variable definitions...
+              </span>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -1015,18 +1041,29 @@ const EnvironmentalIntelligence: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
                   {Object.values(registryItems).map((v) => (
-                    <tr key={v.canonicalName} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                    <tr
+                      key={v.canonicalName}
+                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                    >
                       <td className="py-2.5 px-3">
-                        <div className="font-bold text-gray-900 dark:text-white">{v.displayLabel}</div>
-                        <span className="text-[10px] text-gray-400 font-mono">{v.canonicalName}</span>
+                        <div className="font-bold text-gray-900 dark:text-white">
+                          {v.displayLabel}
+                        </div>
+                        <span className="text-[10px] text-gray-400 font-mono">
+                          {v.canonicalName}
+                        </span>
                       </td>
                       <td className="py-2.5 px-3">
                         <span className="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 uppercase">
                           {v.category}
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{v.unit}</td>
-                      <td className="py-2.5 px-3 text-[11px] text-gray-500 dark:text-gray-400">{v.sourceType.replace(/_/g, ' ')}</td>
+                      <td className="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">
+                        {v.unit}
+                      </td>
+                      <td className="py-2.5 px-3 text-[11px] text-gray-500 dark:text-gray-400">
+                        {v.sourceType.replace(/_/g, ' ')}
+                      </td>
                       <td className="py-2.5 px-3 font-mono text-[11px] text-gray-600 dark:text-gray-400">
                         [{v.validationRange.min}, {v.validationRange.max}]
                       </td>
@@ -1055,9 +1092,10 @@ const EnvironmentalIntelligence: React.FC = () => {
         <AlertTriangle size={13} className="text-amber-500 shrink-0 mt-0.5" />
         <span>
           <strong>Operational Safeguard:</strong> Reanalysis weather estimates, satellite NDVI, and
-          district statistical benchmarks are displayed for macro-climatic and contextual monitoring.
-          In accordance with safety rules, they are strictly decoupled from automated closed-loop
-          irrigation actuators until physical on-farm capacitive sensor ground truth is verified.
+          district statistical benchmarks are displayed for macro-climatic and contextual
+          monitoring. In accordance with safety rules, they are strictly decoupled from automated
+          closed-loop irrigation actuators until physical on-farm capacitive sensor ground truth is
+          verified.
         </span>
       </div>
     </div>

@@ -10,10 +10,16 @@ export class AIService {
     };
     const base = baseYields[crop] || 3000;
 
-    const n = Number(data.nitrogen) || 60;
-    const p = Number(data.phosphorus) || 40;
-    const k = Number(data.potassium) || 50;
-    const ph = Number(data.soilPh) || 6.5;
+    // Defensive input bounds clamping (prevents negative yields and NaN propagation)
+    const rawN = Number(data.nitrogen);
+    const rawP = Number(data.phosphorus);
+    const rawK = Number(data.potassium);
+    const rawPh = Number(data.soilPh);
+
+    const n = Math.max(0, Math.min(300, isNaN(rawN) ? 60 : rawN));
+    const p = Math.max(0, Math.min(200, isNaN(rawP) ? 40 : rawP));
+    const k = Math.max(0, Math.min(250, isNaN(rawK) ? 50 : rawK));
+    const ph = Math.max(3.0, Math.min(10.0, isNaN(rawPh) ? 6.5 : rawPh));
 
     // Soil pH impact (IRRI & FAO guidelines)
     let phMultiplier = 1.0;
@@ -29,7 +35,7 @@ export class AIService {
     const kIndex = Math.min(k / 60, 1.2);
     const npkMultiplier = (nIndex + pIndex + kIndex) / 3;
 
-    const predicted = Math.round(base * phMultiplier * npkMultiplier);
+    const predicted = Math.max(0, Math.round(base * phMultiplier * Math.max(0.1, npkMultiplier)));
     const risk = predicted < base * 0.85 ? 'High' : predicted < base * 0.95 ? 'Medium' : 'Low';
 
     const suggestions: string[] = [];
@@ -69,8 +75,10 @@ export class AIService {
 
   static async getIrrigationSchedule(data: any) {
     const crop = data.cropType || 'Rice';
-    const moisture = Number(data.soilMoisture) || 45;
-    const temp = Number(data.temperature) || 30;
+    const rawM = Number(data.soilMoisture);
+    const rawT = Number(data.temperature);
+    const moisture = Math.max(0, Math.min(100, isNaN(rawM) ? 45 : rawM));
+    const temp = Math.max(-10, Math.min(60, isNaN(rawT) ? 30 : rawT));
 
     const schedule = [];
     if (moisture > 70) {
@@ -113,10 +121,15 @@ export class AIService {
   }
 
   static async analyzeSoil(data: any) {
-    const ph = Number(data.ph) || 6.5;
-    const n = Number(data.nitrogen) || 60;
-    const p = Number(data.phosphorus) || 40;
-    const k = Number(data.potassium) || 50;
+    const rawPh = Number(data.ph);
+    const rawN = Number(data.nitrogen);
+    const rawP = Number(data.phosphorus);
+    const rawK = Number(data.potassium);
+
+    const ph = Math.max(3.0, Math.min(10.0, isNaN(rawPh) ? 6.5 : rawPh));
+    const n = Math.max(0, Math.min(300, isNaN(rawN) ? 60 : rawN));
+    const p = Math.max(0, Math.min(200, isNaN(rawP) ? 40 : rawP));
+    const k = Math.max(0, Math.min(250, isNaN(rawK) ? 50 : rawK));
 
     let score = 95;
     const recommendations: string[] = [];
@@ -160,10 +173,15 @@ export class AIService {
   }
 
   static async evaluateClimateRisk(data: any) {
-    const temp = Number(data.temperature) || 30;
-    const humidity = Number(data.humidity) || 65;
-    const rainfall = Number(data.rainfall) || 120;
-    const windSpeed = Number(data.windSpeed) || 12;
+    const rawT = Number(data.temperature);
+    const rawH = Number(data.humidity);
+    const rawR = Number(data.rainfall);
+    const rawW = Number(data.windSpeed);
+
+    const temp = Math.max(-30, Math.min(65, isNaN(rawT) ? 30 : rawT));
+    const humidity = Math.max(0, Math.min(100, isNaN(rawH) ? 65 : rawH));
+    const rainfall = Math.max(0, Math.min(1000, isNaN(rawR) ? 120 : rawR));
+    const windSpeed = Math.max(0, Math.min(200, isNaN(rawW) ? 12 : rawW));
 
     let riskScore = 20;
     const alerts = [];
@@ -237,8 +255,10 @@ export class AIService {
 
   static async simulateClimate(data: any) {
     const { rainfallChange, tempChange } = data;
-    const rChange = Number(rainfallChange) || 0;
-    const tChange = Number(tempChange) || 0;
+    const rawR = Number(rainfallChange);
+    const rawT = Number(tempChange);
+    const rChange = Math.max(-100, Math.min(100, isNaN(rawR) ? 0 : rawR));
+    const tChange = Math.max(-15, Math.min(20, isNaN(rawT) ? 0 : rawT));
 
     // Formula linking rainfall and temperature shifts to yield swings
     const impact = rChange * 0.4 - tChange * 2.3;

@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import * as iotController from '../controllers/iot.controller';
 import { auth, requireRole } from '../middleware/auth';
 import { env } from '../config/env';
@@ -8,6 +9,7 @@ const router = Router();
 /**
  * IoT API Key middleware — for ESP32/hardware nodes.
  * In production: fails closed if IOT_API_KEY is missing or key does not match.
+ * Uses constant-time comparison to prevent timing side-channel attacks (CWE-208).
  * In development: permits configured dev key.
  */
 const iotDeviceAuth = (req: Request, res: Response, next: NextFunction) => {
@@ -15,8 +17,12 @@ const iotDeviceAuth = (req: Request, res: Response, next: NextFunction) => {
   const expectedKey =
     process.env.IOT_API_KEY || (env.NODE_ENV === 'production' ? '' : 'agriflux-iot-key-dev');
 
-  if (apiKey && expectedKey && apiKey === expectedKey) {
-    return next();
+  if (typeof apiKey === 'string' && expectedKey) {
+    const hashProvided = crypto.createHash('sha256').update(apiKey).digest();
+    const hashExpected = crypto.createHash('sha256').update(expectedKey).digest();
+    if (crypto.timingSafeEqual(hashProvided, hashExpected)) {
+      return next();
+    }
   }
 
   // Also allow JWT-authenticated dashboard users to push test data

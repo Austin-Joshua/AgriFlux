@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Store,
   Leaf,
-  Map,
   Sparkles,
   Shield,
   Users,
@@ -15,6 +14,8 @@ import {
   Satellite,
   CloudLightning,
   ToggleRight,
+  TrendingUp,
+  Wind,
   LucideIcon,
 } from 'lucide-react';
 import SmartFarmReport from './SmartFarmReport';
@@ -67,17 +68,18 @@ const MobileBottomNav: React.FC = () => {
   } else if (role === 'agronomist') {
     leftItems = [
       { to: '/agronomist', icon: Microscope, label: 'Portal' },
-      { to: '/soil', icon: Leaf, label: 'Soil Lab' },
+      { to: '/yield', icon: TrendingUp, label: 'Yield' },
     ];
     rightItems = [
-      { to: '/crop-health', icon: Satellite, label: 'NDVI' },
       { to: '/climate', icon: CloudLightning, label: 'Climate' },
+      { to: '/simulator', icon: Wind, label: 'Simulator' },
     ];
     fabConfig = {
       icon: Calendar,
       label: 'Advisory',
       onClick: () => navigate('/agronomist?tab=consultations'),
-      isActive: location.pathname === '/agronomist' && location.search.includes('tab=consultations'),
+      isActive:
+        location.pathname === '/agronomist' && location.search.includes('tab=consultations'),
     };
   } else {
     // Farmer
@@ -86,8 +88,8 @@ const MobileBottomNav: React.FC = () => {
       { to: '/soil', icon: Leaf, label: 'Soil' },
     ];
     rightItems = [
+      { to: '/crop-health', icon: Satellite, label: 'Health' },
       { to: '/marketplace', icon: Store, label: 'Market' },
-      { to: '/land-intelligence', icon: Map, label: 'Land' },
     ];
     fabConfig = {
       icon: Sparkles,
@@ -120,13 +122,11 @@ const MobileBottomNav: React.FC = () => {
       <NavLink
         key={to}
         to={to}
-        className={
-          `flex-1 min-w-0 flex flex-col items-center justify-center py-1 px-1 transition-all duration-150 active:scale-95 select-none ${
-            active
-              ? 'text-primary-600 dark:text-primary-400 font-bold'
-              : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
-          }`
-        }
+        className={`flex-1 min-w-0 flex flex-col items-center justify-center py-1 px-1 transition-all duration-150 active:scale-95 select-none ${
+          active
+            ? 'text-primary-600 dark:text-primary-400 font-bold'
+            : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+        }`}
       >
         <div
           className={`px-3 py-1 rounded-full flex items-center justify-center transition-all duration-200 ${
@@ -135,7 +135,10 @@ const MobileBottomNav: React.FC = () => {
               : 'hover:text-gray-600 dark:hover:text-gray-200'
           }`}
         >
-          <Icon size={19} className={`transition-transform duration-150 ${active ? 'scale-110' : ''}`} />
+          <Icon
+            size={19}
+            className={`transition-transform duration-150 ${active ? 'scale-110' : ''}`}
+          />
         </div>
         <span
           className={`text-[9.5px] leading-tight mt-0.5 truncate max-w-full tracking-tight ${
@@ -159,30 +162,30 @@ const MobileBottomNav: React.FC = () => {
 
       {/* Mobile/Tablet Bottom Navigation Bar — hidden on desktop (lg:hidden) */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 w-full max-w-full overflow-hidden pointer-events-auto shadow-2xl"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 w-full max-w-full overflow-visible pointer-events-auto bg-white dark:bg-gray-950"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 6px)' }}
         aria-label="Mobile Navigation"
       >
-        <div className="glass-sidebar border-t border-gray-200/70 dark:border-gray-700/50 px-2 pt-1.5 pb-1 flex items-center justify-between w-full max-w-full backdrop-blur-xl">
+        <div className="bg-white/98 dark:bg-gray-950/98 border-t border-gray-200/90 dark:border-gray-800/90 shadow-[0_-6px_25px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-2 pt-1 pb-1 flex items-center justify-between w-full max-w-full relative">
           {/* Left 2 Tabs */}
           {leftItems.map(renderTab)}
 
-          {/* Central Elevated Floating Action Button */}
+          {/* Central Elevated Floating Action Button (100% fully visible round button) */}
           <button
             onClick={fabConfig.onClick}
-            className="flex flex-col items-center -mt-5 group px-1 flex-shrink-0 active:scale-90 transition-transform duration-150 focus:outline-none"
+            className="flex flex-col items-center -mt-6 group px-2 flex-shrink-0 active:scale-95 transition-transform duration-150 focus:outline-none relative z-50"
             aria-label={fabConfig.label}
           >
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform duration-150 border-2 border-white dark:border-gray-900 group-hover:scale-105 ${
+              className={`w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all duration-200 border-[3.5px] border-white dark:border-gray-950 shadow-xl ${
                 fabConfig.isActive
-                  ? 'bg-gradient-to-tr from-emerald-600 to-teal-500 shadow-emerald-500/40 scale-105'
-                  : 'bg-gradient-to-tr from-primary-600 via-primary-500 to-emerald-400 shadow-primary-500/35'
+                  ? 'bg-gradient-to-tr from-emerald-600 via-primary-600 to-teal-500 shadow-emerald-500/50 ring-2 ring-emerald-500/30'
+                  : 'bg-gradient-to-tr from-emerald-500 via-primary-500 to-teal-400 shadow-primary-500/40 hover:scale-105'
               }`}
             >
-              <FabIcon size={21} className="text-white" />
+              <FabIcon size={23} className="text-white drop-shadow-sm" />
             </div>
-            <span className="text-[9.5px] font-black tracking-tight text-primary-700 dark:text-primary-300 mt-0.5 whitespace-nowrap">
+            <span className="text-[10px] font-black tracking-tight text-primary-700 dark:text-primary-300 mt-0.5 whitespace-nowrap">
               {fabConfig.label}
             </span>
           </button>
