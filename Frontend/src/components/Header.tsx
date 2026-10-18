@@ -104,126 +104,217 @@ const NOTIFICATIONS = [
 ];
 
 interface SearchItem {
-  label: string;
+  labelKey: string;
+  labelFallback: string;
+  descKey: string;
+  descFallback: string;
   icon: React.ElementType;
   route: string;
-  desc: string;
   roles?: ('farmer' | 'agronomist' | 'admin')[];
+  keywords: string[];
 }
 
 const SEARCH_DATA: SearchItem[] = [
   {
-    label: 'Dashboard',
+    labelKey: 'nav.dashboard',
+    labelFallback: 'Dashboard',
+    descKey: 'nav.smartFarmingDesc',
+    descFallback: 'Farm telemetry, alerts and field control',
     icon: LayoutDashboard,
     route: '/dashboard',
-    desc: 'Farm telemetry, alerts and field control',
     roles: ['farmer', 'admin'],
+    keywords: ['dashboard', 'home', 'farm', 'telemetry', 'alerts', 'field', 'overview', 'டாஷ்போர்டு', 'முகப்பு', 'விவசாயம்', 'டேஷ்போர்டு', 'डैशबोर्ड', 'खेती'],
   },
   {
-    label: 'Agronomist Command Center',
+    labelKey: 'nav.agronomistPortal',
+    labelFallback: 'Agronomist Command Center',
+    descKey: 'header.agroDesc',
+    descFallback: 'Regional farm monitoring, consultations and diagnostics',
     icon: BarChart3,
     route: '/agronomist',
-    desc: 'Regional farm monitoring, consultations and diagnostics',
     roles: ['agronomist', 'admin'],
+    keywords: ['agronomist', 'portal', 'command', 'center', 'diagnostics', 'consultation', 'field', 'கள ஆலோசகர்', 'கன்சோல்', 'ஆலோசனை', 'कृषिविज्ञानी'],
   },
   {
-    label: 'Yield Forecasting',
+    labelKey: 'nav.yieldPrediction',
+    labelFallback: 'Yield Forecasting',
+    descKey: 'header.yieldDesc',
+    descFallback: 'AI crop yield forecasting & optimization',
     icon: TrendingUp,
     route: '/yield',
-    desc: 'AI crop yield forecasting & optimization',
     roles: ['agronomist', 'admin'],
+    keywords: ['yield', 'harvest', 'forecast', 'production', 'prediction', 'crop', 'forecasting', 'விளைச்சல்', 'கணிப்பு', 'உற்பத்தி', 'மகசூல்', 'पैदावार'],
   },
   {
-    label: 'Irrigation Intelligence',
+    labelKey: 'nav.irrigation',
+    labelFallback: 'Irrigation Intelligence',
+    descKey: 'header.irrigationDesc',
+    descFallback: 'Closed-loop smart water scheduling',
     icon: Droplets,
     route: '/irrigation',
-    desc: 'Closed-loop smart water scheduling',
     roles: ['farmer', 'admin'],
+    keywords: ['irrigation', 'water', 'pump', 'schedule', 'moisture', 'sensors', 'valve', 'பாசனம்', 'நீர்', 'தண்ணீர்', 'ஸ்மார்ட் பாசனம்', 'सिंचाई', 'पानी'],
   },
   {
-    label: 'Soil Intelligence',
+    labelKey: 'nav.soilIntelligence',
+    labelFallback: 'Soil Intelligence',
+    descKey: 'header.soilDesc',
+    descFallback: 'Soil diagnostic, NPK chemistry & field test recommendations',
     icon: Leaf,
     route: '/soil',
-    desc: 'Soil diagnostic, NPK chemistry & field test recommendations',
     roles: ['farmer', 'admin'],
+    keywords: ['soil', 'npk', 'nitrogen', 'phosphorus', 'potassium', 'fertilizer', 'ph', 'chemistry', 'மண்', 'உரம்', 'மண் பரிசோதனை', 'நுண்ணறிவு', 'मिट्टी', 'खाद'],
   },
   {
-    label: 'Crop Health Monitoring',
+    labelKey: 'nav.cropHealth',
+    labelFallback: 'Crop Health Monitoring',
+    descKey: 'header.cropHealthDesc',
+    descFallback: 'Orbital Sentinel-2 NDVI & plant disease scanner',
     icon: Sprout,
     route: '/crop-health',
-    desc: 'Orbital Sentinel-2 NDVI & plant disease scanner',
     roles: ['farmer', 'admin'],
+    keywords: ['crop', 'health', 'disease', 'ndvi', 'satellite', 'blight', 'scanner', 'plant', 'பயிர்', 'ஆரோக்கியம்', 'நோய்', 'கண்காணிப்பு', 'செடி', 'रोग'],
   },
   {
-    label: 'Climate Risk Analysis',
+    labelKey: 'nav.climateRisk',
+    labelFallback: 'Climate Risk Analysis',
+    descKey: 'header.climateDesc',
+    descFallback: 'Extreme weather hazard forecasting & pest risks',
     icon: AlertTriangle,
     route: '/climate',
-    desc: 'Extreme weather hazard forecasting & pest risks',
     roles: ['agronomist', 'admin'],
+    keywords: ['climate', 'risk', 'weather', 'hazard', 'rain', 'drought', 'storm', 'heatwave', 'pest', 'வானிலை', 'ஆபத்து', 'மழை', 'புயல்', 'வெப்பம்', 'मौसम'],
   },
   {
-    label: 'Climate Simulator',
+    labelKey: 'nav.climateSimulator',
+    labelFallback: 'Climate Simulator',
+    descKey: 'header.simulatorDesc',
+    descFallback: 'Micro-climate stress testing & what-if scenarios',
     icon: Wind,
     route: '/simulator',
-    desc: 'Micro-climate stress testing & what-if scenarios',
     roles: ['agronomist', 'admin'],
+    keywords: ['simulator', 'simulation', 'stress', 'test', 'weather', 'what-if', 'scenario', 'சிமுலேட்டர்', 'வானிலை', 'சோதனை', 'सिम्युलेटर'],
   },
   {
-    label: 'Crop Resilience Advisor',
+    labelKey: 'nav.cropSwitching',
+    labelFallback: 'Crop Resilience Advisor',
+    descKey: 'header.cropSwitchingDesc',
+    descFallback: 'Optimal crop switching & economic analysis',
     icon: Sprout,
     route: '/crop-switching',
-    desc: 'Optimal crop switching & economic analysis',
     roles: ['farmer', 'admin'],
+    keywords: ['crop', 'resilience', 'switching', 'switch', 'advisor', 'drought', 'economic', 'பயிர்', 'மாற்ற', 'ஆலோசகர்', 'தாங்கும் திறன்', 'फसल बदलाव'],
   },
   {
-    label: 'Sustainability Index',
+    labelKey: 'nav.sustainability',
+    labelFallback: 'Sustainability Index',
+    descKey: 'header.sustainabilityDesc',
+    descFallback: 'Environmental ESG metrics & carbon audit index',
     icon: CheckCircle,
     route: '/sustainability',
-    desc: 'Environmental ESG metrics & carbon audit index',
     roles: ['agronomist', 'admin'],
+    keywords: ['sustainability', 'carbon', 'esg', 'green', 'audit', 'index', 'eco', 'நிலைத்தன்மை', 'குறியீடு', 'கார்பன்', 'पर्यावरण'],
   },
   {
-    label: 'Land Intelligence',
+    labelKey: 'nav.landIntelligence',
+    labelFallback: 'Land Intelligence',
+    descKey: 'header.landDesc',
+    descFallback: 'Satellite land boundary & topology',
     icon: Map,
     route: '/land-intelligence',
-    desc: 'Satellite land boundary & topology',
     roles: ['farmer', 'admin'],
+    keywords: ['land', 'boundary', 'satellite', 'topology', 'cadastral', 'map', 'area', 'acres', 'நிலம்', 'எல்லை', 'வரைபடம்', 'பரப்பளவு', 'भूमि', 'नक्शा'],
   },
   {
-    label: 'Marketplace',
+    labelKey: 'nav.marketplace',
+    labelFallback: 'Marketplace',
+    descKey: 'header.marketplaceDesc',
+    descFallback: 'Direct farm produce & agricultural inputs',
     icon: Store,
     route: '/marketplace',
-    desc: 'Direct farm produce & agricultural inputs',
     roles: ['farmer', 'admin'],
+    keywords: ['marketplace', 'market', 'buy', 'sell', 'seeds', 'fertilizer', 'produce', 'store', 'சந்தை', 'விற்பனை', 'வாங்குதல்', 'பொருட்கள்', 'बाजार'],
   },
   {
-    label: 'Equipment Rental',
+    labelKey: 'nav.equipmentRental',
+    labelFallback: 'Equipment Rental',
+    descKey: 'header.equipmentDesc',
+    descFallback: 'Machinery sharing, tractors & drones',
     icon: Tractor,
     route: '/equipment-rental',
-    desc: 'Machinery sharing, tractors & drones',
     roles: ['farmer', 'admin'],
+    keywords: ['equipment', 'rental', 'tractor', 'drone', 'harvester', 'machinery', 'rent', 'tools', 'வாடகை', 'உபகரணம்', 'டிராக்டர்', 'ட்ரோன்', 'किराया'],
   },
   {
-    label: 'Government Subsidies',
+    labelKey: 'nav.subsidies',
+    labelFallback: 'Government Subsidies',
+    descKey: 'header.subsidiesDesc',
+    descFallback: 'PM-KISAN, crop insurance & subsidy schemes',
     icon: Landmark,
     route: '/subsidies',
-    desc: 'PM-KISAN, crop insurance & subsidy schemes',
     roles: ['farmer', 'admin'],
+    keywords: ['subsidy', 'subsidies', 'government', 'pm-kisan', 'insurance', 'schemes', 'welfare', 'மானியம்', 'அரசு', 'காப்பீடு', 'திட்டங்கள்', 'सब्सिडी', 'बीमा'],
   },
   {
-    label: 'Market Price Intelligence',
+    labelKey: 'nav.market',
+    labelFallback: 'Market Price Intelligence',
+    descKey: 'header.marketDesc',
+    descFallback: 'APMC mandis, live price trends & forecasts',
     icon: BarChart3,
     route: '/market',
-    desc: 'APMC mandis, live price trends & forecasts',
     roles: ['farmer', 'admin'],
+    keywords: ['price', 'mandi', 'apmc', 'market', 'rates', 'trends', 'forecast', 'commodity', 'விலை', 'சந்தை', 'மண்டி', 'தகவல்', 'मंडी', 'भाव'],
   },
   {
-    label: 'Settings & Preferences',
+    labelKey: 'nav.adminConsole',
+    labelFallback: 'Admin Control Console',
+    descKey: 'header.adminDesc',
+    descFallback: 'Platform governance, user management & system telemetry',
+    icon: Landmark,
+    route: '/admin',
+    roles: ['admin'],
+    keywords: ['admin', 'governance', 'users', 'system', 'ledger', 'audit', 'blockchain', 'infrastructure', 'நிர்வாகி', 'கன்சோல்', 'ஆளுமை', 'एडमिन'],
+  },
+  {
+    labelKey: 'nav.settings',
+    labelFallback: 'Settings & Preferences',
+    descKey: 'header.settingsDesc',
+    descFallback: 'Personalization, notifications & display',
     icon: Settings,
     route: '/settings',
-    desc: 'Personalization, notifications & display',
+    keywords: ['settings', 'preferences', 'profile', 'display', 'language', 'theme', 'password', 'account', 'அமைப்புகள்', 'விருப்பங்கள்', 'சுயவிவரம்', 'सेटिंग्स'],
   },
 ];
+
+interface ExploringLink {
+  labelKey: string;
+  fallbackLabel: string;
+  route: string;
+  icon: React.ElementType;
+}
+
+const ROLE_EXPLORING_LINKS: Record<string, ExploringLink[]> = {
+  farmer: [
+    { labelKey: 'nav.irrigation', fallbackLabel: 'Smart Irrigation', route: '/irrigation', icon: Droplets },
+    { labelKey: 'nav.soilIntelligence', fallbackLabel: 'Soil Intelligence', route: '/soil', icon: Leaf },
+    { labelKey: 'nav.cropSwitching', fallbackLabel: 'Crop Resilience Advisor', route: '/crop-switching', icon: Sprout },
+    { labelKey: 'nav.cropHealth', fallbackLabel: 'Crop Health Monitoring', route: '/crop-health', icon: Leaf },
+    { labelKey: 'nav.marketplace', fallbackLabel: 'Agri Marketplace', route: '/marketplace', icon: Store },
+  ],
+  agronomist: [
+    { labelKey: 'nav.yieldPrediction', fallbackLabel: 'Yield Forecasting', route: '/yield', icon: TrendingUp },
+    { labelKey: 'nav.climateRisk', fallbackLabel: 'Climate Risk Analysis', route: '/climate', icon: AlertTriangle },
+    { labelKey: 'nav.climateSimulator', fallbackLabel: 'Climate Stress Simulator', route: '/simulator', icon: Wind },
+    { labelKey: 'nav.sustainability', fallbackLabel: 'Sustainability Index', route: '/sustainability', icon: CheckCircle },
+    { labelKey: 'nav.farmerPreview', fallbackLabel: 'Farmer Field Preview', route: '/dashboard', icon: LayoutDashboard },
+  ],
+  admin: [
+    { labelKey: 'nav.adminConsole', fallbackLabel: 'Admin Control Console', route: '/admin', icon: Landmark },
+    { labelKey: 'nav.agronomistPortal', fallbackLabel: 'Agronomist Operations', route: '/agronomist', icon: BarChart3 },
+    { labelKey: 'nav.farmerPreview', fallbackLabel: 'Farmer Operations', route: '/dashboard', icon: LayoutDashboard },
+    { labelKey: 'nav.settings', fallbackLabel: 'System Settings', route: '/settings', icon: Settings },
+  ],
+};
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { isDark, toggleTheme } = useTheme();
@@ -237,6 +328,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
@@ -259,12 +351,25 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         ? '/agronomist'
         : '/dashboard';
   const roleAllowedData = SEARCH_DATA.filter((s) => !s.roles || s.roles.includes(userRole));
-  const filteredSearch = searchQuery.trim()
-    ? roleAllowedData.filter(
-        (s) =>
-          s.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.desc.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+  const queryLower = searchQuery.trim().toLowerCase();
+  const filteredSearch = queryLower
+    ? roleAllowedData.filter((s) => {
+        const translatedLabel = t(s.labelKey, s.labelFallback).toLowerCase();
+        const translatedDesc = t(s.descKey, s.descFallback).toLowerCase();
+        const fallbackLabel = s.labelFallback.toLowerCase();
+        const fallbackDesc = s.descFallback.toLowerCase();
+        const matchesKeyword = s.keywords.some((kw) => kw.toLowerCase().includes(queryLower));
+        const matchesRoute = s.route.toLowerCase().includes(queryLower);
+
+        return (
+          translatedLabel.includes(queryLower) ||
+          translatedDesc.includes(queryLower) ||
+          fallbackLabel.includes(queryLower) ||
+          fallbackDesc.includes(queryLower) ||
+          matchesKeyword ||
+          matchesRoute
+        );
+      })
     : roleAllowedData;
 
   const handleMarkAsRead = (id: number) => {
@@ -309,12 +414,45 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-100/90 dark:bg-gray-800/90 glass-input ring-2 ring-primary-400/50">
             <Search size={14} className="text-gray-400 flex-shrink-0" />
             <input
+              id="mobile-search-input"
               type="text"
               autoFocus
               placeholder={t('header.searchPlaceholder', 'Search fields, advisories, tools...')}
               value={searchQuery}
-              onFocus={() => setSearchOpen(true)}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                setSearchOpen(true);
+                setSelectedIndex(0);
+              }}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSearchOpen(true);
+                setSelectedIndex(0);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  if (filteredSearch.length > 0) {
+                    setSelectedIndex((prev) => (prev + 1) % filteredSearch.length);
+                  }
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  if (filteredSearch.length > 0) {
+                    setSelectedIndex((prev) => (prev - 1 + filteredSearch.length) % filteredSearch.length);
+                  }
+                } else if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (filteredSearch.length > 0) {
+                    const item = filteredSearch[selectedIndex] || filteredSearch[0];
+                    navigate(item.route);
+                    setSearchOpen(false);
+                    setMobileSearchOpen(false);
+                    setSearchQuery('');
+                  }
+                } else if (e.key === 'Escape') {
+                  setSearchOpen(false);
+                  setMobileSearchOpen(false);
+                }
+              }}
               className="bg-transparent text-xs text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none flex-1 min-w-0 w-full"
             />
             {searchQuery && (
@@ -328,38 +466,42 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </div>
           {/* Mobile Search Results Dropdown */}
           {searchOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
+            <div className="absolute top-full left-0 right-0 mt-2 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50 max-h-80 overflow-y-auto">
               <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                {searchQuery ? `Results for "${searchQuery}"` : 'Quick Navigate'}
+                {searchQuery ? `${t('common.searchResults', 'Results for')} "${searchQuery}"` : t('common.quickNavigate', 'Quick Navigate')}
               </p>
               {filteredSearch.length === 0 ? (
                 <p className="px-4 py-3 text-sm text-gray-500">{t('common.noResults', 'No results found.')}</p>
               ) : (
-                filteredSearch.map((item) => (
-                  <button
+                filteredSearch.map((item, idx) => (
+                  <Link
                     key={item.route}
+                    id={`mobile-search-item-${item.route.replace('/', '')}`}
+                    to={item.route}
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      navigate(item.route);
                       setSearchOpen(false);
                       setMobileSearchOpen(false);
                       setSearchQuery('');
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-primary-50/60 dark:hover:bg-primary-900/20 transition-all duration-150 group"
+                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-primary-50/70 dark:hover:bg-primary-900/30 transition-all duration-150 group cursor-pointer ${
+                      idx === selectedIndex ? 'bg-primary-50/80 dark:bg-primary-900/40 ring-1 ring-primary-500/20' : ''
+                    }`}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                    <div className="w-8 h-8 rounded-lg bg-primary-100/80 dark:bg-primary-900/40 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
                       <item.icon size={15} className="text-primary-600 dark:text-primary-400" />
                     </div>
-                    <div className="text-left">
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                        {item.label}
+                    <div className="text-left flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                        {t(item.labelKey, item.labelFallback)}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{item.desc}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{t(item.descKey, item.descFallback)}</p>
                     </div>
                     <ChevronRight
                       size={14}
-                      className="ml-auto text-gray-300 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all duration-150"
+                      className="ml-auto text-gray-400 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all duration-150 flex-shrink-0"
                     />
-                  </button>
+                  </Link>
                 ))
               )}
             </div>
@@ -413,11 +555,44 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         >
           <Search size={14} className="text-gray-400 flex-shrink-0" />
           <input
+            id="desktop-search-input"
             type="text"
             placeholder={t('header.searchPlaceholder', 'Search fields, advisories, tools...')}
             value={searchQuery}
-            onFocus={() => setSearchOpen(true)}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => {
+              setSearchOpen(true);
+              setSelectedIndex(0);
+            }}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSearchOpen(true);
+              setSelectedIndex(0);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (filteredSearch.length > 0) {
+                  setSelectedIndex((prev) => (prev + 1) % filteredSearch.length);
+                }
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (filteredSearch.length > 0) {
+                  setSelectedIndex((prev) => (prev - 1 + filteredSearch.length) % filteredSearch.length);
+                }
+              } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (filteredSearch.length > 0) {
+                  const item = filteredSearch[selectedIndex] || filteredSearch[0];
+                  navigate(item.route);
+                  setSearchOpen(false);
+                  setMobileSearchOpen(false);
+                  setSearchQuery('');
+                }
+              } else if (e.key === 'Escape') {
+                setSearchOpen(false);
+                setMobileSearchOpen(false);
+              }
+            }}
             className="bg-transparent text-xs sm:text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none flex-1 min-w-0 w-full"
           />
           {searchQuery && (
@@ -432,37 +607,47 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
         {/* Search Results Dropdown */}
         {searchOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50">
+          <div className="absolute top-full left-0 right-0 mt-2 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-50 max-h-96 overflow-y-auto">
             <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-              {searchQuery ? `Results for "${searchQuery}"` : 'Quick Navigate'}
+              {searchQuery ? `${t('common.searchResults', 'Results for')} "${searchQuery}"` : t('common.quickNavigate', 'Quick Navigate')}
             </p>
             {filteredSearch.length === 0 ? (
               <p className="px-4 py-3 text-sm text-gray-500">{t('common.noResults', 'No results found.')}</p>
             ) : (
-              filteredSearch.map((item) => (
-                <button
+              filteredSearch.map((item, idx) => (
+                <Link
                   key={item.route}
+                  id={`search-item-${item.route.replace('/', '')}`}
+                  to={item.route}
+                  onMouseDown={(e) => {
+                    // Prevent input blur before click registers
+                    e.preventDefault();
+                  }}
                   onClick={() => {
-                    navigate(item.route);
                     setSearchOpen(false);
+                    setMobileSearchOpen(false);
                     setSearchQuery('');
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-primary-50/60 dark:hover:bg-primary-900/20 transition-all duration-150 group"
+                  className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-primary-50/70 dark:hover:bg-primary-900/30 transition-all duration-150 group cursor-pointer ${
+                    idx === selectedIndex ? 'bg-primary-50/80 dark:bg-primary-900/40 ring-1 ring-primary-500/20' : ''
+                  }`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                  <div className="w-8 h-8 rounded-lg bg-primary-100/80 dark:bg-primary-900/40 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
                     <item.icon size={15} className="text-primary-600 dark:text-primary-400" />
                   </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                      {item.label}
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                      {t(item.labelKey, item.labelFallback)}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{item.desc}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {t(item.descKey, item.descFallback)}
+                    </p>
                   </div>
                   <ChevronRight
                     size={14}
-                    className="ml-auto text-gray-300 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all duration-150"
+                    className="ml-auto text-gray-400 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all duration-150 flex-shrink-0"
                   />
-                </button>
+                </Link>
               ))
             )}
           </div>
@@ -693,11 +878,14 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </button>
 
           {accountOpen && (
-            <div className="absolute right-0 top-full mt-2 w-64 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100] border border-gray-100/80 dark:border-gray-800">
+            <div
+              id="profile-dropdown-menu"
+              className="absolute right-0 top-full mt-2 w-72 sm:w-80 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100] border border-gray-100/90 dark:border-gray-800"
+            >
               {/* User Identity Banner */}
-              <div className="p-4 bg-gradient-to-br from-emerald-50/70 to-teal-50/40 dark:from-dark-850 dark:to-dark-900 border-b border-gray-100 dark:border-gray-800">
+              <div className="p-4 bg-gradient-to-br from-emerald-50/80 to-teal-50/50 dark:from-dark-850 dark:to-dark-900 border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-sm shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-sm shadow-md flex-shrink-0">
                     {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -718,8 +906,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 </div>
               </div>
 
-              {/* Navigation Options */}
-              <div className="p-1.5 space-y-0.5">
+              {/* Primary Workspace Dashboard Link */}
+              <div className="p-2 border-b border-gray-100 dark:border-gray-800">
                 <Link
                   id="header-workspace-link"
                   to={workspaceRoute}
@@ -727,13 +915,65 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     setAccountOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 text-gray-800 dark:text-gray-100 text-xs font-bold transition-all group cursor-pointer border border-emerald-200/40 dark:border-emerald-800/40"
                 >
-                  <LayoutDashboard size={16} className="text-emerald-600 dark:text-emerald-400" />
-                  <span>{t('header.workspaceDashboard', 'Workspace Dashboard')}</span>
-                  <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+                    <LayoutDashboard size={15} />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="font-bold text-xs truncate">
+                      {userRole === 'admin'
+                        ? t('nav.adminConsole', 'System Admin Portal')
+                        : userRole === 'agronomist'
+                          ? t('nav.agronomistPortal', 'Agronomist Command Center')
+                          : t('nav.dashboard', 'Farmer Workspace Dashboard')}
+                    </p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-normal truncate">
+                      {userRole === 'admin'
+                        ? t('header.adminConsoleDesc', 'Platform control & governance')
+                        : userRole === 'agronomist'
+                          ? t('header.agronomistDesc', 'Regional diagnostics & farm telemetry')
+                          : t('header.farmerDesc', 'Field telemetry, alerts & operations')}
+                    </p>
+                  </div>
+                  <ChevronRight size={13} className="text-emerald-500 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
                 </Link>
+              </div>
 
+              {/* Role-Specific Exploring Options */}
+              <div className="p-2 border-b border-gray-100 dark:border-gray-800">
+                <div className="px-2 pt-1 pb-1.5 flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                    {t('header.exploreTools', 'Explore Tools')}
+                  </span>
+                  <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded uppercase">
+                    {userRole}
+                  </span>
+                </div>
+                <div className="space-y-0.5">
+                  {(ROLE_EXPLORING_LINKS[userRole] || ROLE_EXPLORING_LINKS.farmer).map((tool) => (
+                    <Link
+                      key={tool.route}
+                      id={`profile-explore-${tool.route.replace('/', '')}`}
+                      to={tool.route}
+                      onClick={() => {
+                        setAccountOpen(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/60 hover:text-primary-600 dark:hover:text-primary-400 transition-colors group cursor-pointer"
+                    >
+                      <div className="w-6 h-6 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/30 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors flex-shrink-0">
+                        <tool.icon size={13} />
+                      </div>
+                      <span className="truncate flex-1">{t(tool.labelKey, tool.fallbackLabel)}</span>
+                      <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation Options: Account & Preferences */}
+              <div className="p-1.5">
                 <Link
                   id="header-settings-link"
                   to="/settings"
@@ -741,11 +981,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     setAccountOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
                 >
-                  <Settings size={16} className="text-gray-500 dark:text-gray-400" />
-                  <span>{t('header.accountPreferences', 'Account & Preferences')}</span>
-                  <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                  <Settings size={15} className="text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                  <span className="flex-1 text-left">{t('header.accountPreferences', 'Account & Preferences')}</span>
+                  <ChevronRight size={13} className="text-gray-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
                 </Link>
               </div>
 
@@ -754,6 +994,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 <button
                   id="header-logout-btn"
                   type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -768,12 +1009,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold transition-colors group cursor-pointer"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-red-100/70 dark:bg-red-950/70 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <div className="w-7 h-7 rounded-lg bg-red-100/70 dark:bg-red-950/70 flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
                     <LogOut size={14} className="text-red-600 dark:text-red-400" />
                   </div>
-                  <div className="text-left flex-1">
-                    <p className="leading-tight">{t('common.signOut', 'Sign Out')}</p>
-                    <p className="text-[10px] text-gray-400 font-normal">{t('header.endSession', 'End active session')}</p>
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="leading-tight truncate">{t('common.signOut', 'Sign Out')}</p>
+                    <p className="text-[10px] text-gray-400 font-normal truncate">{t('header.endSession', 'End active session')}</p>
                   </div>
                 </button>
               </div>
