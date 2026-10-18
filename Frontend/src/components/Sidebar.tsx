@@ -373,8 +373,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
         className={`fixed top-0 left-0 h-[100dvh] pb-6 lg:pb-0 lg:h-screen ${w} glass-sidebar z-50 transform transition-all duration-300 ease-in-out flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       >
-        {/* Mobile Drawer Header with Logo & Close Button */}
-        <div className="flex lg:hidden items-center justify-between px-4 py-4 border-b border-gray-100/60 dark:border-gray-800/60">
+        {/* Sidebar Brand / Logo Header — Preserves spacious top header so navigation items never stack from y=0 */}
+        <div className="flex items-center justify-between px-4 py-3.5 h-16 border-b border-gray-100/60 dark:border-gray-800/60 flex-shrink-0">
           <div
             onClick={() => {
               if (userRole === 'admin') navigate('/admin');
@@ -382,27 +382,29 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
               else navigate('/dashboard');
               onClose();
             }}
-            className="flex items-center gap-2.5 cursor-pointer"
+            className="flex items-center gap-2.5 cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-xl overflow-hidden shadow-sm shadow-primary-500/20 flex-shrink-0">
+            <div className="w-8 h-8 rounded-xl overflow-hidden shadow-sm shadow-primary-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
               <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
             </div>
-            <div className="flex flex-col text-left">
-              <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">
-                Agri<span className="text-gradient">Flux</span>
-              </span>
-              <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">
-                {userRole === 'admin'
-                  ? 'Admin Command'
-                  : userRole === 'agronomist'
-                    ? 'Consulting Suite'
-                    : 'Intelligence Platform'}
-              </span>
-            </div>
+            {!collapsed && (
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-black text-gray-900 dark:text-white leading-none tracking-tight">
+                  Agri<span className="text-gradient">Flux</span>
+                </span>
+                <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">
+                  {userRole === 'admin'
+                    ? 'Admin Command'
+                    : userRole === 'agronomist'
+                      ? 'Consulting Suite'
+                      : 'Intelligence Platform'}
+                </span>
+              </div>
+            )}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
             aria-label="Close menu"
           >
             <X size={18} />

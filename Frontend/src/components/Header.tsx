@@ -298,34 +298,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             Agri<span className="text-gradient">Flux</span>
           </span>
         </div>
-
-        {/* Desktop Brand / Logo: Placed outside the sidebar at the start of navbar (Hamburger completely removed on desktop) */}
-        <div
-          onClick={() => {
-            if (userRole === 'admin') navigate('/admin');
-            else if (userRole === 'agronomist') navigate('/agronomist');
-            else navigate('/dashboard');
-          }}
-          className="hidden lg:flex items-center gap-2.5 cursor-pointer group flex-shrink-0 mr-1"
-          role="button"
-          tabIndex={0}
-        >
-          <div className="w-9 h-9 rounded-xl overflow-hidden shadow-sm shadow-primary-500/25 group-hover:scale-105 transition-transform flex-shrink-0">
-            <img src={logo} alt="AgriFlux Logo" className="h-full w-full object-cover" />
-          </div>
-          <div className="flex flex-col text-left">
-            <span className="text-base font-black text-gray-900 dark:text-white leading-none tracking-tight">
-              Agri<span className="text-gradient">Flux</span>
-            </span>
-            <span className="text-[9px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest mt-0.5">
-              {userRole === 'admin'
-                ? 'Admin Command'
-                : userRole === 'agronomist'
-                  ? 'Consulting Suite'
-                  : 'Intelligence Platform'}
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Center Section: Responsive Search Bar */}
@@ -588,7 +560,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           )}
         </button>
 
-        {/* User Profile & Account Menu — Interactive Profile Avatar */}
+        {/* User Profile & Account Menu — Profile Avatar Icon Only */}
         <div ref={accountRef} className="relative flex-shrink-0">
           <button
             id="profile-dropdown-btn"
@@ -597,26 +569,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               setNotifOpen(false);
               setLangOpen(false);
             }}
-            className="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-white/70 dark:hover:bg-gray-800/70 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-150 group"
+            className="p-0.5 rounded-full text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95 transition-all duration-150 group focus:outline-none"
             aria-label="User profile and account settings"
+            title={user?.name || 'User Profile'}
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-xs shadow-sm ring-2 ring-emerald-500/30 group-hover:ring-emerald-500 transition-all">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-xs shadow-sm ring-2 ring-emerald-500/30 group-hover:ring-emerald-500 group-hover:shadow-emerald-500/25 transition-all">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
-            <div className="hidden lg:flex flex-col text-left">
-              <span className="text-xs font-bold leading-tight truncate max-w-[100px]">
-                {user?.name || 'AgriFlux User'}
-              </span>
-              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 capitalize">
-                {user?.role || 'Farmer'}
-              </span>
-            </div>
-            <ChevronDown
-              size={13}
-              className={`text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-transform duration-150 ${
-                accountOpen ? 'rotate-180' : ''
-              }`}
-            />
           </button>
 
           {accountOpen && (
