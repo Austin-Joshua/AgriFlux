@@ -28,6 +28,10 @@ import cluster from 'cluster';
 import os from 'os';
 import { setIO } from './socket';
 
+console.log(
+  `🌱 [INIT] AgriFlux Backend initializing (PID ${process.pid}, Node ${process.version}, ENV=${env.NODE_ENV})...`
+);
+
 /**
  * Handle uncaught exceptions and unhandled rejections globally
  * to prevent the entire process from crashing silently.
@@ -288,6 +292,18 @@ app.use('/api/field-intelligence', fieldIntelligenceRoutes);
 app.use('/api/environmental', environmentalDataRoutes);
 app.use('/api/blockchain', blockchainRoutes);
 
+// Root platform diagnostic endpoint for cloud health checks
+app.get('/', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'AgriFlux Autonomous Intelligence Mesh API',
+    version: '2.0.0',
+    documentation: '/api',
+    healthCheck: '/health',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // 404
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ message: 'Not found' });
@@ -342,11 +358,12 @@ if (cluster.isPrimary && env.NODE_ENV === 'production' && WEB_CONCURRENCY > 1) {
     cluster.fork();
   });
 } else {
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(
-      `🚀 AgriFlux API Server started (PID ${process.pid}). URL: http://localhost:${PORT}`
+      `🚀 AgriFlux API Server listening on 0.0.0.0:${PORT} (PID ${process.pid}) [NODE_ENV=${env.NODE_ENV}]`
     );
-    console.log(`📡 WebSocket Gateway: ws://localhost:${PORT}`);
+    console.log(`📡 WebSocket Gateway: ws://0.0.0.0:${PORT}`);
+    console.log(`🩺 Health check ready at http://0.0.0.0:${PORT}/health`);
 
     // Auto-seed historical weather observations if available (capped to protect heap in 512MB RAM containers)
     const weatherCsvCandidates = [
