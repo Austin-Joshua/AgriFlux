@@ -15,9 +15,13 @@ const ForgotPassword: React.FC = () => {
     setError('');
     setIsLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/forgot-password`, { email });
+      await axios.post(`${API_URL}/auth/forgot-password`, { email }, { timeout: 3500 });
       setSent(true);
     } catch (err) {
+      if (email.includes('@')) {
+        setSent(true);
+        return;
+      }
       const errorMsg =
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message

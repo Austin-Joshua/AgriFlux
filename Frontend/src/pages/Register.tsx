@@ -166,15 +166,15 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-center py-2 max-w-xl mx-auto">
+    <div className="w-full h-full flex flex-col justify-center py-1 max-w-xl mx-auto">
       <SEO title="Create Account" />
 
       {/* Header */}
-      <div className="mb-5">
-        <h2 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight">
+      <div className="mb-3.5">
+        <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight leading-tight">
           Create Account
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-1 text-xs sm:text-sm">
+        <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs">
           Join AgriFlux to manage crop health, soil, and farm insights
         </p>
       </div>
@@ -184,16 +184,16 @@ const Register: React.FC = () => {
         <div
           role="alert"
           aria-live="polite"
-          className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-medium"
+          className="mb-3 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-medium"
         >
-          <AlertCircle size={15} className="flex-shrink-0" />
+          <AlertCircle size={14} className="flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-3" autoComplete="off">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <form onSubmit={handleSubmit} className="space-y-2.5" autoComplete="off">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {/* Full Name */}
           <div className="space-y-1">
             <label
@@ -204,7 +204,7 @@ const Register: React.FC = () => {
             </label>
             <div className="relative group">
               <User
-                size={15}
+                size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
@@ -213,7 +213,7 @@ const Register: React.FC = () => {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="Ravi Kumar"
                 autoComplete="name"
                 required
@@ -231,7 +231,7 @@ const Register: React.FC = () => {
             </label>
             <div className="relative group">
               <Mail
-                size={15}
+                size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
@@ -240,7 +240,7 @@ const Register: React.FC = () => {
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="farmer@agriflux.com"
                 autoComplete="email"
               />
@@ -249,7 +249,7 @@ const Register: React.FC = () => {
         </div>
 
         {/* Mobile Phone & Verification Code */}
-        <div className="p-3.5 rounded-2xl bg-gray-50/70 dark:bg-gray-800/50 border border-gray-200/80 dark:border-gray-700/60 space-y-2.5">
+        <div className="p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/50 border border-gray-200/80 dark:border-gray-700/60 space-y-2">
           <div className="flex items-center justify-between">
             <label
               htmlFor="register-phone"
@@ -267,7 +267,7 @@ const Register: React.FC = () => {
           <div className="flex items-center gap-2">
             <div className="relative flex-1 group">
               <Phone
-                size={15}
+                size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
@@ -276,7 +276,7 @@ const Register: React.FC = () => {
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                className="input-field pl-10 h-11 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs sm:text-sm w-full rounded-xl"
+                className="input-field pl-9 h-10 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="+91 98765 43210"
                 autoComplete="tel"
                 required
@@ -286,7 +286,7 @@ const Register: React.FC = () => {
               type="button"
               onClick={handleSendOtp}
               disabled={otpLoading || resendTimer > 0 || isOtpVerified}
-              className={`h-11 px-4 min-h-[44px] rounded-xl text-xs font-bold transition-all flex items-center justify-center whitespace-nowrap ${
+              className={`h-10 px-3.5 min-h-[40px] rounded-xl text-xs font-bold transition-all flex items-center justify-center whitespace-nowrap ${
                 isOtpVerified
                   ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 cursor-default'
                   : resendTimer > 0
@@ -299,13 +299,13 @@ const Register: React.FC = () => {
                 : isOtpVerified
                   ? 'Verified'
                   : resendTimer > 0
-                    ? `Resend in ${resendTimer}s`
+                    ? `Resend ${resendTimer}s`
                     : 'Send Code'}
             </button>
           </div>
 
           {(isOtpSent || isOtpVerified) && (
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2 pt-0.5">
               <input
                 id="register-otp"
                 type="text"
@@ -314,7 +314,7 @@ const Register: React.FC = () => {
                 onChange={(e) => setOtp(e.target.value.replace(/[^\d]/g, ''))}
                 disabled={isOtpVerified}
                 aria-label="6-digit mobile verification code"
-                className="input-field h-11 px-3 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs font-mono font-bold tracking-widest text-center rounded-xl flex-1"
+                className="input-field h-9.5 px-3 bg-white dark:bg-gray-900/60 border-gray-200 dark:border-gray-700 text-xs font-mono font-bold tracking-widest text-center rounded-xl flex-1"
                 placeholder="6-digit code"
               />
               {!isOtpVerified && (
@@ -322,7 +322,7 @@ const Register: React.FC = () => {
                   type="button"
                   onClick={handleVerifyOtp}
                   disabled={otpLoading || otp.length < 6}
-                  className="h-11 px-5 min-h-[44px] rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all active:scale-[0.98]"
+                  className="h-9.5 px-4 min-h-[38px] rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all active:scale-[0.98]"
                 >
                   Verify
                 </button>
@@ -332,7 +332,7 @@ const Register: React.FC = () => {
         </div>
 
         {/* Farm Name & Location */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div className="space-y-1">
             <label
               htmlFor="register-farm"
@@ -342,7 +342,7 @@ const Register: React.FC = () => {
             </label>
             <div className="relative group">
               <Wheat
-                size={15}
+                size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
@@ -351,7 +351,7 @@ const Register: React.FC = () => {
                 name="farmName"
                 value={form.farmName}
                 onChange={handleChange}
-                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="Green Valley Farm"
               />
             </div>
@@ -366,7 +366,7 @@ const Register: React.FC = () => {
             </label>
             <div className="relative group">
               <MapPin
-                size={15}
+                size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
@@ -375,7 +375,7 @@ const Register: React.FC = () => {
                 name="location"
                 value={form.location}
                 onChange={handleChange}
-                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="Mysuru, Karnataka"
               />
             </div>
@@ -383,7 +383,7 @@ const Register: React.FC = () => {
         </div>
 
         {/* Password & Confirm */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div className="space-y-1">
             <label
               htmlFor="register-password"
@@ -393,7 +393,7 @@ const Register: React.FC = () => {
             </label>
             <div className="relative group">
               <Lock
-                size={15}
+                size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
@@ -402,7 +402,7 @@ const Register: React.FC = () => {
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="••••••••"
                 autoComplete="new-password"
                 required
@@ -419,7 +419,7 @@ const Register: React.FC = () => {
             </label>
             <div className="relative group">
               <Lock
-                size={15}
+                size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500"
               />
               <input
@@ -428,7 +428,7 @@ const Register: React.FC = () => {
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}
-                className="input-field pl-10 h-11 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
+                className="input-field pl-9 h-10 bg-white/60 dark:bg-gray-900/40 border-gray-200 dark:border-white/10 hover:border-primary-400 text-xs sm:text-sm w-full rounded-xl"
                 placeholder="••••••••"
                 autoComplete="new-password"
                 required
@@ -443,7 +443,7 @@ const Register: React.FC = () => {
             onClick={() => setShowPassword(!showPassword)}
             aria-label={showPassword ? 'Hide password characters' : 'Show password characters'}
             aria-pressed={showPassword}
-            className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline min-h-[36px] flex items-center"
+            className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline flex items-center"
           >
             {showPassword ? 'Hide Password' : 'Show Password'}
           </button>
@@ -451,9 +451,10 @@ const Register: React.FC = () => {
 
         {/* Submit */}
         <button
+          id="register-submit-btn"
           type="submit"
           disabled={isLoading}
-          className="btn-primary w-full h-11 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg shadow-primary-500/15 mt-2 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+          className="btn-primary w-full h-10 sm:h-10.5 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md shadow-primary-500/15 mt-1 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>
@@ -467,10 +468,10 @@ const Register: React.FC = () => {
       </form>
 
       {/* Google Sign Up */}
-      <div className="mt-5">
-        <div className="relative flex items-center gap-4 mb-3.5">
+      <div className="mt-3.5">
+        <div className="relative flex items-center gap-4 mb-2.5">
           <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
-          <span className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold leading-none">
+          <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold leading-none">
             or continue with
           </span>
           <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
@@ -479,7 +480,7 @@ const Register: React.FC = () => {
           type="button"
           onClick={handleGoogleSignup}
           disabled={!!socialLoading || isLoading}
-          className="w-full flex items-center justify-center gap-2.5 h-11 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-200 font-semibold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all active:scale-[0.99]"
+          className="w-full flex items-center justify-center gap-2 h-10 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-200 font-semibold text-xs shadow-xs hover:shadow-sm transition-all active:scale-[0.99]"
         >
           {socialLoading === 'google' ? (
             <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -491,9 +492,10 @@ const Register: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <p className="mt-5 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+      <p className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">
         Already have an account?{' '}
         <Link
+          id="register-signin-link"
           to="/login"
           className="text-primary-600 dark:text-primary-400 font-bold hover:underline ml-1"
         >

@@ -302,6 +302,7 @@ const Login: React.FC = () => {
       <p className="mt-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
         Don&apos;t have an account?{' '}
         <Link
+          id="login-register-link"
           to="/register"
           className="text-primary-600 dark:text-primary-400 font-bold hover:underline ml-1"
         >

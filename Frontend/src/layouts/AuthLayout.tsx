@@ -11,9 +11,9 @@ const AuthLayout: React.FC = () => {
   const isLogin = location.pathname === '/login';
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-1000 overflow-hidden relative font-sans">
+    <div className="min-h-screen w-full flex items-center justify-center p-3 sm:p-6 py-6 sm:py-10 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 overflow-x-hidden overflow-y-auto relative font-sans">
       {/* Dynamic Background Splashes to match Website Pages */}
-      <div className="absolute inset-0 pointer-events-none lg:block hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden lg:block hidden">
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
@@ -33,14 +33,14 @@ const AuthLayout: React.FC = () => {
       </div>
 
       {/* Main Glass Container (Matching Website Glassmorphism) */}
-      <div className="relative w-full max-w-[1050px] min-h-[580px] lg:min-h-[660px] bg-white/70 dark:bg-gray-800/60 backdrop-blur-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-white/40 dark:border-white/5 flex overflow-hidden ring-1 ring-black/5">
+      <div className="relative w-full max-w-[1050px] my-auto bg-white/80 dark:bg-gray-800/70 backdrop-blur-2xl rounded-[2.5rem] sm:rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)] border border-white/50 dark:border-white/10 flex overflow-hidden ring-1 ring-black/5">
         {/* The "Sliding" Branding Panel (Ditto Repo Style) */}
         <motion.div
           className="absolute top-0 w-1/2 h-full z-30 hidden lg:block overflow-hidden"
           initial={false}
           animate={{
             left: isLogin ? '0%' : '50%',
-            borderRadius: isLogin ? '1.5rem 0 0 1.5rem' : '0 1.5rem 1.5rem 0',
+            borderRadius: isLogin ? '2.5rem 0 0 2.5rem' : '0 2.5rem 2.5rem 0',
           }}
           transition={{ type: 'spring', stiffness: 260, damping: 30 }}
         >
@@ -53,40 +53,40 @@ const AuthLayout: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative w-full h-full p-16 flex flex-col justify-between text-white z-10">
-              <div className="space-y-8">
-                <div className="flex items-center gap-4">
+            <div className="relative w-full h-full p-8 lg:p-12 flex flex-col justify-between text-white z-10">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3.5">
                   <motion.div
                     whileHover={{ scale: 1.05, rotate: 3 }}
-                    className="relative p-0.5 rounded-[1.5rem] bg-gradient-to-tr from-white/30 via-white/15 to-gold-400/40 shadow-2xl flex-shrink-0"
+                    className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-white/30 via-white/15 to-gold-400/40 shadow-2xl flex-shrink-0"
                   >
-                    <div className="w-14 h-14 bg-white/15 dark:bg-black/30 backdrop-blur-xl rounded-[22px] flex items-center justify-center border border-white/25">
-                      <img src={logo} alt="AgriFlux Logo" className="w-9 h-9 object-contain" />
+                    <div className="w-12 h-12 bg-white/15 dark:bg-black/30 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/25">
+                      <img src={logo} alt="AgriFlux Logo" className="w-8 h-8 object-contain" />
                     </div>
                   </motion.div>
                   <div className="flex flex-col text-left">
-                    <span className="text-2xl font-black text-white leading-none tracking-tight">
+                    <span className="text-xl font-black text-white leading-none tracking-tight">
                       {t('common.agriflux', 'AgriFlux')}
                     </span>
-                    <span className="text-xs font-black text-gold-400 uppercase tracking-widest mt-1">
+                    <span className="text-[10px] font-black text-gold-400 uppercase tracking-widest mt-1">
                       {t('common.intelligencePlatform', 'Intelligence Platform')}
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <motion.div
                     key={isLogin ? 'login-text' : 'reg-text'}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ delay: 0.15 }}
                   >
-                    <h2 className="text-5xl font-black font-display leading-[1.1] tracking-tightest mb-4">
+                    <h2 className="text-3xl sm:text-4xl font-black font-display leading-[1.12] tracking-tight mb-3">
                       {isLogin
                         ? t('common.smartFarming', 'Smart Farming Starts Here.')
                         : t('common.growBetter', 'Grow Better With AI.')}
                     </h2>
-                    <p className="text-primary-100/90 text-xl font-medium leading-relaxed max-w-[340px]">
+                    <p className="text-primary-100/90 text-sm sm:text-base font-medium leading-relaxed max-w-[340px]">
                       {isLogin
                         ? t(
                             'common.smartFarmingDesc',
@@ -101,30 +101,31 @@ const AuthLayout: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-200/60">
+              <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black uppercase tracking-[0.25em] text-primary-200/70">
                     AGRIFLUX INTELLIGENCE
                   </p>
-                  <div className="h-1 w-12 bg-teal-400 rounded-full" />
+                  <div className="h-1 w-10 bg-teal-400 rounded-full" />
                 </div>
 
                 <Link
+                  id="auth-sliding-toggle-btn"
                   to={isLogin ? '/register' : '/login'}
-                  className="group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10 transition-all font-bold text-sm tracking-wide"
+                  className="group flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 transition-all font-bold text-xs sm:text-sm tracking-wide shadow-sm"
                 >
                   {isLogin ? (
                     <>
                       Sign Up{' '}
                       <ArrowRight
-                        size={16}
+                        size={15}
                         className="group-hover:translate-x-1 transition-transform"
                       />
                     </>
                   ) : (
                     <>
                       <ArrowLeft
-                        size={16}
+                        size={15}
                         className="group-hover:-translate-x-1 transition-transform"
                       />{' '}
                       Sign In
@@ -138,19 +139,19 @@ const AuthLayout: React.FC = () => {
 
         {/* Form Content Areas */}
         <div className="flex w-full h-full relative">
-          {/* Left Slot (Shows Register Form when Register, or empty/bg when Login) */}
+          {/* Left Slot (Shows Register Form when Register, or empty when Login) */}
           <div
-            className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-8 order-2 lg:order-1 ${!isLogin ? 'flex-1' : 'hidden lg:flex'}`}
+            className={`lg:w-1/2 h-full flex items-center justify-center p-5 sm:p-7 lg:p-8 order-2 lg:order-1 ${!isLogin ? 'flex-1' : 'hidden lg:flex'}`}
           >
             <AnimatePresence mode="wait">
               {!isLogin && (
                 <motion.div
                   key="register-content"
-                  initial={{ opacity: 0, x: -50 }}
+                  initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.4, ease: 'circOut' }}
-                  className="w-full max-w-md"
+                  exit={{ opacity: 0, x: -30 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  className="w-full max-w-md py-2"
                 >
                   <Outlet />
                 </motion.div>
@@ -158,19 +159,19 @@ const AuthLayout: React.FC = () => {
             </AnimatePresence>
           </div>
 
-          {/* Right Slot (Shows Login Form when Login, or empty/bg when Register) */}
+          {/* Right Slot (Shows Login Form when Login, or empty when Register) */}
           <div
-            className={`lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-8 order-1 lg:order-2 ${isLogin ? 'flex-1' : 'hidden lg:flex'}`}
+            className={`lg:w-1/2 h-full flex items-center justify-center p-5 sm:p-7 lg:p-8 order-1 lg:order-2 ${isLogin ? 'flex-1' : 'hidden lg:flex'}`}
           >
             <AnimatePresence mode="wait">
               {isLogin && (
                 <motion.div
                   key="login-content"
-                  initial={{ opacity: 0, x: 50 }}
+                  initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ duration: 0.4, ease: 'circOut' }}
-                  className="w-full max-w-sm"
+                  exit={{ opacity: 0, x: 30 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  className="w-full max-w-sm py-2"
                 >
                   <Outlet />
                 </motion.div>
