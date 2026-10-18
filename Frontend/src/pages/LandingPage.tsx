@@ -239,7 +239,7 @@ const LandingPage: React.FC = () => {
       {/* ── Core MVP Features & Real-World Usage ─────────────────────────── */}
       <section
         id="mvp-features"
-        className="py-20 bg-white dark:bg-dark-900 border-y border-slate-200/80 dark:border-dark-800/80 content-auto"
+        className="py-20 bg-white dark:bg-dark-900 border-y border-slate-200/80 dark:border-dark-800/80"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -406,7 +406,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* ── Specialized Roles: Farmer vs. Agronomist Workspaces ─────────── */}
-      <section id="dual-workspaces" className="py-20 bg-slate-50 dark:bg-dark-950 content-auto">
+      <section id="dual-workspaces" className="py-20 bg-slate-50 dark:bg-dark-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
@@ -574,7 +574,7 @@ const LandingPage: React.FC = () => {
       {/* ── Enterprise Data Protection (Feature) ─────────────────────────── */}
       <section
         id="how-it-works"
-        className="py-20 bg-white dark:bg-dark-900 border-t border-slate-200/80 dark:border-dark-800/80 content-auto"
+        className="py-20 bg-white dark:bg-dark-900 border-t border-slate-200/80 dark:border-dark-800/80"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl p-8 sm:p-12 bg-gradient-to-br from-emerald-50 via-teal-50/50 to-slate-50 dark:from-dark-850 dark:via-dark-900 dark:to-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40 shadow-lg">
@@ -691,7 +691,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* ── Impact & ROI Metrics ─────────────────────────────────────────── */}
-      <section id="roi-impact" className="py-16 bg-slate-50 dark:bg-dark-950 content-auto">
+      <section id="roi-impact" className="py-16 bg-slate-50 dark:bg-dark-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
             Measurable Results

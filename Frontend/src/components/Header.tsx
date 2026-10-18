@@ -592,65 +592,119 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           )}
         </button>
 
-        {/* Settings / Account Icon - Visible on Both Mobile & Desktop */}
+        {/* User Profile & Account Menu — Interactive Profile Avatar */}
         <div ref={accountRef} className="relative flex-shrink-0">
           <button
-            id="settings-icon"
+            id="profile-dropdown-btn"
             onClick={() => {
               setAccountOpen(!accountOpen);
               setNotifOpen(false);
               setLangOpen(false);
             }}
-            className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
-            aria-label="Settings"
+            className="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-white/70 dark:hover:bg-gray-800/70 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-150 group"
+            aria-label="User profile and account settings"
           >
-            <Settings size={17} />
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-xs shadow-sm ring-2 ring-emerald-500/30 group-hover:ring-emerald-500 transition-all">
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div className="hidden lg:flex flex-col text-left">
+              <span className="text-xs font-bold leading-tight truncate max-w-[100px]">
+                {user?.name || 'AgriFlux User'}
+              </span>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 capitalize">
+                {user?.role || 'Farmer'}
+              </span>
+            </div>
+            <ChevronDown
+              size={13}
+              className={`text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-transform duration-150 ${
+                accountOpen ? 'rotate-180' : ''
+              }`}
+            />
           </button>
 
           {accountOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100]">
-              {/* Simple Settings Action */}
-              <button
-                onClick={() => {
-                  navigate('/settings');
-                  setAccountOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-4 hover:bg-primary-50/40 dark:hover:bg-primary-900/10 transition-all duration-150 group"
-              >
-                <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                  <Settings size={18} className="text-primary-600 dark:text-primary-400" />
+            <div className="absolute right-0 top-full mt-2 w-64 glass-panel rounded-2xl shadow-2xl overflow-hidden animate-slide-down z-[100] border border-gray-100/80 dark:border-gray-800">
+              {/* User Identity Banner */}
+              <div className="p-4 bg-gradient-to-br from-emerald-50/70 to-teal-50/40 dark:from-dark-850 dark:to-dark-900 border-b border-gray-100 dark:border-gray-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-sm shadow-md">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                      {user?.name || 'AgriFlux User'}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user?.email || user?.phone || 'farmer@agriflux.com'}
+                    </p>
+                    <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40 dark:border-emerald-700/40">
+                      {user?.role === 'agronomist'
+                        ? '🔬 Senior Agronomist'
+                        : user?.role === 'admin'
+                          ? '🛡️ System Admin'
+                          : '🌾 Verified Farmer'}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">Full Settings</p>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-                    App preferences
-                  </p>
-                </div>
-                <ChevronRight
-                  size={14}
-                  className="ml-auto text-primary-300 group-hover:translate-x-0.5 transition-all"
-                />
-              </button>
+              </div>
 
-              {/* Logout Action */}
-              <button
-                onClick={() => {
-                  logout();
-                  toast.info('Signed out successfully.');
-                  navigate('/login');
-                }}
-                className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-50/40 dark:hover:bg-red-900/10 text-red-500 hover:text-red-600 transition-all duration-150 group border-t border-gray-100/50 dark:border-gray-700/50"
-              >
-                <div className="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                  <LogOut size={18} className="text-red-500" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-bold">Sign Out</p>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-                    Exit session
-                  </p>
-                </div>
-              </button>
+              {/* Navigation Options */}
+              <div className="p-1.5 space-y-0.5">
+                <button
+                  id="header-workspace-link"
+                  onClick={() => {
+                    navigate(
+                      user?.role === 'agronomist'
+                        ? '/agronomist'
+                        : user?.role === 'admin'
+                          ? '/admin'
+                          : '/dashboard'
+                    );
+                    setAccountOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
+                >
+                  <LayoutDashboard size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <span>Workspace Dashboard</span>
+                  <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+
+                <button
+                  id="header-settings-link"
+                  onClick={() => {
+                    navigate('/settings');
+                    setAccountOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100/70 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-200 text-xs font-bold transition-colors group cursor-pointer"
+                >
+                  <Settings size={16} className="text-gray-500 dark:text-gray-400" />
+                  <span>Account & Preferences</span>
+                  <ChevronRight size={13} className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </div>
+
+              {/* Explicit Logout Action */}
+              <div className="p-1.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-dark-900/40">
+                <button
+                  id="header-logout-btn"
+                  onClick={() => {
+                    setAccountOpen(false);
+                    logout();
+                    toast.info('Signed out successfully.');
+                    navigate('/login');
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold transition-colors group cursor-pointer"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-red-100/70 dark:bg-red-950/70 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <LogOut size={14} className="text-red-600 dark:text-red-400" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className="leading-tight">Sign Out</p>
+                    <p className="text-[10px] text-gray-400 font-normal">Terminate session</p>
+                  </div>
+                </button>
+              </div>
             </div>
           )}
         </div>

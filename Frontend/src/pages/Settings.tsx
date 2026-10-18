@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
   User,
   Globe,
@@ -25,6 +27,7 @@ import {
   Package,
   RefreshCw,
   HardDrive,
+  LogOut,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -132,10 +135,17 @@ type Section =
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<Section>('profile');
   const [saved, setSaved] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    toast.info('Signed out of AgriFlux account.');
+    navigate('/login');
+  };
 
   const [profile, setProfile] = useState({
     name: user?.name || '',
@@ -216,6 +226,17 @@ const Settings: React.FC = () => {
                 )}
               </button>
             ))}
+
+            <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700/60">
+              <button
+                id="settings-logout-btn"
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 w-full"
+              >
+                <LogOut size={15} />
+                <span className="flex-1 text-left">Sign Out</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -525,6 +546,26 @@ const Settings: React.FC = () => {
                       All your farm data is fully encrypted at rest and in transit.
                     </p>
                   </div>
+                </div>
+
+                {/* Active Session & Logout */}
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                      Active Device Session
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      Signed in as <span className="font-semibold text-gray-700 dark:text-gray-300">{user?.name || user?.email || 'User'}</span> ({user?.role?.toUpperCase() || 'FARMER'})
+                    </p>
+                  </div>
+                  <button
+                    id="settings-security-logout-btn"
+                    onClick={handleLogout}
+                    className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl transition-all border border-red-200 dark:border-red-800 cursor-pointer flex-shrink-0"
+                  >
+                    <LogOut size={14} />
+                    Sign Out Now
+                  </button>
                 </div>
               </div>
             </div>

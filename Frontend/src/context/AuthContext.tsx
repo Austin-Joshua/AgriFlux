@@ -366,23 +366,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // ── Logout ────────────────────────────────────────────────────────────────
-  const logout = async () => {
-    try {
-      await axios.post(`${API_URL}/auth/logout`).catch(() => {});
-    } catch {
-      /* ignore */
-    }
-    try {
-      await signOut(auth);
-    } catch {
-      /* ignore */
-    }
+  const logout = () => {
+    // 1. Synchronously reset user state and purge storage immediately to prevent redirect race conditions
     setUser(null);
     setToken(null);
     setRequiresOnboarding(false);
     localStorage.removeItem('agriflux-token');
     localStorage.removeItem('agriflux-user');
     delete axios.defaults.headers.common['Authorization'];
+
+    // 2. Perform remote session revocation in the background without blocking client transition
+    axios.post(`${API_URL}/auth/logout`).catch(() => {});
+    signOut(auth).catch(() => {});
   };
 
   return (
