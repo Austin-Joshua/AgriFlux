@@ -355,11 +355,14 @@ export async function runFieldIntelligenceTests(): Promise<
 
   // Test 12: Enforces tenant ownership isolation and rejects cross-farmer action with 403
   try {
-    const ownerRec = await FieldIntelligenceService.generateRecommendation('farmer_alice_original', {
-      fieldId: 'field-alice-01',
-      cropType: 'Cotton',
-      soilMoistureOverride: 28,
-    });
+    const ownerRec = await FieldIntelligenceService.generateRecommendation(
+      'farmer_alice_original',
+      {
+        fieldId: 'field-alice-01',
+        cropType: 'Cotton',
+        soilMoistureOverride: 28,
+      }
+    );
 
     let forbiddenCaught = false;
     try {
@@ -399,7 +402,11 @@ export async function runFieldIntelligenceTests(): Promise<
       );
     } catch (err: any) {
       review404 = true;
-      assert.strictEqual(err.statusCode, 404, 'Must throw 404 on review of non-existent recommendation');
+      assert.strictEqual(
+        err.statusCode,
+        404,
+        'Must throw 404 on review of non-existent recommendation'
+      );
     }
     assert.strictEqual(review404, true, 'Agronomist review on phantom ID must reject with 404');
     results.push({
