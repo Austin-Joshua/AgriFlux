@@ -51,6 +51,8 @@ const StatCard: React.FC<{
   onClick?: () => void;
   accentColor: string;
 }> = ({ title, value, change, positive = true, icon, color, bgColor, onClick, accentColor }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className="card-clickable group border-b-2 border-transparent hover:border-primary-500"
@@ -77,7 +79,7 @@ const StatCard: React.FC<{
             {change}
           </span>
           <span className="text-[10px] text-gray-400 group-hover:text-primary-500 flex items-center gap-0.5 transition-colors duration-200">
-            View details{' '}
+            {t('common.viewDetails', 'View details')}{' '}
             <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
@@ -555,8 +557,8 @@ interface BlockchainLedgerHealth {
       >
         <StatCard
           title={t('admin.totalRegistered', 'Total Registered')}
-          value="271 Users"
-          change="+34 this month"
+          value={`271 ${t('admin.users', 'Users')}`}
+          change={`+34 ${t('admin.thisMonth', 'this month')}`}
           positive={true}
           icon={<Users size={22} className="text-primary-600" />}
           color="text-primary-600 dark:text-primary-400"
@@ -566,7 +568,7 @@ interface BlockchainLedgerHealth {
         />
         <StatCard
           title={t('admin.hardwareNodes', 'Hardware Nodes')}
-          value="18 / 18 Online"
+          value={`18 / 18 ${t('common.online', 'Online')}`}
           change="LoRa Mesh 100%"
           positive={true}
           icon={<Cpu size={22} className="text-blue-600" />}
@@ -577,8 +579,8 @@ interface BlockchainLedgerHealth {
         />
         <StatCard
           title={t('admin.farmerInquiries', 'Farmer Inquiries')}
-          value="3 Pending"
-          change="Triage Queue"
+          value={`3 ${t('common.pending', 'Pending')}`}
+          change={t('admin.triageQueue', 'Triage Queue')}
           positive={true}
           icon={<Calendar size={22} className="text-amber-600" />}
           color="text-amber-600 dark:text-amber-400"
@@ -588,8 +590,8 @@ interface BlockchainLedgerHealth {
         />
         <StatCard
           title={t('admin.systemHealth', 'System Health')}
-          value="Nominal"
-          change="Zero Faults"
+          value={t('admin.nominal', 'Nominal')}
+          change={t('admin.zeroFaults', 'Zero Faults')}
           positive={true}
           icon={<ShieldCheck size={22} className="text-emerald-600" />}
           color="text-emerald-600 dark:text-emerald-400"
@@ -813,22 +815,22 @@ interface BlockchainLedgerHealth {
               <p className="text-base font-black text-white mt-1">
                 {t('admin.poaAuthority', 'PoA Demonstration')}
               </p>
-              <span className="text-[10px] text-gray-500">SHA-256 Merkle Ledger</span>
+              <span className="text-[10px] text-gray-500">{t('admin.merkleLedger', 'SHA-256 Merkle Ledger')}</span>
             </div>
             <div className="card p-3.5">
               <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
-                Signing Key Source
+                {t('admin.signingKeySource', 'Signing Key Source')}
               </span>
               <p className="text-base font-black text-emerald-400 mt-1">
                 {blockchainData?.health?.keySource === 'dedicated_audit_key'
-                  ? 'Dedicated Key'
+                  ? t('admin.dedicatedKey', 'Dedicated Key')
                   : blockchainData?.health?.keySource === 'jwt_secret_legacy'
-                    ? 'JWT Secret'
+                    ? t('admin.jwtSecret', 'JWT Secret')
                     : blockchainData?.health?.keySource === 'development_default'
-                      ? 'Dev Deterministic'
-                      : 'Unconfigured'}
+                      ? t('admin.devDeterministic', 'Dev Deterministic')
+                      : t('admin.unconfigured', 'Unconfigured')}
               </p>
-              <span className="text-[10px] text-gray-500">HMAC-SHA256 Authority</span>
+              <span className="text-[10px] text-gray-500">{t('admin.hmacAuthority', 'HMAC-SHA256 Authority')}</span>
             </div>
           </div>
 
@@ -839,7 +841,7 @@ interface BlockchainLedgerHealth {
                 {t('admin.liveBlockExplorer')}
               </h4>
               <span className="text-xs text-gray-500 font-mono">
-                Latest Hash: {blockchainData?.summary?.lastBlockHash?.slice(0, 16)}...
+                {t('admin.latestHash', 'Latest Hash')}: {blockchainData?.summary?.lastBlockHash?.slice(0, 16)}...
               </span>
             </div>
 
@@ -1248,7 +1250,7 @@ interface BlockchainLedgerHealth {
                         <button
                           onClick={() => toast.info(`Viewing activity telemetry for ${u.name}`)}
                           className="p-1 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                          title="View telemetry"
+                          title={t('admin.viewTelemetry', 'View telemetry')}
                         >
                           <Eye size={14} />
                         </button>
@@ -1258,7 +1260,7 @@ interface BlockchainLedgerHealth {
                             toast.success(`User ${u.name} purged from directory.`);
                           }}
                           className="p-1 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          title="Remove user"
+                          title={t('admin.removeUser', 'Remove user')}
                         >
                           <Trash2 size={14} />
                         </button>

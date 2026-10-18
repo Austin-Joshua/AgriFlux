@@ -292,6 +292,7 @@ const NavItem: React.FC<NavItemProps> = React.memo(
 NavItem.displayName = 'NavItem';
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose }) => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -405,7 +406,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
-            aria-label="Close menu"
+            aria-label={t('common.close', 'Close menu')}
           >
             <X size={18} />
           </button>
@@ -486,7 +487,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
               <button
                 onClick={handleLogout}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 hover:scale-110 flex-shrink-0"
-                title="Logout"
+                title={t('auth.logout', 'Logout')}
               >
                 <LogOut size={15} />
               </button>
@@ -494,7 +495,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, onClose })
           ) : (
             <button
               onClick={handleLogout}
-              title="Logout"
+              title={t('auth.logout', 'Logout')}
               className="w-full flex justify-center p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
             >
               <LogOut size={18} />

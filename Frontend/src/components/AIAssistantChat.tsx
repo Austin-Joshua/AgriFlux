@@ -148,7 +148,7 @@ const AIAssistantChat: React.FC = () => {
             <button
               onClick={cycleLanguage}
               className="flex items-center gap-1.5 px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-white text-xs font-bold transition-all"
-              title="Change Language"
+              title={t('header.changeLanguage', 'Change Language')}
             >
               <Globe size={12} />
               <span>{currentLang.flag}</span>

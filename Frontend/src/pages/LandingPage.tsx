@@ -64,8 +64,8 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-dark-950 text-slate-900 dark:text-dark-100 transition-colors duration-300 font-sans selection:bg-emerald-500 selection:text-white">
       <SEO
-        title="AgriFlux — Autonomous Precision Agriculture & Intelligence Platform"
-        description="AgriFlux connects IoT soil sensors, AI crop health diagnostics, closed-loop irrigation, expert agronomy consultations, and equipment rental into one unified precision farming ecosystem."
+        title={t('landing.heroTitle', 'AgriFlux — Autonomous Precision Agriculture & Intelligence Platform')}
+        description={t('landing.heroSubtitle', 'AgriFlux connects IoT soil sensors, AI crop health diagnostics, closed-loop irrigation, expert agronomy consultations, and equipment rental into one unified precision farming ecosystem.')}
       />
 
       {/* ── Top Navigation Bar ────────────────────────────────────────────── */}

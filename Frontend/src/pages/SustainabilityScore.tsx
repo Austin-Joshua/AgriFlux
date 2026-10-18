@@ -156,7 +156,11 @@ const SustainabilityScore: React.FC = () => {
 
   const scoreColor = overall >= 80 ? '#22c55e' : overall >= 60 ? '#f59e0b' : '#ef4444';
   const scoreLabel =
-    overall >= 80 ? 'Excellent 🌟' : overall >= 60 ? 'Good 👍' : 'Needs Improvement ⚠️';
+    overall >= 80
+      ? t('sustainability.scoreExcellent', 'Excellent 🌟')
+      : overall >= 60
+        ? t('sustainability.scoreGood', 'Good 👍')
+        : t('sustainability.scoreNeedsImprovement', 'Needs Improvement ⚠️');
 
   return (
     <div className="space-y-6">
@@ -180,7 +184,7 @@ const SustainabilityScore: React.FC = () => {
         </div>
         <div className="flex items-center justify-center md:justify-start gap-2">
           <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
-            🌟 Premium Farm Score
+            🌟 {t('sustainability.premiumFarmScore', 'Premium Farm Score')}
           </span>
         </div>
       </div>
@@ -190,7 +194,7 @@ const SustainabilityScore: React.FC = () => {
         <div className="card flex flex-col items-center py-8">
           <h3 className="section-header mb-4 flex items-center gap-3">
             <Award size={20} className="text-primary-500" />
-            Our Analysis
+            {t('sustainability.ourAnalysis', 'Our Analysis')}
           </h3>
 
           <div className="relative w-44 h-44 mb-4">
@@ -221,15 +225,15 @@ const SustainabilityScore: React.FC = () => {
 
           <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{scoreLabel}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center max-w-[200px]">
-            Your farm is performing better than 72% of farms in your region
+            {t('sustainability.performanceSummary', 'Your farm is performing better than 72% of farms in your region')}
           </p>
 
           <div className="mt-6 w-full grid grid-cols-2 gap-2">
             {[
-              { label: 'CO₂ Saved', value: '2.4t', color: 'primary' },
-              { label: 'Water Saved', value: '12kL', color: 'blue' },
-              { label: 'Chem Reduced', value: '18%', color: 'earth' },
-              { label: 'Biodiversity', value: 'Good', color: 'primary' },
+              { label: t('sustainability.co2Saved', 'CO₂ Saved'), value: '2.4t', color: 'primary' },
+              { label: t('dashboard.waterSaved', 'Water Saved'), value: '12kL', color: 'blue' },
+              { label: t('sustainability.chemReduced', 'Chem Reduced'), value: '18%', color: 'earth' },
+              { label: t('sustainability.biodiversity', 'Biodiversity'), value: t('common.good', 'Good'), color: 'primary' },
             ].map((s) => (
               <div
                 key={s.label}
@@ -316,7 +320,7 @@ const SustainabilityScore: React.FC = () => {
                       {m.label}
                     </p>
                     <span className="text-[7px] font-black text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Full Report
+                      {t('sustainability.fullReport', 'Full Report')}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">

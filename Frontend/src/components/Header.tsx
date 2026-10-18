@@ -53,6 +53,9 @@ const NOTIFICATIONS = [
     icon: CheckCircle,
     color: 'text-primary-500',
     bg: 'bg-primary-50 dark:bg-primary-900/20',
+    titleKey: 'notifications.yieldReadyTitle',
+    bodyKey: 'notifications.yieldReadyMsg',
+    timeKey: 'notifications.time2m',
     title: 'Yield Prediction Ready',
     body: 'Your Rice crop yield forecast is available.',
     time: '2 min ago',
@@ -63,6 +66,9 @@ const NOTIFICATIONS = [
     icon: AlertTriangle,
     color: 'text-amber-500',
     bg: 'bg-amber-50 dark:bg-amber-900/20',
+    titleKey: 'notifications.heatwaveTitle',
+    bodyKey: 'notifications.heatwaveMsg',
+    timeKey: 'notifications.time15m',
     title: 'Heatwave Alert 🔥',
     body: 'Extreme heat expected Thursday in your region.',
     time: '15 min ago',
@@ -73,6 +79,9 @@ const NOTIFICATIONS = [
     icon: Droplets,
     color: 'text-blue-500',
     bg: 'bg-blue-50 dark:bg-blue-900/20',
+    titleKey: 'notifications.wateringTitle',
+    bodyKey: 'notifications.wateringMsg',
+    timeKey: 'notifications.time1h',
     title: 'Irrigation Optimized',
     body: 'Schedule updated — saving 18mm water this week.',
     time: '1 hr ago',
@@ -83,6 +92,9 @@ const NOTIFICATIONS = [
     icon: Leaf,
     color: 'text-earth-500',
     bg: 'bg-earth-50 dark:bg-earth-900/20',
+    titleKey: 'notifications.soilPhTitle',
+    bodyKey: 'notifications.soilPhMsg',
+    timeKey: 'notifications.time1h',
     title: 'Soil Report Generated',
     body: 'AI detected low Potassium levels in Zone B.',
     time: '3 hr ago',
@@ -275,7 +287,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           id="mobile-menu-toggle"
           onClick={onMenuClick}
           className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 lg:hidden transition-all duration-150 flex-shrink-0"
-          aria-label="Open mobile menu"
+          aria-label={t('header.openMenu', 'Open mobile menu')}
         >
           <Menu size={20} />
         </button>
@@ -377,7 +389,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           id="header-ai-report-btn"
           onClick={() => setReportOpen(true)}
           className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-primary-600 to-teal-600 text-white font-bold text-xs shadow-sm shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all duration-150 flex-shrink-0"
-          title="Generate Smart Farm Report"
+          title={t('header.generateReportTooltip', 'Generate Smart Farm Report')}
         >
           <Sparkles size={14} className="text-yellow-200 animate-pulse flex-shrink-0" />
           <span className="font-bold">{t('header.aiReport', 'AI Report')}</span>
@@ -393,7 +405,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               setLangOpen(false);
             }}
             className="relative p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
-            aria-label="Notifications"
+            aria-label={t('notifications.title', 'Notifications')}
           >
             <Bell size={17} />
             {unreadCount > 0 && (
@@ -441,17 +453,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             <p
                               className={`text-sm tracking-tight ${n.unread ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-600 dark:text-gray-400'}`}
                             >
-                              {n.title}
+                              {n.titleKey ? t(n.titleKey, n.title) : n.title}
                             </p>
                             {n.unread && (
                               <span className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1.5 shadow-glow-green" />
                             )}
                           </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
-                            {n.body}
+                            {n.bodyKey ? t(n.bodyKey, n.body) : n.body}
                           </p>
                           <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 mt-2 uppercase">
-                            {n.time}
+                            {n.timeKey ? t(n.timeKey, n.time) : n.time}
                           </p>
                         </div>
                       </div>
@@ -473,16 +485,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                       </div>
                       <div>
                         <h4 className="font-bold text-gray-900 dark:text-white leading-tight">
-                          {selectedNotif.title}
+                          {selectedNotif.titleKey ? t(selectedNotif.titleKey, selectedNotif.title) : selectedNotif.title}
                         </h4>
                         <p className="text-[10px] font-black text-gray-400 uppercase mt-1">
-                          {selectedNotif.time}
+                          {selectedNotif.timeKey ? t(selectedNotif.timeKey, selectedNotif.time) : selectedNotif.time}
                         </p>
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-600/50">
                       <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                        {selectedNotif.body}
+                        {selectedNotif.bodyKey ? t(selectedNotif.bodyKey, selectedNotif.body) : selectedNotif.body}
                       </p>
                     </div>
                     <button
@@ -514,7 +526,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               setAccountOpen(false);
             }}
             className="flex items-center gap-1 px-1.5 sm:px-2 py-1.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-600 transition-all duration-150 hover:scale-105 active:scale-95 text-xs flex-shrink-0"
-            aria-label="Language selector"
+            aria-label={t('header.selectLanguage', 'Language selector')}
           >
             <span className="text-sm leading-none">{currentLang.flag}</span>
             <span className="hidden sm:inline font-bold text-xs uppercase">{currentLang.code}</span>
@@ -548,7 +560,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           id="theme-toggle"
           onClick={toggleTheme}
           className="p-1.5 sm:p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-150 hover:scale-105 active:scale-95 flex-shrink-0"
-          aria-label="Toggle theme"
+          aria-label={t('header.toggleTheme', 'Toggle theme')}
         >
           {isDark ? (
             <Sun
@@ -570,7 +582,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               setLangOpen(false);
             }}
             className="p-0.5 rounded-full text-gray-700 dark:text-gray-200 hover:scale-105 active:scale-95 transition-all duration-150 group focus:outline-none"
-            aria-label="User profile and account settings"
+            aria-label={t('header.accountSettings', 'User profile and account settings')}
             title={user?.name || 'User Profile'}
           >
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-xs shadow-sm ring-2 ring-emerald-500/30 group-hover:ring-emerald-500 group-hover:shadow-emerald-500/25 transition-all">

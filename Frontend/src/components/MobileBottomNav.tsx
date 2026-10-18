@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   Store,
@@ -33,6 +34,7 @@ interface BottomTab {
  * Native iOS / Material 3 dock aesthetics with role-aware tabs and a central floating action button (FAB).
  */
 const MobileBottomNav: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,31 +54,31 @@ const MobileBottomNav: React.FC = () => {
 
   if (role === 'admin') {
     leftItems = [
-      { to: '/admin', icon: Shield, label: 'Console' },
-      { to: '/admin?tab=users', icon: Users, label: 'Users' },
+      { to: '/admin', icon: Shield, label: t('nav.bottomConsole', 'Console') },
+      { to: '/admin?tab=users', icon: Users, label: t('nav.bottomUsers', 'Users') },
     ];
     rightItems = [
-      { to: '/admin?tab=system', icon: Activity, label: 'System' },
-      { to: '/admin?tab=activity', icon: FileText, label: 'Audit' },
+      { to: '/admin?tab=system', icon: Activity, label: t('nav.bottomSystem', 'System') },
+      { to: '/admin?tab=activity', icon: FileText, label: t('nav.bottomAudit', 'Audit') },
     ];
     fabConfig = {
       icon: ToggleRight,
-      label: 'Actuators',
+      label: t('nav.bottomActuators', 'Actuators'),
       onClick: () => navigate('/admin?tab=actuators'),
       isActive: location.pathname === '/admin' && location.search.includes('tab=actuators'),
     };
   } else if (role === 'agronomist') {
     leftItems = [
-      { to: '/agronomist', icon: Microscope, label: 'Portal' },
-      { to: '/yield', icon: TrendingUp, label: 'Yield' },
+      { to: '/agronomist', icon: Microscope, label: t('nav.bottomPortal', 'Portal') },
+      { to: '/yield', icon: TrendingUp, label: t('nav.bottomYield', 'Yield') },
     ];
     rightItems = [
-      { to: '/climate', icon: CloudLightning, label: 'Climate' },
-      { to: '/simulator', icon: Wind, label: 'Simulator' },
+      { to: '/climate', icon: CloudLightning, label: t('nav.bottomClimate', 'Climate') },
+      { to: '/simulator', icon: Wind, label: t('nav.bottomSimulator', 'Simulator') },
     ];
     fabConfig = {
       icon: Calendar,
-      label: 'Advisory',
+      label: t('nav.bottomAdvisory', 'Advisory'),
       onClick: () => navigate('/agronomist?tab=consultations'),
       isActive:
         location.pathname === '/agronomist' && location.search.includes('tab=consultations'),
@@ -84,16 +86,16 @@ const MobileBottomNav: React.FC = () => {
   } else {
     // Farmer
     leftItems = [
-      { to: '/dashboard', icon: LayoutDashboard, label: 'Home' },
-      { to: '/soil', icon: Leaf, label: 'Soil' },
+      { to: '/dashboard', icon: LayoutDashboard, label: t('nav.bottomHome', 'Home') },
+      { to: '/soil', icon: Leaf, label: t('nav.bottomSoil', 'Soil') },
     ];
     rightItems = [
-      { to: '/crop-health', icon: Satellite, label: 'Health' },
-      { to: '/marketplace', icon: Store, label: 'Market' },
+      { to: '/crop-health', icon: Satellite, label: t('nav.bottomHealth', 'Health') },
+      { to: '/marketplace', icon: Store, label: t('nav.bottomMarket', 'Market') },
     ];
     fabConfig = {
       icon: Sparkles,
-      label: 'AI Report',
+      label: t('nav.bottomAiReport', 'AI Report'),
       onClick: () => setReportOpen(true),
       isActive: reportOpen,
     };
@@ -164,7 +166,7 @@ const MobileBottomNav: React.FC = () => {
       <nav
         className="lg:hidden fixed bottom-0 left-0 right-0 z-40 w-full max-w-full overflow-visible pointer-events-auto bg-white dark:bg-gray-950"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 6px)' }}
-        aria-label="Mobile Navigation"
+        aria-label={t('nav.mobileNav', 'Mobile Navigation')}
       >
         <div className="bg-white/98 dark:bg-gray-950/98 border-t border-gray-200/90 dark:border-gray-800/90 shadow-[0_-6px_25px_rgba(0,0,0,0.1)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-2 pt-1 pb-1 flex items-center justify-between w-full max-w-full relative">
           {/* Left 2 Tabs */}

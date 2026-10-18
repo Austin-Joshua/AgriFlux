@@ -46,6 +46,8 @@ const StatCard: React.FC<{
   onClick?: () => void;
   accentColor: string;
 }> = ({ title, value, change, positive = true, icon, color, bgColor, onClick, accentColor }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className="card-clickable group border-b-2 border-transparent hover:border-primary-500"
@@ -72,7 +74,7 @@ const StatCard: React.FC<{
             {change}
           </span>
           <span className="text-[10px] text-gray-400 group-hover:text-primary-500 flex items-center gap-0.5 transition-colors duration-200">
-            View details{' '}
+            {t('common.viewDetails', 'View details')}{' '}
             <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
@@ -447,7 +449,7 @@ const AgronomistDashboard: React.FC = () => {
         <StatCard
           title={t('agronomist.farmsMonitored', 'Farms Monitored')}
           value={`42 ${t('agronomist.parcels', 'Parcels')}`}
-          change="+4 this month"
+          change={t('agronomist.thisMonth', '+4 this month')}
           positive={true}
           icon={<Sprout size={22} className="text-primary-600" />}
           color="text-primary-600 dark:text-primary-400"
@@ -457,8 +459,8 @@ const AgronomistDashboard: React.FC = () => {
         />
         <StatCard
           title={t('nav.consultationsQueue', 'Farmer Consultations')}
-          value={`${consultations.filter((c) => c.status === 'pending').length || 0} Pending`}
-          change="Triage Active"
+          value={`${consultations.filter((c) => c.status === 'pending').length || 0} ${t('common.pending', 'Pending')}`}
+          change={t('agronomist.triageActive', 'Triage Active')}
           positive={true}
           icon={<Calendar size={22} className="text-blue-600" />}
           color="text-blue-600 dark:text-blue-400"
@@ -468,7 +470,7 @@ const AgronomistDashboard: React.FC = () => {
         />
         <StatCard
           title={t('nav.fieldDecisions', 'Decision Reviews')}
-          value={`${reviews.filter((r) => !r.agronomistReview).length || 0} Awaiting`}
+          value={`${reviews.filter((r) => !r.agronomistReview).length || 0} ${t('agronomist.awaiting', 'Awaiting')}`}
           change="FAO-56 Gates"
           positive={true}
           icon={<Target size={22} className="text-purple-600" />}
@@ -479,8 +481,8 @@ const AgronomistDashboard: React.FC = () => {
         />
         <StatCard
           title={t('agronomist.soilReports', 'Soil Diagnostics')}
-          value="88/100 Optimal"
-          change="Lab Calibrated"
+          value={`88/100 ${t('dashboard.optimal', 'Optimal')}`}
+          change={t('agronomist.labCalibrated', 'Lab Calibrated')}
           positive={true}
           icon={<Leaf size={22} className="text-earth-600" />}
           color="text-earth-600 dark:text-earth-400"
@@ -998,7 +1000,7 @@ const AgronomistDashboard: React.FC = () => {
                               [rec.recommendationId]: e.target.value,
                             }))
                           }
-                          placeholder="Diagnostic directive or field validation notes..."
+                          placeholder={t('agronomist.diagnosticNotesPlaceholder', 'Diagnostic directive or field validation notes...')}
                           className="w-full text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary-500"
                         />
 
@@ -1008,7 +1010,7 @@ const AgronomistDashboard: React.FC = () => {
                             disabled={isUnderReview}
                             className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5"
                           >
-                            <CheckCircle2 size={13} /> Endorse Decision
+                            <CheckCircle2 size={13} /> {t('agronomist.endorseDecision', 'Endorse Decision')}
                           </button>
                           <button
                             onClick={() =>
@@ -1017,7 +1019,7 @@ const AgronomistDashboard: React.FC = () => {
                             disabled={isUnderReview}
                             className="btn-outline py-1.5 px-3 text-xs flex items-center gap-1.5 text-amber-600 border-amber-300 hover:bg-amber-50"
                           >
-                            <AlertTriangle size={13} /> Request Revision
+                            <AlertTriangle size={13} /> {t('agronomist.requestRevision', 'Request Revision')}
                           </button>
                           <button
                             onClick={() =>
@@ -1026,7 +1028,7 @@ const AgronomistDashboard: React.FC = () => {
                             disabled={isUnderReview}
                             className="btn-outline py-1.5 px-3 text-xs flex items-center gap-1.5 text-blue-600 border-blue-300 hover:bg-blue-50"
                           >
-                            <UserCheck size={13} /> Field Inspection Required
+                            <UserCheck size={13} /> {t('agronomist.inspectionRequired', 'Field Inspection Required')}
                           </button>
                         </div>
                       </div>

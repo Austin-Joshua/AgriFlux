@@ -43,7 +43,23 @@
     "advisoryTab": "ಪ್ರಾದೇಶಿಕ ಸಲಹೆಗಳು",
     "adminBlockchain": "ಕ್ರಿಪ್ಟೋಗ್ರಾಫಿಕ್ ಆಡಿಟ್ ಲೆಡ್ಜರ್",
     "soilAdvisor": "ಮಣ್ಣಿನ ಬುದ್ಧಿವಂತಿಕೆ",
-    "yieldForecasting": "ಇಳುವರಿ ಮುನ್ಸೂಚನೆ"
+    "yieldForecasting": "ಇಳುವರಿ ಮುನ್ಸೂಚನೆ",
+    "bottomConsole": "ಕನ್ಸೋಲ್",
+    "bottomUsers": "ಬಳಕೆದಾರರು",
+    "bottomSystem": "ವ್ಯವಸ್ಥೆ",
+    "bottomAudit": "ಆಡಿಟ್",
+    "bottomActuators": "ಆಕ್ಚುಯೇಟರ್‌ಗಳು",
+    "bottomPortal": "ಪೋರ್ಟಲ್",
+    "bottomYield": "ಇಳುವರಿ",
+    "bottomClimate": "ಹವಾಮಾನ",
+    "bottomSimulator": "ಸಿಮ್ಯುಲೇಟರ್",
+    "bottomAdvisory": "ಸಲಹೆ",
+    "bottomHome": "ಮುಖಪುಟ",
+    "bottomSoil": "ಮಣ್ಣು",
+    "bottomHealth": "ಆರೋಗ್ಯ",
+    "bottomMarket": "ಮಾರುಕಟ್ಟೆ",
+    "bottomAiReport": "AI ವರದಿ",
+    "mobileNav": "ಮೊಬೈಲ್ ನ್ಯಾವಿಗೇಶನ್"
   },
   "auth": {
     "login": "ಸೈನ್ ಇನ್",
@@ -102,7 +118,12 @@
     "farmer": "ರೈತ",
     "agronomist": "ಕೃಷಿ ತಜ್ಞ",
     "admin": "ನಿರ್ವಾಹಕ",
-    "getStarted": "ಪ್ರಾರಂಭಿಸಿ"
+    "getStarted": "ಪ್ರಾರಂಭಿಸಿ",
+    "verifyingSession": "ಅಧಿವೇಶನ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...",
+    "workspaceRestricted": "ಕಾರ್ಯಕ್ಷೇತ್ರ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ",
+    "workspaceReserved": "ಈ ಕಾರ್ಯಕ್ಷೇತ್ರವನ್ನು ಈ ಕೆಳಗಿನ ಖಾತೆಗಳಿಗಾಗಿ ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ:",
+    "currentlyLoggedInAs": "ಖಾತೆಗಳು. ನೀವು ಪ್ರಸ್ತುತ ಲಾಗಿನ್ ಆಗಿರುವ ರೂಪ:",
+    "returnWorkspace": "ನನ್ನ ಕಾರ್ಯಕ್ಷೇತ್ರಕ್ಕೆ ಹಿಂತಿರುಗಿ"
   },
   "common": {
     "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
@@ -176,7 +197,31 @@
     "filter": "ಫಿಲ್ಟರ್",
     "riskHigh": "ಹೆಚ್ಚು",
     "riskMedium": "ಮಧ್ಯಮ",
-    "riskLow": "ಕಡಿಮೆ"
+    "riskLow": "ಕಡಿಮೆ",
+    "viewDetails": "ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ",
+    "online": "ಆನ್‌ಲೈನ್",
+    "jan": "ಜನ",
+    "feb": "ಫೆಬ್ರ",
+    "mar": "ಮಾರ್ಚ್",
+    "apr": "ಏಪ್ರಿ",
+    "may": "ಮೇ",
+    "jun": "ಜೂನ್",
+    "jul": "ಜುಲೈ",
+    "aug": "ಆಗ",
+    "sep": "ಸೆಪ್ಟೆಂ",
+    "oct": "ಅಕ್ಟೋ",
+    "nov": "ನವೆಂ",
+    "dec": "ಡಿಸೆಂ",
+    "mon": "ಸೋಮ",
+    "tue": "ಮಂಗಳ",
+    "wed": "ಬುಧ",
+    "thu": "ಗುರು",
+    "fri": "ಶುಕ್ರ",
+    "sat": "ಶನಿ",
+    "sun": "ಭಾನು",
+    "skipToContent": "ಮುಖ್ಯ ವಿಷಯಕ್ಕೆ ಹೋಗಿ",
+    "backToCitizenOne": "CitizenOne ಗೆ ಹಿಂತಿರುಗಿ",
+    "linkSent": "ಲಿಂಕ್ ಕಳುಹಿಸಲಾಗಿದೆ"
   },
   "settings": {
     "title": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
@@ -315,7 +360,14 @@
     "wateringMsg": "ಅತ್ಯುತ್ತಮ ನೀರಾವರಿ ಸಮಯ: ಇಂದು ರಾತ್ರಿ 10 ಗಂಟೆ. ಇಂದು 12% ನೀರನ್ನು ಉಳಿಸಿ.",
     "liveAlerts": "ಲೈವ್ ಇಂಟೆಲಿಜೆನ್ಸ್ ಎಚ್ಚರಿಕೆಗಳು",
     "new": "ಹೊಸದು",
-    "viewAllHistory": "ಎಲ್ಲಾ ಅಧಿಸೂಚನೆ ಇತಿಹಾಸವನ್ನು ವೀಕ್ಷಿಸಿ"
+    "viewAllHistory": "ಎಲ್ಲಾ ಅಧಿಸೂಚನೆ ಇತಿಹಾಸವನ್ನು ವೀಕ್ಷಿಸಿ",
+    "yieldReadyTitle": "ಇಳುವರಿ ಮುನ್ಸೂಚನೆ ಸಿದ್ಧವಾಗಿದೆ",
+    "yieldReadyMsg": "ನಿಮ್ಮ ಭತ್ತದ ಬೆಳೆಯ ಇಳುವರಿ ಮುನ್ಸೂಚನೆ ಲಭ್ಯವಿದೆ.",
+    "heatwaveTitle": "ಬಿಸಿಗಾಳಿ ಎಚ್ಚರಿಕೆ 🔥",
+    "heatwaveMsg": "ನಿಮ್ಮ ಪ್ರದೇಶದಲ್ಲಿ ಗುರುವಾರ ತೀವ್ರ ಶಾಖ ನಿರೀಕ್ಷಿಸಲಾಗಿದೆ.",
+    "time2m": "2 ನಿಮಿಷಗಳ ಹಿಂದೆ",
+    "time15m": "15 ನಿಮಿಷಗಳ ಹಿಂದೆ",
+    "time1h": "1 ಗಂಟೆ ಹಿಂದೆ"
   },
   "ai": {
     "title": "ಅಗ್ರಿಫ್ಲಕ್ಸ್ AI",
@@ -498,7 +550,9 @@
     "waterTable": "ಅಂತರ್ಜಲ ಮಟ್ಟ (ಮೀ)",
     "germinationRate": "ಮೊಳಕೆಯೊಡೆಯುವ ದರ (%)",
     "tenYearTrend": "10 ವರ್ಷಗಳ ಮಾರುಕಟ್ಟೆ ಪ್ರವೃತ್ತಿ",
-    "primaryGuidance": "ಪ್ರಾಥಮಿಕ ಮಾರ್ಗದರ್ಶನ"
+    "primaryGuidance": "ಪ್ರಾಥಮಿಕ ಮಾರ್ಗದರ್ಶನ",
+    "chlorophyllIndex": "ಕ್ಲೋರೊಫಿಲ್ ಸೂಚ್ಯಂಕ",
+    "diseaseProbability": "ರೋಗ ಸಂಭವನೀಯತೆ"
   },
   "agronomist": {
     "title": "ಕೃಷಿ ತಜ್ಞರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
@@ -552,7 +606,15 @@
     "noConsultationsYet": "ಇನ್ನೂ ಯಾವುದೇ ಸಮಾಲೋಚನೆಗಳನ್ನು ಕೋರಲಾಗಿಲ್ಲ.",
     "farmerLabel": "ರೈತ",
     "requestedExpert": "ವಿನಂತಿಸಿದ ತಜ್ಞ",
-    "time": "ಸಮಯ"
+    "time": "ಸಮಯ",
+    "thisMonth": "+4 ಈ ತಿಂಗಳು",
+    "triageActive": "ಟ್ರಯೇಜ್ ಸಕ್ರಿಯ",
+    "labCalibrated": "ಪ್ರಯೋಗಾಲಯ ಮಾಪನಾಂಕ ನಿರ್ಣಯ",
+    "awaiting": "ನಿರೀಕ್ಷಿಸಲಾಗುತ್ತಿದೆ",
+    "diagnosticNotesPlaceholder": "ರೋಗನಿರ್ಣಯ ನಿರ್ದೇಶನ ಅಥವಾ ಕ್ಷೇತ್ರ ಪರಿಶೀಲನಾ ಟಿಪ್ಪಣಿಗಳು...",
+    "endorseDecision": "ನಿರ್ಧಾರವನ್ನು ಅನುಮೋದಿಸಿ",
+    "requestRevision": "ಪರಿಷ್ಕರಣೆಯನ್ನು ವಿನಂತಿಸಿ",
+    "inspectionRequired": "ಕ್ಷೇತ್ರ ತಪಾಸಣೆ ಅಗತ್ಯವಿದೆ"
   },
   "admin": {
     "title": "ಅಡ್ಮಿನ್ ನಿಯಂತ್ರಣ ಫಲಕ",
@@ -663,7 +725,22 @@
     "policyEstop": "ಆಕ್ಚುಯೇಟರ್ ಇ-ಸ್ಟಾಪ್ ಇಂಟರ್‌ಲಾಕ್ ಸಕ್ರಿಯವಾಗಿದೆ",
     "enforced": "ಜಾರಿಗೊಳಿಸಲಾಗಿದೆ",
     "roleElevation": "ಪಾತ್ರ ಉನ್ನತೀಕರಣ",
-    "telemetry": "ಟೆಲಿಮೆಟ್ರಿ"
+    "telemetry": "ಟೆಲಿಮೆಟ್ರಿ",
+    "users": "ಬಳಕೆದಾರರು",
+    "thisMonth": "ಈ ತಿಂಗಳು",
+    "triageQueue": "ಟ್ರಯೇಜ್ ಸರದಿ",
+    "nominal": "ಸಾಮಾನ್ಯ",
+    "zeroFaults": "ಶೂನ್ಯ ದೋಷಗಳು",
+    "signingKeySource": "ಸಹಿ ಕೀ ಮೂಲ",
+    "dedicatedKey": "ಮೀಸಲಾದ ಕೀ",
+    "jwtSecret": "JWT ರಹಸ್ಯ",
+    "devDeterministic": "ಡೆವ್ ಡಿಟರ್ಮಿನಿಸ್ಟಿಕ್",
+    "unconfigured": "ಕಾನ್ಫಿಗರ್ ಮಾಡಲಾಗಿಲ್ಲ",
+    "merkleLedger": "SHA-256 ಮರ್ಕಲ್ ಲೆಡ್ಜರ್",
+    "hmacAuthority": "HMAC-SHA256 ಪ್ರಾಧಿಕಾರ",
+    "latestHash": "ಇತ್ತೀಚಿನ ಹ್ಯಾಶ್",
+    "viewTelemetry": "ಟೆಲಿಮೆಟ್ರಿ ವೀಕ್ಷಿಸಿ",
+    "removeUser": "ಬಳಕೆದಾರರನ್ನು ತೆಗೆದುಹಾಕಿ"
   },
   "dashboard": {
     "title": "ಕೃಷಿ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
@@ -718,7 +795,14 @@
     "financialAdvisory": "ಹಣಕಾಸು ಸಲಹೆ",
     "whyRecommendation": "ಈ ಶಿಫಾರಸು ಏಕೆ?",
     "highProfitAdvice": "{{crop}} ಗೆ ಹೆಚ್ಚಿನ ಲಾಭದಾಯಕತೆ ಕಂಡುಬಂದಿದೆ. ₹{{price}}/ಕೆಜಿಗಿಂತ ಹೆಚ್ಚಿನ ಬೆಲೆಯನ್ನು ಪಡೆಯಲು ಮುಂಗಡ ಒಪ್ಪಂದವನ್ನು ಪರಿಗಣಿಸಿ.",
-    "tightMarginAdvice": "ಲಾಭದ ಪ್ರಮಾಣ ಕಡಿಮೆ ಇದೆ. ಯೂರಿಯಾ ಬಳಕೆಯನ್ನು 15% ರಷ್ಟು ಕಡಿಮೆ ಮಾಡಲು ಮತ್ತು ಸರ್ಕಾರಿ ಕೆಸಿಸಿ ಸಾಲಗಳನ್ನು ಬಳಸಿಕೊಳ್ಳಲು ಗಮನಹರಿಸಿ."
+    "tightMarginAdvice": "ಲಾಭದ ಪ್ರಮಾಣ ಕಡಿಮೆ ಇದೆ. ಯೂರಿಯಾ ಬಳಕೆಯನ್ನು 15% ರಷ್ಟು ಕಡಿಮೆ ಮಾಡಲು ಮತ್ತು ಸರ್ಕಾರಿ ಕೆಸಿಸಿ ಸಾಲಗಳನ್ನು ಬಳಸಿಕೊಳ್ಳಲು ಗಮನಹರಿಸಿ.",
+    "farmLocationMap": "ಫಾರ್ಮ್ ಸ್ಥಳ ನಕ್ಷೆ",
+    "soilHealthChange": "+5 ಅಂಕಗಳು",
+    "optimal96": "ಅತ್ಯುತ್ತಮ (96%)",
+    "ndviActive": "NDVI ಸಕ್ರಿಯ",
+    "waterSaved": "ಉಳಿಸಿದ ನೀರು",
+    "advisoryReady": "ಸಲಹೆ ಸಿದ್ಧವಾಗಿದೆ",
+    "clickDeepAnalysis": "ಆಳವಾದ ವಿಶ್ಲೇಷಣೆ ಒಳನೋಟಗಳಿಗಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ"
   },
   "yield": {
     "title": "AI ಬೆಳೆ ಇಳುವರಿ ಮುನ್ಸೂಚನೆ",
@@ -801,7 +885,13 @@
     "droughtRisk": "ಬರಗಾಲದ ಅಪಾಯ",
     "floodRisk": "ಪ್ರವಾಹದ ಅಪಾಯ",
     "rainfallForecastTitle": "ಮಳೆ ಮುನ್ಸೂಚನೆ vs ಐತಿಹಾಸಿಕ ದಾಖಲೆ",
-    "tempRangeTitle": "ತಾಪಮಾನ ಶ್ರೇಣಿ ಮುನ್ಸೂಚನೆ"
+    "tempRangeTitle": "ತಾಪಮಾನ ಶ್ರೇಣಿ ಮುನ್ಸೂಚನೆ",
+    "climateIntelligenceBadge": "ಹವಾಮಾನ ಬುದ್ಧಿಮತ್ತೆ",
+    "historicalAvg": "ಐತಿಹಾಸಿಕ ಸರಾಸರಿ",
+    "aiForecast": "AI ಮುನ್ಸೂಚನೆ",
+    "actual": "ನಿಜವಾದ ಅಳತೆ",
+    "minTemp": "ಕನಿಷ್ಠ ತಾಪಮಾನ",
+    "maxTemp": "ಗರಿಷ್ಠ ತಾಪಮಾನ"
   },
   "simulator": {
     "title": "ಹವಾಮಾನ ಸನ್ನಿವೇಶ ಸಿಮ್ಯುಲೇಟರ್",
@@ -871,7 +961,17 @@
     "diversity": "ಬೆಳೆ ವೈವಿಧ್ಯತೆ",
     "soilHealth": "ಮಣ್ಣಿನ ಆರೋಗ್ಯ ಸೂಚ್ಯಂಕ",
     "radarTitle": "ಸುಸ್ಥಿರತೆಯ ರಾಡಾರ್",
-    "scoreTrendTitle": "ಸ್ಕೋರ್ ಪ್ರವೃತ್ತಿ (6 ತಿಂಗಳು)"
+    "scoreTrendTitle": "ಸ್ಕೋರ್ ಪ್ರವೃತ್ತಿ (6 ತಿಂಗಳು)",
+    "premiumFarmScore": "ಪ್ರೀಮಿಯಂ ಫಾರ್ಮ್ ಸ್ಕೋರ್",
+    "ourAnalysis": "ನಮ್ಮ ವಿಶ್ಲೇಷಣೆ",
+    "scoreExcellent": "ಉತ್ಕೃಷ್ಟ 🌟",
+    "scoreGood": "ಉತ್ತಮ 👍",
+    "scoreNeedsImprovement": "ಸುಧಾರಣೆ ಅಗತ್ಯವಿದೆ ⚠️",
+    "performanceSummary": "ನಿಮ್ಮ ಜಮೀನು ನಿಮ್ಮ ಪ್ರದೇಶದ 72% ಜಮೀನುಗಳಿಗಿಂತ ಉತ್ತಮವಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿದೆ",
+    "co2Saved": "ಉಳಿಸಲಾದ CO₂",
+    "chemReduced": "ಕಡಿಮೆಗೊಳಿಸಿದ ರಾಸಾಯನಿಕ",
+    "biodiversity": "ಜೀವವೈವಿಧ್ಯ",
+    "fullReport": "ಸಂಪೂರ್ಣ ವರದಿ"
   },
   "header": {
     "workspaceDashboard": "ಕಾರ್ಯಕ್ಷೇತ್ರದ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
@@ -883,7 +983,13 @@
     "endSession": "ಸೆಷನ್ ಮುಕ್ತಾಯ",
     "aiReport": "AI ವರದಿ",
     "lightMode": "ಲೈಟ್ ಮೋಡ್",
-    "darkMode": "ಡಾರ್ಕ್ ಮೋಡ್"
+    "darkMode": "ಡಾರ್ಕ್ ಮೋಡ್",
+    "generateReportTooltip": "ಸ್ಮಾರ್ಟ್ ಫಾರ್ಮ್ ವರದಿಯನ್ನು ರಚಿಸಿ",
+    "openMenu": "ಮೊಬೈಲ್ ಮೆನು ತೆರೆಯಿರಿ",
+    "selectLanguage": "ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ",
+    "toggleTheme": "ಥೀಮ್ ಬದಲಾಯಿಸಿ",
+    "accountSettings": "ಬಳಕೆದಾರರ ಪ್ರೊಫೈಲ್ ಮತ್ತು ಖಾತೆ ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "changeLanguage": "ಭಾಷೆಯನ್ನು ಬದಲಾಯಿಸಿ"
   },
   "cropHealthMonitor": {
     "title": "ಉಪಗ್ರಹ ಬೆಳೆ ಆರೋಗ್ಯ",
@@ -990,7 +1096,9 @@
     "simulatedBaseline": "ಅನುಕರಿಸಿದ ಮೂಲರೇಖೆ",
     "deficit": "ಕೊರತೆ",
     "target": "ಗುರಿ",
-    "sat": "ಸಂತೃಪ್ತ"
+    "sat": "ಸಂತೃಪ್ತ",
+    "refreshTelemetry": "ಟೆಲಿಮೆಟ್ರಿಯನ್ನು ನವೀಕರಿಸಿ",
+    "refreshTimeline": "ಟೈಮ್‌ಲೈನ್ ನವೀಕರಿಸಿ"
   },
   "environmental": {
     "title": "ಪರಿಸರ ಇಂಟೆಲಿಜೆನ್ಸ್ ಹಬ್",
@@ -1330,5 +1438,12 @@
     "notAvailable": "ಲಭ್ಯವಿಲ್ಲ",
     "ownerDetails": "ಮಾಲೀಕರ ವಿವರಗಳು",
     "rent": "ಬಾಡಿಗೆ"
+  },
+  "errors": {
+    "somethingWentWrong": "ಏನೋ ತಪ್ಪಾಗಿದೆ",
+    "unexpectedErrorDesc": "AgriFlux ನಲ್ಲಿ ಅನಿರೀಕ್ಷಿತ ದೋಷ ಸಂಭವಿಸಿದೆ. ನಿಮ್ಮ ಕೃಷಿ ಡೇಟಾ ಸುರಕ್ಷಿತವಾಗಿದೆ — ದಯವಿಟ್ಟು ಪುಟವನ್ನು ರಿಫ್ರೆಶ್ ಮಾಡಿ ಅಥವಾ ಮುಖಪುಟಕ್ಕೆ ಹೋಗಿ.",
+    "tryAgain": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "goToDashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹೋಗಿ",
+    "platformTagline": "AgriFlux AI · ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಬುದ್ಧಿಮತ್ತೆ ವೇದಿಕೆ"
   }
 }

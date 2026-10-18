@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import MobileBottomNav from './MobileBottomNav';
@@ -10,6 +11,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isFromCitizenOne, setIsFromCitizenOne] = useState(false);
   const location = useLocation();
@@ -36,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg z-[200] font-bold text-xs"
       >
-        Skip to main content
+        {t('common.skipToContent', 'Skip to main content')}
       </a>
 
       {/* Accessible Live Region Announcer */}
@@ -53,7 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-gradient-to-r from-teal-500 to-primary-600 text-white px-5 py-2.5 rounded-full shadow-2xl hover:scale-105 hover:shadow-primary-500/50 transition-all font-black text-sm uppercase tracking-widest border border-white/20 backdrop-blur-md"
         >
           <ArrowLeft size={16} />
-          Back to CitizenOne
+          {t('common.backToCitizenOne', 'Back to CitizenOne')}
         </a>
       )}
 

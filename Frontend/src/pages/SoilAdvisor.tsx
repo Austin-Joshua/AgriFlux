@@ -841,11 +841,11 @@ const SoilAdvisor: React.FC = () => {
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-gray-500">Chlorophyll Index</span>
+                        <span className="text-gray-500">{t('soilAdvisor.chlorophyllIndex', 'Chlorophyll Index')}</span>
                         <span className="font-bold text-gray-300">--</span>
                       </div>
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-gray-500">Disease Probability</span>
+                        <span className="text-gray-500">{t('soilAdvisor.diseaseProbability', 'Disease Probability')}</span>
                         <span className="font-bold text-gray-300">--</span>
                       </div>
                     </div>

@@ -79,6 +79,7 @@ const StatCard: React.FC<{
   accentColor: string;
 }> = ({ title, value, change, positive = true, icon, color, bgColor, route, accentColor }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -106,7 +107,7 @@ const StatCard: React.FC<{
             {change}
           </span>
           <span className="text-[10px] text-gray-400 group-hover:text-primary-500 flex items-center gap-0.5 transition-colors duration-200">
-            View details{' '}
+            {t('common.viewDetails', 'View details')}{' '}
             <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
@@ -223,7 +224,7 @@ const Dashboard: React.FC = () => {
         <StatCard
           title={t('dashboard.soilHealth', 'Soil Health')}
           value={`${soilScore}/100`}
-          change="+5 pts"
+          change={t('dashboard.soilHealthChange', '+5 pts')}
           icon={<Leaf size={22} className="text-earth-600" />}
           color="text-earth-600 dark:text-earth-400"
           bgColor="bg-earth-100 dark:bg-earth-900/30"
@@ -232,8 +233,8 @@ const Dashboard: React.FC = () => {
         />
         <StatCard
           title={t('dashboard.cropHealth', 'Crop Health')}
-          value="Optimal (96%)"
-          change="NDVI Active"
+          value={t('dashboard.optimal96', 'Optimal (96%)')}
+          change={t('dashboard.ndviActive', 'NDVI Active')}
           icon={<Satellite size={22} className="text-primary-600" />}
           color="text-primary-600 dark:text-primary-400"
           bgColor="bg-primary-100 dark:bg-primary-900/30"
@@ -243,7 +244,7 @@ const Dashboard: React.FC = () => {
         <StatCard
           title={t('dashboard.irrigationStatus', 'Irrigation Status')}
           value={t('dashboard.optimal', 'Optimal')}
-          change="Water Saved"
+          change={t('dashboard.waterSaved', 'Water Saved')}
           icon={<Droplets size={22} className="text-blue-600" />}
           color="text-blue-600 dark:text-blue-400"
           bgColor="bg-blue-100 dark:bg-blue-900/30"
@@ -253,7 +254,7 @@ const Dashboard: React.FC = () => {
         <StatCard
           title={t('dashboard.cropResilience', 'Crop Resilience')}
           value={t('dashboard.resilient', 'Resilient')}
-          change="Advisory Ready"
+          change={t('dashboard.advisoryReady', 'Advisory Ready')}
           icon={<Sprout size={22} className="text-emerald-600" />}
           color="text-emerald-600 dark:text-emerald-400"
           bgColor="bg-emerald-100 dark:bg-emerald-900/30"
@@ -382,7 +383,7 @@ const Dashboard: React.FC = () => {
               </ResponsiveContainer>
             </div>
             <div className="mt-2 text-[10px] text-gray-400 text-center opacity-0 group/chart:opacity-100 transition-opacity font-bold uppercase tracking-widest">
-              Click for Deep Analysis Insights
+              {t('dashboard.clickDeepAnalysis', 'Click for Deep Analysis Insights')}
             </div>
           </div>
         </div>
@@ -525,7 +526,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="relative w-full group/map" style={{ height: '180px' }}>
             <iframe
-              title="Farm Location Map"
+              title={t('dashboard.farmLocationMap', 'Farm Location Map')}
               className="w-full h-full border-0 transition-all duration-200 grayscale group-hover/map:grayscale-0"
               loading="lazy"
               allowFullScreen
@@ -633,7 +634,7 @@ const Dashboard: React.FC = () => {
                   </span>
                   {b.status === 'confirmed' && (
                     <span className="flex items-center gap-1 text-primary-500 font-bold">
-                      <Video size={11} /> Link Sent
+                      <Video size={11} /> {t('common.linkSent', 'Link Sent')}
                     </span>
                   )}
                 </div>

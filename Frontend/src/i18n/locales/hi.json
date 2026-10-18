@@ -43,7 +43,23 @@
     "advisoryTab": "क्षेत्रीय परामर्श",
     "adminBlockchain": "क्रिप्टोग्राफ़िक ऑडिट लेज़र",
     "soilAdvisor": "मृदा बुद्धिमत्ता",
-    "yieldForecasting": "उपज पूर्वानुमान"
+    "yieldForecasting": "उपज पूर्वानुमान",
+    "bottomConsole": "कंसोल",
+    "bottomUsers": "उपयोगकर्ता",
+    "bottomSystem": "सिस्टम",
+    "bottomAudit": "ऑडिट",
+    "bottomActuators": "एक्चुएटर्स",
+    "bottomPortal": "पोर्टल",
+    "bottomYield": "उपज",
+    "bottomClimate": "जलवायु",
+    "bottomSimulator": "सिम्युलेटर",
+    "bottomAdvisory": "परामर्श",
+    "bottomHome": "होम",
+    "bottomSoil": "मृदा",
+    "bottomHealth": "स्वास्थ्य",
+    "bottomMarket": "बाजार",
+    "bottomAiReport": "AI रिपोर्ट",
+    "mobileNav": "मोबाइल नेविगेशन"
   },
   "land": {
     "title": "भूमि इंटेलिजेंस",
@@ -127,7 +143,15 @@
     "noConsultationsYet": "अभी तक किसी परामर्श का अनुरोध नहीं किया गया है।",
     "farmerLabel": "किसान",
     "requestedExpert": "अनुरोधित विशेषज्ञ",
-    "time": "समय"
+    "time": "समय",
+    "thisMonth": "+4 इस महीने",
+    "triageActive": "ट्राइएज सक्रिय",
+    "labCalibrated": "प्रयोगशाला कैलिब्रेटेड",
+    "awaiting": "प्रतीक्षारत",
+    "diagnosticNotesPlaceholder": "नैदानिक निर्देश या क्षेत्र सत्यापन नोट्स...",
+    "endorseDecision": "निर्णय का समर्थन करें",
+    "requestRevision": "संशोधन का अनुरोध करें",
+    "inspectionRequired": "खेत निरीक्षण आवश्यक"
   },
   "admin": {
     "title": "एडमिन कंट्रोल पैनल",
@@ -238,7 +262,22 @@
     "policyEstop": "एक्चुएटर ई-स्टॉप इंटरलॉक सक्रिय",
     "enforced": "लागू किया गया",
     "roleElevation": "भूमिका संवर्धन",
-    "telemetry": "टेलीमेट्री"
+    "telemetry": "टेलीमेट्री",
+    "users": "उपयोगकर्ता",
+    "thisMonth": "इस महीने",
+    "triageQueue": "ट्राइएज कतार",
+    "nominal": "सामान्य",
+    "zeroFaults": "शून्य त्रुटियां",
+    "signingKeySource": "हस्ताक्षर कुंजी स्रोत",
+    "dedicatedKey": "समर्पित कुंजी",
+    "jwtSecret": "JWT सीक्रेट",
+    "devDeterministic": "डेव नियतात्मक",
+    "unconfigured": "अकॉन्फ़िगर",
+    "merkleLedger": "SHA-256 मर्कल लेजर",
+    "hmacAuthority": "HMAC-SHA256 प्राधिकरण",
+    "latestHash": "नवीनतम हैश",
+    "viewTelemetry": "टेलीमेट्री देखें",
+    "removeUser": "उपयोगकर्ता हटाएं"
   },
   "subsidies": {
     "title": "सरकारी सब्सिडी और योजनाएं",
@@ -352,7 +391,9 @@
     "waterTable": "जल स्तर (मी)",
     "germinationRate": "अंकुरण दर (%)",
     "tenYearTrend": "10-वर्षीय बाजार रुझान",
-    "primaryGuidance": "प्राथमिक मार्गदर्शन"
+    "primaryGuidance": "प्राथमिक मार्गदर्शन",
+    "chlorophyllIndex": "क्लोरोफिल सूचकांक",
+    "diseaseProbability": "रोग संभावना"
   },
   "auth": {
     "login": "साइन इन करें",
@@ -411,7 +452,12 @@
     "farmer": "किसान",
     "agronomist": "कृषि विज्ञानी",
     "admin": "व्यवस्थापक",
-    "getStarted": "शुरू करें"
+    "getStarted": "शुरू करें",
+    "verifyingSession": "सत्र सत्यापन जारी है...",
+    "workspaceRestricted": "कार्यक्षेत्र प्रतिबंधित है",
+    "workspaceReserved": "यह कार्यक्षेत्र केवल निम्न खातों के लिए आरक्षित है:",
+    "currentlyLoggedInAs": "। वर्तमान में आप इस रूप में लॉग इन हैं:",
+    "returnWorkspace": "मेरे कार्यक्षेत्र पर वापस जाएं"
   },
   "dashboard": {
     "title": "फार्म डैशबोर्ड",
@@ -466,7 +512,14 @@
     "financialAdvisory": "वित्तीय सलाह",
     "whyRecommendation": "यह अनुशंसा क्यों?",
     "highProfitAdvice": "{{crop}} के लिए उच्च लाभप्रदता देखी गई। ₹{{price}}/किग्रा से ऊपर मूल्य तय करने के लिए अनुबंध पर विचार करें।",
-    "tightMarginAdvice": "मार्जिन कम है। यूरिया के उपयोग में 15% की कमी करने और कार्यशील पूंजी के लिए सरकारी केसीसी ऋण का उपयोग करने पर ध्यान दें।"
+    "tightMarginAdvice": "मार्जिन कम है। यूरिया के उपयोग में 15% की कमी करने और कार्यशील पूंजी के लिए सरकारी केसीसी ऋण का उपयोग करने पर ध्यान दें।",
+    "farmLocationMap": "खेत स्थान मानचित्र",
+    "soilHealthChange": "+5 अंक",
+    "optimal96": "इष्टतम (96%)",
+    "ndviActive": "NDVI सक्रिय",
+    "waterSaved": "जल संरक्षित",
+    "advisoryReady": "परामर्श तैयार",
+    "clickDeepAnalysis": "गहन विश्लेषण अंतर्दृष्टि के लिए क्लिक करें"
   },
   "yield": {
     "title": "AI फसल उपज पूर्वानुमान",
@@ -549,7 +602,13 @@
     "droughtRisk": "सूखे का जोखिम",
     "floodRisk": "बाढ़ का जोखिम",
     "rainfallForecastTitle": "वर्षा पूर्वानुमान बनाम ऐतिहासिक",
-    "tempRangeTitle": "तापमान सीमा पूर्वानुमान"
+    "tempRangeTitle": "तापमान सीमा पूर्वानुमान",
+    "climateIntelligenceBadge": "जलवायु बुद्धिमत्ता",
+    "historicalAvg": "ऐतिहासिक औसत",
+    "aiForecast": "AI पूर्वानुमान",
+    "actual": "वास्तविक",
+    "minTemp": "न्यूनतम तापमान",
+    "maxTemp": "अधिकतम तापमान"
   },
   "simulator": {
     "title": "जलवायु परिदृश्य सिम्युलेटर",
@@ -619,7 +678,17 @@
     "diversity": "फसल विविधता",
     "soilHealth": "मिट्टी स्वास्थ्य सूचकांक",
     "radarTitle": "स्थिरता रडार",
-    "scoreTrendTitle": "स्कोर रुझान (6 महीने)"
+    "scoreTrendTitle": "स्कोर रुझान (6 महीने)",
+    "premiumFarmScore": "प्रीमियम फार्म स्कोर",
+    "ourAnalysis": "हमारा विश्लेषण",
+    "scoreExcellent": "उत्कृष्ट 🌟",
+    "scoreGood": "अच्छा 👍",
+    "scoreNeedsImprovement": "सुधार की आवश्यकता ⚠️",
+    "performanceSummary": "आपका खेत आपके क्षेत्र के 72% खेतों से बेहतर प्रदर्शन कर रहा है",
+    "co2Saved": "CO₂ बचत",
+    "chemReduced": "रसायन कमी",
+    "biodiversity": "जैव विविधता",
+    "fullReport": "पूरी रिपोर्ट"
   },
   "settings": {
     "title": "सेटिंग्स",
@@ -758,7 +827,14 @@
     "wateringMsg": "इष्टतम सिंचाई विंडो: आज रात 10 बजे। आज 12% पानी बचाएं।",
     "liveAlerts": "लाइव इंटेलिजेंस अलर्ट",
     "new": "नया",
-    "viewAllHistory": "सभी सूचना इतिहास देखें"
+    "viewAllHistory": "सभी सूचना इतिहास देखें",
+    "yieldReadyTitle": "उपज का अनुमान तैयार है",
+    "yieldReadyMsg": "आपकी धान की फसल की उपज का पूर्वानुमान उपलब्ध है।",
+    "heatwaveTitle": "लू की चेतावनी 🔥",
+    "heatwaveMsg": "आपके क्षेत्र में गुरुवार को अत्यधिक गर्मी की संभावना है।",
+    "time2m": "2 मिनट पहले",
+    "time15m": "15 मिनट पहले",
+    "time1h": "1 घंटा पहले"
   },
   "common": {
     "loading": "लोड हो रहा है...",
@@ -832,7 +908,31 @@
     "filter": "फ़िल्टर",
     "riskHigh": "उच्च",
     "riskMedium": "मध्यम",
-    "riskLow": "कम"
+    "riskLow": "कम",
+    "viewDetails": "विवरण देखें",
+    "online": "ऑनलाइन",
+    "jan": "जन",
+    "feb": "फ़र",
+    "mar": "मार्च",
+    "apr": "अप्रै",
+    "may": "मई",
+    "jun": "जून",
+    "jul": "जुला",
+    "aug": "अग",
+    "sep": "सित",
+    "oct": "अक्टू",
+    "nov": "नवं",
+    "dec": "दिसं",
+    "mon": "सोम",
+    "tue": "मंगल",
+    "wed": "बुध",
+    "thu": "गुरु",
+    "fri": "शुक्र",
+    "sat": "शनि",
+    "sun": "रवि",
+    "skipToContent": "मुख्य सामग्री पर जाएं",
+    "backToCitizenOne": "CitizenOne पर वापस जाएं",
+    "linkSent": "लिंक भेज दिया गया"
   },
   "ai": {
     "title": "एग्रीफ्लक्स एआई",
@@ -883,7 +983,13 @@
     "endSession": "सक्रिय सत्र समाप्त करें",
     "aiReport": "एआई रिपोर्ट",
     "lightMode": "लाइट मोड",
-    "darkMode": "डार्क मोड"
+    "darkMode": "डार्क मोड",
+    "generateReportTooltip": "स्मार्ट फार्म रिपोर्ट जनरेट करें",
+    "openMenu": "मोबाइल मेनू खोलें",
+    "selectLanguage": "भाषा चयनकर्ता",
+    "toggleTheme": "थीम बदलें",
+    "accountSettings": "उपयोगकर्ता प्रोफ़ाइल और खाता सेटिंग्स",
+    "changeLanguage": "भाषा बदलें"
   },
   "cropHealthMonitor": {
     "title": "उपग्रह फसल स्वास्थ्य",
@@ -990,7 +1096,9 @@
     "simulatedBaseline": "सिम्युलेटेड बेसलाइन",
     "deficit": "घाटा",
     "target": "लक्ष्य",
-    "sat": "संतृप्त"
+    "sat": "संतृप्त",
+    "refreshTelemetry": "इन-सिटू टेलीमेट्री रीफ़्रेश करें",
+    "refreshTimeline": "समयरेखा रीफ़्रेश करें"
   },
   "environmental": {
     "title": "पर्यावरणीय इंटेलिजेंस हब",
@@ -1330,5 +1438,12 @@
     "notAvailable": "उपलब्ध नहीं",
     "ownerDetails": "मालिक का विवरण",
     "rent": "किराया"
+  },
+  "errors": {
+    "somethingWentWrong": "कुछ गलत हो गया",
+    "unexpectedErrorDesc": "AgriFlux में अनपेक्षित त्रुटि हुई। आपका कृषि डेटा सुरक्षित है — कृपया पृष्ठ रीफ्रेश करें या होम पर जाएं।",
+    "tryAgain": "पुनः प्रयास करें",
+    "goToDashboard": "डैशबोर्ड पर जाएं",
+    "platformTagline": "AgriFlux AI · स्मार्ट कृषि खुफिया प्लेटफॉर्म"
   }
 }

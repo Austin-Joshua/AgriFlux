@@ -476,7 +476,7 @@ const AIDecisionPanel: React.FC = () => {
             <button
               onClick={() => fetchRecommendation(selectedField, selectedField.defaultMoisture, true)}
               disabled={loading}
-              title="Refresh In-Situ Telemetry"
+              title={t('decisionEngine.refreshTelemetry', 'Refresh In-Situ Telemetry')}
               className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex-shrink-0 active:scale-95"
             >
               <RotateCw size={14} className={loading ? 'animate-spin text-emerald-600' : ''} />
@@ -944,7 +944,7 @@ const AIDecisionPanel: React.FC = () => {
               onClick={() => fetchTimeline(selectedField.id)}
               disabled={loadingTimeline}
               className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 transition-colors"
-              title="Refresh timeline"
+              title={t('decisionEngine.refreshTimeline', 'Refresh timeline')}
             >
               <RotateCw size={14} className={loadingTimeline ? 'animate-spin' : ''} />
             </button>

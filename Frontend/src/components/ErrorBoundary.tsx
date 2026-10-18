@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import i18n from '../i18n';
 
 interface State {
   hasError: boolean;
@@ -37,11 +38,13 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
           {/* Heading */}
           <div>
             <h1 className="text-2xl font-black text-gray-900 dark:text-white font-display">
-              Something went wrong
+              {i18n.t('errors.somethingWentWrong', 'Something went wrong')}
             </h1>
             <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">
-              AgriFlux encountered an unexpected error. Your farm data is safe — please refresh the
-              page or return home.
+              {i18n.t(
+                'errors.unexpectedErrorDesc',
+                'AgriFlux encountered an unexpected error. Your farm data is safe — please refresh the page or return home.'
+              )}
             </p>
           </div>
 
@@ -61,7 +64,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
               className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold shadow-lg hover:scale-105 active:scale-95 transition-all"
             >
               <RefreshCw size={16} />
-              Try Again
+              {i18n.t('errors.tryAgain', 'Try Again')}
             </button>
             <button
               onClick={() => {
@@ -70,13 +73,16 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
               className="flex items-center justify-center gap-2 px-5 py-2.5 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-primary-500 hover:text-primary-600 rounded-xl font-semibold transition-all"
             >
               <Home size={16} />
-              Go to Dashboard
+              {i18n.t('errors.goToDashboard', 'Go to Dashboard')}
             </button>
           </div>
 
           {/* Brand */}
           <p className="text-xs text-gray-400 dark:text-gray-600">
-            AgriFlux AI · Smart Agricultural Intelligence Platform
+            {i18n.t(
+              'errors.platformTagline',
+              'AgriFlux AI · Smart Agricultural Intelligence Platform'
+            )}
           </p>
         </div>
       </div>

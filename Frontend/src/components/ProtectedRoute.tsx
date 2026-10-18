@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 
 /**
@@ -14,6 +15,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
@@ -23,7 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm font-bold text-primary-600 animate-pulse uppercase tracking-widest">
-            Verifying Session...
+            {t('auth.verifyingSession', 'Verifying Session...')}
           </p>
         </div>
       </div>
@@ -40,9 +42,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     const target =
       user.role === 'admin' ? '/admin' : user.role === 'agronomist' ? '/agronomist' : '/dashboard';
     const roleLabels: Record<string, string> = {
-      farmer: 'Farmer',
-      agronomist: 'Agronomist',
-      admin: 'Administrator',
+      farmer: t('auth.roleFarmer', 'Farmer'),
+      agronomist: t('auth.roleAgronomist', 'Agronomist'),
+      admin: t('auth.roleAdmin', 'Systems Administrator'),
     };
 
     return (
@@ -52,14 +54,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
             🛡️
           </div>
           <h2 className="text-xl font-black text-slate-900 dark:text-white font-display">
-            Workspace Restricted
+            {t('auth.workspaceRestricted', 'Workspace Restricted')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-dark-300 mt-2 leading-relaxed">
-            This workspace is reserved for{' '}
+            {t('auth.workspaceReserved', 'This workspace is reserved for')}{' '}
             <span className="font-bold text-slate-800 dark:text-dark-100">
               {allowedRoles.map((r) => roleLabels[r] || r).join(' / ')}
             </span>{' '}
-            accounts. You are currently logged in as a{' '}
+            {t('auth.currentlyLoggedInAs', 'accounts. You are currently logged in as a')}{' '}
             <span className="font-bold text-emerald-600 dark:text-emerald-400 capitalize">
               {roleLabels[user.role] || user.role}
             </span>
@@ -70,7 +72,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
               to={target}
               className="w-full btn-primary py-3 text-xs uppercase tracking-wider font-bold shadow-md text-center"
             >
-              Return to My Workspace
+              {t('auth.returnWorkspace', 'Return to My Workspace')}
             </Link>
           </div>
         </div>

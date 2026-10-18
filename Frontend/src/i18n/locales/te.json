@@ -43,7 +43,23 @@
     "advisoryTab": "ప్రాంతీయ సలహాలు",
     "adminBlockchain": "క్రిప్టోగ్రాఫిక్ ఆడిట్ లెడ్జర్",
     "soilAdvisor": "నేల ఇంటెలిజెన్స్",
-    "yieldForecasting": "దిగుబడి అంచనా"
+    "yieldForecasting": "దిగుబడి అంచనా",
+    "bottomConsole": "కన్సోల్",
+    "bottomUsers": "వినియోగదారులు",
+    "bottomSystem": "సిస్టమ్",
+    "bottomAudit": "ఆడిట్",
+    "bottomActuators": "యాక్చుయేటర్లు",
+    "bottomPortal": "పోర్టల్",
+    "bottomYield": "దిగుబడి",
+    "bottomClimate": "వాతావరణం",
+    "bottomSimulator": "సిమ్యులేటర్",
+    "bottomAdvisory": "సలహా",
+    "bottomHome": "హోమ్",
+    "bottomSoil": "నేల",
+    "bottomHealth": "ఆరోగ్యం",
+    "bottomMarket": "మార్కెట్",
+    "bottomAiReport": "AI నివేదిక",
+    "mobileNav": "మొబైల్ నావిగేషన్"
   },
   "auth": {
     "login": "సైన్ ఇన్",
@@ -102,7 +118,12 @@
     "farmer": "రైతు",
     "agronomist": "వ్యవసాయ శాస్త్రవేత్త",
     "admin": "నిర్వాహకుడు",
-    "getStarted": "ప్రారంభించండి"
+    "getStarted": "ప్రారంభించండి",
+    "verifyingSession": "సెషన్ ధృవీకరిస్తోంది...",
+    "workspaceRestricted": "వర్క్‌స్పేస్ పరిమితం చేయబడింది",
+    "workspaceReserved": "ఈ వర్క్‌స్పేస్ ఈ క్రింది ఖాతాలకు మాత్రమే కేటాయించబడింది:",
+    "currentlyLoggedInAs": "ఖాతాలు. మీరు ప్రస్తుతం లాగిన్ అయిన రూపం:",
+    "returnWorkspace": "నా వర్క్‌స్పేస్‌కి తిరిగి వెళ్లండి"
   },
   "common": {
     "loading": "లోడ్ అవుతోంది...",
@@ -176,7 +197,31 @@
     "filter": "ఫిల్టర్",
     "riskHigh": "అధికం",
     "riskMedium": "మధ్యస్థం",
-    "riskLow": "తక్కువ"
+    "riskLow": "తక్కువ",
+    "viewDetails": "వివరాలను చూడండి",
+    "online": "ఆన్‌లైన్",
+    "jan": "జన",
+    "feb": "ఫిబ్ర",
+    "mar": "మార్చి",
+    "apr": "ఏప్రి",
+    "may": "మే",
+    "jun": "జూన్",
+    "jul": "జూలై",
+    "aug": "ఆగ",
+    "sep": "సెప్టెం",
+    "oct": "అక్టో",
+    "nov": "నవం",
+    "dec": "డిసెం",
+    "mon": "సోమ",
+    "tue": "మంగళ",
+    "wed": "బుధ",
+    "thu": "గురు",
+    "fri": "శుక్ర",
+    "sat": "శని",
+    "sun": "ఆది",
+    "skipToContent": "ప్రధాన కంటెంట్‌కి వెళ్లండి",
+    "backToCitizenOne": "CitizenOne కి తిరిగి వెళ్ళండి",
+    "linkSent": "లింక్ పంపబడింది"
   },
   "settings": {
     "title": "సెట్టింగ్‌లు",
@@ -315,7 +360,14 @@
     "wateringMsg": "సరైన నీటిపారుదల సమయం: ఈ రాత్రి 10 గంటలకు. ఈరోజు 12% నీటిని ఆదా చేయండి.",
     "liveAlerts": "ప్రత్యక్ష ఇంటెలిజెన్స్ హెచ్చరికలు",
     "new": "కొత్తది",
-    "viewAllHistory": "మొత్తం నోటిఫికేషన్ చరిత్రను చూడండి"
+    "viewAllHistory": "మొత్తం నోటిఫికేషన్ చరిత్రను చూడండి",
+    "yieldReadyTitle": "దిగుబడి అంచనా సిద్ధంగా ఉంది",
+    "yieldReadyMsg": "మీ వరి పంట దిగుబడి అంచనా అందుబాటులో ఉంది.",
+    "heatwaveTitle": "తీవ్ర వడగాల్పుల హెచ్చరిక 🔥",
+    "heatwaveMsg": "మీ ప్రాంతంలో గురువారం తీవ్రమైన ఎండలు ఉండే అవకాశం ఉంది.",
+    "time2m": "2 నిమిషాల క్రితం",
+    "time15m": "15 నిమిషాల క్రితం",
+    "time1h": "1 గంట క్రితం"
   },
   "ai": {
     "title": "అగ్రిఫ్లక్స్ AI",
@@ -498,7 +550,9 @@
     "waterTable": "భూగర్భ జలమట్టం (మీ)",
     "germinationRate": "మొలక శాతం (%)",
     "tenYearTrend": "10 ఏళ్ల మార్కెట్ ట్రెండ్",
-    "primaryGuidance": "ప్రాథమిక మార్గదర్శకత్వం"
+    "primaryGuidance": "ప్రాథమిక మార్గదర్శకత్వం",
+    "chlorophyllIndex": "క్లోరోఫిల్ సూచిక",
+    "diseaseProbability": "వ్యాధి సంభావ్యత"
   },
   "agronomist": {
     "title": "వ్యవసాయ నిపుణుల డాష్‌బోర్డ్",
@@ -552,7 +606,15 @@
     "noConsultationsYet": "ఇప్పటివరకు సంప్రదింపులు కోరబడలేదు.",
     "farmerLabel": "రైతు",
     "requestedExpert": "కోరిన నిపుణుడు",
-    "time": "సమయం"
+    "time": "సమయం",
+    "thisMonth": "+4 ఈ నెలలో",
+    "triageActive": "ట్రయాజ్ సక్రియంగా ఉంది",
+    "labCalibrated": "ల్యాబ్ క్యాలిబ్రేట్ చేయబడింది",
+    "awaiting": "వేచి ఉంది",
+    "diagnosticNotesPlaceholder": "రోగనిర్ధారణ ఆదేశం లేదా ఫీల్డ్ ధృవీకరణ గమనికలు...",
+    "endorseDecision": "నిర్ణయాన్ని ఆమోదించండి",
+    "requestRevision": "సవరణను అభ్యర్థించండి",
+    "inspectionRequired": "క్షేత్ర పరిశీలన అవసరం"
   },
   "admin": {
     "title": "అడ్మిన్ కంట్రోల్ ప్యానెల్",
@@ -663,7 +725,22 @@
     "policyEstop": "యాక్యుయేటర్ E-STOP ఇంటర్‌లాక్ సిద్ధంగా ఉంది",
     "enforced": "అమలు చేయబడింది",
     "roleElevation": "పాత్ర హోదా పెంపు",
-    "telemetry": "టెలిమెట్రీ"
+    "telemetry": "టెలిమెట్రీ",
+    "users": "వినియోగదారులు",
+    "thisMonth": "ఈ నెలలో",
+    "triageQueue": "ట్రయాజ్ క్యూ",
+    "nominal": "సాధారణం",
+    "zeroFaults": "సున్నా లోపాలు",
+    "signingKeySource": "సంతకం కీ మూలం",
+    "dedicatedKey": "ప్రత్యేక కీ",
+    "jwtSecret": "JWT రహస్యం",
+    "devDeterministic": "డెవ్ డిటర్మినిస్టిక్",
+    "unconfigured": "కాన్ఫిగర్ చేయబడలేదు",
+    "merkleLedger": "SHA-256 మెర్కిల్ లెడ్జర్",
+    "hmacAuthority": "HMAC-SHA256 అథారిటీ",
+    "latestHash": "తాజా హాష్",
+    "viewTelemetry": "టెలిమెట్రీని చూడండి",
+    "removeUser": "వినియోగదారుని తొలగించండి"
   },
   "dashboard": {
     "title": "వ్యవసాయ డాష్‌బోర్డ్",
@@ -718,7 +795,14 @@
     "financialAdvisory": "ఆర్థిక సలహా",
     "whyRecommendation": "ఈ సిఫార్సు ఎందుకు?",
     "highProfitAdvice": "{{crop}} కోసం అధిక లాభదాయకత గుర్తించబడింది. ₹{{price}}/కిలో కంటే ఎక్కువ ధరకు లాక్ చేయడానికి ముందస్తు ఒప్పందం చేసుకోండి.",
-    "tightMarginAdvice": "మార్జిన్లు తక్కువగా ఉన్నాయి. యూరియా వాడకాన్ని 15% తగ్గించడం మరియు ప్రభుత్వ KCC రుణాలను ఉపయోగించడంపై దృష్టి పెట్టండి."
+    "tightMarginAdvice": "మార్జిన్లు తక్కువగా ఉన్నాయి. యూరియా వాడకాన్ని 15% తగ్గించడం మరియు ప్రభుత్వ KCC రుణాలను ఉపయోగించడంపై దృష్టి పెట్టండి.",
+    "farmLocationMap": "వ్యవసాయ క్షేత్ర స్థాన పటం",
+    "soilHealthChange": "+5 పాయింట్లు",
+    "optimal96": "ఆదర్శవంతమైనది (96%)",
+    "ndviActive": "NDVI సక్రియంగా ఉంది",
+    "waterSaved": "నీరు ఆదా చేయబడింది",
+    "advisoryReady": "సలహా సిద్ధంగా ఉంది",
+    "clickDeepAnalysis": "లోతైన విశ్లేషణ అంతర్దృష్టుల కోసం క్లిక్ చేయండి"
   },
   "yield": {
     "title": "AI పంట దిగుబడి అంచనా",
@@ -801,7 +885,13 @@
     "droughtRisk": "కరువు ప్రమాదం",
     "floodRisk": "వరద ప్రమాదం",
     "rainfallForecastTitle": "వర్షపాతం అంచనా vs చారిత్రక రికార్డు",
-    "tempRangeTitle": "ఉష్ణోగ్రత శ్రేణి అంచనా"
+    "tempRangeTitle": "ఉష్ణోగ్రత శ్రేణి అంచనా",
+    "climateIntelligenceBadge": "వాతావరణ మేధస్సు",
+    "historicalAvg": "చారిత్రక సగటు",
+    "aiForecast": "AI సూచన",
+    "actual": "వాస్తవ కొలత",
+    "minTemp": "కనిష్ట ఉష్ణోగ్రత",
+    "maxTemp": "గరిష్ట ఉష్ణోగ్రత"
   },
   "simulator": {
     "title": "వాతావరణ పరిస్థితుల సిమ్యులేటర్",
@@ -871,7 +961,17 @@
     "diversity": "పంట వైవిధ్యం",
     "soilHealth": "నేల ఆరోగ్య సూచిక",
     "radarTitle": "సుస్థిరత రాడార్",
-    "scoreTrendTitle": "స్కోరు ట్రెండ్ (6 నెలలు)"
+    "scoreTrendTitle": "స్కోరు ట్రెండ్ (6 నెలలు)",
+    "premiumFarmScore": "ప్రీమియం వ్యవసాయ స్కోరు",
+    "ourAnalysis": "మా విశ్లేషణ",
+    "scoreExcellent": "అద్భుతం 🌟",
+    "scoreGood": "మంచిది 👍",
+    "scoreNeedsImprovement": "మెరుగుదల అవసరం ⚠️",
+    "performanceSummary": "మీ పొలం మీ ప్రాంతంలోని 72% పొలాల కంటే మెరుగైన పనితీరును ప్రదర్శిస్తోంది",
+    "co2Saved": "ఆదా చేయబడిన CO₂",
+    "chemReduced": "తగ్గించబడిన రసాయనాలు",
+    "biodiversity": "జీవవైవిధ్యం",
+    "fullReport": "పూర్తి నివేదిక"
   },
   "header": {
     "workspaceDashboard": "వర్క్‌స్పేస్ డాష్‌బోర్డ్",
@@ -883,7 +983,13 @@
     "endSession": "సెషన్ ముగించు",
     "aiReport": "AI నివేదిక",
     "lightMode": "లైట్ మోడ్",
-    "darkMode": "డార్క్ మోడ్"
+    "darkMode": "డార్క్ మోడ్",
+    "generateReportTooltip": "స్మార్ట్ ఫార్మ్ నివేదికను రూపొందించండి",
+    "openMenu": "మొబైల్ మెనుని తెరవండి",
+    "selectLanguage": "భాష ఎంపిక",
+    "toggleTheme": "థీమ్ మార్చండి",
+    "accountSettings": "వినియోగదారు ప్రొఫైల్ మరియు ఖాతా సెట్టింగ్‌లు",
+    "changeLanguage": "భాషను మార్చండి"
   },
   "cropHealthMonitor": {
     "title": "ఉపగ్రహ పంట ఆరోగ్యం",
@@ -990,7 +1096,9 @@
     "simulatedBaseline": "అనుకరణ బేస్‌లైన్",
     "deficit": "లోటు",
     "target": "లక్ష్యం",
-    "sat": "సంతృప్తం"
+    "sat": "సంతృప్తం",
+    "refreshTelemetry": "ఇన్-సిటు టెలిమెట్రీని రీఫ్రెష్ చేయండి",
+    "refreshTimeline": "టైమ్‌లైన్‌ను రీఫ్రెష్ చేయండి"
   },
   "environmental": {
     "title": "పర్యావరణ ఇంటెలిజెన్స్ హబ్",
@@ -1330,5 +1438,12 @@
     "notAvailable": "అందుబాటులో లేదు",
     "ownerDetails": "యజమాని వివరాలు",
     "rent": "అద్దె"
+  },
+  "errors": {
+    "somethingWentWrong": "ఏదో తప్పు జరిగింది",
+    "unexpectedErrorDesc": "AgriFlux లో ఊహించని లోపం ఎదురైంది. మీ వ్యవసాయ డేటా సురక్షితంగా ఉంది — దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా హోమ్‌కి వెళ్లండి.",
+    "tryAgain": "మళ్ళీ ప్రయత్నించండి",
+    "goToDashboard": "డాష్‌బోర్డ్‌కి వెళ్లండి",
+    "platformTagline": "AgriFlux AI · స్మార్ట్ వ్యవసాయ ఇంటెలిజెన్స్ ప్లాట్‌ఫారమ్"
   }
 }

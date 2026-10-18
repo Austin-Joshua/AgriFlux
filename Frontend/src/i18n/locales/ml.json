@@ -43,7 +43,23 @@
     "advisoryTab": "മേഖലാ ഉപദേശങ്ങൾ",
     "adminBlockchain": "ക്രിപ്റ്റോഗ്രാഫിക് ഓഡിറ്റ് ലെഡ്ജർ",
     "soilAdvisor": "മണ്ണ് ഇന്റലിജൻസ്",
-    "yieldForecasting": "വിളവ് പ്രവചനം"
+    "yieldForecasting": "വിളവ് പ്രവചനം",
+    "bottomConsole": "കൺസോൾ",
+    "bottomUsers": "ഉപയോക്താക്കൾ",
+    "bottomSystem": "സിസ്റ്റം",
+    "bottomAudit": "ഓഡിറ്റ്",
+    "bottomActuators": "ആക്ച്വേറ്ററുകൾ",
+    "bottomPortal": "പോർട്ടൽ",
+    "bottomYield": "വിളവ്",
+    "bottomClimate": "കാലാവസ്ഥ",
+    "bottomSimulator": "സിമുലേറ്റർ",
+    "bottomAdvisory": "ഉപദേശം",
+    "bottomHome": "ഹോം",
+    "bottomSoil": "മണ്ണ്",
+    "bottomHealth": "ആരോഗ്യം",
+    "bottomMarket": "വിപണി",
+    "bottomAiReport": "AI റിപ്പോർട്ട്",
+    "mobileNav": "മൊബൈൽ നാവിഗേഷൻ"
   },
   "auth": {
     "login": "സൈൻ ഇൻ",
@@ -102,7 +118,12 @@
     "farmer": "കർഷകൻ",
     "agronomist": "കാർഷിക ശാസ്ത്രജ്ഞൻ",
     "admin": "അഡ്മിൻ",
-    "getStarted": "ആരംഭിക്കുക"
+    "getStarted": "ആരംഭിക്കുക",
+    "verifyingSession": "സെഷൻ പരിശോധിക്കുന്നു...",
+    "workspaceRestricted": "വർക്ക്‌സ്‌പേസ് നിയന്ത്രിച്ചിരിക്കുന്നു",
+    "workspaceReserved": "ഈ വർക്ക്‌സ്‌പേസ് ഇനിപ്പറയുന്ന അക്കൗണ്ടുകൾക്കായി നീക്കിവച്ചിരിക്കുന്നു:",
+    "currentlyLoggedInAs": "അക്കൗണ്ടുകൾ. നിങ്ങൾ ഇപ്പോൾ ലോഗിൻ ചെയ്തിരിക്കുന്നത്:",
+    "returnWorkspace": "എന്റെ വർക്ക്‌സ്‌പേസിലേക്ക് മടങ്ങുക"
   },
   "common": {
     "loading": "ലഭ്യമാക്കുന്നു...",
@@ -176,7 +197,31 @@
     "filter": "ഫിൽട്ടർ",
     "riskHigh": "ഉയർന്നത്",
     "riskMedium": "ഇടത്തരം",
-    "riskLow": "കുറഞ്ഞത്"
+    "riskLow": "കുറഞ്ഞത്",
+    "viewDetails": "വിശദാംശങ്ങൾ കാണുക",
+    "online": "ഓൺലൈൻ",
+    "jan": "ജനു",
+    "feb": "ഫെബ്രു",
+    "mar": "മാർച്ച്",
+    "apr": "ഏപ്രിൽ",
+    "may": "മെയ്",
+    "jun": "ജൂൺ",
+    "jul": "ജൂലൈ",
+    "aug": "ആഗ",
+    "sep": "സെപ്റ്റം",
+    "oct": "ഒക്ടോ",
+    "nov": "നവം",
+    "dec": "ഡിസം",
+    "mon": "തിങ്കൾ",
+    "tue": "ചൊവ്വ",
+    "wed": "ബുധൻ",
+    "thu": "വ്യാഴം",
+    "fri": "വെള്ളി",
+    "sat": "ശനി",
+    "sun": "ഞായർ",
+    "skipToContent": "പ്രധാന ഉള്ളടക്കത്തിലേക്ക് പോകുക",
+    "backToCitizenOne": "CitizenOne ലേക്ക് മടങ്ങുക",
+    "linkSent": "ലിങ്ക് അയച്ചു"
   },
   "settings": {
     "title": "ക്രമീകരണങ്ങൾ",
@@ -315,7 +360,14 @@
     "wateringMsg": "അനുയോജ്യമായ നനയ്ക്കൽ സമയം: ഇന്ന് രാത്രി 10 മണി. ഇന്ന് 12% വെള്ളം ലാഭിക്കുക.",
     "liveAlerts": "തത്സമയ ഇന്റലിജൻസ് അലേർട്ടുകൾ",
     "new": "പുതിയത്",
-    "viewAllHistory": "എല്ലാ അറിയിപ്പ് ചരിത്രവും കാണുക"
+    "viewAllHistory": "എല്ലാ അറിയിപ്പ് ചരിത്രവും കാണുക",
+    "yieldReadyTitle": "വിളവ് പ്രവചനം തയ്യാറാണ്",
+    "yieldReadyMsg": "നിങ്ങളുടെ നെല്ല് വിളവ് പ്രവചനം ലഭ്യമാണ്.",
+    "heatwaveTitle": "ഉഷ്ണതരംഗ മുന്നറിയിപ്പ് 🔥",
+    "heatwaveMsg": "നിങ്ങളുടെ പ്രദേശത്ത് വ്യാഴാഴ്ച കടുത്ത ചൂട് പ്രതീക്ഷിക്കുന്നു.",
+    "time2m": "2 മിനിറ്റ് മുൻപ്",
+    "time15m": "15 മിനിറ്റ് മുൻപ്",
+    "time1h": "1 മണിക്കൂർ മുൻപ്"
   },
   "ai": {
     "title": "അഗ്രിഫ്ലക്സ് AI",
@@ -498,7 +550,9 @@
     "waterTable": "ഭൂഗർഭ ജലനിരപ്പ് (മീ)",
     "germinationRate": "മുളയ്ക്കൽ നിരക്ക് (%)",
     "tenYearTrend": "10 വർഷത്തെ വിപണി പ്രവണത",
-    "primaryGuidance": "പ്രാഥമിക മാർഗ്ഗനിർദ്ദേശം"
+    "primaryGuidance": "പ്രാഥമിക മാർഗ്ഗനിർദ്ദേശം",
+    "chlorophyllIndex": "ക്ലോറോഫിൽ സൂചിക",
+    "diseaseProbability": "രോഗ സാധ്യത"
   },
   "agronomist": {
     "title": "കാർഷിക വിദഗ്ദ്ധ ഡാഷ്‌ബോർഡ്",
@@ -552,7 +606,15 @@
     "noConsultationsYet": "ഇതുവരെ കൺസൾട്ടേഷനുകളൊന്നും അഭ്യർത്ഥിച്ചിട്ടില്ല.",
     "farmerLabel": "കർഷകൻ",
     "requestedExpert": "ആവശ്യപ്പെട്ട വിദഗ്ദ്ധൻ",
-    "time": "സമയം"
+    "time": "സമയം",
+    "thisMonth": "+4 ഈ മാസം",
+    "triageActive": "ട്രയേജ് സജീവം",
+    "labCalibrated": "ലാബ് കാലിബ്രേറ്റ് ചെയ്തത്",
+    "awaiting": "പ്രതീക്ഷിക്കുന്നു",
+    "diagnosticNotesPlaceholder": "രോഗനിർണയ നിർദ്ദേശം അല്ലെങ്കിൽ ഫീൽഡ് പരിശോധനാ കുറിപ്പുകൾ...",
+    "endorseDecision": "തീരുമാനം അംഗീകരിക്കുക",
+    "requestRevision": "പുനരവലോകനം അഭ്യർത്ഥിക്കുക",
+    "inspectionRequired": "ഫീൽഡ് പരിശോധന ആവശ്യമാണ്"
   },
   "admin": {
     "title": "അഡ്മിൻ നിയന്ത്രണ പാനൽ",
@@ -663,7 +725,22 @@
     "policyEstop": "ആക്ച്വേറ്റർ ഇ-സ്റ്റോപ്പ് ഇന്റർലോക്ക് സജ്ജമാണ്",
     "enforced": "നടപ്പിലാക്കി",
     "roleElevation": "റോൾ ഉയർത്തൽ",
-    "telemetry": "ടെലിമെട്രി"
+    "telemetry": "ടെലിമെട്രി",
+    "users": "ഉപയോക്താക്കൾ",
+    "thisMonth": "ഈ മാസം",
+    "triageQueue": "ട്രയേജ് ക്യൂ",
+    "nominal": "സാധാരണ നിലയിൽ",
+    "zeroFaults": "പിഴവുകളില്ല",
+    "signingKeySource": "ഒപ്പ് കീ ഉറവിടം",
+    "dedicatedKey": "പ്രത്യേക കീ",
+    "jwtSecret": "JWT രഹസ്യം",
+    "devDeterministic": "ഡെവ് ഡിറ്റർമിനിസ്റ്റിക്",
+    "unconfigured": "ക്രമീകരിച്ചിട്ടില്ല",
+    "merkleLedger": "SHA-256 മെർക്കിൾ ലെഡ്ജർ",
+    "hmacAuthority": "HMAC-SHA256 അതോറിറ്റി",
+    "latestHash": "ഏറ്റവും പുതിയ ഹാഷ്",
+    "viewTelemetry": "ടെലിമെട്രി കാണുക",
+    "removeUser": "ഉപയോക്താവിനെ നീക്കംചെയ്യുക"
   },
   "dashboard": {
     "title": "ഫാം ഡാഷ്‌ബോർഡ്",
@@ -718,7 +795,14 @@
     "financialAdvisory": "സാമ്പത്തിക ഉപദേശം",
     "whyRecommendation": "എന്തുകൊണ്ട് ഈ ശുപാർശ?",
     "highProfitAdvice": "{{crop}} വിളവിന് ഉയർന്ന ലാഭസാധ്യത കാണുന്നു. കിലോഗ്രാമിന് ₹{{price}}-ന് മുകളിൽ വില ഉറപ്പാക്കാൻ ഫോർവേഡ് കോൺട്രാക്റ്റിംഗ് പരിഗണിക്കുക.",
-    "tightMarginAdvice": "ലാഭവിഹിതം കുറവാണ്. യൂറിയ ഉപയോഗം 15% കുറയ്ക്കുന്നതിലും കെസിസി വായ്പകൾ പ്രയോജനപ്പെടുത്തുന്നതിലും ശ്രദ്ധ കേന്ദ്രീകരിക്കുക."
+    "tightMarginAdvice": "ലാഭവിഹിതം കുറവാണ്. യൂറിയ ഉപയോഗം 15% കുറയ്ക്കുന്നതിലും കെസിസി വായ്പകൾ പ്രയോജനപ്പെടുത്തുന്നതിലും ശ്രദ്ധ കേന്ദ്രീകരിക്കുക.",
+    "farmLocationMap": "ഫാം ലൊക്കേഷൻ മാപ്പ്",
+    "soilHealthChange": "+5 പോയിന്റുകൾ",
+    "optimal96": "ഏറ്റവും അനുയോജ്യമായത് (96%)",
+    "ndviActive": "NDVI സജീവം",
+    "waterSaved": "സംരക്ഷിച്ച വെള്ളം",
+    "advisoryReady": "ഉപദേശം തയ്യാറാണ്",
+    "clickDeepAnalysis": "ആഴത്തിലുള്ള വിശകലന ഉൾക്കാഴ്ചകൾക്കായി ക്ലിക്ക് ചെയ്യുക"
   },
   "yield": {
     "title": "AI വിളവ് പ്രവചനം",
@@ -801,7 +885,13 @@
     "droughtRisk": "വരൾച്ചാ സാധ്യത",
     "floodRisk": "വെള്ളപ്പൊക്ക സാധ്യത",
     "rainfallForecastTitle": "മഴ പ്രവചനവും മുൻകാല രേഖകളും",
-    "tempRangeTitle": "താപനില പരിധി പ്രവചനം"
+    "tempRangeTitle": "താപനില പരിധി പ്രവചനം",
+    "climateIntelligenceBadge": "കാലാവസ്ഥാ ബുദ്ധിശക്തി",
+    "historicalAvg": "ചരിത്രപരമായ ശരാശരി",
+    "aiForecast": "AI പ്രവചനം",
+    "actual": "യഥാർത്ഥ അളവ്",
+    "minTemp": "കുറഞ്ഞ താപനില",
+    "maxTemp": "പരമാവധി താപനില"
   },
   "simulator": {
     "title": "കാലാവസ്ഥാ സിമുലേറ്റർ",
@@ -871,7 +961,17 @@
     "diversity": "വിള വൈവിധ്യം",
     "soilHealth": "മണ്ണ് ആരോഗ്യ സൂചിക",
     "radarTitle": "സുസ്ഥിരതാ റഡാർ",
-    "scoreTrendTitle": "സ്കോർ ട്രെൻഡ് (6 മാസം)"
+    "scoreTrendTitle": "സ്കോർ ട്രെൻഡ് (6 മാസം)",
+    "premiumFarmScore": "പ്രീമിയം ഫാം സ്കോർ",
+    "ourAnalysis": "ഞങ്ങളുടെ വിശകലനം",
+    "scoreExcellent": "മികച്ചത് 🌟",
+    "scoreGood": "നല്ലത് 👍",
+    "scoreNeedsImprovement": "മെച്ചപ്പെടുത്തൽ ആവശ്യമാണ് ⚠️",
+    "performanceSummary": "നിങ്ങളുടെ ഫാം നിങ്ങളുടെ പ്രദേശത്തെ 72% ഫാമുകളേക്കാൾ മികച്ച പ്രകടനം കാഴ്ചവയ്ക്കുന്നു",
+    "co2Saved": "ലാഭിച്ച CO₂",
+    "chemReduced": "കുറച്ച രാസവസ്തുക്കൾ",
+    "biodiversity": "ജൈവവൈവിധ്യം",
+    "fullReport": "മുഴുവൻ റിപ്പോർട്ട്"
   },
   "header": {
     "workspaceDashboard": "വർക്ക്‌സ്‌പേസ് ഡാഷ്‌ബോർഡ്",
@@ -883,7 +983,13 @@
     "endSession": "സെഷൻ അവസാനിപ്പിക്കുക",
     "aiReport": "AI റിപ്പോർട്ട്",
     "lightMode": "ലൈറ്റ് മോഡ്",
-    "darkMode": "ഡാർക്ക് മോഡ്"
+    "darkMode": "ഡാർക്ക് മോഡ്",
+    "generateReportTooltip": "സ്മാർട്ട് ഫാം റിപ്പോർട്ട് തയ്യാറാക്കുക",
+    "openMenu": "മെനു തുറക്കുക",
+    "selectLanguage": "ഭാഷ തിരഞ്ഞെടുക്കൽ",
+    "toggleTheme": "തീം മാറ്റുക",
+    "accountSettings": "പ്രൊഫൈലും അക്കൗണ്ട് ക്രമീകരണങ്ങളും",
+    "changeLanguage": "ഭാഷ മാറ്റുക"
   },
   "cropHealthMonitor": {
     "title": "ഉപഗ്രഹ വിള ആരോഗ്യം",
@@ -990,7 +1096,9 @@
     "simulatedBaseline": "സിമുലേറ്റഡ് ബേസ്‌ലൈൻ",
     "deficit": "കമ്മി",
     "target": "ലക്ഷ്യം",
-    "sat": "പൂരിതം"
+    "sat": "പൂരിതം",
+    "refreshTelemetry": "ടെലിമെട്രി പുതുക്കുക",
+    "refreshTimeline": "ടൈംലൈൻ പുതുക്കുക"
   },
   "environmental": {
     "title": "പരിസ്ഥിതി ഇന്റലിജൻസ് ഹബ്",
@@ -1330,5 +1438,12 @@
     "notAvailable": "ലഭ്യമല്ല",
     "ownerDetails": "ഉടമസ്ഥന്റെ വിവരങ്ങൾ",
     "rent": "വാടക"
+  },
+  "errors": {
+    "somethingWentWrong": "എന്തോ തകരാർ സംഭവിച്ചു",
+    "unexpectedErrorDesc": "AgriFlux-ൽ ഒരു അപ്രതീക്ഷിത പിശക് സംഭവിച്ചു. നിങ്ങളുടെ ഫാം ഡാറ്റ സുരക്ഷിതമാണ് — ദയവായി പേജ് റീഫ്രഷ് ചെയ്യുക അല്ലെങ്കിൽ ഹോമിലേക്ക് പോകുക.",
+    "tryAgain": "വീണ്ടും ശ്രമിക്കുക",
+    "goToDashboard": "ഡാഷ്‌ബോർഡിലേക്ക് പോകുക",
+    "platformTagline": "AgriFlux AI · സ്മാർട്ട് കാർഷിക ഇന്റലിജൻസ് പ്ലാറ്റ്‌ഫോം"
   }
 }

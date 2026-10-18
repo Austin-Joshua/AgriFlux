@@ -43,7 +43,23 @@
     "advisoryTab": "Regional Advisory",
     "adminBlockchain": "Cryptographic Audit Ledger",
     "soilAdvisor": "Soil Intelligence",
-    "yieldForecasting": "Yield Forecasting"
+    "yieldForecasting": "Yield Forecasting",
+    "bottomConsole": "Console",
+    "bottomUsers": "Users",
+    "bottomSystem": "System",
+    "bottomAudit": "Audit",
+    "bottomActuators": "Actuators",
+    "bottomPortal": "Portal",
+    "bottomYield": "Yield",
+    "bottomClimate": "Climate",
+    "bottomSimulator": "Simulator",
+    "bottomAdvisory": "Advisory",
+    "bottomHome": "Home",
+    "bottomSoil": "Soil",
+    "bottomHealth": "Health",
+    "bottomMarket": "Market",
+    "bottomAiReport": "AI Report",
+    "mobileNav": "Mobile Navigation"
   },
   "land": {
     "title": "Land Intelligence",
@@ -187,7 +203,9 @@
     "waterTable": "Water Table (m)",
     "germinationRate": "Germination Rate (%)",
     "tenYearTrend": "10-Year Market Trend",
-    "primaryGuidance": "Primary Guidance"
+    "primaryGuidance": "Primary Guidance",
+    "chlorophyllIndex": "Chlorophyll Index",
+    "diseaseProbability": "Disease Probability"
   },
   "agronomist": {
     "title": "Agronomist Dashboard",
@@ -241,7 +259,15 @@
     "noConsultationsYet": "No consultations requested yet.",
     "farmerLabel": "Farmer",
     "requestedExpert": "Requested Expert",
-    "time": "Time"
+    "time": "Time",
+    "thisMonth": "+4 this month",
+    "triageActive": "Triage Active",
+    "labCalibrated": "Lab Calibrated",
+    "awaiting": "Awaiting",
+    "diagnosticNotesPlaceholder": "Diagnostic directive or field validation notes...",
+    "endorseDecision": "Endorse Decision",
+    "requestRevision": "Request Revision",
+    "inspectionRequired": "Field Inspection Required"
   },
   "admin": {
     "title": "Admin Control Panel",
@@ -352,7 +378,22 @@
     "policyEstop": "Actuator E-STOP Interlock Armed",
     "enforced": "ENFORCED",
     "roleElevation": "Role Elevation",
-    "telemetry": "Telemetry"
+    "telemetry": "Telemetry",
+    "users": "Users",
+    "thisMonth": "this month",
+    "triageQueue": "Triage Queue",
+    "nominal": "Nominal",
+    "zeroFaults": "Zero Faults",
+    "signingKeySource": "Signing Key Source",
+    "dedicatedKey": "Dedicated Key",
+    "jwtSecret": "JWT Secret",
+    "devDeterministic": "Dev Deterministic",
+    "unconfigured": "Unconfigured",
+    "merkleLedger": "SHA-256 Merkle Ledger",
+    "hmacAuthority": "HMAC-SHA256 Authority",
+    "latestHash": "Latest Hash",
+    "viewTelemetry": "View telemetry",
+    "removeUser": "Remove user"
   },
   "auth": {
     "login": "Sign In",
@@ -411,7 +452,12 @@
     "farmer": "Farmer",
     "agronomist": "Agronomist",
     "admin": "Admin",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "verifyingSession": "Verifying Session...",
+    "workspaceRestricted": "Workspace Restricted",
+    "workspaceReserved": "This workspace is reserved for",
+    "currentlyLoggedInAs": "accounts. You are currently logged in as a",
+    "returnWorkspace": "Return to My Workspace"
   },
   "dashboard": {
     "title": "Farm Dashboard",
@@ -466,7 +512,14 @@
     "financialAdvisory": "Financial Advisory",
     "whyRecommendation": "Why this recommendation?",
     "highProfitAdvice": "High profitability detected for {{crop}}. Consider forward contracting to lock in prices above ₹{{price}}/kg.",
-    "tightMarginAdvice": "Margins are tight. Focus on reducing urea input by 15% and utilizing government KCC loans for operational liquidity."
+    "tightMarginAdvice": "Margins are tight. Focus on reducing urea input by 15% and utilizing government KCC loans for operational liquidity.",
+    "farmLocationMap": "Farm Location Map",
+    "soilHealthChange": "+5 pts",
+    "optimal96": "Optimal (96%)",
+    "ndviActive": "NDVI Active",
+    "waterSaved": "Water Saved",
+    "advisoryReady": "Advisory Ready",
+    "clickDeepAnalysis": "Click for Deep Analysis Insights"
   },
   "yield": {
     "title": "AI Crop Yield Prediction",
@@ -549,7 +602,13 @@
     "droughtRisk": "Drought Risk",
     "floodRisk": "Flood Risk",
     "rainfallForecastTitle": "Rainfall Forecast vs Historical",
-    "tempRangeTitle": "Temperature Range Forecast"
+    "tempRangeTitle": "Temperature Range Forecast",
+    "climateIntelligenceBadge": "Climate Intelligence",
+    "historicalAvg": "Historical Avg",
+    "aiForecast": "AI Forecast",
+    "actual": "Actual",
+    "minTemp": "Min Temp",
+    "maxTemp": "Max Temp"
   },
   "simulator": {
     "title": "Climate Scenario Simulator",
@@ -619,7 +678,17 @@
     "diversity": "Crop Diversity",
     "soilHealth": "Soil Health Index",
     "radarTitle": "Sustainability Radar",
-    "scoreTrendTitle": "Score Trend (6 Months)"
+    "scoreTrendTitle": "Score Trend (6 Months)",
+    "premiumFarmScore": "Premium Farm Score",
+    "ourAnalysis": "Our Analysis",
+    "scoreExcellent": "Excellent 🌟",
+    "scoreGood": "Good 👍",
+    "scoreNeedsImprovement": "Needs Improvement ⚠️",
+    "performanceSummary": "Your farm is performing better than 72% of farms in your region",
+    "co2Saved": "CO₂ Saved",
+    "chemReduced": "Chem Reduced",
+    "biodiversity": "Biodiversity",
+    "fullReport": "Full Report"
   },
   "settings": {
     "title": "Settings",
@@ -758,7 +827,14 @@
     "wateringMsg": "Optimal irrigation window: Tonight 10 PM. Save 12% water today.",
     "liveAlerts": "Live Intelligence Alerts",
     "new": "New",
-    "viewAllHistory": "View All Notification History"
+    "viewAllHistory": "View All Notification History",
+    "yieldReadyTitle": "Yield Prediction Ready",
+    "yieldReadyMsg": "Your Rice crop yield forecast is available.",
+    "heatwaveTitle": "Heatwave Alert 🔥",
+    "heatwaveMsg": "Extreme heat expected Thursday in your region.",
+    "time2m": "2 min ago",
+    "time15m": "15 min ago",
+    "time1h": "1 hr ago"
   },
   "common": {
     "loading": "Loading...",
@@ -832,7 +908,31 @@
     "filter": "Filter",
     "riskHigh": "High",
     "riskMedium": "Medium",
-    "riskLow": "Low"
+    "riskLow": "Low",
+    "viewDetails": "View Details",
+    "online": "Online",
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun",
+    "skipToContent": "Skip to main content",
+    "backToCitizenOne": "Back to CitizenOne",
+    "linkSent": "Link Sent"
   },
   "ai": {
     "title": "AgriFlux AI",
@@ -883,7 +983,13 @@
     "endSession": "End active session",
     "aiReport": "AI Report",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "generateReportTooltip": "Generate Smart Farm Report",
+    "openMenu": "Open mobile menu",
+    "selectLanguage": "Language selector",
+    "toggleTheme": "Toggle theme",
+    "accountSettings": "User profile and account settings",
+    "changeLanguage": "Change Language"
   },
   "cropHealthMonitor": {
     "title": "Satellite Crop Health",
@@ -990,7 +1096,9 @@
     "simulatedBaseline": "Simulated Baseline",
     "deficit": "Deficit",
     "target": "Target",
-    "sat": "Sat"
+    "sat": "Sat",
+    "refreshTelemetry": "Refresh In-Situ Telemetry",
+    "refreshTimeline": "Refresh timeline"
   },
   "environmental": {
     "title": "Environmental Intelligence Hub",
@@ -1330,5 +1438,12 @@
     "notAvailable": "Not Available",
     "ownerDetails": "Owner Details",
     "rent": "Rent"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "unexpectedErrorDesc": "AgriFlux encountered an unexpected error. Your farm data is safe — please refresh the page or return home.",
+    "tryAgain": "Try Again",
+    "goToDashboard": "Go to Dashboard",
+    "platformTagline": "AgriFlux AI · Smart Agricultural Intelligence Platform"
   }
 }

@@ -81,7 +81,7 @@ const ClimateRisk: React.FC = () => {
         </div>
         <div className="flex items-center justify-center md:justify-start gap-2">
           <span className="badge-gold py-1.5 px-3 shadow-sm border border-gold-200 dark:border-gold-800">
-            🛡️ Climate Intelligence
+            🛡️ {t('climate.climateIntelligenceBadge', 'Climate Intelligence')}
           </span>
         </div>
       </div>
@@ -173,7 +173,7 @@ const ClimateRisk: React.FC = () => {
               <Area
                 type="monotone"
                 dataKey="avg"
-                name="Historical Avg"
+                name={t('climate.historicalAvg', 'Historical Avg')}
                 stroke="#9ca3af"
                 fill="none"
                 strokeDasharray="4 2"
@@ -182,7 +182,7 @@ const ClimateRisk: React.FC = () => {
               <Area
                 type="monotone"
                 dataKey="forecast"
-                name="AI Forecast"
+                name={t('climate.aiForecast', 'AI Forecast')}
                 stroke="#3b82f6"
                 fill="url(#forecastG)"
                 strokeWidth={2}
@@ -190,7 +190,7 @@ const ClimateRisk: React.FC = () => {
               <Area
                 type="monotone"
                 dataKey="actual"
-                name="Actual"
+                name={t('climate.actual', 'Actual')}
                 stroke="#22c55e"
                 fill="none"
                 strokeWidth={2}
@@ -207,8 +207,8 @@ const ClimateRisk: React.FC = () => {
               <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
               <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} unit="°C" />
               <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
-              <Bar dataKey="min" name="Min Temp" fill="#93c5fd" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="max" name="Max Temp" fill="#f97316" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="min" name={t('climate.minTemp', 'Min Temp')} fill="#93c5fd" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="max" name={t('climate.maxTemp', 'Max Temp')} fill="#f97316" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

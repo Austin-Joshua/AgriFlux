@@ -32,7 +32,7 @@ const Onboarding: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-      <SEO title="Complete Your Profile" />
+      <SEO title={t('onboarding.completeSetup', 'Complete Setup')} />
 
       <div className="max-w-md w-full">
         {/* Header */}

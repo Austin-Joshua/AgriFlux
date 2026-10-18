@@ -43,7 +43,23 @@
     "advisoryTab": "மண்டல ஆலோசனைகள்",
     "adminBlockchain": "கிரிப்டோகிராஃபிக் தணிக்கை லெட்ஜர்",
     "soilAdvisor": "மண் நுண்ணறிவு",
-    "yieldForecasting": "மகசூல் முன்னறிவிப்பு"
+    "yieldForecasting": "மகசூல் முன்னறிவிப்பு",
+    "bottomConsole": "கன்சோல்",
+    "bottomUsers": "பயனர்கள்",
+    "bottomSystem": "அமைப்பு",
+    "bottomAudit": "தணிக்கை",
+    "bottomActuators": "ஆக்சுவேட்டர்கள்",
+    "bottomPortal": "போர்ட்டல்",
+    "bottomYield": "மகசூல்",
+    "bottomClimate": "காலநிலை",
+    "bottomSimulator": "சிமுலேட்டர்",
+    "bottomAdvisory": "ஆலோசனை",
+    "bottomHome": "முகப்பு",
+    "bottomSoil": "மண்",
+    "bottomHealth": "வளர்ச்சி",
+    "bottomMarket": "சந்தை",
+    "bottomAiReport": "AI அறிக்கை",
+    "mobileNav": "மொபைல் வழிசெலுத்தல்"
   },
   "land": {
     "title": "நில நுண்ணறிவு",
@@ -186,7 +202,15 @@
     "noConsultationsYet": "இதுவரை எந்த ஆலோசனையும் கோரப்படவில்லை.",
     "farmerLabel": "விவசாயி",
     "requestedExpert": "கோரப்பட்ட நிபுணர்",
-    "time": "நேரம்"
+    "time": "நேரம்",
+    "thisMonth": "+4 இந்த மாதம்",
+    "triageActive": "முன்னுரிமை வரிசை செயலில்",
+    "labCalibrated": "ஆய்வக அளவீடு செய்யப்பட்டது",
+    "awaiting": "காத்திருக்கிறது",
+    "diagnosticNotesPlaceholder": "கள ஆய்வு மற்றும் பரிந்துரை குறிப்புகள்...",
+    "endorseDecision": "முடிவை அங்கீகரிக்கவும்",
+    "requestRevision": "மறுஆய்வு கோரவும்",
+    "inspectionRequired": "கள ஆய்வு தேவைப்படுகிறது"
   },
   "admin": {
     "title": "நிர்வாக கட்டுப்பாட்டு பலகை",
@@ -297,7 +321,22 @@
     "policyEstop": "ஆக்சுவேட்டர் அவசர நிறுத்த பூட்டு தயார்",
     "enforced": "அமல்படுத்தப்பட்டது",
     "roleElevation": "பங்கு உயர்வு",
-    "telemetry": "தொலை அளவியல்"
+    "telemetry": "தொலை அளவியல்",
+    "users": "பயனர்கள்",
+    "thisMonth": "இந்த மாதம்",
+    "triageQueue": "முன்னுரிமை வரிசை",
+    "nominal": "சீரானது",
+    "zeroFaults": "பிழைகள் இல்லை",
+    "signingKeySource": "கையொப்ப விசை மூலம்",
+    "dedicatedKey": "பிரத்யேக விசை",
+    "jwtSecret": "JWT சீக்ரெட்",
+    "devDeterministic": "டெவ் உறுதியானது",
+    "unconfigured": "கட்டமைக்கப்படவில்லை",
+    "merkleLedger": "SHA-256 மெர்க்கல் லெட்ஜர்",
+    "hmacAuthority": "HMAC-SHA256 அதிகாரம்",
+    "latestHash": "சமீபத்திய ஹாஷ்",
+    "viewTelemetry": "டெலிமெட்ரியைக் காண்க",
+    "removeUser": "பயனரை நீக்கு"
   },
   "auth": {
     "login": "உள்நுழைய",
@@ -356,7 +395,12 @@
     "farmer": "விவசாயி",
     "agronomist": "வேளாண் விஞ்ஞானி",
     "admin": "நிர்வாகி",
-    "getStarted": "தொடங்குங்கள்"
+    "getStarted": "தொடங்குங்கள்",
+    "verifyingSession": "அமர்வு சரிபார்க்கப்படுகிறது...",
+    "workspaceRestricted": "பணியிட அணுகல் கட்டுப்படுத்தப்பட்டுள்ளது",
+    "workspaceReserved": "இந்த பணியிடம் பின்வரும் கணக்குகளுக்கு மட்டுமே ஒதுக்கப்பட்டுள்ளது:",
+    "currentlyLoggedInAs": "கணக்குகள். நீங்கள் தற்போது உள்நுழைந்துள்ள நிலை:",
+    "returnWorkspace": "எனது பணியிடத்திற்கு திரும்புக"
   },
   "dashboard": {
     "title": "பண்ணை டாஷ்போர்டு",
@@ -411,7 +455,14 @@
     "financialAdvisory": "நிதி ஆலோசனை",
     "whyRecommendation": "இந்த பரிந்துரை ஏன்?",
     "highProfitAdvice": "{{crop}}-க்கு அதிக லாப வாய்ப்பு உள்ளது. ₹{{price}}/கிலோவுக்கு மேல் விலையை உறுதிப்படுத்த முன்கூட்டியே ஒப்பந்தம் செய்யவும்.",
-    "tightMarginAdvice": "லாப வரம்பு குறைவாக உள்ளது. யூரியா பயன்பாட்டை 15% குறைத்து, நிதி தேவைகளுக்கு கிசான் கிரெடிட் கார்டு (KCC) கடன்களை பயன்படுத்தவும்."
+    "tightMarginAdvice": "லாப வரம்பு குறைவாக உள்ளது. யூரியா பயன்பாட்டை 15% குறைத்து, நிதி தேவைகளுக்கு கிசான் கிரெடிட் கார்டு (KCC) கடன்களை பயன்படுத்தவும்.",
+    "farmLocationMap": "பண்ணை இருப்பிட வரைபடம்",
+    "soilHealthChange": "+5 புள்ளிகள்",
+    "optimal96": "உகந்தது (96%)",
+    "ndviActive": "NDVI செயலில் உள்ளது",
+    "waterSaved": "சேமிக்கப்பட்ட நீர்",
+    "advisoryReady": "ஆலோசனை தயார்",
+    "clickDeepAnalysis": "ஆழமான பகுப்பாய்வு நுண்ணறிவுக்கு கிளிக் செய்க"
   },
   "yield": {
     "title": "AI பயிர் விளைச்சல் கணிப்பு",
@@ -494,7 +545,13 @@
     "droughtRisk": "வறட்சி ஆபத்து",
     "floodRisk": "வெள்ள ஆபத்து",
     "rainfallForecastTitle": "மழைப்பொழிவு முன்னறிவிப்பு vs வரலாற்று பதிவு",
-    "tempRangeTitle": "வெப்பநிலை வரம்பு முன்னறிவிப்பு"
+    "tempRangeTitle": "வெப்பநிலை வரம்பு முன்னறிவிப்பு",
+    "climateIntelligenceBadge": "காலநிலை நுண்ணறிவு",
+    "historicalAvg": "வரலாற்று சராசரி",
+    "aiForecast": "AI கணிப்பு",
+    "actual": "உண்மை அளவு",
+    "minTemp": "குறைந்தபட்ச வெப்பநிலை",
+    "maxTemp": "அதிகபட்ச வெப்பநிலை"
   },
   "simulator": {
     "title": "காலநிலை உருவகப்படுத்துதல்",
@@ -564,7 +621,17 @@
     "diversity": "பயிர் பன்முகத்தன்மை",
     "soilHealth": "மண் ஆரோக்கியக் குறியீடு",
     "radarTitle": "நிலையான விவசாய ரேடார்",
-    "scoreTrendTitle": "மதிப்பீட்டு போக்கு (6 மாதங்கள்)"
+    "scoreTrendTitle": "மதிப்பீட்டு போக்கு (6 மாதங்கள்)",
+    "premiumFarmScore": "பிரீமியம் பண்ணை மதிப்பீடு",
+    "ourAnalysis": "எங்கள் பகுப்பாய்வு",
+    "scoreExcellent": "மிகச் சிறந்தது 🌟",
+    "scoreGood": "நன்று 👍",
+    "scoreNeedsImprovement": "மேம்பாடு தேவை ⚠️",
+    "performanceSummary": "உங்கள் பண்ணை உங்கள் பிராந்தியத்தில் உள்ள 72% பண்ணைகளை விட சிறப்பாக செயல்படுகிறது",
+    "co2Saved": "சேமிக்கப்பட்ட CO₂",
+    "chemReduced": "குறைக்கப்பட்ட ரசாயனம்",
+    "biodiversity": "பல்லுயிர் வளம்",
+    "fullReport": "முழு அறிக்கை"
   },
   "settings": {
     "title": "அமைப்புகள்",
@@ -703,7 +770,14 @@
     "wateringMsg": "உகந்த நீர்ப்பாசன நேரம்: இன்று இரவு 10 மணி. இன்று 12% தண்ணீரை சேமிக்கவும்.",
     "liveAlerts": "நேரலை நுண்ணறிவு எச்சரிக்கைகள்",
     "new": "புதியது",
-    "viewAllHistory": "அனைத்து அறிவிப்பு வரலாற்றையும் காண்க"
+    "viewAllHistory": "அனைத்து அறிவிப்பு வரலாற்றையும் காண்க",
+    "yieldReadyTitle": "மகசூல் முன்னறிவிப்பு தயார்",
+    "yieldReadyMsg": "உங்கள் நெல் பயிர் மகசூல் முன்னறிவிப்பு கிடைக்கிறது.",
+    "heatwaveTitle": "வெப்ப அலை எச்சரிக்கை 🔥",
+    "heatwaveMsg": "உங்கள் பகுதியில் வியாழக்கிழமை கடுமையான வெப்பம் எதிர்பார்க்கப்படுகிறது.",
+    "time2m": "2 நிமிடங்களுக்கு முன்பு",
+    "time15m": "15 நிமிடங்களுக்கு முன்பு",
+    "time1h": "1 மணி நேரத்திற்கு முன்பு"
   },
   "common": {
     "loading": "ஏற்றுகிறது...",
@@ -777,7 +851,31 @@
     "filter": "வடிகட்டி",
     "riskHigh": "அதிகம்",
     "riskMedium": "நடுத்தரம்",
-    "riskLow": "குறைவு"
+    "riskLow": "குறைவு",
+    "viewDetails": "விவரங்களைக் காண்க",
+    "online": "ஆன்லைன்",
+    "jan": "ஜன",
+    "feb": "பிப்",
+    "mar": "மார்",
+    "apr": "ஏப்",
+    "may": "மே",
+    "jun": "ஜூன்",
+    "jul": "ஜூலை",
+    "aug": "ஆக",
+    "sep": "செப்",
+    "oct": "அக்",
+    "nov": "நவம்",
+    "dec": "டிசம்",
+    "mon": "திங்கள்",
+    "tue": "செவ்வாய்",
+    "wed": "புதன்",
+    "thu": "வியாழன்",
+    "fri": "வெள்ளி",
+    "sat": "சனி",
+    "sun": "ஞாயிறு",
+    "skipToContent": "முக்கிய உள்ளடக்கத்திற்கு செல்க",
+    "backToCitizenOne": "CitizenOne-க்கு திரும்புக",
+    "linkSent": "இணைப்பு அனுப்பப்பட்டது"
   },
   "ai": {
     "title": "அக்ரிஃப்ளக்ஸ் AI",
@@ -871,7 +969,9 @@
     "waterTable": "நிலத்தடி நீர்மட்டம் (மீ)",
     "germinationRate": "முளைப்புத் திறன் (%)",
     "tenYearTrend": "10 ஆண்டு சந்தை போக்கு",
-    "primaryGuidance": "முதன்மை வழிகாட்டுதல்"
+    "primaryGuidance": "முதன்மை வழிகாட்டுதல்",
+    "chlorophyllIndex": "குளோரோபில் குறியீடு",
+    "diseaseProbability": "நோய் தாக்கும் நிகழ்தகவு"
   },
   "header": {
     "workspaceDashboard": "பணிமனை டாஷ்போர்டு",
@@ -883,7 +983,13 @@
     "endSession": "அமர்வை முடி",
     "aiReport": "AI அறிக்கை",
     "lightMode": "பகல் முறை",
-    "darkMode": "இரவு முறை"
+    "darkMode": "இரவு முறை",
+    "generateReportTooltip": "ஸ்மார்ட் பண்ணை அறிக்கை உருவாக்கவும்",
+    "openMenu": "மெனுவை திறக்கவும்",
+    "selectLanguage": "மொழி தேர்வு",
+    "toggleTheme": "தீம் மாற்றவும்",
+    "accountSettings": "சுயவிவரம் மற்றும் கணக்கு அமைப்புகள்",
+    "changeLanguage": "மொழியை மாற்றவும்"
   },
   "cropHealthMonitor": {
     "title": "செயற்கைக்கோள் பயிர் ஆரோக்கியம்",
@@ -990,7 +1096,9 @@
     "simulatedBaseline": "உருவகப்படுத்தப்பட்ட அடிப்படை",
     "deficit": "பற்றாக்குறை",
     "target": "இலக்கு",
-    "sat": "நிறைவுற்றது"
+    "sat": "நிறைவுற்றது",
+    "refreshTelemetry": "டெலிமெட்ரியை புதுப்பிக்கவும்",
+    "refreshTimeline": "காலவரிசையை புதுப்பிக்கவும்"
   },
   "environmental": {
     "title": "சுற்றுச்சூழல் நுண்ணறிவு மையம்",
@@ -1330,5 +1438,12 @@
     "notAvailable": "கிடைக்கவில்லை",
     "ownerDetails": "உரிமையாளர் விவரங்கள்",
     "rent": "வாடகை"
+  },
+  "errors": {
+    "somethingWentWrong": "ஏதோ தவறாகிவிட்டது",
+    "unexpectedErrorDesc": "AgriFlux-ல் எதிர்பாராத பிழை ஏற்பட்டது. உங்கள் பண்ணை தரவு பாதுகாப்பாக உள்ளது — பக்கத்தை புதுப்பிக்கவும் அல்லது முகப்புக்கு செல்லவும்.",
+    "tryAgain": "மீண்டும் முயற்சிக்கவும்",
+    "goToDashboard": "டாஷ்போர்டிற்கு செல்க",
+    "platformTagline": "AgriFlux AI · நவீன ஸ்மார்ட் விவசாய நுண்ணறிவு தளம்"
   }
 }
