@@ -1,21 +1,89 @@
-# 🌾 AgriFlux: Agricultural Intelligence Platform
+# 🌾 AgriFlux: Agricultural Intelligence & Autonomous Irrigation Platform
 
-AgriFlux is a unified agricultural intelligence platform built for smallholder farmers, cooperative managers, expert agronomists, and system administrators. By synthesizing historical meteorological reanalysis, multi-source environmental baselines, real-time IoT sensor telemetry, and agronomic heuristics, AgriFlux translates raw field data into explainable, actionable crop and irrigation management decisions.
+[![Build & Verification Status](https://img.shields.io/badge/tests-130%2F130%20passing%20(100%25)-brightgreen.svg)](reports/README_SECURITY_TELEMETRY_TEST_RESULTS.md)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3.1-61dafb.svg)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-Express%204.18-green.svg)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Mongoose-47A248.svg)](https://www.mongodb.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+AgriFlux is a unified agricultural decision platform and physical IoT actuation system engineered for smallholder farmers, cooperative managers (FPOs), and certified agronomists. Focused on climate-vulnerable agricultural basins (such as the Cauvery Delta, Tamil Nadu), AgriFlux bridges the gap between raw hardware sensor readings, open environmental reanalysis datasets, and real-world farm actuation.
+
+- **Production Frontend**: [https://agri-flux-sandy.vercel.app/](https://agri-flux-sandy.vercel.app/)
+- **Production Backend**: [https://agriflux-backend.onrender.com/](https://agriflux-backend.onrender.com/)
+- **Primary Repository**: [https://github.com/Austin-Joshua/AgriFlux](https://github.com/Austin-Joshua/AgriFlux)
+
+---
+
+## 🌍 The Problem & Real-World Application
+
+Smallholder farmers in tropical and deltaic farming zones face compounding operational challenges:
+1. **Irrigation Inefficiency**: Uncalibrated flood irrigation depletes aquifers and stresses crop root zones, while drought stress causes irreversible yield losses.
+2. **Silent Sensor Failure**: Traditional IoT platforms silently actuate pumps based on outdated, disconnected, or malformed sensor data, risking crop drowning or equipment burnout.
+3. **Black-Box AI Claims**: Farmers are frequently given unsupported predictive advice from opaque models without explainability, scientific provenance, or agronomist accountability.
+4. **Fragmented Agricultural Tools**: Soil health data, weather forecasts, market rates, and agronomist consultations are scattered across disconnected applications.
+
+### The AgriFlux Solution
+AgriFlux introduces a **closed-loop field intelligence architecture**:
+- **Explainable Decision Engine**: Uses the Food and Agriculture Organization (FAO-56) Penman-Monteith and Maximum Allowable Depletion (MAD) framework.
+- **Fail-Safe Telemetry Gate**: Strictly gates recommendations and physical actuation behind a 15-minute sensor freshness window.
+- **Tamper-Evident Audit Ledger**: Every recommendation, farmer action, and agronomist review is cryptographically linked in a single-node SHA-256 block chain with Merkle tree verification.
+
+---
+
+## 🎯 System Scope: Core MVP vs. Supporting Ecosystem
+
+AgriFlux maintains scientific and engineering rigor by clearly distinguishing the **Core Closed-Loop MVP** from the **Supporting Feature Ecosystem**.
+
+```
+                                ┌────────────────────────────────────────────────────────┐
+                                │              AGRIFLUX APPLICATION SUITE                │
+                                └──────────────────────────┬─────────────────────────────┘
+                                                           │
+                      ┌────────────────────────────────────┴────────────────────────────────────┐
+                      ▼                                                                         ▼
+   ┌─────────────────────────────────────┐                                   ┌─────────────────────────────────────┐
+   │         CORE CLOSED-LOOP MVP        │                                   │     SUPPORTING ECOSYSTEM MODULES    │
+   ├─────────────────────────────────────┤                                   ├─────────────────────────────────────┤
+   │ 1. Telemetry Quality Gate (15m)     │                                   │ 1. Regional Soil Health Profile     │
+   │ 2. Explainable FAO-56 Engine        │                                   │ 2. Formula Agronomic Yield Model    │
+   │ 3. Actuator Safety Interlock (422)  │                                   │ 3. Climate Risk & Stress Simulator  │
+   │ 4. Two-Phase Pump Hardware ACK      │                                   │ 4. Sentinel-2 Satellite Interface   │
+   │ 5. Cryptographic Audit Ledger       │                                   │ 5. Specialist Consultation Booking  │
+   │ 6. Tenant & Parcel Scoping          │                                   │ 6. Marketplace & Subsidy Directory  │
+   └─────────────────────────────────────┘                                   └─────────────────────────────────────┘
+```
+
+### 1. The Core Closed-Loop MVP (Hero Workflow)
+The Core MVP comprises the critical path from physical sensor to physical pump:
+- **Telemetry Ingestion & Quality Evaluation**: Continuous ingestion of soil moisture, ambient temperature, and relative humidity via ESP32 microcontrollers or simulated nodes. Categorizes telemetry into 5 discrete quality states: `fresh`, `stale`, `missing`, `invalid`, `simulated`.
+- **Explainable Irrigation Decision Engine**: Implements FAO-56 Penman-Monteith reference evapotranspiration ($ET_0$) and crop coefficient ($K_c$) depletion curves. If telemetry is stale (>15 min) or invalid, the engine halts with `INSUFFICIENT_DATA` rather than guessing.
+- **Actuator Safety Interlock**: Remote pump activations (`pumpStatus: true`) are verified against telemetry freshness. If readings are older than 15 minutes, commands are refused with **HTTP 422 Unprocessable Entity** (`TRIPPED_STALE_TELEMETRY`). Emergency shutoff (`pumpStatus: false`) is always permitted immediately.
+- **Two-Phase Actuator Protocol**: Enforces a strict command lifecycle (`PENDING_ACK` -> physical execution by hardware -> `ACKNOWLEDGED`).
+- **Cryptographic Audit Ledger**: An immutable SHA-256 block chain recording telemetry hashes, generated prescriptions, farmer execution logs, and agronomist reviews.
+- **Tenant & Parcel Isolation**: Strict boundary scoping ensuring queries for uninstrumented parcels return HTTP 404 and prevent cross-farmer telemetry leakage.
+
+### 2. Supporting Ecosystem Modules
+These modules complement the core decision loop with broader agro-ecological context:
+- **Soil Advisory & Regional Benchmarks (`/soil`)**: Delivers baseline ICAR-TNAU Cauvery Delta alluvial chemistry (pH 6.4, low N, medium P, high K) and accepts certified Soil Health Card parameters.
+- **Formula-Based Yield Estimation (`/yield`)**: Calculates deterministic agronomic potential based on crop base yields, NPK stoichiometry, and temperature-humidity indices, contrasted against historical DES APY statistics.
+- **Climate Risk & What-If Stress Simulator (`/climate`, `/simulator`)**: Interactive parametric simulation modeling crop heat stress, drought thresholds, and flood risks across vegetative, flowering, and maturity stages.
+- **Crop Health & Satellite Spectral Interface (`/crop-health`)**: Multispectral NDVI pipeline specified for Copernicus Sentinel-2 MSI Level-2A surface reflectance (Band 04 & Band 08). Transparently displays `"Satellite data not connected"` when real orbital rasters are not present.
+- **Specialist Consultation Portal (`/agronomist`, `/book-consultation`)**: Clinical triage interface where agronomists review pending prescriptions, add endorsement notes, and seal decisions into the audit ledger.
+- **Market Intelligence & Community Hub (`/marketplace`, `/equipment-rental`, `/subsidies`, `/market`)**: Directory of farm machinery rentals, central and state agricultural subsidy schemes, and mandi commodity pricing.
 
 ---
 
 ## 🏛️ System Architecture
 
-AgriFlux operates as a multi-tier distributed architecture comprising a client single-page application (SPA), an Express.js service backend, an IoT telemetry and actuation tier, multi-source environmental pipelines, a closed-loop field decision engine, and a tamper-evident cryptographic audit ledger.
-
 ```mermaid
 graph TD
     subgraph Client Tier ["Frontend Client (React 18 SPA + Vite)"]
-        UI_Entry[App Entry & Providers] --> UI_Auth[Auth & Language Context]
-        UI_Auth --> UI_Routes{Role-Based Router}
-        UI_Routes -->|Farmer / Admin| UI_Farmer["Farmer Workspace (/dashboard, /irrigation, /soil)"]
-        UI_Routes -->|Agronomist / Admin| UI_Agro["Agronomist Portal (/agronomist, /yield, /climate)"]
-        UI_Routes -->|Admin Only| UI_Admin["Admin Console (/admin, /users)"]
+        UI_Entry[App Entry & Providers] --> UI_Auth[Auth Context & Theme Providers]
+        UI_Auth --> UI_Router{Protected Role Router}
+        UI_Router -->|Farmer / Admin| UI_Farmer["Farmer Workspace (/dashboard, /irrigation, /soil)"]
+        UI_Router -->|Agronomist / Admin| UI_Agro["Agronomist Portal (/agronomist, /yield, /climate)"]
+        UI_Router -->|Admin Only| UI_Admin["Admin Control Console (/admin)"]
         UI_Farmer --> UI_DecisionPanel["AI Decision Panel & Stale Badges"]
     end
 
@@ -61,7 +129,7 @@ graph TD
         BLK_1 --> BLK_2["Block 2: Recommendation Prescription"]
         BLK_2 --> BLK_3["Block 3: Farmer Actuator Action"]
         BLK_3 --> BLK_4["Block 4: Agronomist Review & Merkle Root"]
-        SRV_Audit --> LEDGER_NOTE["*Single-node SHA-256 block chain for tamper-detection, not a decentralized consensus blockchain*"]
+        SRV_Audit --> LEDGER_NOTE["*Single-node SHA-256 block chain for tamper-detection, not a decentralized cryptocurrency blockchain*"]
     end
 
     ENG_Decision <--> DB
@@ -71,276 +139,218 @@ graph TD
 
 ---
 
-## 🛠️ Real Technology Stack
+## 🛠️ Complete Technology Stack
 
-AgriFlux is engineered with production-ready, typed technologies across all tiers:
+### Frontend Application (`Frontend/package.json`)
+| Package / Dependency | Version | Purpose |
+| :--- | :---: | :--- |
+| **`react`** & **`react-dom`** | `18.3.1` | Core UI component framework and virtual DOM rendering. |
+| **`typescript`** | `5.5.3` | Type-safe static analysis and typed component props. |
+| **`vite`** | `5.4.2` | Fast HMR development server and optimized ES production bundler. |
+| **`tailwindcss`** | `3.4.1` | Utility-first responsive CSS styling with dark/light theming. |
+| **`react-router-dom`** | `6.22.3` | Client-side declarative routing and role-based route guards. |
+| **`recharts`** | `2.12.7` | SVG time-series charts for telemetry, weather, and yield models. |
+| **`lucide-react`** | `0.344.0` | Clean, modern iconography across all dashboard panels. |
+| **`framer-motion`** | `12.35.0` | Fluid micro-animations, modal transitions, and responsive drawers. |
+| **`socket.io-client`** | `4.8.3` | Real-time WebSocket connection to backend for live IoT broadcasts. |
+| **`i18next`** & **`react-i18next`** | `23.10.1` | Multi-language localization (English, Tamil, Hindi, Telugu, Malayalam). |
+| **`firebase`** | `12.11.0` | Client authentication SDK for Google OAuth and phone verification. |
+| **`axios`** | `1.6.8` | HTTP client with centralized bearer token and error interceptors. |
+| **`react-toastify`** | `11.0.5` | Non-blocking user feedback alerts and system notifications. |
+| **`react-helmet-async`**| `3.0.0` | Dynamic document metadata, title tags, and SEO tags. |
 
-### Frontend (`Frontend/package.json`)
-- **Core Framework**: React `18.3.1`, React DOM `18.3.1`
-- **Build Tooling**: Vite `5.4.2`, TypeScript `5.5.3`
-- **Styling**: Tailwind CSS `3.4.1`, PostCSS `8.4.35`, Autoprefixer `10.4.18`
-- **Routing & State**: React Router DOM `6.22.3`
-- **Data Visualization**: Recharts `2.12.7`
-- **Icons & Motion**: Lucide React `0.344.0`, Framer Motion `12.35.0`
-- **Internationalization**: i18next `23.10.1`, react-i18next `14.1.0`, i18next-browser-languagedetector `7.2.1`
-- **Real-Time Client**: Socket.IO Client `4.8.3`
-- **Notifications & Metadata**: React Toastify `11.0.5`, React Helmet Async `3.0.0`
-- **Authentication**: Firebase Client SDK `12.11.0`, `@react-oauth/google` `0.13.4`, Axios `1.6.8`
-
-### Backend (`Backend/package.json`)
-- **Runtime & Web Framework**: Node.js (v18, v20, or v24), Express `4.18.2`, TypeScript `5.9.3`
-- **Database & ODM**: MongoDB, Mongoose `9.2.4`, `mongodb-memory-server` `11.3.0` (for testing & development)
-- **Real-Time WebSockets**: Socket.IO `4.8.3`
-- **Authentication & Cryptography**: JSON Web Tokens (`jsonwebtoken` `9.0.2`), Bcrypt (`bcryptjs` `2.4.3`), Node.js `crypto`
-- **Security & Protection**: Helmet `8.1.0`, CORS `2.8.5`, HPP `0.2.3`, Express Rate Limit `8.3.2`
-- **Firebase Administration**: `firebase-admin` `13.7.0`
-- **HTTP Client & Utilities**: Axios `1.6.2`, Compression `1.8.1`, Morgan `1.10.1`, Dotenv `16.3.1`
-- **Quality & Linting**: ESLint `10.0.2`, TypeScript ESLint `8.62.0`, Prettier `3.8.1`
+### Backend API Service (`Backend/package.json`)
+| Package / Dependency | Version | Purpose |
+| :--- | :---: | :--- |
+| **`express`** | `4.18.2` | Web server framework handling RESTful routing and middleware. |
+| **`typescript`** | `5.9.3` | Strong backend typing, interfaces, and strict compiler checks. |
+| **`mongoose`** | `9.2.4` | MongoDB Object Data Modeling (ODM) with schema validation. |
+| **`socket.io`** | `4.8.3` | Bidirectional WebSocket server broadcasting sensor events to clients. |
+| **`jsonwebtoken`** | `9.0.2` | Cryptographic JWT signing and role-based authorization verification. |
+| **`bcryptjs`** | `2.4.3` | One-way password hashing using salted Blowfish key derivation (10 rounds). |
+| **`helmet`** | `8.1.0` | Security headers (CSP, HSTS, X-Content-Type-Options, Frameguard). |
+| **`cors`** | `2.8.5` | Strict cross-origin resource sharing allowlist against `FRONTEND_URL`. |
+| **`express-rate-limit`**| `8.3.2` | Rate limiting protection on authentication and compute-heavy endpoints. |
+| **`firebase-admin`** | `13.7.0` | Server-side validation of Google tokens and Firebase service account keys. |
+| **`mongodb-memory-server`** | `11.3.0` | Ephemeral in-memory database engine for automated testing suites. |
+| **`eslint`** & **`prettier`** | `10.0.2` | Static code analysis, security auditing, and automated formatting. |
 
 ---
 
 ## ⚙️ Environment Variables Reference
 
-AgriFlux uses environment variables to configure database connections, authentication secrets, port assignments, and external APIs.
-
 ### Backend Configuration (`Backend/.env.example`)
 
-| Variable Name | Required? | Default / Example Value | Description |
+| Variable Name | Required? | Default / Example Value | Operational Description |
 | :--- | :---: | :--- | :--- |
-| `PORT` | Optional | `5001` | TCP port on which the Express HTTP server listens. |
-| `NODE_ENV` | Optional | `development` | Operating environment (`development`, `test`, or `production`). In `production`, strict security validations are enforced. |
-| `MONGODB_URI` | **Required** in Production | `mongodb://localhost:27017/agriflux` | MongoDB connection URI. In production, unauthenticated localhost strings are strictly rejected. |
-| `JWT_SECRET` | **Required** in Production | `your_strong_random_jwt_secret_32_chars` | Secret key used to sign and verify HMAC-SHA256 JWT tokens. Must be >= 32 characters in production. |
-| `JWT_EXPIRE` | Optional | `7d` | Token expiration duration (e.g., `24h`, `7d`). |
-| `FRONTEND_URL` | Optional | `http://localhost:3000` | Allowed CORS origin for browser client connections. |
-| `IOT_API_KEY` | Optional | `agriflux-iot-key-dev` | Pre-shared key expected in `x-iot-api-key` header for ESP32 nodes. In production, failing to set this key triggers fail-closed rejection. |
-| `AUDIT_SIGNING_KEY` | Optional | `your_hmac_sha256_audit_signing_key` | Secret key used to generate HMAC-SHA256 signatures for tamper-evident audit ledger blocks. |
+| `PORT` | Optional | `5001` | TCP port on which the Express server listens. |
+| `NODE_ENV` | **Required** in Prod | `production` | Environment mode (`development`, `test`, `production`). In production, strict security validations are active. |
+| `MONGODB_URI` | **Required** in Prod | `mongodb+srv://...` | Remote MongoDB Atlas URI. Unauthenticated localhost strings are strictly rejected in production. |
+| `JWT_SECRET` | **Required** in Prod | `random_32_char_hex_key` | Secret key for signing HMAC-SHA256 JWT tokens. Must be >= 32 characters in production. |
+| `JWT_EXPIRE` | Optional | `7d` | Token expiration period. |
+| `FRONTEND_URL` | **Required** in Prod | `https://agri-flux-sandy.vercel.app` | Allowed CORS origin for web browser client access. |
+| `IOT_API_KEY` | Optional | `agriflux-iot-key-dev` | Pre-shared key expected in `x-iot-api-key` header for ESP32 nodes. In production, missing key triggers fail-closed 401. |
+| `AUDIT_SIGNING_KEY` | Optional | `random_32_char_hex_key` | Secret key used to generate HMAC-SHA256 signatures for the cryptographic audit ledger. |
 | `AUTO_SEED_DEMO` | Optional | `false` | Explicit flag to enable demo account seeding on non-production startup. Refused in production. |
-| `ALLOW_DEMO_LOGIN` | Optional | `true` in dev | Determines whether demo login presets are shown on the frontend. |
-| `FIREBASE_PROJECT_ID` | Optional | `your-firebase-project-id` | Firebase Admin project ID for SMS OTP authentication. |
-| `FIREBASE_CLIENT_EMAIL`| Optional | `firebase-adminsdk@...` | Service account client email for Firebase Admin SDK. |
+| `FIREBASE_PROJECT_ID` | Optional | `agriflux-ai` | Firebase project ID for server-side auth validation. |
+| `FIREBASE_CLIENT_EMAIL`| Optional | `firebase-adminsdk@...` | Service account email for Firebase Admin SDK. |
 | `FIREBASE_PRIVATE_KEY` | Optional | `-----BEGIN PRIVATE KEY-----\n...` | Service account RSA private key for Firebase Admin SDK. |
 
 ### Frontend Configuration (`Frontend/.env.example`)
 
-| Variable Name | Required? | Default / Example Value | Description |
+| Variable Name | Required? | Default / Example Value | Operational Description |
 | :--- | :---: | :--- | :--- |
-| `VITE_API_URL` | Optional | `http://localhost:5001/api` | Base HTTP URL of the AgriFlux Backend API. In production, points to the live backend domain. |
+| `VITE_API_URL` | **Required** | `https://agriflux-backend.onrender.com/api` | Base API URL pointing to the backend (must end in `/api` without trailing slash). |
+| `VITE_FIREBASE_API_KEY` | Optional | `AIzaSyCvNUuv7rC0wzt...` | Firebase client API key for Google & Phone authentication. |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Optional | `agriflux-ai.firebaseapp.com` | Firebase authentication domain. |
+| `VITE_FIREBASE_PROJECT_ID` | Optional | `agriflux-ai` | Firebase project identifier. |
+| `VITE_FIREBASE_APP_ID` | Optional | `1:464366143152:web:...` | Unique web application client ID in Firebase. |
 
 ---
 
 ## 👥 Demo Accounts Policy & Usage
 
-To prevent credential leakage and unauthorized access in hosted environments, AgriFlux enforces a strict demo provisioning policy:
-
-1. **Refused in Production**: The backend server strictly refuses to seed demo accounts when `NODE_ENV=production`. Any attempt to trigger automatic seeding during production startup is blocked and audited.
-2. **Dedicated Operator CLI**: In development and staging environments, demo accounts are provisioned exclusively through an operator-initiated CLI script:
+To prevent credential leakage in deployed environments, AgriFlux enforces a strict demo provisioning policy:
+1. **Refused in Production**: The backend strictly refuses to provision demo accounts when `NODE_ENV === 'production'`.
+2. **Dedicated Operator CLI**: In development and staging, demo accounts are created via an operator CLI script:
    ```bash
-   cd Backend
-   npm run seed:demo
+   cd Backend && npm run seed:demo
    ```
-3. **Idempotent & Safe**: If demo accounts already exist, `seed:demo` preserves their existing passwords and does not overwrite or corrupt existing records.
-4. **Credential Sanitation**: Seeding logs never print plain text passwords or secrets to stdout.
+3. **Idempotent & Safe**: If demo accounts already exist, `seed:demo` preserves their existing passwords and records.
+4. **Credential Sanitation**: Seeding logs redact all passwords and connection strings.
 
 ### Pre-Configured Demo Roles (For Local Testing Only)
-
 | Role | Email Identifier | Default Role Scope | Operational Permissions |
 | :--- | :--- | :--- | :--- |
-| **Farmer** | `farmer@agriflux.com` | `farmer` | Access to field dashboard, IoT monitoring, irrigation controls, soil advisory, and consultation bookings. |
-| **Agronomist** | `agronomist@agriflux.com` | `agronomist` | Multi-farm crop health monitoring, prescription review & endorsement, and climate risk simulation. |
-| **Admin** | `admin@agriflux.com` | `admin` | Full system control, user role elevation, emergency broadcasting, and audit chain verification. |
-
-> [!WARNING]
-> Default passwords for demo accounts must never be used in publicly hosted environments. For production deployments, create unique accounts through `/api/auth/register` with strong passwords.
+| **Farmer** | `farmer@agriflux.com` | `farmer` | Access to field dashboard, IoT telemetry, irrigation controls, soil advisory, and consultation bookings. |
+| **Agronomist** | `agronomist@agriflux.com` | `agronomist` | Multi-farm triage, pathology trends, prescription reviews, and climate risk simulation. |
+| **Admin** | `admin@agriflux.com` | `admin` | Full system control, role elevation, emergency broadcasting, and audit chain verification. |
 
 ---
 
 ## 🌐 Verified Routes & API Endpoints
 
-### Frontend Protected & Public Routes (`Frontend/src/App.tsx`)
-
-| Path | Access Level | Target Component | Description |
-| :--- | :---: | :--- | :--- |
-| `/` or `/home` | Public | `LandingPage` | Platform overview, features, and public entry point. |
-| `/login` | Public | `Login` | Email/password, phone OTP, and Google authentication. |
-| `/register` | Public | `Register` | New farmer and specialist onboarding registration. |
-| `/forgot-password` | Public | `ForgotPassword` | Password recovery workflow. |
-| `/onboarding` | Authenticated | `Onboarding` | User role and farm profile initialization. |
-| `/dashboard` | `farmer`, `admin` | `Dashboard` | Real-time farm overview, IoT status, and weather charts. |
-| `/irrigation` | `farmer`, `admin` | `IrrigationIntelligence` | Closed-loop FAO-56 irrigation decisions & pump control. |
-| `/soil` | `farmer`, `admin` | `SoilAdvisor` | Soil health card analysis & ICAR regional reference. |
-| `/crop-health` | `farmer`, `admin` | `CropHealthMonitoring` | Field vegetation health & Sentinel-2 surface reflectance status. |
-| `/land-intelligence` | `farmer`, `admin` | `LandIntelligence` | GIS boundary and cadastral parcel intelligence. |
-| `/marketplace` | `farmer`, `admin` | `Marketplace` | Agri-input marketplace & trade exchange. |
-| `/equipment-rental` | `farmer`, `admin` | `EquipmentRental` | Farm machinery rental registry. |
-| `/subsidies` | `farmer`, `admin` | `GovernmentSubsidies` | Central & State agricultural subsidy schemes. |
-| `/market` | `farmer`, `admin` | `MarketAnalysis` | Mandi commodity prices & crop trend forecasting. |
-| `/investors` | `farmer`, `admin` | `InvestorsHub` | Farm funding & agtech investor portfolio. |
-| `/book-consultation` | `farmer`, `admin` | `BookConsultation` | Direct appointment scheduling with certified agronomists. |
-| `/agronomist` | `agronomist`, `admin` | `AgronomistDashboard` | Multi-farm clinical triage, pathology trends, prescription reviews. |
-| `/yield` | `agronomist`, `admin` | `YieldPrediction` | Agronomic formula yield estimates vs historical DES APY. |
-| `/climate` | `agronomist`, `admin` | `ClimateRisk` | Extreme climate risk matrix & vulnerability indices. |
-| `/simulator` | `agronomist`, `admin` | `ClimateSimulator` | Microclimate temperature & precipitation stress simulation. |
-| `/sustainability` | `agronomist`, `admin` | `SustainabilityScore` | Environmental stewardship & carbon emission scorecard. |
-| `/admin` | `admin` | `AdminDashboard` | System health diagnostics, audit verification, user management. |
-| `/settings` | Authenticated | `Settings` | Profile preferences, language selection, security settings. |
-| `/about` | Authenticated | `About` | Team, mission, scientific disclosures, and data provenance. |
-| `/404` | Public | `NotFoundPage` | Graceful 404 page for unmatched routes. |
-
----
+### Frontend Routes (`Frontend/src/App.tsx`)
+- **Public Routes**: `/`, `/home` (Landing Page), `/login`, `/register`, `/forgot-password`, `/404`
+- **Protected Farmer & Admin Routes**:
+  - `/dashboard` — Real-time farm overview, live sensor cards, and weather charts.
+  - `/irrigation` — Closed-loop FAO-56 irrigation decisions, freshness badges, and pump controls.
+  - `/soil` — Soil health card analysis & ICAR regional reference baseline.
+  - `/crop-health` — Field vegetation health and Sentinel-2 satellite status.
+  - `/land-intelligence` — Cadastral parcel intelligence and GIS boundaries.
+  - `/marketplace` — Agricultural inputs and trade directory.
+  - `/equipment-rental` — Tractor and machinery hiring registry.
+  - `/subsidies` — Central and State government agricultural subsidy schemes.
+  - `/market` — Mandi commodity prices and trend analysis.
+  - `/investors` — Farm funding portfolio and investor pitch metrics.
+  - `/book-consultation` — Direct appointment scheduling with agronomists.
+- **Protected Agronomist & Admin Routes**:
+  - `/agronomist` — Multi-farm clinical triage, pathology trends, and prescription review.
+  - `/yield` — Deterministic agronomic formula yield estimation vs historical DES APY.
+  - `/climate` & `/simulator` — Extreme weather vulnerability matrix and parametric stress simulator.
+  - `/sustainability` — Environmental stewardship and carbon footprint scoring.
+- **Protected Admin-Only Routes**:
+  - `/admin` — System diagnostics, audit chain verification, and user management.
+- **Common Protected Routes**:
+  - `/settings` — Profile preferences, language switching, security settings.
+  - `/about` — Scientific disclosures, methodology, and data provenance.
+  - `/onboarding` — First-time user setup.
 
 ### Backend API Endpoints Reference
-
-#### 1. Authentication (`/api/auth`)
-- `POST /api/auth/register` — Register a new user account with role selection.
-- `POST /api/auth/login` — Authenticate credentials; returns signed JWT token.
-- `POST /api/auth/send-otp` — Dispatch verification OTP via Firebase / simulated gateway (Rate limited).
-- `POST /api/auth/verify-otp` — Verify 6-digit OTP token and return session.
-- `POST /api/auth/social-login` — Google OAuth credential exchange.
-- `POST /api/auth/forgot-password` — Password recovery dispatch.
-- `POST /api/auth/logout` — Invalidate client session.
-- `PATCH /api/auth/users/:userId/role` — Role elevation (Requires `admin` role).
-
-#### 2. IoT Telemetry & Actuation (`/api/iot-data`)
-- `POST /api/iot-data` — Ingest sensor telemetry from ESP32 hardware or simulator. Requires `x-iot-api-key` header or JWT Bearer. Rejects future-dated timestamps (>60s) and spoofed cross-user telemetry with HTTP 403.
-- `GET /api/iot-data` — Retrieve latest telemetry reading for an instrumented field (`fieldId` parameter). Returns HTTP 404 if no reading exists (no cross-field data leakage).
-- `GET /api/iot-data/history` — Scoped historical telemetry readings for the authenticated user and parcel.
-- `POST /api/iot-data/control` — Issue pump actuation command (`pumpStatus: boolean`). Enforces **Actuator Safety Interlock**: rejects pump activation with HTTP 422 `TRIPPED_STALE_TELEMETRY` if telemetry > 15 minutes old (emergency deactivation always permitted). Requires `farmer` or `admin` role.
-- `POST /api/iot-data/actuator-ack` — Physical hardware execution acknowledgment from ESP32. Requires `x-iot-api-key`.
-- `GET /api/iot-data/actuator-state` — Get current pump command state machine status (`PENDING_ACK`, `ACKNOWLEDGED`, `FAULT`).
-
-#### 3. Field Intelligence & Decision Engine (`/api/field-intelligence`)
-- `POST /api/field-intelligence/recommend` — Generate explainable FAO-56 irrigation recommendation. Requires JWT. Enforces **Data Quality Gate**: if telemetry is stale (>15m), missing, or invalid, safely blocks `IRRIGATE_IMMEDIATE` and returns `INSUFFICIENT_DATA`.
-- `GET /api/field-intelligence/context` — Retrieve aggregated multi-source context (soil, weather, telemetry).
-- `POST /api/field-intelligence/action` — Record farmer physical execution action on timeline.
-- `GET /api/field-intelligence/timeline/:fieldId` — Retrieve chronologically ordered field event timeline.
-- `POST /api/field-intelligence/evaluate` — Record follow-up outcome evaluation (verifies moisture recovery vs worsening).
-- `POST /api/field-intelligence/review` — Specialist review and endorsement of recommendation. Requires `agronomist` or `admin` role. Seals event into audit ledger.
-- `GET /api/field-intelligence/reviews` — Fetch pending agronomist reviews. Requires `agronomist` or `admin`.
-- `GET /api/field-intelligence/history` — Retrieve historical recommendation ledger for authenticated farmer.
-
-#### 4. Environmental Data (`/api/environmental`)
-- `GET /api/environmental/registry` — Canonical environmental variable registry and units.
-- `GET /api/environmental/weather` — Historical weather reanalysis data (Open-Meteo ERA5-Land).
-- `GET /api/environmental/satellite/ndvi` — Sentinel-2 L2A NDVI data (returns honest empty state when unintegrated).
-- `GET /api/environmental/soil` — Published ICAR-TNAU regional soil reference benchmark.
-- `GET /api/environmental/crop-statistics` — DES APY historical crop production statistics.
-- `POST /api/environmental/ingest/weather` — Trigger weather CSV reanalysis ingestion (Requires `admin`).
-- `POST /api/environmental/ingest/satellite` — Ingest satellite raster reflections (Requires `admin`).
-- `POST /api/environmental/soil/ingest` — Ingest calibrated soil lab test (Requires `farmer`, `agronomist`, or `admin`).
-- `POST /api/environmental/crop-statistics/ingest` — Ingest agricultural yield statistics (Requires `admin`).
-
-#### 5. Cryptographic Audit Ledger (`/api/blockchain`)
-- `GET /api/blockchain/chain` — Retrieve the full tamper-evident cryptographic block chain.
-- `GET /api/blockchain/verify` — Execute cryptographic block-by-block hash and Merkle root verification.
-- `POST /api/blockchain/log` — Seal an agronomic or administrative event into an immutable block. Requires `agronomist` or `admin`.
-
-#### 6. AI Agronomic Predictions (`/api/ai`)
-- `POST /api/ai/predict-yield` — Agronomic formula crop yield prediction. Requires JWT.
-- `POST /api/ai/irrigation-schedule` — Multi-day irrigation scheduling advisory. Requires JWT.
-- `POST /api/ai/soil-analysis` — NPK stoichiometry and fertilizer optimization. Requires JWT.
-- `POST /api/ai/climate-risk` — Extreme heat, drought, and flood risk assessment. Requires JWT.
-- `POST /api/ai/simulate-climate` — What-if climate stress simulation. Requires JWT.
-
-#### 7. Specialist Consultations (`/api/consultations`)
-- `POST /api/consultations/book` — Schedule appointment with agronomist specialist. Requires JWT.
-- `GET /api/consultations/my-bookings` — List consultations booked by authenticated user.
-- `GET /api/consultations/all` — List all consultations across the platform (Requires `agronomist` or `admin`).
-- `PATCH /api/consultations/:id/status` — Update booking status (`scheduled`, `completed`, `cancelled`).
+- **Authentication (`/api/auth`)**:
+  - `POST /register`, `POST /login`, `POST /send-otp`, `POST /verify-otp`, `POST /social-login`, `POST /forgot-password`, `POST /logout`
+  - `PATCH /users/:userId/role` (Admin only)
+- **IoT Telemetry & Actuation (`/api/iot-data`)**:
+  - `POST /` — Ingest sensor telemetry (`x-iot-api-key` or JWT). Enforces skew checks and anti-spoofing (403).
+  - `GET /` — Latest reading for requested field (`fieldId`). Returns 404 for uninstrumented fields.
+  - `GET /history` — Scoped historical telemetry.
+  - `POST /control` — Pump actuation command. Refuses activation on stale telemetry with **HTTP 422 `TRIPPED_STALE_TELEMETRY`**. Emergency shutoff always allowed.
+  - `POST /actuator-ack` — Physical hardware execution confirmation from ESP32.
+  - `GET /actuator-state` — Current actuator state machine status (`PENDING_ACK`, `ACKNOWLEDGED`).
+- **Field Intelligence & Decisions (`/api/field-intelligence`)**:
+  - `POST /recommend` — Explainable FAO-56 irrigation advice with 15-minute telemetry freshness gate.
+  - `GET /context` — Multi-source field context (soil, weather, telemetry).
+  - `POST /action` — Farmer recorded action on field timeline.
+  - `GET /timeline/:fieldId` — Chronological field event history.
+  - `POST /evaluate` — Follow-up outcome evaluation (moisture recovery vs worsening).
+  - `POST /review` & `GET /reviews` — Agronomist prescription endorsement (Agronomist/Admin only).
+  - `GET /history` — Historical recommendation audit log.
+- **Environmental Data Ingestion (`/api/environmental`)**:
+  - `GET /registry`, `GET /weather`, `GET /satellite/ndvi`, `GET /soil`, `GET /crop-statistics`
+  - `POST /ingest/weather`, `POST /ingest/satellite`, `POST /soil/ingest`, `POST /crop-statistics/ingest`
+- **Cryptographic Audit Ledger (`/api/blockchain`)**:
+  - `GET /chain` — Full SHA-256 block chain retrieval.
+  - `GET /verify` — Merkle root and cryptographic hash link verification.
+  - `POST /log` — Seal arbitrary event into immutable block (Agronomist/Admin only).
+- **AI Agronomic Predictions (`/api/ai`)**:
+  - `POST /predict-yield`, `POST /irrigation-schedule`, `POST /soil-analysis`, `POST /climate-risk`, `POST /simulate-climate`
+- **Specialist Consultations (`/api/consultations`)**:
+  - `POST /book`, `GET /my-bookings`, `GET /all`, `PATCH /:id/status`
 
 ---
 
-## 📊 Environmental Data Provenance & Real-World Boundaries
+## 📊 Scientific Data Provenance & Real-World Boundaries
 
-AgriFlux maintains scientific rigor by strictly differentiating verified historical data, regional reference baselines, and live sensor measurements from speculative models:
+AgriFlux strictly separates verified real-world baselines from speculative claims:
 
-### 1. Historical Weather Reanalysis (Open-Meteo ERA5-Land)
-- **Source**: Open-Meteo ERA5-Land Reanalysis (2021–2026) for the Thanjavur pilot district (10.79°N, 79.10°E, 59m elevation, Cauvery Delta).
-- **Scope**: Historical model-based reanalysis providing daily temperature ($T_{\text{mean}}$, $T_{\text{min}}$, $T_{\text{max}}$), precipitation sum ($\text{mm}$), and FAO-56 Penman-Monteith reference evapotranspiration ($ET_0$).
-- **Distinction**: These are historical reanalysis estimates, **not** live microclimate measurements or 14-day operational forecasts. Ingested idempotently into MongoDB.
-
-### 2. Satellite Spectral Processing (Copernicus Sentinel-2 L2A)
-- **Pipeline Architecture**: Multispectral processing pipeline designed for Sentinel-2 MSI Level-2A surface reflectance (Band 04 Red 665nm, Band 08 NIR 842nm at 10m spatial resolution) with Scene Classification Layer (SCL) cloud masking:
-  $$\text{NDVI} = \frac{\text{B08} - \text{B04}}{\text{B08} + \text{B04}}$$
-- **Current Integration Status**: **Satellite data not connected**. When genuine raster data has not been ingested, AgriFlux presents an honest empty state (`"Satellite data not connected"`). Synthetic vegetation indices are **never** fabricated or presented as real orbital observations.
-
-### 3. Regional Soil Reference Profile
-- **Source**: Published ICAR-TNAU regional soil survey classifications for the Cauvery Delta alluvial basin (pH 6.4, low available N, medium P, high reserve K).
-- **Scope**: **Illustrative regional benchmark** providing agro-ecological context for the district.
-- **Distinction**: It is **not** an official certified farm Soil Health Card, laboratory report, or in-situ measurement of an individual farm boundary. Operational farm advisories recommend certified soil testing.
-
-### 4. Historical Crop Production Statistics (DES APY)
-- **Source**: Directorate of Economics & Statistics (DES), Ministry of Agriculture & Farmers Welfare, Government of India.
-- **Scope**: Archived historical records from **Agricultural Year 1997–1998** for Thanjavur Rice (Area: 181,496 Ha, Production: 489,770 Tonnes, Yield: 2.70 t/Ha).
-- **Distinction**: Provides macroeconomic historical district yield context; **not** a current seasonal target or individual farm productivity metric.
-
-### 5. Agronomic Decision Engine vs. Machine Learning
-- **Irrigation Logic**: Implements the Food and Agriculture Organization (FAO) Irrigation and Drainage Paper No. 56 Penman-Monteith equation and Maximum Allowable Depletion (MAD) framework.
-- **Yield Modeling**: Deterministic agronomic formula based on crop-specific base potential calibrated with NPK stoichiometry, rainfall distribution, and temperature-humidity indices. Clearly labeled as an **Agronomic Formula Estimate**, distinguished from empirical machine learning inferences.
-
-### 6. Cryptographic Audit Ledger vs. Blockchain
-- **Ledger Model**: A single-node, tamper-evident SHA-256 block chain with Merkle tree verification and HMAC signing.
-- **Distinction**: Provides immutable local auditability for farm actions and agronomist reviews. It is **not** a decentralized, proof-of-work, or multi-validator cryptocurrency blockchain.
+1. **Historical Weather Reanalysis (Open-Meteo ERA5-Land)**:
+   - Covers 2021–2026 for the Thanjavur pilot district (10.79°N, 79.10°E, Cauvery Delta). Provides temperature, precipitation, and reference evapotranspiration ($ET_0$).
+   - *Boundary*: Historical model-based reanalysis estimates, **not** live microclimate sensor readings or operational 14-day forecasts.
+2. **Satellite Spectral Processing (Copernicus Sentinel-2 L2A)**:
+   - Multispectral pipeline designed for Sentinel-2 MSI Level-2A surface reflectance (Band 04 Red 665nm, Band 08 NIR 842nm at 10m resolution) with Scene Classification Layer (SCL) cloud masking.
+   - *Boundary*: When genuine raster tiles are not ingested, AgriFlux presents an honest empty state (`"Satellite data not connected"`). Synthetic vegetation indices are **never** fabricated.
+3. **Regional Soil Reference Profile**:
+   - Published ICAR-TNAU regional soil survey classifications for the Cauvery Delta alluvial basin (pH 6.4, low N, medium P, high reserve K).
+   - *Boundary*: An **illustrative regional benchmark** providing agro-ecological context; **not** an individual farm Soil Health Card or laboratory test.
+4. **Historical Crop Production Statistics (DES APY)**:
+   - Directorate of Economics & Statistics (DES), Ministry of Agriculture & Farmers Welfare, Government of India. Archived records from **Agricultural Year 1997–1998** for Thanjavur Rice.
+   - *Boundary*: Macroeconomic historical district yield context; **not** a farm-level seasonal yield guarantee.
+5. **Deterministic Agronomic Formula vs Machine Learning**:
+   - Irrigation logic implements the FAO-56 Penman-Monteith and Maximum Allowable Depletion (MAD) framework. Yield estimations are deterministic agronomic formulas calibrated against NPK stoichiometry and climate indices, transparently distinguished from black-box ML.
+6. **Cryptographic Audit Ledger vs Cryptocurrency Blockchain**:
+   - A single-node, tamper-evident SHA-256 block chain with Merkle tree verification and HMAC signing.
+   - *Boundary*: Provides local cryptographic auditability and tamper-detection. It is **not** a decentralized, multi-validator proof-of-work/stake cryptocurrency network.
 
 ---
 
-## 🧪 Automated Verification Suite
+## 🧪 Automated Verification Suite (16 Suites, 130 Tests — 100% Passing)
 
-AgriFlux includes a comprehensive 16-suite automated test suite covering authentication, RBAC, IoT validation, actuator state machines, data ingestion, stale telemetry gating, actuator safety interlocks, and regression tests.
+AgriFlux includes a comprehensive automated test suite validating security, decision reliability, and safety interlocks:
 
 ```bash
-cd Backend
-npm test
+cd Backend && npm test
 ```
 
-### Verified Test Suites (130/130 Passing — 100% Pass Rate):
+| Suite | Focus Area | Tests | Result |
+| :---: | :--- | :---: | :---: |
+| **Suite 1** | Authentication, Token Integrity, RBAC Middleware & Post-Login Voice Regression | 6 | **PASS** |
+| **Suite 2** | IoT Telemetry Ingestion, Ring Buffer, Validation & Device IDs | 6 | **PASS** |
+| **Suite 3** | Field Intelligence Engine, Closed-Loop Decisions & Moisture Depletion | 6 | **PASS** |
+| **Suite 4** | AI & Agronomic Prediction Services (Yield, Schedule, Risk) | 5 | **PASS** |
+| **Suite 5** | Historical Weather CSV Ingestion & Idempotency | 3 | **PASS** |
+| **Suite 6** | Sentinel-2 L2A Satellite NDVI Processing & Quality Filters | 5 | **PASS** |
+| **Suite 7** | Soil Health Card & Laboratory Chemistry Ingestion | 3 | **PASS** |
+| **Suite 8** | Directorate of Economics & Statistics (DES) APY Ingestion | 2 | **PASS** |
+| **Suite 9** | IoT Actuator State Machine & Two-Phase Acknowledgement Protocol | 6 | **PASS** |
+| **Suite 10**| Field Intelligence Multi-Source Environmental Integration | 3 | **PASS** |
+| **Suite 11**| Blockchain Ledger Persistence, Concurrency & Security | 18 | **PASS** |
+| **Suite 12**| Decision Engine Defect Remediation & Verification Suite | 12 | **PASS** |
+| **Suite 13**| Quantex Master Audit & Defect Remediation Verification | 5 | **PASS** |
+| **Suite 14**| Quantex Closed-Loop End-to-End Workflow Verification | 7 | **PASS** |
+| **Suite 15**| Demo Account Seeding Security & Secret Validation | 7 | **PASS** |
+| **Suite 16**| Stale Telemetry Gating, Actuator Safety Interlock & Tenant Isolation | 18 | **PASS** |
+| **TOTAL** | **Comprehensive Regression & Security Gate** | **130** | **100% PASS** |
 
-| Suite | Description | Test Count |
-| :--- | :--- | :---: |
-| **Suite 1** | Authentication, Token Integrity, RBAC Middleware & Post-Login Voice Regression | 6 tests |
-| **Suite 2** | IoT Telemetry Ingestion, Validation & Buffering | 6 tests |
-| **Suite 3** | Field Intelligence Engine & Closed-Loop Decisions | 6 tests |
-| **Suite 4** | AI & Agronomic Prediction Services | 5 tests |
-| **Suite 5** | Historical Weather CSV Ingestion & Idempotency | 3 tests |
-| **Suite 6** | Sentinel-2 L2A Satellite NDVI Processing & Quality Filters | 5 tests |
-| **Suite 7** | Soil Health Card & Laboratory Chemistry Ingestion | 3 tests |
-| **Suite 8** | Directorate of Economics & Statistics (DES) APY Ingestion | 2 tests |
-| **Suite 9** | IoT Actuator State Machine & Acknowledgement Protocol | 6 tests |
-| **Suite 10** | Field Intelligence Multi-Source Environmental Integration | 3 tests |
-| **Suite 11** | Blockchain Ledger Persistence, Concurrency & Security | 18 tests |
-| **Suite 12** | Decision Engine Defect Remediation & Verification Suite | 12 tests |
-| **Suite 13** | Quantex Master Audit & Defect Remediation Verification | 5 tests |
-| **Suite 14** | Quantex Closed-Loop End-to-End Workflow Verification | 7 tests |
-| **Suite 15** | Demo Account Seeding Security & Secret Validation | 7 tests |
-| **Suite 16** | Stale Telemetry Gating, Actuator Safety Interlock & Tenant Isolation | 18 tests |
-| **TOTAL** | **Full End-to-End Automated Test Verification** | **130 tests** |
-
----
-
-## 🔒 Security & Production Checklist
-
-1. **Production Secret Strength**: The backend checks JWT secrets on startup; weak or default placeholder secrets (`agriflux_development_secret_2026`) are refused in production mode. Secrets must be >= 32 characters.
-2. **Fail-Closed Hardware Authentication**: ESP32 endpoints enforce `x-iot-api-key` validation using constant-time cryptographic hash comparison (`crypto.timingSafeEqual`) to prevent timing side-channel attacks (CWE-208).
-3. **Telemetry Freshness & Actuator Interlock**:
-   - Telemetry older than 15 minutes is flagged as `stale`.
-   - Stale telemetry triggers the `INSUFFICIENT_DATA` safety gate, suppressing automated irrigation recommendations.
-   - Physical pump activation commands against stale telemetry are blocked with HTTP 422 `TRIPPED_STALE_TELEMETRY`.
-   - Emergency deactivations (`pumpStatus: false`) are always permitted immediately.
-4. **Tenant Isolation**:
-   - Telemetry queries for uninstrumented fields return HTTP 404 without leaking other parcels.
-   - Sensor ingestion validates device and user ownership, rejecting cross-user spoofing with HTTP 403.
-5. **Rate Limiting & Abuse Prevention**: Express rate limiters protect authentication, OTP dispatch, and compute-heavy AI prediction endpoints.
-6. **No Plaintext Credential Logging**: All startup, database connection, and seeding logs redact credentials and connection strings.
-7. **Clean Post-Login UX**: Zero unwanted automated speech synthesis, microphone activation, or floating widgets upon authentication.
+Detailed execution evidence is documented in [reports/README_SECURITY_TELEMETRY_TEST_RESULTS.md](reports/README_SECURITY_TELEMETRY_TEST_RESULTS.md).
 
 ---
 
 ## 🚀 Quickstart: Local Setup & Development
 
 ### Prerequisites
-- Node.js (v18.x, v20.x, or v24.x)
+- Node.js (`v18.x`, `v20.x`, or `v24.x`)
 - Git
-- MongoDB (local community edition or Atlas connection string)
+- MongoDB (local instance or MongoDB Atlas cluster)
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -349,25 +359,44 @@ cd AgriFlux
 npm run install-all
 ```
 
-### 2. Configure Environment Variables
+### 2. Configure Environment Files
 ```bash
-# Backend environment configuration
+# In Backend/
 cp Backend/.env.example Backend/.env
 
-# Frontend environment configuration
+# In Frontend/
 cp Frontend/.env.example Frontend/.env
+```
+
+Ensure `Backend/.env` has:
+```env
+PORT=5001
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/agriflux
+JWT_SECRET=agriflux_development_secret_2026
+FRONTEND_URL=http://localhost:3000
+IOT_API_KEY=agriflux-iot-key-dev
 ```
 
 ### 3. Provision Demo Accounts (Non-Production Only)
 ```bash
-cd Backend
-npm run seed:demo
+cd Backend && npm run seed:demo
 ```
 
 ### 4. Run Development Servers
-From the repository root:
+From the root directory:
 ```bash
 npm run dev
 ```
-- **Frontend SPA**: `http://localhost:3000`
+- **Frontend Client**: `http://localhost:3000`
 - **Backend API**: `http://localhost:5001/api`
+
+---
+
+## 🔒 Security & Quality Standards
+
+- **Code Cleanliness**: 0 ESLint warnings (`eslint . --max-warnings 0`) and 0 TypeScript compilation errors (`tsc`).
+- **Cryptographic Safeguards**: Constant-time comparison (`crypto.timingSafeEqual`) for IoT API keys (CWE-208 mitigation).
+- **Actuator Interlock**: Refuses physical pump actuation on telemetry > 15 minutes old with HTTP 422.
+- **Fail-Closed Design**: Database disconnections and invalid signatures cause the system to safely halt critical operations rather than continuing in an inconsistent state.
+- **Clean Post-Login UX**: Zero unwanted automated voice synthesis, microphone triggers, or intrusive floating popups upon authentication.
