@@ -19,6 +19,7 @@ export const useIoT = () => {
   const [humidity, setHumidity] = useState(62.0);
   const [pumpActive, setPumpActive] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
+  const [isStale, setIsStale] = useState(false);
 
   // Refs for socket and polling
   const socketRef = useRef<Socket | null>(null);
@@ -41,6 +42,7 @@ export const useIoT = () => {
       setHumidity((prev) => prev + (Math.random() * 0.2 - 0.1));
       setLastSync(new Date());
       setIsOnline(true);
+      setIsStale(false);
     }, 3000);
 
     return () => clearInterval(interval);
@@ -88,6 +90,7 @@ export const useIoT = () => {
       setPumpActive(data.pumpStatus);
       setLastSync(new Date(data.timestamp));
       setIsOnline(data.isOnline);
+      setIsStale(Boolean(data.isStale));
     });
 
     socket.on('disconnect', () => {
@@ -123,6 +126,7 @@ export const useIoT = () => {
         setPumpActive(data.pumpStatus);
         setLastSync(new Date(data.timestamp));
         setIsOnline(data.isOnline);
+        setIsStale(Boolean(data.isStale));
       }
     } catch {
       setIsOnline(false);
@@ -190,6 +194,7 @@ export const useIoT = () => {
     isLiveMode,
     isLoading,
     isOnline,
+    isStale,
     socketConnected,
     isSimulated: !isLiveMode,
 

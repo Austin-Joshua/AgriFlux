@@ -455,6 +455,10 @@ const AIDecisionPanel: React.FC = () => {
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/40">
                   {obs?.soilMoisture?.value == null
                     ? `⚠️ ${t('decisionEngine.telemetryMissing', 'Telemetry Offline')}`
+                    : obs?.soilMoisture?.isStale || obs?.soilMoisture?.dataQualityStatus === 'stale'
+                    ? `⚠️ ${t('decisionEngine.telemetryStale', 'Telemetry Stale (>15m)')}`
+                    : obs?.soilMoisture?.dataQualityStatus === 'invalid'
+                    ? `⛔ ${t('decisionEngine.telemetryInvalid', 'Telemetry Invalid')}`
                     : obs?.soilMoisture?.provenance === 'measured'
                     ? `⚡ ${t('decisionEngine.measuredEsp32', 'ESP32 Measured')}`
                     : obs?.soilMoisture?.provenance === 'operator_override'
@@ -517,6 +521,14 @@ const AIDecisionPanel: React.FC = () => {
               {obs?.soilMoisture?.value == null ? (
                 <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-700">
                   {t('decisionEngine.telemetryOffline', 'Telemetry Offline')}
+                </span>
+              ) : obs?.soilMoisture?.isStale || obs?.soilMoisture?.dataQualityStatus === 'stale' ? (
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                  ⚠️ {t('decisionEngine.telemetryStale', 'Stale (>15m)')}
+                </span>
+              ) : obs?.soilMoisture?.dataQualityStatus === 'invalid' ? (
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-red-500/30">
+                  ⛔ {t('decisionEngine.telemetryInvalid', 'Invalid')}
                 </span>
               ) : obs?.soilMoisture?.source === 'esp32_hardware' ? (
                 <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">

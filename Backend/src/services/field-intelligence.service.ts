@@ -10,6 +10,12 @@ import { SatelliteProcessingService } from './satellite-processing.service';
 import { SoilDataService } from './soil-data.service';
 import { CropStatisticsService } from './crop-statistics.service';
 import { BlockchainService } from './blockchain.service';
+import {
+  TELEMETRY_FRESHNESS_WINDOW_MINUTES,
+  evaluateTelemetryQuality,
+  TelemetryQualityStatus,
+} from '../types/telemetry';
+import { getInMemoryIoTReading } from '../controllers/iot.controller';
 
 export interface FieldContextInput {
   fieldId?: string;
@@ -138,7 +144,7 @@ export class FieldIntelligenceService {
     }
 
     // --- 1. SENSOR TELEMETRY ACQUISITION (Scoped by field and device) ---
-    let latestSensor: any = null;
+    let latestSensor: any;
     if (isDBConnected) {
       try {
         const sensorFilter: any = {
@@ -154,6 +160,8 @@ export class FieldIntelligenceService {
       } catch {
         latestSensor = null;
       }
+    } else {
+      latestSensor = getInMemoryIoTReading(fieldId, context.deviceId);
     }
 
     const now = Date.now();
@@ -189,10 +197,11 @@ export class FieldIntelligenceService {
     let sensorHumidity: number | null | undefined;
     let sensorSource: string | undefined;
     let sensorSourceType: string | undefined;
-    let sensorQualityStatus: string | undefined;
+    let sensorQualityStatus: TelemetryQualityStatus | string;
     let sensorProvenance: 'measured' | 'simulated' | 'missing';
-    let freshnessMinutes = 0;
-    let isStale = false;
+    let freshnessMinutes: number;
+    let isStale: boolean;
+    let stalenessReason: string | undefined;
 
     if (context.soilMoistureOverride !== undefined) {
       if (context.soilMoistureOverride === null) {
@@ -203,6 +212,7 @@ export class FieldIntelligenceService {
         sensorProvenance = 'missing';
         freshnessMinutes = -1;
         isStale = true;
+        stalenessReason = 'Operator explicit null telemetry override.';
       } else {
         const rawMoist = Number(context.soilMoistureOverride);
         if (isNaN(rawMoist) || !isFinite(rawMoist) || rawMoist < 0 || rawMoist > 100) {
@@ -215,39 +225,64 @@ export class FieldIntelligenceService {
         sensorMoisture = Math.round(rawMoist * 10) / 10;
         sensorSource = 'manual_operator_input';
         sensorSourceType = 'calibrated_field_measurement';
-        sensorQualityStatus = 'verified';
+        sensorQualityStatus = 'fresh';
         sensorProvenance = 'measured';
+        freshnessMinutes = 0;
+        isStale = false;
       }
+    } else if (context.isSimulated) {
+      // Explicit simulation requested by operator or test harness
+      const fieldDefaultMoisture =
+        fieldId === 'field-01'
+          ? 24 // North Acre Rice: Triggers targeted irrigation advisory
+          : fieldId === 'field-02'
+            ? 52 // South Terrace Maize: Optimal moisture
+            : fieldId === 'field-03'
+              ? 78 // Riverside Sugarcane: High moisture / postponed cycle
+              : 38;
+      sensorMoisture = fieldDefaultMoisture;
+      sensorTemp = 28;
+      sensorHumidity = 62;
+      sensorSource = 'iot_simulator';
+      sensorSourceType = 'simulated_calibration_profile';
+      sensorQualityStatus = 'simulated';
+      sensorProvenance = 'simulated';
+      freshnessMinutes = 2;
+      isStale = false;
     } else if (latestSensor) {
-      if (
-        latestSensor.moisture !== undefined &&
-        latestSensor.moisture !== null &&
-        !isNaN(Number(latestSensor.moisture)) &&
-        Number(latestSensor.moisture) >= 0 &&
-        Number(latestSensor.moisture) <= 100
-      ) {
+      const assessment = evaluateTelemetryQuality(latestSensor);
+      sensorQualityStatus = assessment.quality;
+      freshnessMinutes = assessment.freshnessMinutes;
+      isStale = assessment.isStale;
+      stalenessReason = assessment.reason;
+
+      if (assessment.quality === 'invalid') {
+        sensorMoisture = null;
+        sensorSource = 'invalid_telemetry';
+        sensorSourceType = 'iot_capacitive_probe';
+        sensorProvenance = 'missing';
+      } else if (assessment.quality === 'stale') {
         sensorMoisture = Number(latestSensor.moisture);
         sensorTemp = latestSensor.temperature;
         sensorHumidity = latestSensor.humidity;
         sensorSource = latestSensor.isSimulated ? 'iot_simulator' : 'esp32_hardware';
         sensorSourceType = 'iot_capacitive_probe';
-        sensorQualityStatus = latestSensor.isSimulated ? 'simulated' : 'verified';
         sensorProvenance = latestSensor.isSimulated ? 'simulated' : 'measured';
-        const readingAge =
-          now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
-        freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
-        isStale = freshnessMinutes > 15;
-        if (isStale) {
-          sensorQualityStatus = 'stale';
-        }
+      } else if (assessment.quality === 'simulated') {
+        sensorMoisture = Number(latestSensor.moisture);
+        sensorTemp = latestSensor.temperature;
+        sensorHumidity = latestSensor.humidity;
+        sensorSource = 'iot_simulator';
+        sensorSourceType = 'simulated_calibration_profile';
+        sensorProvenance = 'simulated';
       } else {
-        sensorMoisture = null;
-        sensorSource = 'missing_telemetry';
+        // Fresh physical telemetry
+        sensorMoisture = Number(latestSensor.moisture);
+        sensorTemp = latestSensor.temperature;
+        sensorHumidity = latestSensor.humidity;
+        sensorSource = 'esp32_hardware';
         sensorSourceType = 'iot_capacitive_probe';
-        sensorQualityStatus = 'missing';
-        sensorProvenance = 'missing';
-        freshnessMinutes = -1;
-        isStale = true;
+        sensorProvenance = 'measured';
       }
     } else if (context.allowSimulation || context.isSimulated) {
       // Explicit simulation mode permitted only when requested
@@ -277,6 +312,7 @@ export class FieldIntelligenceService {
       sensorProvenance = 'missing';
       freshnessMinutes = -1;
       isStale = true;
+      stalenessReason = 'No physical sensor telemetry or calibrated observation available.';
     }
 
     // --- 2. MULTI-SOURCE ENVIRONMENTAL DATA INGESTION ---
@@ -410,9 +446,19 @@ export class FieldIntelligenceService {
     const ambientHumidity = Number(context.humidity) || sensorHumidity || 60;
 
     // --- 3. DATA-QUALITY GATE: INSUFFICIENT DATA SAFETY CHECK ---
-    // If neither in-situ sensor telemetry nor manual override is supplied:
-    if (sensorMoisture == null) {
+    // Physical root-zone telemetry must be fresh, finite, and verified to drive automated decisions.
+    // Stale, missing, or invalid telemetry MUST trigger the safety gate and return INSUFFICIENT_DATA.
+    if (
+      sensorMoisture == null ||
+      isStale ||
+      sensorQualityStatus === 'stale' ||
+      sensorQualityStatus === 'missing' ||
+      sensorQualityStatus === 'invalid'
+    ) {
       const recommendationId = 'rec_' + crypto.randomUUID().substring(0, 12);
+      const isStaleCase = isStale || sensorQualityStatus === 'stale';
+      const isInvalidCase = sensorQualityStatus === 'invalid';
+
       const insufficientResult = {
         recommendationId,
         userId,
@@ -422,16 +468,20 @@ export class FieldIntelligenceService {
         cropType,
         cropStage,
         action: 'INSUFFICIENT_DATA' as const,
-        actionLabel: 'Data Quality Gate: In-Situ Soil Moisture Reading Required',
-        urgency: 'low' as const,
+        actionLabel: isStaleCase
+          ? `Data Quality Gate: Telemetry Stale (>${TELEMETRY_FRESHNESS_WINDOW_MINUTES}m) — Automated Irrigation Paused`
+          : isInvalidCase
+            ? 'Data Quality Gate: Telemetry Invalid or Out-of-Bounds'
+            : 'Data Quality Gate: In-Situ Soil Moisture Reading Required',
+        urgency: isStaleCase ? ('medium' as const) : ('low' as const),
         supportingObservations: {
           soilMoisture: {
-            value: null,
+            value: sensorMoisture ?? null,
             unit: '%',
-            source: 'missing_telemetry',
-            sourceType: 'iot_capacitive_probe',
-            dataQualityStatus: 'missing',
-            freshnessMinutes: -1,
+            source: sensorSource,
+            sourceType: sensorSourceType,
+            dataQualityStatus: sensorQualityStatus,
+            freshnessMinutes,
             isStale: true,
             provenance: sensorProvenance,
           },
@@ -464,30 +514,38 @@ export class FieldIntelligenceService {
           },
         },
         decisionRules: [
-          'Safety Gate Triggered: No physical capacitive probe reading or calibrated field observation available.',
-          'Operational Rule: Macro-climatic reanalysis and orbital NDVI cannot safely trigger automated irrigation without root-zone ground truth.',
+          isStaleCase
+            ? `Safety Gate Triggered: Telemetry age (${freshnessMinutes}m) exceeds the strict ${TELEMETRY_FRESHNESS_WINDOW_MINUTES}-minute freshness boundary.`
+            : isInvalidCase
+              ? `Safety Gate Triggered: Sensor readings failed integrity validation (${stalenessReason || 'invalid timestamp/bounds'}).`
+              : 'Safety Gate Triggered: No physical capacitive probe reading or calibrated field observation available.',
+          'Operational Rule: Stale, missing, or invalid telemetry cannot safely drive automated physical pump actuation.',
         ],
-        explanation:
-          'AgriFlux enforces strict scientific data gates. While macro-reanalysis weather and orbital satellite NDVI provide regional environmental context, they do not replace direct root-zone moisture measurements for automated closed-loop irrigation.',
+        explanation: isStaleCase
+          ? `Soil moisture telemetry is stale (${freshnessMinutes} minutes old, exceeding the ${TELEMETRY_FRESHNESS_WINDOW_MINUTES}-minute freshness threshold). AgriFlux safety interlocks withhold automated irrigation recommendations until current in-situ readings are synchronized, preventing accidental waterlogging or under-irrigation.`
+          : isInvalidCase
+            ? `Telemetry reading failed physical data sanity checks (${stalenessReason || 'invalid or future-dated'}). Actionable recommendations are withheld.`
+            : 'AgriFlux enforces strict scientific data gates. While macro-reanalysis weather and orbital satellite NDVI provide regional environmental context, they do not replace direct root-zone moisture measurements for automated closed-loop irrigation.',
         assumptionsAndLimitations: [
-          'Irrigation commands strictly prohibited until live sensor probe connects or operator provides manual reading.',
-          'Satellite NDVI reflects top-of-canopy greenness and cannot penetrate saturated soil profiles.',
+          'Automated physical irrigation commands strictly prohibited until live sensor probe connects or operator provides calibrated manual reading.',
+          'Macro-climate ERA5 reanalysis and Sentinel-2 NDVI provide contextual background but cannot override missing in-situ root-zone truth.',
         ],
         alternativeActions: [
           {
             action: 'Check ESP32 sensor battery and LoRaWAN/Wi-Fi connection',
-            tradeOff: 'Restores real-time automated intelligence.',
+            tradeOff: 'Restores real-time automated intelligence once fresh telemetry arrives.',
           },
           {
-            action: 'Input manual soil moisture test reading',
-            tradeOff: 'Enables immediate one-off agronomic calculation.',
+            action: 'Input manual calibrated soil moisture reading',
+            tradeOff:
+              'Enables immediate one-off agronomic calculation based on verified manual observation.',
           },
         ],
         expectedFollowUpCondition: {
           parameter: 'Sensor Connectivity',
-          targetRange: 'Online with telemetry < 15m old',
+          targetRange: `Online with fresh telemetry (< ${TELEMETRY_FRESHNESS_WINDOW_MINUTES}m old)`,
           timeframeHours: 1,
-          description: 'Awaiting sensor sync.',
+          description: 'Awaiting fresh sensor sync.',
         },
         ruleVersion: 'v2.1-QUANTEX-FAO56',
         createdAt: new Date(),
@@ -886,7 +944,7 @@ export class FieldIntelligenceService {
     const longitude = context.longitude || 79.098145;
 
     // 1. Sensor acquisition (Scoped by field and device)
-    let latestSensor: any = null;
+    let latestSensor: any;
     if (isDBConnected) {
       try {
         const sensorFilter: any = {
@@ -902,6 +960,8 @@ export class FieldIntelligenceService {
       } catch {
         latestSensor = null;
       }
+    } else {
+      latestSensor = getInMemoryIoTReading(fieldId, context.deviceId);
     }
 
     const now = Date.now();
@@ -944,20 +1004,16 @@ export class FieldIntelligenceService {
         isStale = false;
       }
     } else if (latestSensor) {
-      sensorMoisture = latestSensor.moisture;
+      const assessment = evaluateTelemetryQuality(latestSensor);
+      sensorMoisture = assessment.quality === 'invalid' ? null : Number(latestSensor.moisture);
       sensorTemp = latestSensor.temperature;
       sensorHumidity = latestSensor.humidity;
       sensorSource = latestSensor.isSimulated ? 'iot_simulator' : 'esp32_hardware';
       sensorSourceType = 'iot_capacitive_probe';
-      sensorQualityStatus = latestSensor.isSimulated ? 'simulated' : 'verified';
+      sensorQualityStatus = assessment.quality;
       sensorProvenance = latestSensor.isSimulated ? 'simulated' : 'measured';
-      const readingAge =
-        now - new Date(latestSensor.createdAt || latestSensor.rawTimestamp).getTime();
-      freshnessMinutes = Math.max(0, Math.round(readingAge / 60000));
-      isStale = freshnessMinutes > 15;
-      if (isStale) {
-        sensorQualityStatus = 'stale';
-      }
+      freshnessMinutes = assessment.freshnessMinutes;
+      isStale = assessment.isStale;
     } else if (context.allowSimulation || context.isSimulated) {
       const fieldDefaultMoisture =
         fieldId === 'field-01'

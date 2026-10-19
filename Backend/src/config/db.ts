@@ -6,11 +6,32 @@ import { env } from './env';
 
 export let isDBConnected = false;
 
-export const seedDefaultAccounts = async () => {
-  if (env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEEDING !== 'true') {
-    console.log('🔒 [SECURITY] Production mode active: default demo account seeding is refused.');
-    return;
+export interface SeedAccountOptions {
+  force?: boolean;
+  isCli?: boolean;
+}
+
+export const seedDefaultAccounts = async (options: SeedAccountOptions = {}) => {
+  // Guard 1: In production, normal startup must NEVER create demo accounts.
+  if (env.NODE_ENV === 'production') {
+    if (!options.isCli || process.env.ALLOW_PRODUCTION_DEMO_SEEDING !== 'true') {
+      console.log('🔒 [SECURITY] Production mode active: default demo account seeding is refused.');
+      return { seeded: 0, skipped: 0, status: 'refused_in_production' };
+    }
+    console.warn(
+      '⚠️ [SECURITY AUDIT] Dedicated CLI demo seeding executing in production environment.'
+    );
   }
+
+  // Guard 2: In development/test, automatic seeding during startup is disabled by default.
+  // Requires explicit opt-in via AUTO_SEED_DEMO=true or standalone CLI invocation (options.force)
+  if (!options.force && process.env.AUTO_SEED_DEMO !== 'true') {
+    console.log(
+      'ℹ️ [SECURITY] Demo account seeding disabled by default on startup. Run "npm run seed:demo" or set AUTO_SEED_DEMO=true to provision demo accounts.'
+    );
+    return { seeded: 0, skipped: 0, status: 'disabled_by_default' };
+  }
+
   try {
     const accounts = [
       {
@@ -18,7 +39,7 @@ export const seedDefaultAccounts = async () => {
         email: 'farmer@agriflux.com',
         name: 'Demo Farmer',
         phone: '0000000001',
-        password: 'password123',
+        password: process.env.DEMO_FARMER_PASSWORD || 'password123',
         role: 'farmer' as const,
       },
       {
@@ -26,7 +47,7 @@ export const seedDefaultAccounts = async () => {
         email: 'agronomist@agriflux.com',
         name: 'Demo Agronomist',
         phone: '0000000002',
-        password: 'agro123',
+        password: process.env.DEMO_AGRONOMIST_PASSWORD || 'agro123',
         role: 'agronomist' as const,
       },
       {
@@ -34,25 +55,37 @@ export const seedDefaultAccounts = async () => {
         email: 'admin@agriflux.com',
         name: 'Demo Admin',
         phone: '0000000003',
-        password: 'admin123',
+        password: process.env.DEMO_ADMIN_PASSWORD || 'admin123',
         role: 'admin' as const,
       },
     ];
+
+    let seeded = 0;
+    let skipped = 0;
 
     for (const acc of accounts) {
       const existing = await User.findOne({ email: acc.email });
       if (!existing) {
         const hashed = await bcrypt.hash(acc.password, 10);
         await User.create({
-          ...acc,
+          id: acc.id,
+          email: acc.email,
+          name: acc.name,
+          phone: acc.phone,
           password: hashed,
-          id: acc.id, // Pre-defined UUIDs for seeds
+          role: acc.role,
         });
-        console.log(`🌱 Seeded ${acc.role} account (${acc.email})`);
+        seeded++;
+        // Safe operational information only - NEVER log passwords, hashes, or secrets
+        console.log(`🌱 [SEED] Provisioned demo account: role=${acc.role}, email=${acc.email}`);
+      } else {
+        skipped++;
       }
     }
-  } catch (e) {
-    console.warn(`⚠️  Could not seed accounts: ${e}`);
+    return { seeded, skipped, status: 'completed' };
+  } catch (e: any) {
+    console.warn(`⚠️ [SEED] Could not complete demo account seeding: ${e.message}`);
+    return { seeded: 0, skipped: 0, status: 'error', error: e.message };
   }
 };
 

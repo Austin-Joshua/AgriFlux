@@ -61,6 +61,7 @@ const IrrigationIntelligence: React.FC = () => {
     lastSync,
     isLiveMode,
     isOnline,
+    isStale,
     isLoading,
     socketConnected,
   } = useIoT();
@@ -86,6 +87,12 @@ const IrrigationIntelligence: React.FC = () => {
 
   // Derived Status Indicators
   const getMoistureStatus = () => {
+    if (isStale)
+      return {
+        label: t('irrigation.staleTelemetry', 'Stale Sensor Reading (>15m) — Verification Required'),
+        color: 'text-amber-600 dark:text-amber-400',
+        badge: 'badge-yellow',
+      };
     if (moisture < 30)
       return { label: 'Dry Soil – Irrigation Active', color: 'text-red-600', badge: 'badge-red' };
     if (moisture < 60)

@@ -72,3 +72,46 @@ const getEnv = (): EnvConfig => {
 };
 
 export const env = getEnv();
+
+/**
+ * Strict production security validator.
+ * Validates that production environments fail safely when required secrets
+ * are absent, weak, or left as obvious development placeholders.
+ * Never prints secret values to logs or console.
+ */
+export const validateProductionSecurity = (
+  targetEnv?: Partial<EnvConfig>
+): { valid: boolean; errors: string[] } => {
+  const current = targetEnv || env;
+  const errors: string[] = [];
+
+  if (current.NODE_ENV === 'production') {
+    const rawJwt =
+      targetEnv?.JWT_SECRET !== undefined
+        ? targetEnv.JWT_SECRET
+        : process.env.JWT_SECRET || current.JWT_SECRET;
+    if (
+      !rawJwt ||
+      rawJwt === 'agriflux_default_secret_change_me' ||
+      rawJwt === 'your_jwt_secret_key' ||
+      rawJwt === 'agriflux_development_secret_2026'
+    ) {
+      errors.push('JWT_SECRET is missing or using an insecure development placeholder.');
+    } else if (rawJwt.length < 32) {
+      errors.push('JWT_SECRET is too short (< 32 characters) for production HMAC-SHA256 signing.');
+    }
+
+    const rawMongo =
+      targetEnv?.MONGODB_URI !== undefined
+        ? targetEnv.MONGODB_URI
+        : process.env.MONGODB_URI || current.MONGODB_URI;
+    if (!rawMongo || rawMongo.includes('localhost') || rawMongo.includes('127.0.0.1')) {
+      errors.push('MONGODB_URI must point to an authorized cluster in production, not localhost.');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+};

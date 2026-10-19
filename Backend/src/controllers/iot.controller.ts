@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { getIO } from '../socket';
 import IoTReading from '../../../Database/Models/IoTReading';
 import { isDBConnected } from '../config/db';
+import { evaluateTelemetryQuality } from '../types/telemetry';
 
 /**
  * AgriFlux IoT Intelligence Controller
@@ -42,6 +43,23 @@ let latestIoTData: IoTReadingData = {
 
 // In-memory historical ring buffer (last 50 readings for fallback)
 const inMemoryHistory: IoTReadingData[] = [latestIoTData];
+
+/**
+ * Field-scoped in-memory reading accessor for memory-mode and unit test environments.
+ * Strictly enforces field scoping: returns null if no reading matches the requested field.
+ */
+export const getInMemoryIoTReading = (
+  fieldId?: string,
+  deviceId?: string
+): IoTReadingData | null => {
+  if (!fieldId && !deviceId) return latestIoTData;
+  const match = inMemoryHistory.find(
+    (r) =>
+      (fieldId && (r.fieldId === fieldId || r.deviceId === fieldId)) ||
+      (deviceId && r.deviceId === deviceId)
+  );
+  return match || null;
+};
 
 // Actuator command state machine
 export interface ActuatorCommand {
@@ -136,9 +154,21 @@ export const postIoTData = async (req: Request, res: Response) => {
         ? 'field-01'
         : undefined;
     const targetFarmId = farmId ? String(farmId) : undefined;
-    const targetUserId = userId ? String(userId) : undefined;
     const targetPumpStatus = Boolean(pumpStatus);
     const targetSimulated = Boolean(isSimulated);
+
+    // Identity binding: if JWT authenticated, bind userId and reject cross-user farm spoofing
+    const authUser = (req as any).user;
+    let targetUserId = userId ? String(userId) : undefined;
+    if (authUser) {
+      if (authUser.role === 'farmer' && targetUserId && targetUserId !== authUser.id) {
+        return res.status(403).json({
+          success: false,
+          message: 'Forbidden: Cannot submit IoT telemetry for an unauthorized user ID.',
+        });
+      }
+      targetUserId = authUser.id || targetUserId;
+    }
 
     let sensorStatus: 'healthy' | 'warning' | 'critical' | 'sensor_fault' = 'healthy';
     if (numMoisture < 25) {
@@ -147,7 +177,23 @@ export const postIoTData = async (req: Request, res: Response) => {
       sensorStatus = 'warning';
     }
 
-    const timestamp = new Date().toISOString();
+    let timestamp = new Date().toISOString();
+    if (req.body.timestamp) {
+      const parsedTime = new Date(req.body.timestamp).getTime();
+      if (isNaN(parsedTime)) {
+        return res.status(400).json({
+          success: false,
+          message: `Malformed sensor timestamp: "${req.body.timestamp}".`,
+        });
+      }
+      if (parsedTime > Date.now() + 60000) {
+        return res.status(400).json({
+          success: false,
+          message: `Future-dated sensor timestamp rejected: "${req.body.timestamp}". Clock skew must not exceed 60 seconds.`,
+        });
+      }
+      timestamp = new Date(parsedTime).toISOString();
+    }
 
     latestIoTData = {
       deviceId: targetDeviceId,
@@ -230,20 +276,20 @@ export const getIoTData = async (req: Request, res: Response) => {
     const fieldId = req.query?.fieldId ? String(req.query.fieldId) : undefined;
     const deviceId = req.query?.deviceId ? String(req.query.deviceId) : undefined;
 
-    if (isDBConnected && (fieldId || deviceId)) {
-      const filter: any = {};
-      if (fieldId) {
-        filter.$or = [{ fieldId }, { deviceId: fieldId }];
-      } else if (deviceId) {
-        filter.deviceId = deviceId;
+    if (fieldId || deviceId) {
+      let dbRec: any = null;
+      if (isDBConnected) {
+        const filter: any = {};
+        if (fieldId) {
+          filter.$or = [{ fieldId }, { deviceId: fieldId }];
+        } else if (deviceId) {
+          filter.deviceId = deviceId;
+        }
+        dbRec = await IoTReading.findOne(filter).sort({ createdAt: -1 });
       }
-      const dbRec = await IoTReading.findOne(filter).sort({ createdAt: -1 });
-      if (dbRec) {
-        const lastUpdate = new Date(dbRec.createdAt || dbRec.rawTimestamp).getTime();
-        const isStale = Date.now() - lastUpdate > 15000;
-        return res.status(200).json({
-          success: true,
-          data: {
+
+      const targetRec = dbRec
+        ? {
             deviceId: dbRec.deviceId,
             fieldId: dbRec.fieldId,
             moisture: dbRec.moisture,
@@ -253,29 +299,50 @@ export const getIoTData = async (req: Request, res: Response) => {
             isSimulated: dbRec.isSimulated,
             status: dbRec.status,
             timestamp: new Date(dbRec.createdAt || dbRec.rawTimestamp).toISOString(),
-            isOnline: !isStale,
-            isStale,
-          },
+          }
+        : inMemoryHistory.find(
+            (r: any) =>
+              (fieldId && (r.fieldId === fieldId || r.deviceId === fieldId)) ||
+              (deviceId && r.deviceId === deviceId)
+          );
+
+      if (!targetRec) {
+        return res.status(404).json({
+          success: false,
+          message: `No telemetry reading found for requested field "${fieldId || deviceId}". Cross-field fallback suppressed.`,
+          data: null,
         });
       }
+
+      const quality = evaluateTelemetryQuality(targetRec);
+      const lastUpdate = new Date(targetRec.timestamp).getTime();
+      const isOnline = Date.now() - lastUpdate < 30000;
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...targetRec,
+          isOnline,
+          isStale: quality.isStale,
+          telemetryQuality: quality.quality,
+          freshnessMinutes: quality.freshnessMinutes,
+        },
+      });
     }
 
-    // Fallback to in-memory history matching fieldId or latestIoTData
-    const matchingMem =
-      inMemoryHistory.find(
-        (r: any) => !fieldId || r.fieldId === fieldId || r.deviceId === fieldId
-      ) || latestIoTData;
-
-    const lastUpdate = new Date(matchingMem.timestamp).getTime();
-    const now = Date.now();
-    const isStale = now - lastUpdate > 15000;
+    // Unscoped request: return latest default node telemetry
+    const quality = evaluateTelemetryQuality(latestIoTData);
+    const lastUpdate = new Date(latestIoTData.timestamp).getTime();
+    const isOnline = Date.now() - lastUpdate < 30000;
 
     return res.status(200).json({
       success: true,
       data: {
-        ...matchingMem,
-        isOnline: matchingMem.isOnline && !isStale,
-        isStale,
+        ...latestIoTData,
+        isOnline,
+        isStale: quality.isStale,
+        telemetryQuality: quality.quality,
+        freshnessMinutes: quality.freshnessMinutes,
       },
     });
   } catch (error: any) {
@@ -314,9 +381,12 @@ export const getIoTHistory = async (req: Request, res: Response) => {
       }
     }
 
-    // Fallback to in-memory history
+    // Fallback to in-memory history matching requested field/device
     const filteredMem = inMemoryHistory.filter(
-      (r: any) => !fieldId || r.fieldId === fieldId || r.deviceId === fieldId
+      (r: any) =>
+        (!fieldId && !deviceId) ||
+        (fieldId && (r.fieldId === fieldId || r.deviceId === fieldId)) ||
+        (deviceId && r.deviceId === deviceId)
     );
     return res.status(200).json({
       success: true,
@@ -348,13 +418,70 @@ export const controlPump = async (req: Request, res: Response) => {
     }
 
     const targetPumpStatus = Boolean(pumpStatus);
+    const targetDeviceId = req.body.deviceId ? String(req.body.deviceId) : 'esp32-node-01';
+    const targetFieldId = req.body.fieldId
+      ? String(req.body.fieldId)
+      : targetDeviceId === 'esp32-node-01'
+        ? 'field-01'
+        : undefined;
+
+    // Actuator Safety Interlock:
+    // If activating pump (targetPumpStatus === true), root-zone telemetry must be fresh (<15m).
+    // Stale or missing telemetry trips the interlock to prevent accidental over-irrigation.
+    // Deactivation (targetPumpStatus === false) is ALWAYS permitted immediately as a fail-safe shutdown.
+    if (targetPumpStatus === true) {
+      let relevantReading: any = null;
+      if (isDBConnected && (targetFieldId || targetDeviceId)) {
+        try {
+          const filter: any = {};
+          if (targetFieldId) filter.$or = [{ fieldId: targetFieldId }, { deviceId: targetFieldId }];
+          else filter.deviceId = targetDeviceId;
+          relevantReading = await IoTReading.findOne(filter).sort({ createdAt: -1 });
+        } catch {
+          relevantReading = null;
+        }
+      }
+      if (!relevantReading) {
+        relevantReading = inMemoryHistory.find(
+          (r: any) =>
+            (targetFieldId && (r.fieldId === targetFieldId || r.deviceId === targetFieldId)) ||
+            (targetDeviceId && r.deviceId === targetDeviceId)
+        );
+        if (!relevantReading && (!targetFieldId || targetFieldId === 'field-01')) {
+          relevantReading = latestIoTData;
+        }
+      }
+
+      const quality = evaluateTelemetryQuality(relevantReading);
+      const allowOverride =
+        req.body.forceOverride === true || req.body.bypassSafetyInterlock === true;
+
+      if (
+        !allowOverride &&
+        (quality.isStale ||
+          quality.quality === 'stale' ||
+          quality.quality === 'missing' ||
+          quality.quality === 'invalid')
+      ) {
+        return res.status(422).json({
+          success: false,
+          safetyInterlock: 'TRIPPED_STALE_TELEMETRY',
+          message: `Actuator Safety Interlock: Pump activation refused. Root-zone telemetry for field "${targetFieldId || targetDeviceId}" is ${quality.quality} (${quality.freshnessMinutes >= 0 ? quality.freshnessMinutes + 'm old' : 'no reading'}). Fresh measurement (<15m) required before initiating irrigation.`,
+          telemetryQuality: quality.quality,
+          freshnessMinutes: quality.freshnessMinutes,
+          requiredAction:
+            'Verify field sensors, allow reading sync, or supply explicit operator emergency override (forceOverride: true).',
+        });
+      }
+    }
+
     const commandId = 'cmd_' + crypto.randomUUID().substring(0, 10);
     const issuedBy = (req as any).user?.email || (req as any).user?.id || 'authenticated_operator';
     const issuedAt = new Date().toISOString();
 
     const command: ActuatorCommand = {
       commandId,
-      deviceId: 'esp32-node-01',
+      deviceId: targetDeviceId,
       action: targetPumpStatus ? 'ACTIVATE_PUMP' : 'DEACTIVATE_PUMP',
       targetPumpStatus,
       issuedAt,

@@ -20,6 +20,8 @@ import { runBlockchainTests } from './blockchain.test';
 import { runDecisionEngineRemediationTests } from './decision-engine-remediation.test';
 import { runQuantexRemediationTests } from './quantex-remediation-audit.test';
 import { runQuantexE2EWorkflowTests } from './quantex-e2e-workflow.test';
+import { runDemoSeedingSecurityTests } from './demo-seeding-security.test';
+import { runStaleTelemetrySafetyTests } from './stale-telemetry-safety.test';
 
 async function main() {
   console.log('================================================================');
@@ -80,6 +82,14 @@ async function main() {
     {
       name: 'Suite 14: Quantex Closed-Loop End-to-End Workflow Verification',
       runner: runQuantexE2EWorkflowTests,
+    },
+    {
+      name: 'Suite 15: Demo Account Seeding Security & Secret Validation',
+      runner: runDemoSeedingSecurityTests,
+    },
+    {
+      name: 'Suite 16: Stale Telemetry Gating, Actuator Safety Interlock & Tenant Isolation',
+      runner: runStaleTelemetrySafetyTests,
     },
   ];
 
