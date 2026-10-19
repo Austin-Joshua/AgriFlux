@@ -54,21 +54,6 @@ const Register: React.FC = () => {
     return () => clearInterval(timer);
   }, [resendTimer]);
 
-  // Handle redirection after auth state updates
-  useEffect(() => {
-    if (!isLoading && requiresOnboarding) {
-      navigate('/onboarding');
-    } else if (!isLoading && isAuthenticated && user) {
-      const target =
-        user.role === 'admin'
-          ? '/admin'
-          : user.role === 'agronomist'
-            ? '/agronomist'
-            : '/dashboard';
-      navigate(target, { replace: true });
-    }
-  }, [isLoading, requiresOnboarding, isAuthenticated, user, navigate]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -177,6 +162,7 @@ const Register: React.FC = () => {
     try {
       await loginWithProvider('google', 'farmer', form.phone || undefined);
       toast.success('Successfully authenticated with Google.');
+      navigate('/dashboard');
     } catch {
       setError('Google sign-up could not be completed. Please try again.');
     } finally {
@@ -217,6 +203,33 @@ const Register: React.FC = () => {
           {t('auth.registerDesktopDesc', 'Join AgriFlux to manage crop health, soil, and farm insights')}
         </p>
       </div>
+
+      {/* Existing Session Notice */}
+      {isAuthenticated && user && (
+        <div className="mb-3.5 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center justify-between text-xs animate-fade-in shadow-xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-emerald-800 dark:text-emerald-200 truncate">
+              {t('auth.signedInAs', 'Active session')}: <strong>{user.name}</strong> ({user.role})
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                user.role === 'admin'
+                  ? '/admin'
+                  : user.role === 'agronomist'
+                    ? '/agronomist'
+                    : '/dashboard'
+              )
+            }
+            className="text-emerald-700 dark:text-emerald-300 font-bold hover:underline shrink-0 ml-2"
+          >
+            {t('auth.continueToWorkspace', 'Go to Workspace →')}
+          </button>
+        </div>
+      )}
 
       {/* Error Alert */}
       {error && (

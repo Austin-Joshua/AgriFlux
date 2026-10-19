@@ -67,19 +67,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ── Token Expiry Verification (Prevents Sudden Logouts) ───────────────────
   const isTokenExpired = (tokenStr: string | null): boolean => {
     if (!tokenStr) return true;
-    // Development, mock, and local demo tokens never expire
+    // Development, mock, and local demo tokens expire after 24 hours to prevent stale persistent sessions
     if (
       tokenStr.startsWith('demo-') ||
       tokenStr.startsWith('mock-') ||
       tokenStr.includes('demo') ||
       tokenStr.includes('offline')
     ) {
+      const loginTime = localStorage.getItem('agriflux-login-time');
+      if (loginTime) {
+        const elapsed = Date.now() - Number(loginTime);
+        if (Number.isFinite(elapsed) && elapsed > 24 * 60 * 60 * 1000) {
+          return true; // Expired after 24 hours
+        }
+      }
       return false;
     }
     try {
       const parts = tokenStr.split('.');
       if (parts.length !== 3) {
-        // Non-JWT token in local testing environment — keep alive
+        // Non-JWT token in local testing environment — keep alive for active test run
         return false;
       }
       const payload = JSON.parse(atob(parts[1]));
@@ -102,6 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (isTokenExpired(savedToken)) {
         localStorage.removeItem('agriflux-token');
         localStorage.removeItem('agriflux-user');
+        localStorage.removeItem('agriflux-login-time');
         setUser(null);
         setToken(null);
       } else {
@@ -113,6 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch {
           localStorage.removeItem('agriflux-token');
           localStorage.removeItem('agriflux-user');
+          localStorage.removeItem('agriflux-login-time');
         }
       }
     }
@@ -124,6 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(data.token);
     localStorage.setItem('agriflux-token', data.token);
     localStorage.setItem('agriflux-user', JSON.stringify(data.user));
+    localStorage.setItem('agriflux-login-time', Date.now().toString());
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
   };
 
@@ -379,8 +389,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setRequiresOnboarding(false);
     localStorage.removeItem('agriflux-token');
     localStorage.removeItem('agriflux-user');
+    localStorage.removeItem('agriflux-login-time');
     sessionStorage.removeItem('agriflux-token');
     sessionStorage.removeItem('agriflux-user');
+    sessionStorage.removeItem('agriflux-login-time');
     delete axios.defaults.headers.common['Authorization'];
 
     // 2. Perform remote session revocation in the background without blocking client transition

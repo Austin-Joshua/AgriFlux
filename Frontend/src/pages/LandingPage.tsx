@@ -224,41 +224,48 @@ const LandingPage: React.FC = () => {
               )}
             </button>
 
-            {/* Desktop Auth CTAs (hidden on small mobile screens, shown on tablet & desktop) */}
-            {isAuthenticated ? (
-              <button
-                onClick={() => navigate(getDashboardRoute())}
-                className="hidden sm:inline-flex btn-primary px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-bold uppercase tracking-wider shadow-sm items-center gap-1.5"
-              >
-                <span>{t('landing.goToWorkspace', 'Go to Workspace')}</span>
-                <ArrowRight size={14} />
-              </button>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="hidden sm:inline-flex px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 bg-slate-100/90 hover:bg-slate-200/90 dark:bg-dark-800 dark:hover:bg-dark-700 border border-slate-200 dark:border-dark-700 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 transition-all active:scale-95 shadow-xs whitespace-nowrap"
-                >
-                  {t('auth.login', 'Sign In')}
-                </Link>
-                <Link
-                  to="/register"
-                  className="hidden md:inline-flex btn-primary px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-md shadow-emerald-500/25 active:scale-95 transition-all whitespace-nowrap"
-                >
-                  {t('auth.getStarted', 'Get Started')}
-                </Link>
-              </>
-            )}
-
-            {/* Mobile "Sign In" Quick Pill (Compact on mobile for direct tap) */}
-            {!isAuthenticated && (
+            {/* Desktop Auth CTAs (shown on tablet & desktop) */}
+            <div className="hidden sm:flex items-center gap-2">
               <Link
                 to="/login"
-                className="sm:hidden px-2.5 py-1.5 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all whitespace-nowrap active:scale-95"
+                className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 bg-slate-100/90 hover:bg-slate-200/90 dark:bg-dark-800 dark:hover:bg-dark-700 border border-slate-200 dark:border-dark-700 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 transition-all active:scale-95 shadow-xs whitespace-nowrap"
               >
                 {t('auth.login', 'Sign In')}
               </Link>
-            )}
+              <Link
+                to="/login"
+                className="btn-primary px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-md shadow-emerald-500/25 active:scale-95 transition-all whitespace-nowrap"
+              >
+                {t('auth.getStarted', 'Get Started')}
+              </Link>
+              {isAuthenticated && (
+                <button
+                  onClick={() => navigate(getDashboardRoute())}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all whitespace-nowrap active:scale-95"
+                  title={t('landing.goToWorkspace', 'Go to Workspace')}
+                >
+                  <LayoutDashboard size={13} />
+                  <span>{t('landing.goToWorkspace', 'Workspace')}</span>
+                  <ArrowRight size={12} />
+                </button>
+              )}
+            </div>
+
+            {/* Mobile "Sign In" & "Get Started" Quick Pills (Compact on mobile for direct tap) */}
+            <div className="flex sm:hidden items-center gap-1.5">
+              <Link
+                to="/login"
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 bg-slate-100 dark:bg-dark-800 border border-slate-200 dark:border-dark-700 transition-all whitespace-nowrap active:scale-95"
+              >
+                {t('auth.login', 'Sign In')}
+              </Link>
+              <Link
+                to="/login"
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all whitespace-nowrap active:scale-95 shadow-xs"
+              >
+                {t('auth.getStarted', 'Get Started')}
+              </Link>
+            </div>
 
             {/* Mobile Hamburger / Close Button */}
             <button
@@ -344,38 +351,45 @@ const LandingPage: React.FC = () => {
 
             {/* Mobile Actions & CTAs */}
             <div className="pt-4 border-t border-slate-200/80 dark:border-dark-800/80 space-y-2.5">
-              {isAuthenticated ? (
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full btn-primary py-3 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-md shadow-emerald-500/25 flex items-center justify-center gap-2 active:scale-98"
+              >
+                <span>{t('auth.getStarted', 'Get Started')}</span>
+                <ArrowRight size={16} />
+              </Link>
+
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-dark-100 bg-slate-100 dark:bg-dark-850 hover:bg-slate-200 dark:hover:bg-dark-800 border border-slate-200 dark:border-dark-700 flex items-center justify-center gap-2 transition-all active:scale-98"
+              >
+                <LogIn size={16} className="text-emerald-600 dark:text-emerald-400" />
+                <span>{t('landing.exploreDemoAccounts', 'Explore Demo Accounts')}</span>
+              </Link>
+
+              <Link
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-dark-300 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <span>{t('auth.createAccount', 'Create New Account')}</span>
+                <ChevronRight size={14} />
+              </Link>
+
+              {isAuthenticated && (
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigate(getDashboardRoute());
                   }}
-                  className="w-full btn-primary py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center gap-2"
                 >
-                  <LayoutDashboard size={16} />
-                  <span>{t('landing.goToWorkspace', 'Go to Workspace')}</span>
-                  <ArrowRight size={14} />
+                  <LayoutDashboard size={14} />
+                  <span>{t('landing.goToWorkspace', 'Resume Active Workspace')}</span>
+                  <ArrowRight size={13} />
                 </button>
-              ) : (
-                <>
-                  <Link
-                    to="/register"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full btn-primary py-3 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-md shadow-emerald-500/25 flex items-center justify-center gap-2 active:scale-98"
-                  >
-                    <span>{t('landing.startFreeNow', 'Start Free Now')}</span>
-                    <ArrowRight size={16} />
-                  </Link>
-
-                  <Link
-                    to="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-800 dark:text-dark-100 bg-slate-100 dark:bg-dark-850 hover:bg-slate-200 dark:hover:bg-dark-800 border border-slate-200 dark:border-dark-700 flex items-center justify-center gap-2 transition-all active:scale-98"
-                  >
-                    <LogIn size={16} className="text-emerald-600 dark:text-emerald-400" />
-                    <span>{t('landing.exploreDemoAccounts', 'Explore Demo Accounts')}</span>
-                  </Link>
-                </>
               )}
             </div>
 
@@ -437,16 +451,17 @@ const LandingPage: React.FC = () => {
           {/* Action CTAs: Full-width stacked on mobile, row on tablet/desktop */}
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-3.5 max-w-md mx-auto w-full px-2 sm:px-0">
             <Link
-              to="/register"
-              className="w-full sm:w-auto btn-primary px-7 py-3.5 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 active:scale-98 transition-all"
+              to="/login"
+              className="w-full sm:w-auto btn-primary px-7 py-3.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 active:scale-98 transition-all"
             >
-              <span>{t('landing.startFreeNow', 'Start Free Now')}</span>
+              <span>{t('auth.getStarted', 'Get Started')}</span>
               <ArrowRight size={16} />
             </Link>
             <Link
               to="/login"
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-slate-300 dark:border-dark-700 bg-white/80 dark:bg-dark-900/80 hover:bg-slate-100 dark:hover:bg-dark-800 text-slate-800 dark:text-dark-100 text-xs sm:text-sm font-bold shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2"
             >
+              <LogIn size={15} className="text-emerald-600 dark:text-emerald-400" />
               <span>{t('landing.exploreDemoAccounts', 'Explore Demo Accounts')}</span>
             </Link>
           </div>

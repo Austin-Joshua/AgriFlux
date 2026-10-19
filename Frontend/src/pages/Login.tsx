@@ -78,17 +78,6 @@ const Login: React.FC = () => {
     [location.state]
   );
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      if (requiresOnboarding) {
-        navigate('/onboarding');
-      } else {
-        navigate(getSafeRedirect(user.role));
-      }
-    }
-  }, [isLoading, isAuthenticated, user, requiresOnboarding, navigate, getSafeRedirect]);
-
   // Safe identifier pre-fill from redirect params (e.g. following registration)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -173,6 +162,25 @@ const Login: React.FC = () => {
           {t('auth.loginSubtitle', 'Sign in to access your farm intelligence and advisory')}
         </p>
       </div>
+
+      {/* Existing Session Notice (if user already has an active session, allow 1-click return while keeping login form accessible) */}
+      {isAuthenticated && user && (
+        <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center justify-between text-xs animate-fade-in shadow-xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-emerald-800 dark:text-emerald-200 truncate">
+              {t('auth.signedInAs', 'Active session')}: <strong>{user.name}</strong> ({user.role})
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate(getSafeRedirect(user.role))}
+            className="text-emerald-700 dark:text-emerald-300 font-bold hover:underline shrink-0 ml-2"
+          >
+            {t('auth.continueToWorkspace', 'Go to Workspace →')}
+          </button>
+        </div>
+      )}
 
       {/* Simple Role Selector Tabs */}
       <div
